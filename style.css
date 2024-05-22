@@ -46,7 +46,6 @@ main {
 .wrapper-game {
 	width: 70%;
 	height: 80%;
-	border: 2px solid black;
 	border-radius: 25px;
 	overflow: hidden;
 }
@@ -55,6 +54,10 @@ canvas {
 	background: black;
 	height: 100%;
 	width: 100%;
+}
+
+canvas:focus {
+	outline: none;
 }
 
 .wrapper-chat {

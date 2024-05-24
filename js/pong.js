@@ -32,7 +32,7 @@ function getPaddles(canvas)
 	let paddles = {
 		height: height,
 		width: width,
-		speed: 8,
+		speed: 7,
 		left: createPaddle(canvas, height, width, "l"),
 		right: createPaddle(canvas, height, width, "r")
 	}
@@ -53,7 +53,7 @@ function enableMove(event, paddles)
 
 function disableMove(event, paddles)
 {
-	if (event.key == "w" || event.key == "W")
+	if (event.key == "w" || event.key == "w")
 		paddles.left.move_top = 0;
 	else if (event.key == "s" || event.key == "S")
 		paddles.left.move_bot = 0;
@@ -70,15 +70,9 @@ function movePaddles(canvas, paddles)
 	if (paddles.left.move_bot == 1 && paddles.left.y < (canvas.height - paddles.height))
 		paddles.left.y += paddles.speed;
 	if (paddles.right.move_top == 1 && paddles.right.y > 0)
-	{
 		paddles.right.y -= paddles.speed;
-		console.log(paddles.right);
-	}
 	if (paddles.right.move_bot == 1 && paddles.right.y < (canvas.height - paddles.height))
-	{
 		paddles.right.y += paddles.speed;
-		console.log(paddles.right);
-	}
 }
 
 function getBall(canvas)
@@ -87,10 +81,8 @@ function getBall(canvas)
 		radius: 16,
 		x: canvas.width / 2,
 		y: canvas.height / 2,
-		dir_y: 1,
-		dir_x: 1,
-		// dir_y: (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1,
-		// dir_x: (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1,
+		dir_x: (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1,
+		dir_y: (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1,
 		speed: 8,
 		out: 0
 	}
@@ -102,10 +94,8 @@ function resetBall(canvas, ball)
 	console.log("Point!");
 	ball.x = canvas.width / 2;
 	ball.y = canvas.height / 2;
-	ball.dir_y = 1,
-	ball.dir_x = 1,
-	// ball.dir_y = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
-	// ball.dir_x = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
+	ball.dir_x = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
+	ball.dir_y = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
 	ball.out = 0;
 }
 
@@ -114,36 +104,64 @@ function collision(paddles, ball)
 	if (ball.x >= (paddles.left.x + paddles.width) && ball.x <= paddles.right.x) // FROM SIDE
 	{
 		if ((ball.x - ball.radius) <= (paddles.left.x + paddles.width)
-			&& ball.y >= paddles.left.y && ball.y <= (paddles.left.y + paddles.height)) // Touche la surface droite du paddle gauche
-		{
+		&& ball.y >= paddles.left.y && ball.y <= (paddles.left.y + paddles.height)) // Touche la surface droite du paddle gauche
 			ball.dir_x *= -1;
-			ball.x += ball.speed * ball.dir_x;
-			ball.y += ball.speed * ball.dir_y;
-		}
 		else if ((ball.x + ball.radius) >= paddles.right.x  && ball.y >= paddles.right.y
-			&& ball.y <= (paddles.right.y + paddles.height)) // Touche la surface gauche du paddle droit
-		{
+		&& ball.y <= (paddles.right.y + paddles.height)) // Touche la surface gauche du paddle droit
 			ball.dir_x *= -1;
-			ball.x += ball.speed * ball.dir_x;
-			ball.y += ball.speed * ball.dir_y;
+		else if (ball.dir_x > 0)
+		{
+			if ((ball.y - ball.radius) <= (paddles.right.y + paddles.height) && ball.y >= (paddles.right.y + paddles.height)
+				&& (ball.x + ball.radius) >= paddles.right.x && ball.x <= paddles.right.x) // Dans le corner bas gauche du paddle droit
+			{
+				console.log("Corner Bot - Droit");
+				ball.dir_x *= -1;
+				ball.dir_y *= -1;
+			}
+			else if ((ball.y + ball.radius) >= paddles.right.y && ball.y <= paddles.right.y
+				&& (ball.x + ball.radius) >= paddles.right.x && ball.x <= paddles.right.x) // Dans le corner haut gauche du paddle droit
+			{
+				console.log("Corner Top - Droit");
+				ball.dir_x *= -1;
+				ball.dir_y *= -1;
+			}
+		}
+		else if (ball.dir_x < 0)
+		{
+			if ((ball.y - ball.radius) <= (paddles.left.y + paddles.height) && ball.y >= (paddles.left.y + paddles.height)
+				&& (ball.x - ball.radius) <= (paddles.left.x + paddles.width) && ball.x >= (paddles.left.x + paddles.width)) // Dans le corner bas droit du paddle gauche
+			{
+				console.log("Corner Bot - Gauche");
+				ball.dir_x *= -1;
+				ball.dir_y *= -1;
+			}
+			else if ((ball.y + ball.radius) >= paddles.left.y && ball.y <= paddles.left.y
+				&& (ball.x - ball.radius) <= (paddles.left.x + paddles.width) && ball.x >= (paddles.left.x + paddles.width)) // Dans le corner haut droit du paddle gauche
+			{
+				console.log("Corner Top - Gauche");
+				ball.dir_x *= -1;
+				ball.dir_y *= -1;
+			}
 		}
 	}
 	else if (ball.dir_y > 0) // FROM TOP
 	{
 		if (ball.y < paddles.left.y && (ball.y + ball.radius) >= paddles.left.y) // Juste au dessus du paddle gauche
 		{
-			if (ball.x >= paddles.left.x && ball.x <= (paddles.left.x + paddles.width)) // Dans la surface
+			if ((ball.x + ball.radius) >= paddles.left.x && (ball.x - ball.radius) <= (paddles.left.x + paddles.width)) // Dans la surface
 			{
-				ball.dir_y *= -1;
+				console.log("Top - Gauche");
 				ball.dir_x *= -1;
+				ball.dir_y *= -1;
 			}
 		}
 		else if (ball.y < paddles.right.y && (ball.y + ball.radius) >= paddles.right.y) // Juste au dessus du paddle droit
 		{
-			if (ball.x <= (paddles.right.x + paddles.width) && ball.x >= paddles.right.x) // Dans la surface
+			if ((ball.x - ball.radius) <= (paddles.right.x + paddles.width) && (ball.x + ball.radius) >= paddles.right.x) // Dans la surface
 			{
-				ball.dir_y *= -1;
+				console.log("Top - Droite");
 				ball.dir_x *= -1;
+				ball.dir_y *= -1;
 			}
 		}
 	}
@@ -151,18 +169,20 @@ function collision(paddles, ball)
 	{
 		if (ball.y > (paddles.left.y + paddles.height) && (ball.y - ball.radius) <= (paddles.left.y + paddles.height)) // Juste en dessous du paddle gauche
 		{
-			if (ball.x >= paddles.left.x && ball.x <= paddles.left.x + paddles.width) // Dans la surface
+			if ((ball.x + ball.radius) >= paddles.left.x && (ball.x - ball.radius) <= paddles.left.x + paddles.width) // Dans la surface
 			{
-				ball.dir_y *= -1;
+				console.log("From Bot - Gauche");
 				ball.dir_x *= -1;
+				ball.dir_y *= -1;
 			}
 		}
 		else if (ball.y > (paddles.right.y + paddles.height) && (ball.y - ball.radius) <= (paddles.right.y + paddles.height)) // Juste en dessous du paddle droit
 		{
-			if (ball.x >= paddles.right.x && ball.x <= paddles.right.x + paddles.width) // Dans la surface
+			if ((ball.x + ball.radius) >= paddles.right.x && (ball.x - ball.radius) <= paddles.right.x + paddles.width) // Dans la surface
 			{
-				ball.dir_y *= -1;
+				console.log("From Bot - Droit");
 				ball.dir_x *= -1;
+				ball.dir_y *= -1;
 			}
 		}
 	}
@@ -206,6 +226,11 @@ function startPong()
 	canvas.addEventListener("keyup", function(event) {
 		disableMove(event, paddles);
 	});
+	// canvas.addEventListener("click", function() {
+	// 	loop(canvas, ctx, paddles, ball);
+	// 	console.log(ball);
+	// 	console.log(paddles);
+	// });
 	loop(canvas, ctx, paddles, ball);
 }
 

@@ -94,11 +94,17 @@ function	getBall(canvas)
 		x: canvas.width / 2,
 		y: canvas.height / 2,
 		dir_x: (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1,
-		dir_y: (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1,
-		speed: 8,
+		dir_y: generateDirY(),
+		speed: 10,
 		out: 0
 	}
 	return (ball);
+}
+
+function	generateDirY()
+{
+	let tmp = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
+	return (Math.random() * tmp);
 }
 
 function	resetBall(canvas, ball)
@@ -107,7 +113,7 @@ function	resetBall(canvas, ball)
 	ball.x = canvas.width / 2;
 	ball.y = canvas.height / 2;
 	ball.dir_x = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
-	ball.dir_y = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
+	ball.dir_y = generateDirY();
 	ball.out = 0;
 }
 
@@ -123,16 +129,6 @@ function	moveBall(canvas, paddles, ball)
 /////////////////////////
 // Collisions
 /////////////////////////
-function	collision_side(paddles, ball)
-{
-	if ((ball.x - ball.radius) <= (paddles.left.x + paddles.width) && ball.y >= paddles.left.y && ball.y <= (paddles.left.y + paddles.height)) // Touche la surface droite du paddle gauche
-		ball.dir_x *= -1;
-	else if ((ball.x + ball.radius) >= paddles.right.x  && ball.y >= paddles.right.y && ball.y <= (paddles.right.y + paddles.height)) // Touche la surface gauche du paddle droit
-		ball.dir_x *= -1;
-	else if (ball.dir_x > 0 || ball.dir_x < 0)
-		collision_corner(paddles, ball);
-}
-
 function	collision_corner(paddles, ball)
 {
 	if (ball.dir_x > 0)
@@ -169,6 +165,16 @@ function	collision_corner(paddles, ball)
 			ball.dir_y *= -1;
 		}
 	}
+}
+
+function	collision_side(paddles, ball)
+{
+	if ((ball.x - ball.radius) <= (paddles.left.x + paddles.width) && ball.y >= paddles.left.y && ball.y <= (paddles.left.y + paddles.height)) // Touche la surface droite du paddle gauche
+		ball.dir_x *= -1;
+	else if ((ball.x + ball.radius) >= paddles.right.x  && ball.y >= paddles.right.y && ball.y <= (paddles.right.y + paddles.height)) // Touche la surface gauche du paddle droit
+		ball.dir_x *= -1;
+	else if (ball.dir_x > 0 || ball.dir_x < 0)
+		collision_corner(paddles, ball);
 }
 
 function	collision_top(paddles, ball)

@@ -15,7 +15,7 @@ body {
 }
 
 header {
-	height: 7%;
+	height: 5%;
 	width: 100%;
 	background-color: blue;
 }
@@ -23,7 +23,7 @@ header {
 main {
 	display: flex;
 	flex-direction: column;
-	height: 90%;
+	height: 92%;
 }
 
 .wrapper-playzone {
@@ -75,7 +75,7 @@ canvas:focus {
 }
 
 footer {
-	height: 4%;
+	height: 3%;
 	width: 100%;
 	background-color: blue;
 }

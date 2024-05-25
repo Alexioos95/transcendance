@@ -1,10 +1,16 @@
-function getCanevas()
+/////////////////////////
+// Getters
+/////////////////////////
+function	getCanevas()
 {
 	const canvas = document.getElementById("canvas");
 	return (canvas);
 }
 
-function createPaddle(canvas, height, width, position)
+/////////////////////////
+// Paddles
+/////////////////////////
+function	createPaddle(canvas, height, width, position)
 {
 	let paddle = {
 		x: 0,
@@ -25,7 +31,7 @@ function createPaddle(canvas, height, width, position)
 	return (paddle);
 }
 
-function getPaddles(canvas)
+function	getPaddles(canvas)
 {
 	let height = canvas.height / 5;
 	let width = canvas.width / 50;
@@ -39,7 +45,10 @@ function getPaddles(canvas)
 	return (paddles);
 }
 
-function enableMove(event, paddles)
+/////////////////////////
+// Paddles - Movements
+/////////////////////////
+function	enableMove(event, paddles)
 {
 	if (event.key == "w" || event.key == "W")
 		paddles.left.move_top = 1;
@@ -51,7 +60,7 @@ function enableMove(event, paddles)
 		paddles.right.move_bot = 1;
 }
 
-function disableMove(event, paddles)
+function	disableMove(event, paddles)
 {
 	if (event.key == "w" || event.key == "w")
 		paddles.left.move_top = 0;
@@ -63,7 +72,7 @@ function disableMove(event, paddles)
 		paddles.right.move_bot = 0;
 }
 
-function movePaddles(canvas, paddles)
+function	movePaddles(canvas, paddles)
 {
 	if (paddles.left.move_top == 1 && paddles.left.y > 0)
 		paddles.left.y -= paddles.speed;
@@ -75,9 +84,12 @@ function movePaddles(canvas, paddles)
 		paddles.right.y += paddles.speed;
 }
 
-function getBall(canvas)
+/////////////////////////
+// Ball
+/////////////////////////
+function	getBall(canvas)
 {
-	const ball = {
+	let ball = {
 		radius: 16,
 		x: canvas.width / 2,
 		y: canvas.height / 2,
@@ -89,7 +101,7 @@ function getBall(canvas)
 	return (ball);
 }
 
-function resetBall(canvas, ball)
+function	resetBall(canvas, ball)
 {
 	console.log("Point!");
 	ball.x = canvas.width / 2;
@@ -99,110 +111,126 @@ function resetBall(canvas, ball)
 	ball.out = 0;
 }
 
-function collision(paddles, ball)
-{
-	if (ball.x >= (paddles.left.x + paddles.width) && ball.x <= paddles.right.x) // FROM SIDE
-	{
-		if ((ball.x - ball.radius) <= (paddles.left.x + paddles.width)
-		&& ball.y >= paddles.left.y && ball.y <= (paddles.left.y + paddles.height)) // Touche la surface droite du paddle gauche
-			ball.dir_x *= -1;
-		else if ((ball.x + ball.radius) >= paddles.right.x  && ball.y >= paddles.right.y
-		&& ball.y <= (paddles.right.y + paddles.height)) // Touche la surface gauche du paddle droit
-			ball.dir_x *= -1;
-		else if (ball.dir_x > 0)
-		{
-			if ((ball.y - ball.radius) <= (paddles.right.y + paddles.height) && ball.y >= (paddles.right.y + paddles.height)
-				&& (ball.x + ball.radius) >= paddles.right.x && ball.x <= paddles.right.x) // Dans le corner bas gauche du paddle droit
-			{
-				console.log("Corner Bot - Droit");
-				ball.dir_x *= -1;
-				ball.dir_y *= -1;
-			}
-			else if ((ball.y + ball.radius) >= paddles.right.y && ball.y <= paddles.right.y
-				&& (ball.x + ball.radius) >= paddles.right.x && ball.x <= paddles.right.x) // Dans le corner haut gauche du paddle droit
-			{
-				console.log("Corner Top - Droit");
-				ball.dir_x *= -1;
-				ball.dir_y *= -1;
-			}
-		}
-		else if (ball.dir_x < 0)
-		{
-			if ((ball.y - ball.radius) <= (paddles.left.y + paddles.height) && ball.y >= (paddles.left.y + paddles.height)
-				&& (ball.x - ball.radius) <= (paddles.left.x + paddles.width) && ball.x >= (paddles.left.x + paddles.width)) // Dans le corner bas droit du paddle gauche
-			{
-				console.log("Corner Bot - Gauche");
-				ball.dir_x *= -1;
-				ball.dir_y *= -1;
-			}
-			else if ((ball.y + ball.radius) >= paddles.left.y && ball.y <= paddles.left.y
-				&& (ball.x - ball.radius) <= (paddles.left.x + paddles.width) && ball.x >= (paddles.left.x + paddles.width)) // Dans le corner haut droit du paddle gauche
-			{
-				console.log("Corner Top - Gauche");
-				ball.dir_x *= -1;
-				ball.dir_y *= -1;
-			}
-		}
-	}
-	else if (ball.dir_y > 0) // FROM TOP
-	{
-		if (ball.y < paddles.left.y && (ball.y + ball.radius) >= paddles.left.y) // Juste au dessus du paddle gauche
-		{
-			if ((ball.x + ball.radius) >= paddles.left.x && (ball.x - ball.radius) <= (paddles.left.x + paddles.width)) // Dans la surface
-			{
-				console.log("Top - Gauche");
-				ball.dir_x *= -1;
-				ball.dir_y *= -1;
-			}
-		}
-		else if (ball.y < paddles.right.y && (ball.y + ball.radius) >= paddles.right.y) // Juste au dessus du paddle droit
-		{
-			if ((ball.x - ball.radius) <= (paddles.right.x + paddles.width) && (ball.x + ball.radius) >= paddles.right.x) // Dans la surface
-			{
-				console.log("Top - Droite");
-				ball.dir_x *= -1;
-				ball.dir_y *= -1;
-			}
-		}
-	}
-	else if (ball.dir_y < 0) // FROM BOTTOM
-	{
-		if (ball.y > (paddles.left.y + paddles.height) && (ball.y - ball.radius) <= (paddles.left.y + paddles.height)) // Juste en dessous du paddle gauche
-		{
-			if ((ball.x + ball.radius) >= paddles.left.x && (ball.x - ball.radius) <= paddles.left.x + paddles.width) // Dans la surface
-			{
-				console.log("From Bot - Gauche");
-				ball.dir_x *= -1;
-				ball.dir_y *= -1;
-			}
-		}
-		else if (ball.y > (paddles.right.y + paddles.height) && (ball.y - ball.radius) <= (paddles.right.y + paddles.height)) // Juste en dessous du paddle droit
-		{
-			if ((ball.x + ball.radius) >= paddles.right.x && (ball.x - ball.radius) <= paddles.right.x + paddles.width) // Dans la surface
-			{
-				console.log("From Bot - Droit");
-				ball.dir_x *= -1;
-				ball.dir_y *= -1;
-			}
-		}
-	}
-}
-
-function moveBall(canvas, paddles, ball)
+function	moveBall(canvas, paddles, ball)
 {
 	if (ball.x <= -100 || ball.x >= (canvas.width + 100)) // Out
 		resetBall(canvas, ball);
-	else if (ball.y <= ball.radius || ball.y >= (canvas.height - ball.radius)) // Walls
-		ball.dir_y *= -1;
 	collision(paddles, ball);
 	ball.x += ball.speed * ball.dir_x;
 	ball.y += ball.speed * ball.dir_y;
 }
 
-function loop(canvas, ctx, paddles, ball)
+/////////////////////////
+// Collisions
+/////////////////////////
+function	collision_side(paddles, ball)
 {
-	movePaddles(canvas, paddles);
-	moveBall(canvas, paddles, ball);
+	if ((ball.x - ball.radius) <= (paddles.left.x + paddles.width) && ball.y >= paddles.left.y && ball.y <= (paddles.left.y + paddles.height)) // Touche la surface droite du paddle gauche
+		ball.dir_x *= -1;
+	else if ((ball.x + ball.radius) >= paddles.right.x  && ball.y >= paddles.right.y && ball.y <= (paddles.right.y + paddles.height)) // Touche la surface gauche du paddle droit
+		ball.dir_x *= -1;
+	else if (ball.dir_x > 0 || ball.dir_x < 0)
+		collision_corner(paddles, ball);
+}
+
+function	collision_corner(paddles, ball)
+{
+	if (ball.dir_x > 0)
+	{
+		if ((ball.y - ball.radius) <= (paddles.right.y + paddles.height) && ball.y >= (paddles.right.y + paddles.height) 
+			&& (ball.x + ball.radius) >= paddles.right.x && ball.x <= paddles.right.x) // Dans le corner bas gauche du paddle droit
+		{
+			console.log("Corner Bot - Droit");
+			ball.dir_x *= -1;
+			ball.dir_y *= -1;
+		}
+		else if ((ball.y + ball.radius) >= paddles.right.y && ball.y <= paddles.right.y
+			&& (ball.x + ball.radius) >= paddles.right.x && ball.x <= paddles.right.x) // Dans le corner haut gauche du paddle droit
+		{
+			console.log("Corner Top - Droit");
+			ball.dir_x *= -1;
+			ball.dir_y *= -1;
+		}
+	}
+	else if (ball.dir_x < 0)
+	{
+		if ((ball.y - ball.radius) <= (paddles.left.y + paddles.height) && ball.y >= (paddles.left.y + paddles.height)
+			&& (ball.x - ball.radius) <= (paddles.left.x + paddles.width) && ball.x >= (paddles.left.x + paddles.width)) // Dans le corner bas droit du paddle gauche
+		{
+			console.log("Corner Bot - Gauche");
+			ball.dir_x *= -1;
+			ball.dir_y *= -1;
+		}
+		else if ((ball.y + ball.radius) >= paddles.left.y && ball.y <= paddles.left.y
+			&& (ball.x - ball.radius) <= (paddles.left.x + paddles.width) && ball.x >= (paddles.left.x + paddles.width)) // Dans le corner haut droit du paddle gauche
+		{
+			console.log("Corner Top - Gauche");
+			ball.dir_x *= -1;
+			ball.dir_y *= -1;
+		}
+	}
+}
+
+function	collision_top(paddles, ball)
+{
+	if (ball.y < paddles.left.y && (ball.y + ball.radius) >= paddles.left.y) // Juste au dessus du paddle gauche
+	{
+		if ((ball.x + ball.radius) >= paddles.left.x && (ball.x - ball.radius) <= (paddles.left.x + paddles.width)) // Dans la surface
+		{
+			console.log("Top - Gauche");
+			ball.dir_x *= -1;
+			ball.dir_y *= -1;
+		}
+	}
+	else if (ball.y < paddles.right.y && (ball.y + ball.radius) >= paddles.right.y) // Juste au dessus du paddle droit
+	{
+		if ((ball.x - ball.radius) <= (paddles.right.x + paddles.width) && (ball.x + ball.radius) >= paddles.right.x) // Dans la surface
+		{
+			console.log("Top - Droite");
+			ball.dir_x *= -1;
+			ball.dir_y *= -1;
+		}
+	}
+}
+
+function	collision_bot(paddles, ball)
+{
+	if (ball.y > (paddles.left.y + paddles.height) && (ball.y - ball.radius) <= (paddles.left.y + paddles.height)) // Juste en dessous du paddle gauche
+	{
+		if ((ball.x + ball.radius) >= paddles.left.x && (ball.x - ball.radius) <= paddles.left.x + paddles.width) // Dans la surface
+		{
+			console.log("From Bot - Gauche");
+			ball.dir_x *= -1;
+			ball.dir_y *= -1;
+		}
+	}
+	else if (ball.y > (paddles.right.y + paddles.height) && (ball.y - ball.radius) <= (paddles.right.y + paddles.height)) // Juste en dessous du paddle droit
+	{
+		if ((ball.x + ball.radius) >= paddles.right.x && (ball.x - ball.radius) <= paddles.right.x + paddles.width) // Dans la surface
+		{
+			console.log("From Bot - Droit");
+			ball.dir_x *= -1;
+			ball.dir_y *= -1;
+		}
+	}
+}
+
+function	collision(paddles, ball)
+{
+	if (ball.y <= ball.radius || ball.y >= (canvas.height - ball.radius)) // WALL
+		ball.dir_y *= -1;
+	if (ball.x >= (paddles.left.x + paddles.width) && ball.x <= paddles.right.x) // FROM SIDE
+		collision_side(paddles, ball);
+	else if (ball.dir_y > 0) // FROM TOP
+		collision_top(paddles, ball);
+	else if (ball.dir_y < 0) // FROM BOTTOM
+		collision_bot(paddles, ball);
+}
+
+/////////////////////////
+// Script
+function	render(canvas, ctx, paddles, ball)
+{
 	ctx.fillStyle = "black";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	ctx.fillStyle = "white";
@@ -211,15 +239,22 @@ function loop(canvas, ctx, paddles, ball)
 	ctx.beginPath();
 	ctx.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
 	ctx.fill();
+}
+
+function	loop(canvas, ctx, paddles, ball)
+{
+	movePaddles(canvas, paddles);
+	moveBall(canvas, paddles, ball);
+	render(canvas, ctx, paddles, ball);
 	requestAnimationFrame(() => loop(canvas, ctx, paddles, ball));
 }
 
-function startPong()
+function	startPong()
 {
 	const canvas = getCanevas();
 	const ctx = canvas.getContext("2d");
-	const paddles = getPaddles(canvas);
-	const ball = getBall(canvas);
+	let paddles = getPaddles(canvas);
+	let ball = getBall(canvas);
 	canvas.addEventListener("keydown", function(event) {
 		enableMove(event, paddles);
 	});

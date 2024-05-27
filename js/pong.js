@@ -90,21 +90,20 @@ function	movePaddles(canvas, paddles)
 function	getBall(canvas)
 {
 	let ball = {
-		radius: 16,
+		radius: 15,
 		x: canvas.width / 2,
 		y: canvas.height / 2,
 		dir_x: (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1,
 		dir_y: generateDirY(),
 		speed: 10,
-		out: 0
 	}
 	return (ball);
 }
 
 function	generateDirY()
 {
-	let tmp = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
-	return (Math.random() * tmp);
+	let sign = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
+	return (Math.random() * sign);
 }
 
 function	resetBall(canvas, ball)
@@ -114,16 +113,29 @@ function	resetBall(canvas, ball)
 	ball.y = canvas.height / 2;
 	ball.dir_x = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
 	ball.dir_y = generateDirY();
-	ball.out = 0;
 }
 
-function	moveBall(canvas, paddles, ball)
+function	moveBall(canvas, ctx, paddles, ball)
 {
 	if (ball.x <= -100 || ball.x >= (canvas.width + 100)) // Out
 		resetBall(canvas, ball);
 	collision(paddles, ball);
-	ball.x += ball.speed * ball.dir_x;
-	ball.y += ball.speed * ball.dir_y;
+	let i = 0;
+	while (i < ball.speed)
+	{
+		ctx.fillStyle = "#2E2E2E";
+		ctx.beginPath();
+		ctx.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
+		ctx.fill();
+		ctx.stroke();
+		ball.x += 1 * ball.dir_x;
+		ball.y += 1 * ball.dir_y;
+		ctx.fillStyle = "#FDFDFD";
+		ctx.beginPath();
+		ctx.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
+		ctx.fill();
+		i += 1;
+	}
 }
 
 /////////////////////////
@@ -133,7 +145,7 @@ function	collision_corner(paddles, ball)
 {
 	if (ball.dir_x > 0)
 	{
-		if ((ball.y - ball.radius) <= (paddles.right.y + paddles.height) && ball.y >= (paddles.right.y + paddles.height) 
+		if ((ball.y - ball.radius) <= (paddles.right.y + paddles.height) && ball.y >= (paddles.right.y + paddles.height)
 			&& (ball.x + ball.radius) >= paddles.right.x && ball.x <= paddles.right.x) // Dans le corner bas gauche du paddle droit
 		{
 			console.log("Corner Bot - Droit");
@@ -169,11 +181,13 @@ function	collision_corner(paddles, ball)
 
 function	collision_side(paddles, ball)
 {
-	if ((ball.x - ball.radius) <= (paddles.left.x + paddles.width) && ball.y >= paddles.left.y && ball.y <= (paddles.left.y + paddles.height)) // Touche la surface droite du paddle gauche
+	if (ball.dir_x < 0 && (ball.x - ball.radius) <= (paddles.left.x + paddles.width)
+	&& ball.y >= paddles.left.y && ball.y <= (paddles.left.y + paddles.height)) // Touche la surface droite du paddle gauche
 		ball.dir_x *= -1;
-	else if ((ball.x + ball.radius) >= paddles.right.x  && ball.y >= paddles.right.y && ball.y <= (paddles.right.y + paddles.height)) // Touche la surface gauche du paddle droit
+	else if (ball.dir_x > 0 && (ball.x + ball.radius) >= paddles.right.x
+	&& ball.y >= paddles.right.y && ball.y <= (paddles.right.y + paddles.height)) // Touche la surface gauche du paddle droit
 		ball.dir_x *= -1;
-	else if (ball.dir_x > 0 || ball.dir_x < 0)
+	else
 		collision_corner(paddles, ball);
 }
 
@@ -225,7 +239,7 @@ function	collision(paddles, ball)
 {
 	if (ball.y <= ball.radius || ball.y >= (canvas.height - ball.radius)) // WALL
 		ball.dir_y *= -1;
-	if (ball.x >= (paddles.left.x + paddles.width) && ball.x <= paddles.right.x) // FROM SIDE
+	else if (ball.x >= (paddles.left.x + paddles.width) && ball.x <= paddles.right.x) // FROM SIDE
 		collision_side(paddles, ball);
 	else if (ball.dir_y > 0) // FROM TOP
 		collision_top(paddles, ball);
@@ -235,22 +249,24 @@ function	collision(paddles, ball)
 
 /////////////////////////
 // Script
+/////////////////////////
 function	render(canvas, ctx, paddles, ball)
 {
-	ctx.fillStyle = "black";
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	ctx.fillStyle = "white";
+	ctx.fillStyle = "#FDFDFD";
 	ctx.fillRect(paddles.left.x, paddles.left.y, paddles.width, paddles.height);
 	ctx.fillRect(paddles.right.x, paddles.right.y, paddles.width, paddles.height);
 	ctx.beginPath();
 	ctx.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
 	ctx.fill();
+	ctx.stroke();
 }
 
 function	loop(canvas, ctx, paddles, ball)
 {
+	ctx.fillStyle = "#2F2F2F";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	movePaddles(canvas, paddles);
-	moveBall(canvas, paddles, ball);
+	moveBall(canvas, ctx, paddles, ball);
 	render(canvas, ctx, paddles, ball);
 	requestAnimationFrame(() => loop(canvas, ctx, paddles, ball));
 }

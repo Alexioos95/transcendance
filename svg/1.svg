@@ -1,0 +1,23 @@
+<svg width="40" height="50" xmlns="http://www.w3.org/2000/svg">
+	<!-- Line 1 -->
+	<rect x="10" y="90" width="20" height="10" fill="black"/>
+	<!-- Line 2 -->
+	<!-- Line 3 -->
+	<!-- Line 4 -->
+	<!-- Line 5 -->
+	<rect x="40" y="90" width="20" height="10" fill="black"/>
+</svg>
+
+<!-- 0001
+0011
+0101
+0001
+0001
+
+
+
+0110
+1011
+1111
+1101
+0110 -->

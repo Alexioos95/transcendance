@@ -17,6 +17,7 @@ function	createPaddle(canvas, height, width, position)
 		y: 0,
 		move_top: 0,
 		move_bot: 0,
+		score: 0
 	}
 	if (position == "l")
 	{
@@ -38,7 +39,7 @@ function	getPaddles(canvas)
 	let paddles = {
 		height: height,
 		width: width,
-		speed: 7,
+		speed: 10,
 		left: createPaddle(canvas, height, width, "l"),
 		right: createPaddle(canvas, height, width, "r")
 	}
@@ -87,6 +88,12 @@ function	movePaddles(canvas, paddles)
 /////////////////////////
 // Ball
 /////////////////////////
+function	generateDirY()
+{
+	const sign = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
+	return (Math.random() * sign);
+}
+
 function	getBall(canvas)
 {
 	let ball = {
@@ -98,21 +105,6 @@ function	getBall(canvas)
 		speed: 10,
 	}
 	return (ball);
-}
-
-function	generateDirY()
-{
-	const sign = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
-	return (Math.random() * sign);
-}
-
-function	resetBall(canvas, ball)
-{
-	console.log("Point!");
-	ball.x = canvas.width / 2;
-	ball.y = canvas.height / 2;
-	ball.dir_x = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
-	ball.dir_y = generateDirY();
 }
 
 function	movePXbyPX(ctx, ball)
@@ -131,14 +123,14 @@ function	movePXbyPX(ctx, ball)
 		ctx.beginPath();
 		ctx.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
 		ctx.fill();
-		i += 1;
+		i++;
 	}
 }
 
 function	moveBall(canvas, ctx, paddles, ball)
 {
 	if (ball.x <= -100 || ball.x >= (canvas.width + 100)) // OUT
-		resetBall(canvas, ball);
+		point(canvas, paddles, ball);
 	collision(paddles, ball);
 	movePXbyPX(ctx, ball);
 }
@@ -239,12 +231,50 @@ function	collision(paddles, ball)
 function angle(paddleStartY, height, ball)
 {
 	const len  = height / 3;
-	const ballY = ball.y - paddleStartY;
-	if (ballY >= 0 && ballY <= len)
-		ball.dir_y -= (ball.y + (height - paddleStartY)) / 100;
-	else if (ballY >= (len * 2) + 1 && ballY <= height)
-		ball.dir_y += ballY / 100;
+	const extreme = len / 3;
+	const fromTop = ball.y - paddleStartY;
+	const fromBot = ball.y - (paddleStartY + height);
+	if (fromTop >= 0 && fromTop <= len) // UPPER PART
+	{
+		if (fromTop >= 0 && fromTop <= extreme) // TOP
+			ball.dir_y += fromBot / 100;
+		else
+			ball.dir_y -= fromTop / 100;
+	}
+	else if (fromTop >= (len * 2) + 1 && fromTop <= height) // LOWER PART
+	{
+		if (fromTop > ((len * 2) + extreme)) // BOTTOM
+			ball.dir_y += fromTop / 100;
+		else
+			ball.dir_y -= fromBot / 100;
+	}
 	ball.dir_x *= -1;
+}
+
+/////////////////////////
+// Point
+/////////////////////////
+function	resetBall(canvas, ball)
+{
+	ball.x = canvas.width / 2;
+	ball.y = canvas.height / 2;
+	ball.dir_x = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
+	ball.dir_y = generateDirY();
+}
+
+function	updateScore(canvas, paddles, ball)
+{
+	if (ball.x <= -100)
+		paddles.right.score++;
+	else if (ball.x >= (canvas.width + 100))
+		paddles.left.score++;
+}
+
+function	point(canvas, paddles, ball)
+{
+	console.log("Point!");
+	updateScore(canvas, paddles, ball);
+	resetBall(canvas, ball);
 }
 
 /////////////////////////
@@ -259,6 +289,7 @@ function	render(ctx, paddles, ball)
 	ctx.stroke();
 	ctx.fillRect(paddles.left.x, paddles.left.y, paddles.width, paddles.height);
 	ctx.fillRect(paddles.right.x, paddles.right.y, paddles.width, paddles.height);
+	// Score
 }
 
 function	loop(canvas, ctx, paddles, ball)
@@ -283,10 +314,18 @@ function	startPong()
 	canvas.addEventListener("keyup", function(event) {
 		disableMove(event, paddles);
 	});
+	// let freeze = 0;
 	// canvas.addEventListener("click", function() {
-	// 	loop(canvas, ctx, paddles, ball);
-	// 	console.log(ball);
-	// 	console.log(paddles);
+	// 	if (freeze == 0)
+	// 	{
+	// 		ball.speed = 0;
+	// 		freeze = 1;
+	// 	}
+	// 	else
+	// 	{
+	// 		ball.speed = 10;
+	// 		freeze = 0;
+	// 	}
 	// });
 	loop(canvas, ctx, paddles, ball);
 }

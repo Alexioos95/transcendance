@@ -1,7 +1,7 @@
 /////////////////////////
-// Getters
+// Canvas
 /////////////////////////
-function	getCanevas()
+function	getCanvas()
 {
 	const canvas = document.getElementById("canvas");
 	return (canvas);
@@ -17,7 +17,7 @@ function	createPaddle(canvas, height, width, position)
 		y: 0,
 		move_top: 0,
 		move_bot: 0,
-		score: 0
+		score: 19
 	}
 	if (position == "l")
 	{
@@ -252,6 +252,49 @@ function angle(paddleStartY, height, ball)
 }
 
 /////////////////////////
+// Scores
+/////////////////////////
+function	getNumbers(paddles)
+{
+	if (paddles.left.score > 99)
+		paddles.left.score = 99;
+	if (paddles.right.score > 99)
+		paddles.right.score = 99;
+	let numbers = {
+		nb1Left: Math.floor(paddles.left.score / 10),
+		nb2Left: Math.floor(paddles.left.score % 10),
+		nb1Right: Math.floor(paddles.right.score / 10),
+		nb2Right: Math.floor(paddles.right.score % 10)
+	}
+	return (numbers);
+}
+
+function	getPictures(numbers)
+{
+	const pictures = {
+		nb1Left: 0,
+		nb2Left: 0,
+		nb1Right: 0,
+		nb2Right: 0,
+	}
+	if (numbers.nb1Left != 0)
+	{
+		pictures.nb1Left = new Image();
+		pictures.nb1Left.src = "../svg/" + numbers.nb1Left + ".svg";
+	}
+	pictures.nb2Left = new Image();
+	pictures.nb2Left.src = "../svg/" + numbers.nb2Left + ".svg";
+	if (numbers.nb1Right != 0)
+	{
+		pictures.nb1Right = new Image();
+		pictures.nb1Right.src = "../svg/" + numbers.nb1Right + ".svg";
+	}
+	pictures.nb2Right = new Image();
+	pictures.nb2Right.src = "../svg/" + numbers.nb2Right + ".svg";
+	return (pictures);
+}
+
+/////////////////////////
 // Point
 /////////////////////////
 function	resetBall(canvas, ball)
@@ -280,7 +323,19 @@ function	point(canvas, paddles, ball)
 /////////////////////////
 // Script
 /////////////////////////
-function	render(ctx, paddles, ball)
+function	renderScore(canvas, ctx, paddles)
+{
+	const numbers = getNumbers(paddles);
+	const pictures = getPictures(numbers);
+	if (numbers.nb1Left != 0)
+		ctx.drawImage(pictures.nb1Left, ((canvas.width / 2) / 2) - 50, 20);
+	ctx.drawImage(pictures.nb2Left, ((canvas.width / 2) / 2) + 3, 20);
+	if (numbers.nb1Right != 0)
+		ctx.drawImage(pictures.nb1Right, (canvas.width / 2) + ((canvas.width / 2) / 2) - 50, 20);
+	ctx.drawImage(pictures.nb2Right, (canvas.width / 2) + ((canvas.width / 2) / 2) - 3, 20);
+}
+
+function	render(canvas, ctx, paddles, ball)
 {
 	ctx.fillStyle = "#FDFDFD";
 	ctx.beginPath();
@@ -289,7 +344,7 @@ function	render(ctx, paddles, ball)
 	ctx.stroke();
 	ctx.fillRect(paddles.left.x, paddles.left.y, paddles.width, paddles.height);
 	ctx.fillRect(paddles.right.x, paddles.right.y, paddles.width, paddles.height);
-	// Score
+	renderScore(canvas, ctx, paddles);
 }
 
 function	loop(canvas, ctx, paddles, ball)
@@ -298,13 +353,13 @@ function	loop(canvas, ctx, paddles, ball)
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	movePaddles(canvas, paddles);
 	moveBall(canvas, ctx, paddles, ball);
-	render(ctx, paddles, ball);
+	render(canvas, ctx, paddles, ball);
 	requestAnimationFrame(() => loop(canvas, ctx, paddles, ball));
 }
 
 function	startPong()
 {
-	const canvas = getCanevas();
+	const canvas = getCanvas();
 	const ctx = canvas.getContext("2d");
 	const paddles = getPaddles(canvas);
 	const ball = getBall(canvas);

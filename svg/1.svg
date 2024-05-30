@@ -1,23 +1,12 @@
 <svg width="40" height="50" xmlns="http://www.w3.org/2000/svg">
 	<!-- Line 1 -->
-	<rect x="10" y="90" width="20" height="10" fill="black"/>
+	<rect x="20" y="0" width="10" height="10" fill="white"/>
 	<!-- Line 2 -->
+	<rect x="20" y="10" width="10" height="10" fill="white"/>
 	<!-- Line 3 -->
+	<rect x="20" y="20" width="10" height="10" fill="white"/>
 	<!-- Line 4 -->
+	<rect x="20" y="30" width="10" height="10" fill="white"/>
 	<!-- Line 5 -->
-	<rect x="40" y="90" width="20" height="10" fill="black"/>
+	<rect x="20" y="40" width="10" height="10" fill="white"/>
 </svg>
-
-<!-- 0001
-0011
-0101
-0001
-0001
-
-
-
-0110
-1011
-1111
-1101
-0110 -->

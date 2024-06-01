@@ -5,7 +5,6 @@ startPong();
 
 function	startPong()
 {
-	let end = 0;
 	const canvas = getCanvas();
 	const ctx = canvas.getContext("2d");
 	const paddles = getPaddles(canvas);
@@ -16,35 +15,59 @@ function	startPong()
 	canvas.addEventListener("keyup", function(event) {
 		disableMove(event, paddles);
 	});
-	loop(canvas, ctx, paddles, ball, end);
+	loop(canvas, ctx, paddles, ball);
 }
 
-function	loop(canvas, ctx, paddles, ball, end)
+function	loop(canvas, ctx, paddles, ball)
 {
 	ctx.fillStyle = "#2F2F2F";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	if (end == 0)
+	if (paddles.left.score < 11 && paddles.right.score < 11)
 	{
 		movePaddles(canvas, paddles);
 		moveBall(canvas, ctx, paddles, ball);
+		render(canvas, ctx, paddles, ball);
+		requestAnimationFrame(() => loop(canvas, ctx, paddles, ball));
 	}
-	render(canvas, ctx, paddles, ball, end);
-	requestAnimationFrame(() => loop(canvas, ctx, paddles, ball, end));
+	else
+		renderFinalScore(canvas, ctx, paddles);
+}
+
+function	renderFinalScore(canvas, ctx, paddles)
+{
+	const pictures = getPictures(paddles);
+	const dim = getDimensions(canvas, pictures, paddles);
+	if (pictures[0] != 0)
+		ctx.drawImage(pictures[0], dim.leftWidth[0], dim.leftHeight, dim.leftDimensions, dim.leftDimensions);
+	ctx.drawImage(pictures[1], dim.leftWidth[1], dim.leftHeight, dim.leftDimensions, dim.leftDimensions);
+	if (pictures[2] != 0)
+		ctx.drawImage(pictures[2], dim.rightWidth[0], dim.rightHeight, dim.rightDimensions, dim.rightDimensions);
+	ctx.drawImage(pictures[3], dim.rightWidth[1], dim.rightHeight, dim.rightDimensions, dim.rightDimensions);
 }
 
 /////////////////////////
 // Render
 /////////////////////////
-function	render(canvas, ctx, paddles, ball, end)
+function	render(canvas, ctx, paddles, ball)
 {
 	ctx.fillStyle = "#FDFDFD";
+	renderPaddles(ctx, paddles);
+	renderBall(ctx, ball);
+	renderScore(canvas, ctx, paddles);
+}
+
+function	renderPaddles(ctx, paddles)
+{
+	ctx.fillRect(paddles.left.x, paddles.left.y, paddles.width, paddles.height);
+	ctx.fillRect(paddles.right.x, paddles.right.y, paddles.width, paddles.height);
+}
+
+function	renderBall(ctx, ball)
+{
 	ctx.beginPath();
 	ctx.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
 	ctx.fill();
 	ctx.stroke();
-	ctx.fillRect(paddles.left.x, paddles.left.y, paddles.width, paddles.height);
-	ctx.fillRect(paddles.right.x, paddles.right.y, paddles.width, paddles.height);
-	renderScore(canvas, ctx, paddles);
 }
 
 function	renderScore(canvas, ctx, paddles)
@@ -99,7 +122,7 @@ function	movePaddles(canvas, paddles)
 
 function	moveBall(canvas, ctx, paddles, ball)
 {
-	if (ball.x <= -100 || ball.x >= (canvas.width + 100)) // OUT
+	if (ball.x <= -100 || ball.x >= (canvas.width + 100))
 		point(canvas, paddles, ball);
 	else
 		collision(paddles, ball);
@@ -204,14 +227,14 @@ function	collisionCorner(paddles, ball)
 	if (ball.dir_x < 0) // GOING LEFT
 	{
 		if ((ball.y - ball.radius) <= (paddles.left.y + paddles.height) && ball.y >= (paddles.left.y + paddles.height)
-			&& (ball.x - ball.radius) <= (paddles.left.x + paddles.width) && ball.x >= (paddles.left.x + paddles.width)) // BOTTOM RIGHT CORNER OF LEFT PADDLE
+		&& (ball.x - ball.radius) <= (paddles.left.x + paddles.width) && ball.x >= (paddles.left.x + paddles.width)) // BOTTOM RIGHT CORNER OF LEFT PADDLE
 		{
 			ball.dir_x *= -1;
 			if (ball.dir_y < 0)
 				ball.dir_y *= -1;
 		}
 		else if ((ball.y + ball.radius) >= paddles.left.y && ball.y <= paddles.left.y
-			&& (ball.x - ball.radius) <= (paddles.left.x + paddles.width) && ball.x >= (paddles.left.x + paddles.width)) // TOP RIGHT CORNER OF LEFT PADDLE
+		&& (ball.x - ball.radius) <= (paddles.left.x + paddles.width) && ball.x >= (paddles.left.x + paddles.width)) // TOP RIGHT CORNER OF LEFT PADDLE
 		{
 			ball.dir_x *= -1;
 			if (ball.dir_y > 0)
@@ -221,14 +244,14 @@ function	collisionCorner(paddles, ball)
 	else if (ball.dir_x > 0) // GOING RIGHT
 	{
 		if ((ball.y - ball.radius) <= (paddles.right.y + paddles.height) && ball.y >= (paddles.right.y + paddles.height)
-			&& (ball.x + ball.radius) >= paddles.right.x && ball.x <= paddles.right.x) // BOTTOM LEFT CORNER OF RIGHT PADDLE
+		&& (ball.x + ball.radius) >= paddles.right.x && ball.x <= paddles.right.x) // BOTTOM LEFT CORNER OF RIGHT PADDLE
 		{
 			ball.dir_x *= -1;
 			if (ball.dir_y < 0)
 				ball.dir_y *= -1;
 		}
 		else if ((ball.y + ball.radius) >= paddles.right.y && ball.y <= paddles.right.y
-			&& (ball.x + ball.radius) >= paddles.right.x && ball.x <= paddles.right.x) // TOP LEFT CORNER OF RIGHT PADDLED
+		&& (ball.x + ball.radius) >= paddles.right.x && ball.x <= paddles.right.x) // TOP LEFT CORNER OF RIGHT PADDLED
 		{
 			ball.dir_x *= -1;
 			if (ball.dir_y > 0)
@@ -283,7 +306,7 @@ function	getPaddles(canvas)
 		width: width,
 		speed: 10,
 		left: createPaddle(canvas, height, width, "l"),
-		right: createPaddle(canvas, height, width, "r")
+		right: createPaddle(canvas, height, width, "r"),
 	}
 	return (paddles);
 }
@@ -359,4 +382,28 @@ function	getNumbers(paddles)
 		Math.floor(paddles.right.score % 10)
 	];
 	return (numbers);
+}
+
+function	getDimensions(canvas, pictures, paddles)
+{
+	let dimensions = {
+		leftDimensions: canvas.height / 5,
+		leftHeight: (canvas.height / 2) - ((canvas.height / 5) / 2),
+		rightDimensions: pictures[1].height,
+		rightHeight: (canvas.height / 2) - (pictures[3].height / 2),
+		leftWidth: [0, 0],
+		rightWidth: [0, 0]
+	};
+	if (paddles.right.score > paddles.left.score)
+	{
+		dimensions.leftDimensions = pictures[1].height;
+		dimensions.rightDimensions = canvas.height / 5;
+		dimensions.leftHeight = (canvas.height / 2) - (pictures[3].height / 2);
+		dimensions.rightHeight = (canvas.height / 2) - ((canvas.height / 5) / 2);
+	}
+	dimensions.leftWidth[0] = ((canvas.width / 2) / 2) - (dimensions.leftDimensions + 20);
+	dimensions.leftWidth[1] = ((canvas.width / 2) / 2);
+	dimensions.rightWidth[0] = (canvas.width / 2) + ((canvas.width / 2) / 2) - (dimensions.rightDimensions + 20);
+	dimensions.rightWidth[1] = (canvas.width / 2) + ((canvas.width / 2) / 2);
+	return (dimensions);
 }

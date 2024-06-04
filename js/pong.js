@@ -5,35 +5,37 @@ startPong();
 
 function	startPong()
 {
-	const canvas = getCanvas();
-	const ctx = canvas.getContext("2d");
-	const paddles = getPaddles(canvas);
-	const ball = getBall(canvas);
+	let game = {
+		canvas: getCanvas(),
+		ctx: canvas.getContext("2d"),
+		paddles: getPaddles(canvas),
+		ball: getBall(canvas)
+	}
 	canvas.addEventListener("keydown", function(event) {
-		enableMove(event, paddles);
+		enableMove(event, game.paddles);
 	});
 	canvas.addEventListener("keyup", function(event) {
-		disableMove(event, paddles);
+		disableMove(event, game.paddles);
 	});
-	loop(canvas, ctx, paddles, ball);
+	loop(game);
 }
 
-function	loop(canvas, ctx, paddles, ball)
+function	loop(game)
 {
-	ctx.fillStyle = "#2F2F2F";
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	if (paddles.left.score < 11 && paddles.right.score < 11)
+	game.ctx.fillStyle = "#2F2F2F";
+	game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
+	if (game.paddles.left.score < 11 && game.paddles.right.score < 11)
 	{
-		movePaddles(canvas, paddles);
-		moveBall(canvas, ctx, paddles, ball);
-		render(canvas, ctx, paddles, ball);
-		requestAnimationFrame(() => loop(canvas, ctx, paddles, ball));
+		movePaddles(game.canvas, game.paddles)
+		moveBall(game);
+		render(game);
+		requestAnimationFrame(() => loop(game));
 	}
 	else
-		renderFinalScore(canvas, ctx, paddles);
+		renderFinalScore(game.ctx, game.paddles);
 }
 
-function	renderFinalScore(canvas, ctx, paddles)
+function	renderFinalScore(ctx, paddles)
 {
 	const pictures = getPictures(paddles);
 	const dim = getDimensions(canvas, pictures, paddles);
@@ -48,12 +50,12 @@ function	renderFinalScore(canvas, ctx, paddles)
 /////////////////////////
 // Render
 /////////////////////////
-function	render(canvas, ctx, paddles, ball)
+function	render(game)
 {
-	ctx.fillStyle = "#FDFDFD";
-	renderPaddles(ctx, paddles);
-	renderBall(ctx, ball);
-	renderScore(canvas, ctx, paddles);
+	game.ctx.fillStyle = "#FDFDFD";
+	renderPaddles(game.ctx, game.paddles);
+	renderBall(game.ctx, game.ball);
+	renderScore(game);
 }
 
 function	renderPaddles(ctx, paddles)
@@ -70,15 +72,15 @@ function	renderBall(ctx, ball)
 	ctx.stroke();
 }
 
-function	renderScore(canvas, ctx, paddles)
+function	renderScore(game)
 {
-	const pictures = getPictures(paddles);
+	const pictures = getPictures(game.paddles);
 	if (pictures[0] != 0)
-		ctx.drawImage(pictures[0], ((((canvas.width / 2) / 2) - pictures[1].width) - 5), 20);
-	ctx.drawImage(pictures[1], ((canvas.width / 2) / 2) + 3, 20);
+		game.ctx.drawImage(pictures[0], ((((game.canvas.width / 2) / 2) - pictures[1].width) - 5), 20);
+	game.ctx.drawImage(pictures[1], ((game.canvas.width / 2) / 2) + 3, 20);
 	if (pictures[2] != 0)
-		ctx.drawImage(pictures[2], (canvas.width / 2) + ((((canvas.width / 2) / 2) - pictures[3].width) - 5), 20);
-	ctx.drawImage(pictures[3], (canvas.width / 2) + ((canvas.width / 2) / 2) - 3, 20);
+		game.ctx.drawImage(pictures[2], (game.canvas.width / 2) + ((((game.canvas.width / 2) / 2) - pictures[3].width) - 5), 20);
+	game.ctx.drawImage(pictures[3], (game.canvas.width / 2) + ((game.canvas.width / 2) / 2) - 3, 20);
 }
 
 /////////////////////////
@@ -120,29 +122,29 @@ function	movePaddles(canvas, paddles)
 		paddles.right.y += paddles.speed;
 }
 
-function	moveBall(canvas, ctx, paddles, ball)
+function	moveBall(game)
 {
-	if (ball.x <= -100 || ball.x >= (canvas.width + 100))
-		point(canvas, paddles, ball);
+	if (game.ball.x <= -100 || game.ball.x >= (canvas.width + 100))
+		point(game);
 	else
-		collision(paddles, ball);
-	movePXbyPX(ctx, ball);
+		collision(game.paddles, game.ball);
+	movePXbyPX(game);
 }
 
-function	movePXbyPX(ctx, ball)
+function	movePXbyPX(game)
 {
 	let i = 0;
-	while (i < ball.speed)
+	while (i < game.ball.speed)
 	{
-		ctx.fillStyle = "#2E2E2E";
-		ctx.beginPath();
-		ctx.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
-		ctx.stroke();
-		ball.x += ball.dir_x;
-		ball.y += ball.dir_y;
-		ctx.fillStyle = "#FDFDFD";
-		ctx.beginPath();
-		ctx.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
+		game.ctx.fillStyle = "#2E2E2E";
+		game.ctx.beginPath();
+		game.ctx.arc(game.ball.x, game.ball.y, game.ball.radius, 0, 2 * Math.PI);
+		game.ctx.stroke();
+		game.ball.x += game.ball.dir_x;
+		game.ball.y += game.ball.dir_y;
+		game.ctx.fillStyle = "#FDFDFD";
+		game.ctx.beginPath();
+		game.ctx.arc(game.ball.x, game.ball.y, game.ball.radius, 0, 2 * Math.PI);
 		i++;
 	}
 }
@@ -150,26 +152,26 @@ function	movePXbyPX(ctx, ball)
 /////////////////////////
 // Point
 /////////////////////////
-function	point(canvas, paddles, ball)
+function	point(game)
 {
-	updateScore(canvas, paddles, ball);
-	resetBall(canvas, ball);
+	updateScore(game);
+	resetBall(game);
 }
 
-function	updateScore(canvas, paddles, ball)
+function	updateScore(game)
 {
-	if (ball.x <= -100 && paddles.right.score < 99)
-		paddles.right.score++;
-	else if (ball.x >= (canvas.width + 100) && paddles.left.score < 99)
-		paddles.left.score++;
+	if (game.ball.x <= -100 && game.paddles.right.score < 99)
+		game.paddles.right.score++;
+	else if (game.ball.x >= (canvas.width + 100) && game.paddles.left.score < 99)
+		game.paddles.left.score++;
 }
 
-function	resetBall(canvas, ball)
+function	resetBall(game)
 {
-	ball.x = canvas.width / 2;
-	ball.y = canvas.height / 2;
-	ball.dir_x = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
-	ball.dir_y = generateDirY();
+	game.ball.x = game.canvas.width / 2;
+	game.ball.y = game.canvas.height / 2;
+	game.ball.dir_x = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
+	game.ball.dir_y = generateDirY();
 }
 
 /////////////////////////
@@ -318,7 +320,7 @@ function	createPaddle(canvas, height, width, position)
 		y: 0,
 		move_top: 0,
 		move_bot: 0,
-		score: 0
+		score: 10
 	}
 	if (position == "l")
 	{

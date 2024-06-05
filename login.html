@@ -11,6 +11,8 @@
 		<script src="https://kit.fontawesome.com/70111f5ad5.js" crossorigin="anonymous"></script>
 		<!--Google Auth-->
 		<script src="https://accounts.google.com/gsi/client" async></script>
+		<meta name="referrer" content="no-referrer-when-downgrade">
+		<meta name="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
 		<!--Google Font-->
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,13 +29,13 @@
 				</div>
 				<div class="wrapper-connection">
 					<form>
-						<input type="email" placeholder="Email" aria-label="Email"/>
-						<input type="password" placeholder="Mot de passe" aria-label="Mot de passe"/>
-						<button aria-label="Connection ou Inscription">Connexion/Inscription</button>
-						<p aria-label="Mot de passe oublie">Mot de passe oublie</p>
+						<input type="email" placeholder="Email" aria-label="Email" tabindex="1"/>
+						<input type="password" placeholder="Mot de passe" aria-label="Mot de passe" tabindex="2"/>
+						<button aria-label="Connection ou Inscription" tabindex="2">Connexion/Inscription</button>
+						<p aria-label="Mot de passe oublie" tabindex="3">Mot de passe oublie</p>
 					</form>
 					<div class="wrapper-sp-login">
-						<button class="sp-login login-42" aria-label="Connexion avec 42">
+						<button class="sp-login login-42" aria-label="Connexion avec 42" tabindex="4">
 							<svg version="1.1"
 								id="Calque_1" sodipodi:docname="42_logo.svg" inkscape:version="0.48.2 r9819" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
 								xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 -200 960 960"
@@ -46,10 +48,10 @@
 							</svg>
 							Connexion avec 42
 						</button>
-						<button class="sp-login login-google" aria-label="Connexion avec Google">
+						<button class="sp-login login-google" aria-label="Connexion avec Google" tabindex="5">
 							<div id="g_id_onload"
-								data-client_id="YOUR_GOOGLE_CLIENT_ID"
-								data-login_uri="https://your.domain/your_login_endpoint"
+								data-client_id="758405755747-7nrn695q1lo3pgg28f1nafdbgd9d3sf4.apps.googleusercontent.com"
+								data-login_uri="https://localhost:5500/google-oauth"
 								data-auto_prompt="false">
 							</div>
 							<div class="g_id_signin"
@@ -61,7 +63,7 @@
 								data-logo_alignment="left">
 							</div>
 						</button>
-						<button class="sp-login login-guest" aria-label="Jouer sans se connecter">
+						<button class="sp-login login-guest" aria-label="Jouer sans se connecter" tabindex="6">
 							<img src="./svg/incognito.svg" height="30" width="30"/>
 							Connexion en tant qu'Invite
 						</button>

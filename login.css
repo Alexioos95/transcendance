@@ -110,6 +110,10 @@ form p {
 	gap: 2%;
 }
 
+.sp-login:focus {
+	outline: 5px auto -webkit-focus-ring-color;
+}
+
 .login-42 {
 	display: flex;
 	flex-direction: row;
@@ -133,7 +137,3 @@ form p {
 .login-42:hover .svg {
 	fill: white !important;
 }
-
-/* .login-guest { */
-
-/* } */

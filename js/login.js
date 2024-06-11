@@ -27,10 +27,10 @@ function	loadGoogleButtonWidth()
 /////////////////////////
 function	forgottenPassword()
 {
-	const link = document.getElementsByTagName("p");
-	const pwd = document.getElementsByTagName("input");
-	const button = document.getElementsByTagName("button");
-	link[0].addEventListener("click", function() { move(link[0], pwd[1], button[0]); });
+	const link = document.getElementsByTagName("p")[0];
+	const pwd = document.getElementsByTagName("input")[1];
+	const button = document.getElementsByTagName("button")[0];
+	link.addEventListener("click", function() { move(link, pwd, button); });
 }
 
 function	move(link, pwd, button)

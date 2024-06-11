@@ -24,7 +24,7 @@ header {
 	height: 5%;
 	width: 100%;
 	background-color: #2E2E2E;
-	border-bottom: 1px solid rgb(131, 126, 126);;
+	border-bottom: 1px solid rgb(131, 126, 126);
 }
 
 /*/////////////*/
@@ -40,20 +40,23 @@ header {
 main {
 	display: flex;
 	flex-direction: column;
-	background-color: black;
 	height: 95%;
 	padding: 2%;
 	gap: 2%;
+	color: white;
+	background-color: black;
 }
 
 h2 {
 	text-align: center;
 	margin: 0;
 	color: white;
+	user-select: none;
 }
 
 .wrapper-playzone {
 	display: flex;
+	justify-content: space-between;
 	height: 100%;
 	gap: 2%;
 }
@@ -65,6 +68,94 @@ h2 {
 .wrapper-options {
 	width: 20%;
 	height: 100%;
+	padding: 2% 1%;
+}
+
+.wrapper-options form {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	text-align: center;
+	width: 100%;
+	height: 100%;
+}
+
+.wrapper-options div {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 25px;
+}
+
+span {
+	font-weight: bolder;
+	font-size: 1.3em;
+	user-select: none;
+}
+
+label {
+	user-select: none;
+}
+
+label img {
+	height: 100%;
+	width: 100%;
+	max-width: 214px;
+}
+
+label div {
+	border: 2px solid rgb(88, 88, 88);
+	transform-style: preserve-3d;
+	transition: all 175ms cubic-bezier(0, 0, 1, 1);
+}
+
+label div::before {
+	position: absolute;
+	content: "";
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgb(150, 150, 150);
+	border-radius: inherit;
+	box-shadow: 0 0 0 2px rgb(88, 88, 88), 0 0.75em 0 0 rgb(88, 88, 88);
+	transform: translate3d(0, 0.75em, -1em);
+	transition: all 175ms cubic-bezier(0, 0, 1, 1);
+}
+
+label div:active {
+	transform: translate(0em, 0.75em);
+}
+
+label div:active::before {
+	transform: translate3d(0, 0, -1em);
+	box-shadow: 0 0 0 2px rgb(88, 88, 88), 0 0.25em 0 0 rgb(88, 88, 88);
+}
+
+[type=radio] {
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+[type=radio] + div {
+	background: rgb(115, 115, 115);
+	cursor: pointer;
+}
+
+[type=radio]:checked + div {
+	transform: translate(0em, 0.75em);
+	border: 2px solid black;
+}
+
+[type=radio]:checked + div::before {
+	width: 0;
+	height: 0;
+	transform: translate3d(0, 0, -1em);
 }
 
 /*//////////////////////////*/
@@ -74,13 +165,13 @@ h2 {
 .wrapper-game {
 	display: flex;
 	flex-direction: column;
-	gap: 2%;
+	width: 65%;
+	height: 100%;
+	gap: 4%;
 }
 
 .wrapper-canvas {
-	width: 100%;
 	height: 100%;
-	border-radius: 25px;
 	overflow: hidden;
 }
 
@@ -94,10 +185,7 @@ canvas:focus {
 }
 
 .wrapper-controls {
-	border: 2px solid black;
-	border-radius: 25px;
 	height: 15%;
-	width: 100%;
 }
 
 /*/////////////*/
@@ -109,18 +197,14 @@ canvas:focus {
 	flex-direction: column;
 	height: 100%;
 	width: 20%;
-	gap: 2%;
+	gap: 4%;
 }
 
 .chat-display {
-	border: 2px solid black;
-	border-radius: 25px;
 	height: 100%;
 }
 
 .chat-input {
-	border: 2px solid black;
-	border-radius: 25px;
 	height: 15%;
 	width: 100%;
 }

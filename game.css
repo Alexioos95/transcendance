@@ -1,3 +1,6 @@
+/*/////////*/
+/* General */
+/*/////////*/
 * {
 	box-sizing: border-box;
 }
@@ -8,55 +11,69 @@ html {
 }
 
 body {
-	display: flex;
-	flex-direction: column;
 	width: 100%;
 	height: 100%;
+	font: 0.9em "Poppins", sans-serif;
 }
+
+/*///////////////*/
+/* Game - header */
+/*///////////////*/
 
 header {
 	height: 5%;
 	width: 100%;
-	background-color: blue;
+	background-color: #2E2E2E;
+	border-bottom: 1px solid rgb(131, 126, 126);;
+}
+
+/*/////////////*/
+/* Game - main */
+/*/////////////*/
+
+.card {
+	background-color: #2E2E2E;
+	border-radius: 10px;
+	box-shadow: 0 3px 10px 3px rgb(131, 126, 126);
 }
 
 main {
 	display: flex;
 	flex-direction: column;
-	background-color: #e9d734;
-	height: 92%;
-	padding: 1% 2%;
+	background-color: black;
+	height: 95%;
+	padding: 2%;
 	gap: 2%;
 }
 
-main h2 {
-	width: 100%;
+h2 {
 	text-align: center;
-	padding: 0;
 	margin: 0;
+	color: white;
 }
 
 .wrapper-playzone {
-	height: 100%;
-	width: 100%;
 	display: flex;
-	flex-direction: row;
+	height: 100%;
 	gap: 2%;
 }
 
+/*////////////////*/
+/* Game - options */
+/*////////////////*/
+
 .wrapper-options {
-	background-color: green;
-	border: 2px solid black;
-	border-radius: 25px;
-	height: 100%;
 	width: 20%;
+	height: 100%;
 }
+
+/*//////////////////////////*/
+/* Game - game and controls */
+/*//////////////////////////*/
 
 .wrapper-game {
 	display: flex;
 	flex-direction: column;
-	height: 100%;
-	width: 80%;
 	gap: 2%;
 }
 
@@ -83,6 +100,10 @@ canvas:focus {
 	width: 100%;
 }
 
+/*/////////////*/
+/* Game - chat */
+/*/////////////*/
+
 .wrapper-chat {
 	display: flex;
 	flex-direction: column;
@@ -102,10 +123,4 @@ canvas:focus {
 	border-radius: 25px;
 	height: 15%;
 	width: 100%;
-}
-
-footer {
-	height: 3%;
-	width: 100%;
-	background-color: blue;
 }

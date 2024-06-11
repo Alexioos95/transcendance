@@ -3,6 +3,10 @@
 /////////////////////////
 function	loadGoogleButtonWidth()
 {
+	console.log("CALL");
+	const googleButton = document.getElementsByClassName("g_id_signin")[0];
+	if (googleButton != undefined)
+		googleButton.remove();
 	const wrapperGoogle = document.getElementsByClassName("login-google")[0];
 	const button = document.getElementsByClassName("login-42")[0];
 	const width = button.offsetWidth - 20;
@@ -99,5 +103,6 @@ function restore(link, pwd, button)
 /////////////////////////
 // Script
 /////////////////////////
-loadGoogleButtonWidth();
+// loadGoogleButtonWidth();
 forgottenPassword();
+document.addEventListener("load", loadGoogleButtonWidth());

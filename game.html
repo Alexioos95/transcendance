@@ -27,31 +27,45 @@
 				<div class="wrapper-options card">
 					<form>
 						<div>
-							<span aria-label="Choisissez le jeu">Jeu</span>
-							<label>
-								<input type="radio" name="game" aria-label="Pong"/>
-								<div>
-									<img src="./svg/pong.svg"/>
-								</div>
-							</label>
-							<label>
-								<input type="radio" name="game" aria-label="Tetris"/>
-								<div>
-									<img src="./svg/tetris.svg"/>
-								</div>
-							</label>
+							<span aria-label="Choisissez le jeu: Pong ou Tetris">Jeu</span>
+							<div>
+								<label class="game-selector">
+									<input type="radio" name="game" aria-label="Pong"/>
+									<div>
+										<img src="./svg/pong.svg"/>
+									</div>
+								</label>
+								<label class="game-selector">
+									<input type="radio" name="game" aria-label="Tetris"/>
+									<div>
+										<img src="./svg/tetris.svg"/>
+									</div>
+								</label>
+							</div>
 						</div>
 						<div>
-							<span aria-label="Choisissez le mode">Mode</span>
+							<span aria-label="Choisissez le mode de jeu: ">Mode</span>
 							<div>
-								Local
-								<input type="radio" name="mode">1vIA</input>
-								<input type="radio" name="mode">1v1</input>
-								<input type="radio" name="mode">Tournoi a 4 (1v1v1v1)</input>
-							</div>
-							<div>
-								Online
-								<input type="radio" name="mode">1v1</input>
+								<label class="mode-selector">
+									<input type="radio" name="mode" aria-label="Joueur contre Ordinateur"/>
+									<div class="circle"></div>
+									<span>1vIA</span>
+								</label>
+								<label class="mode-selector">
+									<input type="radio" name="mode" aria-label="Joueur contre Joueur en local"/>
+									<div class="circle"></div>
+									<span>1v1 local</span>
+								</label>
+								<label class="mode-selector">
+									<input type="radio" name="mode" aria-label="Tournoi a 4 joueurs en local"/>
+									<div class="circle"></div>
+									<span>Tournoi local a 4</span>
+								</label>
+								<label class="mode-selector">
+									<input type="radio" name="mode" aria-label="Joueur contre Joueur en ligne"/>
+									<div class="circle"></div>
+									<span>1v1 en ligne</span>
+								</label>
 							</div>
 						</div>
 						<button aria-label="Jouer !">Jouer !</buttonb>
@@ -59,7 +73,7 @@
 				</div>
 				<div class="wrapper-game">
 					<div class="wrapper-canvas card">
-						<canvas id="canvas" width="1179px" height="581px" tabindex="0"></canvas>
+						<!-- <canvas id="canvas" width="1179px" height="581px" tabindex="0"></canvas> -->
 					</div>
 					<div class="wrapper-controls card"></div>
 				</div>

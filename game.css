@@ -83,9 +83,10 @@ h2 {
 .wrapper-options div {
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
+	justify-content: space-between;
 	align-items: center;
 	gap: 25px;
+	width: 100%;
 }
 
 span {
@@ -94,23 +95,27 @@ span {
 	user-select: none;
 }
 
-label {
+.game-selector {
+	width: 100%;
 	user-select: none;
 }
 
-label img {
+.game-selector img {
 	height: 100%;
 	width: 100%;
 	max-width: 214px;
+	pointer-events: none;
 }
 
-label div {
+.game-selector div {
+	width: 100%;
 	border: 2px solid rgb(88, 88, 88);
+	border-radius: 10px;
 	transform-style: preserve-3d;
 	transition: all 175ms cubic-bezier(0, 0, 1, 1);
 }
 
-label div::before {
+.game-selector div::before {
 	position: absolute;
 	content: "";
 	width: 100%;
@@ -126,11 +131,11 @@ label div::before {
 	transition: all 175ms cubic-bezier(0, 0, 1, 1);
 }
 
-label div:active {
+.game-selector div:active {
 	transform: translate(0em, 0.75em);
 }
 
-label div:active::before {
+.game-selector div:active::before {
 	transform: translate3d(0, 0, -1em);
 	box-shadow: 0 0 0 2px rgb(88, 88, 88), 0 0.25em 0 0 rgb(88, 88, 88);
 }
@@ -142,20 +147,115 @@ label div:active::before {
 	height: 0;
 }
 
-[type=radio] + div {
+.game-selector [type=radio] + div {
+	padding: 5px;
 	background: rgb(115, 115, 115);
 	cursor: pointer;
 }
 
-[type=radio]:checked + div {
+.game-selector [type=radio]:checked + div {
 	transform: translate(0em, 0.75em);
-	border: 2px solid black;
+	border: 2px ridge black;
 }
 
-[type=radio]:checked + div::before {
+.game-selector [type=radio]:checked + div::before {
 	width: 0;
 	height: 0;
+	top: 50%;
 	transform: translate3d(0, 0, -1em);
+}
+
+.mode-selector {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+}
+
+.mode-selector span {
+	width: 100%;
+}
+
+*::before, *::after {
+	margin: auto;
+	padding: 0;
+	outline: 0;
+	overflow: hidden;
+	box-sizing: border-box;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.mode-selector .circle {
+	background-color: white;
+	display: inline-block;
+	position: relative;
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+	transition: all .2s ease-in-out;
+	animation-timing-function: ease-in-out;
+	animation-iteration-count: infinite;
+	animation-duration: 1.6s;
+	overflow: hidden;
+}
+
+.mode-selector .circle::before {
+	content: "";
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	background: white;
+	border-radius: 50%;
+	box-shadow: rgba(0, 0, 0, 0.117647) 0 0 .8vw 0, rgba(0, 0, 0, 0.239216) 0 .8vw .8vw 0;
+	transition: all .2s;
+}
+
+.mode-selector .circle::after {
+	content: "";
+	position: absolute;
+	width: 10vw;
+	height: 10vw;
+	background: rgba(255, 255, 255, .5);
+	border-radius: 50%;
+	transform: scale(0);
+}
+
+.mode-selector [type=radio]:checked + .mode-selector .circle::after {
+	background: transparent;
+	transition: all 0.5s;
+	transform: scale(1);
+}
+
+.mode-selector [type=radio] + .circle {
+	animation-delay: 0.6s;
+}
+.mode-selector [type=radio] + .circle:before {
+	background: blue;
+	animation: radio-uncheck 0.5s both;
+}
+.mode-selector [type=radio]:checked + .circle:before {
+	animation-name: radio-check;
+	animation-duration: 0.6s;
+	animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+	animation-fill-mode: both;
+}
+
+@keyframes radio-check {
+	0% { transform: rotate(0) translateY(-4.8px) scale(0.2); }
+	83% { transform: rotate(360deg) translateY(-2.5px) scale(1); transform-origin: 2px; }
+	88% { transform: translateY(0.6px) scale(1); }
+	93% { transform: translateY(-1px) scale(1); }
+	100% { transform: translateY(0) scale(1); }
+}
+@keyframes radio-uncheck {
+	25% { top: -6.5px; }
+	50% { top: 9px; }
+	75% { top: -10px; }
+	100% { top: -10px; transform: scale(0); }
 }
 
 /*//////////////////////////*/

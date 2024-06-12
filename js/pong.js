@@ -291,8 +291,15 @@ function	collisionBot(paddles, ball)
 /////////////////////////
 function	getCanvas()
 {
-	const canvas = document.getElementById("canvas");
+	const wrapper = document.getElementsByClassName("wrapper-canvas")[0];
+	const canvas = document.createElement("canvas");
+	canvas.setAttribute("id", "canvas");
+	canvas.setAttribute("width", "1179px");
+	canvas.setAttribute("height", "581px");
+	canvas.setAttribute("tabindex", "0");
+	wrapper.appendChild(canvas);
 	return (canvas);
+
 }
 
 function	getPaddles(canvas)

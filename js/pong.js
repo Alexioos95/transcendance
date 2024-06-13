@@ -8,11 +8,22 @@ function	startPong()
 	let game = {
 		canvas: getCanvas(),
 		ctx: canvas.getContext("2d"),
-		paddles: getPaddles(canvas),
+		paddles: getPaddles(canvas, undefined),
 		ball: getBall(canvas)
 	}
 	canvas.addEventListener("keydown", function(event) { enableMove(event, game.paddles); });
 	canvas.addEventListener("keyup", function(event) { disableMove(event, game.paddles); });
+	// document.defaultView.addEventListener("resize", function() {
+	// 	console.log("CALL");
+	// 	const canvas = document.getElementById("canvas");
+	// 	if (canvas !== undefined)
+	// 		canvas.remove();
+	// 	game.canvas = getCanvas();
+	// 	game.ctx = game.canvas.getContext("2d");
+	// 	game.paddles = actualizePaddles(game.canvas, game.paddles);
+	// 	game.canvas.addEventListener("keydown", function(event) { enableMove(event, game.paddles); });
+	// 	game.canvas.addEventListener("keyup", function(event) { disableMove(event, game.paddles); });
+	// });
 	loop(game);
 }
 
@@ -291,15 +302,17 @@ function	collisionBot(paddles, ball)
 /////////////////////////
 function	getCanvas()
 {
-	const wrapper = document.getElementsByClassName("wrapper-canvas")[0];
-	const canvas = document.createElement("canvas");
-	canvas.setAttribute("id", "canvas");
-	canvas.setAttribute("width", "1179px");
-	canvas.setAttribute("height", "581px");
-	canvas.setAttribute("tabindex", "0");
-	wrapper.appendChild(canvas);
+	const wrapper = document.getElementById("canvas");
+	// const wrapper = document.getElementsByClassName("wrapper-canvas")[0];
+	// const width = wrapper.offsetWidth;
+	// const height = wrapper.offsetHeight;
+	// const canvas = document.createElement("canvas");
+	// canvas.setAttribute("id", "canvas");
+	// canvas.setAttribute("width", width);
+	// canvas.setAttribute("height", height);
+	// canvas.setAttribute("tabindex", "0");
+	// wrapper.appendChild(canvas);
 	return (canvas);
-
 }
 
 function	getPaddles(canvas)
@@ -338,6 +351,20 @@ function	createPaddle(canvas, height, width, position)
 	return (paddle);
 }
 
+function	actualizePaddles(canvas, previousIteration)
+{
+	let paddles = {
+		height: canvas.height / 5,
+		width: canvas.width / 50,
+		speed: 10,
+		left: previousIteration.left,
+		right: previousIteration.right,
+	}
+	paddles.left.x = canvas.width / 20;
+	paddles.right.x = canvas.width - (canvas.width / 20) - paddles.width;
+	return (paddles);
+}
+
 function	getBall(canvas)
 {
 	let ball = {
@@ -346,7 +373,7 @@ function	getBall(canvas)
 		y: canvas.height / 2,
 		dir_x: (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1,
 		dir_y: generateDirY(),
-		speed: 10
+		speed: canvas.width / 100
 	}
 	return (ball);
 }

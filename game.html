@@ -12,6 +12,8 @@
 		<!--Google Font-->
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
 		<!--My CSS-->
 		<link rel="stylesheet" type="text/css" href="./game.css">
 		<!--My JS-->
@@ -26,7 +28,7 @@
 			<div class="wrapper-playzone">
 				<div class="wrapper-options card">
 					<form>
-						<div>
+						<div class="section-selector">
 							<span aria-label="Choisissez le jeu: Pong ou Tetris">Jeu</span>
 							<div>
 								<label class="game-selector">
@@ -43,7 +45,7 @@
 								</label>
 							</div>
 						</div>
-						<div>
+						<div class="section-selector">
 							<span aria-label="Choisissez le mode de jeu: ">Mode</span>
 							<div>
 								<label class="mode-selector">
@@ -68,12 +70,16 @@
 								</label>
 							</div>
 						</div>
-						<button aria-label="Jouer !">Jouer !</buttonb>
+						<div class="wrapper-submit-button">
+							<button aria-label="Jouer !">
+								<span>Inserer une piece</span>
+							</button>
+						</div>
 					</form>
 				</div>
 				<div class="wrapper-game">
 					<div class="wrapper-canvas card">
-						<!-- <canvas id="canvas" width="1179px" height="581px" tabindex="0"></canvas> -->
+						<canvas id="canvas" width="1179px" height="581px" tabindex="0"></canvas>
 					</div>
 					<div class="wrapper-controls card"></div>
 				</div>

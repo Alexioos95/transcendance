@@ -21,7 +21,7 @@ body {
 /*///////////////*/
 
 header {
-	height: 5%;
+	height: 6%;
 	width: 100%;
 	background-color: #2E2E2E;
 	border-bottom: 1px solid rgb(131, 126, 126);
@@ -40,9 +40,8 @@ header {
 main {
 	display: flex;
 	flex-direction: column;
-	height: 95%;
+	height: 94%;
 	padding: 2%;
-	gap: 2%;
 	color: white;
 	background-color: black;
 }
@@ -52,6 +51,7 @@ h2 {
 	margin: 0;
 	color: white;
 	user-select: none;
+	font-size: 25px;
 }
 
 .wrapper-playzone {
@@ -76,39 +76,36 @@ h2 {
 .wrapper-options form {
 	display: flex;
 	flex-direction: column;
-	justify-content: space-between;
 	text-align: center;
-	gap: 25px;
+	justify-content: space-between;
 	width: 100%;
 	height: 100%;
-	overflow: auto;
 }
 
-.wrapper-options div.section-selector {
-	height: 240px;
-	min-height: 240px;
+.section-selector {
+	margin-bottom: 10%;
 }
 
-.wrapper-options div {
+.section-selector div {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	gap: 25px;
-	width: 100%;
+	gap: 20px;
 }
 
-span {
-	font-weight: bolder;
-	font-size: 1.3em;
+.wrapper-options form h3 {
+	font-size: 1.5em;
+	margin: 5px 0px;
 	user-select: none;
 }
 
 .game-selector {
 	width: 100%;
+	padding: 1% 2%;
 	user-select: none;
 }
 
 .game-selector img {
+	align-self: center;
 	height: 100%;
 	width: 100%;
 	max-width: 214px;
@@ -178,15 +175,10 @@ span {
 	justify-content: flex-end;
 	align-items: center;
 	width: 100%;
+	height: 37px;
 	position: relative;
 	cursor: pointer;
 	z-index: 1;
-}
-
-.mode-selector span {
-	width: 80%;
-	text-wrap: balance;
-	text-wrap: pretty;
 }
 
 .mode-selector .circle {
@@ -203,7 +195,7 @@ span {
 		rgba(255, 255, 255, 0.3) 0 -1px 2px inset,
 		#A14647 0 -3px 10px inset;
 	border: #fc2c71 solid 1px;
-	border-radius: 50%;
+	border-radius: 100%;
 	cursor: pointer;
 	outline: none;
 }
@@ -217,7 +209,7 @@ span {
 	width: 35px;
 	background: #fc2c71;
 	border: #fc2c71 1px solid;
-	border-radius: 50%;
+	border-radius: 100%;
 	box-shadow:
 	#CA235A 0 4px 5px inset,
 	rgba(255, 255, 255, 0.5) 0 12px 5px inset,
@@ -237,23 +229,42 @@ span {
 		#D1253B 0 -7px 20px inset;
 }
 
-.wrapper-options .wrapper-submit-button {
+.mode-selector span {
+	width: 100%;
+	text-wrap: wrap;
+	text-align: start;
+	font-weight: bolder;
+	font-size: 1.3em;
+	padding-left: 40%;
+	user-select: none;
+}
+
+.wrapper-submit-button {
 	display: flex;
 	justify-content: flex-end;
 	min-height: 100px;
+	overflow: hidden;
 }
 
-form button {
+.wrapper-submit-button button {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
 	align-self: center;
 	width: 100%;
+	height: 100px;
+	min-height: 100px;
 	padding: 0;
 	background: none;
 	border: none;
 	cursor: pointer;
+	position: relative;
 }
 
-form button span {
+.wrapper-submit-button span {
 	font-family: 'Press Start 2P';
+	font-size: 1.5em;
 	color: white;
 	text-shadow: 0 0 5px #ec41bf, 0 0 10px #8606b6, 0 0 15px #fff, 0 0 20px #921982, 0 0 25px #770067;
 	animation: fade 3s infinite;
@@ -263,6 +274,54 @@ form button span {
 	0% { opacity: 1; }
 	50% { opacity: 0; }
 	100% { opacity: 1; }
+}
+
+.slot{
+	height: 70px;
+	width: 15px;
+	background: #555;
+	border: 2px solid #CCC;
+	border-radius: 4px;
+	position: relative;
+}
+
+.slot:after{
+	content: '';
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	width: 8px;
+	height: 60px;
+	background: #777;
+	border-radius: 4px 0 3px 0;
+}
+
+.coin{
+	position: absolute;
+	left: 0px;
+	width: 35px;
+	height: 55px;
+	border-radius: 100%;
+	background: #e79178;
+	transition: margin 3s ease;
+	opacity: 0;
+	z-index: 1;
+}
+
+.coin:after{
+	content: '';
+	position: absolute;
+	left: 6px;
+	width: 35px;
+	height: 55px;
+	border-radius: 100%;
+	background: #cb6d51;
+}
+
+.coin.active{
+	opacity: 1;
+	margin-top: 5px;
+	margin-left: 120%;
 }
 
 /*//////////////////////////*/

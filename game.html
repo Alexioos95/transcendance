@@ -18,6 +18,7 @@
 		<link rel="stylesheet" type="text/css" href="./game.css">
 		<!--My JS-->
 		<script src="./js/pong.js" defer></script>
+		<script src="./js/game.js" defer></script>
 	</head>
 	<body>
 		<header>
@@ -29,7 +30,7 @@
 				<div class="wrapper-options card">
 					<form>
 						<div class="section-selector">
-							<span aria-label="Choisissez le jeu: Pong ou Tetris">Jeu</span>
+							<h3 aria-label="Choisissez le jeu: Pong ou Tetris">Jeu</h3>
 							<div>
 								<label class="game-selector">
 									<input type="radio" name="game" aria-label="Pong"/>
@@ -46,7 +47,7 @@
 							</div>
 						</div>
 						<div class="section-selector">
-							<span aria-label="Choisissez le mode de jeu: ">Mode</span>
+							<h3 aria-label="Choisissez le mode de jeu: ">Mode</h3>
 							<div>
 								<label class="mode-selector">
 									<input type="radio" name="mode" aria-label="Joueur contre Ordinateur"/>
@@ -71,8 +72,14 @@
 							</div>
 						</div>
 						<div class="wrapper-submit-button">
-							<button aria-label="Jouer !">
+							<button id="selector" type="button" aria-label="Jouer !">
 								<span>Inserer une piece</span>
+								<div class="coin">
+								</div>
+								<div class="slot-wrapper">
+									<div class="slot">
+									</div>
+								</div>
 							</button>
 						</div>
 					</form>

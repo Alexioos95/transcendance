@@ -1,28 +1,4 @@
 /////////////////////////
-// Google button
-/////////////////////////
-function	loadGoogleButtonWidth()
-{
-	console.log("CALL");
-	const googleButton = document.getElementsByClassName("g_id_signin")[0];
-	if (googleButton != undefined)
-		googleButton.remove();
-	const wrapperGoogle = document.getElementsByClassName("login-google")[0];
-	const button = document.getElementsByClassName("login-42")[0];
-	const width = button.offsetWidth - 20;
-	const newDiv = document.createElement("div");
-	newDiv.classList.add("g_id_signin");
-	newDiv.setAttribute("data-type", "standard");
-	newDiv.setAttribute("data-size", "large");
-	newDiv.setAttribute("data-theme", "outline");
-	newDiv.setAttribute("data-text", "signin_with");
-	newDiv.setAttribute("data-shape", "rectangular");
-	newDiv.setAttribute("data-logo_alignment", "center");
-	newDiv.setAttribute("data-width", width);
-	wrapperGoogle.appendChild(newDiv);
-}
-
-/////////////////////////
 // Forgotten password
 /////////////////////////
 function	forgottenPassword()
@@ -105,4 +81,3 @@ function restore(link, pwd, button)
 /////////////////////////
 // loadGoogleButtonWidth();
 forgottenPassword();
-document.addEventListener("load", loadGoogleButtonWidth());

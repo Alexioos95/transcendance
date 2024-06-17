@@ -33,13 +33,13 @@
 							<h3 aria-label="Choisissez le jeu: Pong ou Tetris">Jeu</h3>
 							<div>
 								<label class="game-selector">
-									<input type="radio" name="game" aria-label="Pong"/>
+									<input type="radio" name="game" value="pong" aria-label="Pong"/>
 									<div>
 										<img src="./svg/pong.svg"/>
 									</div>
 								</label>
 								<label class="game-selector">
-									<input type="radio" name="game" aria-label="Tetris"/>
+									<input type="radio" name="game" value="tetris" aria-label="Tetris"/>
 									<div>
 										<img src="./svg/tetris.svg"/>
 									</div>
@@ -50,22 +50,22 @@
 							<h3 aria-label="Choisissez le mode de jeu: ">Mode</h3>
 							<div>
 								<label class="mode-selector">
-									<input type="radio" name="mode" aria-label="Joueur contre Ordinateur"/>
+									<input type="radio" name="mode" value="1vAI" aria-label="Joueur contre Ordinateur"/>
 									<div class="circle"></div>
 									<span>1vIA</span>
 								</label>
 								<label class="mode-selector">
-									<input type="radio" name="mode" aria-label="Joueur contre Joueur en local"/>
+									<input type="radio" name="mode" value="1v1" aria-label="Joueur contre Joueur en local"/>
 									<div class="circle"></div>
 									<span>1v1 local</span>
 								</label>
 								<label class="mode-selector">
-									<input type="radio" name="mode" aria-label="Tournoi a 4 joueurs en local"/>
+									<input type="radio" name="mode" value="tournament" aria-label="Tournoi a 4 joueurs en local"/>
 									<div class="circle"></div>
 									<span>Tournoi local a 4</span>
 								</label>
 								<label class="mode-selector">
-									<input type="radio" name="mode" aria-label="Joueur contre Joueur en ligne"/>
+									<input type="radio" name="mode" value="online" aria-label="Joueur contre Joueur en ligne"/>
 									<div class="circle"></div>
 									<span>1v1 en ligne</span>
 								</label>
@@ -74,11 +74,9 @@
 						<div class="wrapper-submit-button">
 							<button id="selector" type="button" aria-label="Jouer !">
 								<span>Inserer une piece</span>
-								<div class="coin">
-								</div>
-								<div class="slot-wrapper">
-									<div class="slot">
-									</div>
+								<div class="coin"></div>
+								<div>
+									<div class="slot"></div>
 								</div>
 							</button>
 						</div>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="Jouez au celebre jeu-video des annees 70, PONG !">
+		<title>ft_transcendance</title>
+		<!--Normalize-->
+		<link rel="stylesheet" type="text/css" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+		<!--Font Awesome-->
+		<script src="https://kit.fontawesome.com/70111f5ad5.js" crossorigin="anonymous"></script>
+		<!--Google Font-->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+		<!--My CSS-->
+		<link rel="stylesheet" type="text/css" href="../css/game.css">
+		<!--My JS-->
+		<script src="../js/pong.js" defer></script>
+		<script src="../js/game.js" defer></script>
+	</head>
+	<body>
+		<header>
+			<!--  -->
+		</header>
+		<main>
+			<h2>PONG</h2>
+			<div class="wrapper-playzone">
+				<div class="wrapper-options card">
+					<form>
+						<div class="section-selector">
+							<h3 aria-label="Choisissez le jeu: Pong ou Tetris">Jeu</h3>
+							<div>
+								<label class="game-selector">
+									<input type="radio" name="game" value="pong" aria-label="Pong"/>
+									<div>
+										<img src="../svg/pong.svg"/>
+									</div>
+								</label>
+								<label class="game-selector">
+									<input type="radio" name="game" value="tetris" aria-label="Tetris"/>
+									<div>
+										<img src="../svg/tetris.svg"/>
+									</div>
+								</label>
+							</div>
+						</div>
+						<div class="section-selector">
+							<h3 aria-label="Choisissez le mode de jeu: ">Mode</h3>
+							<div>
+								<label class="mode-selector">
+									<input type="radio" name="mode" value="1vAI" aria-label="Joueur contre Ordinateur"/>
+									<div class="circle"></div>
+									<span>1vIA</span>
+								</label>
+								<label class="mode-selector">
+									<input type="radio" name="mode" value="1v1" aria-label="Joueur contre Joueur en local"/>
+									<div class="circle"></div>
+									<span>1v1 local</span>
+								</label>
+								<label class="mode-selector">
+									<input type="radio" name="mode" value="tournament" aria-label="Tournoi a 4 joueurs en local"/>
+									<div class="circle"></div>
+									<span>Tournoi local a 4</span>
+								</label>
+								<label class="mode-selector">
+									<input type="radio" name="mode" value="online" aria-label="Joueur contre Joueur en ligne"/>
+									<div class="circle"></div>
+									<span>1v1 en ligne</span>
+								</label>
+							</div>
+						</div>
+						<div class="wrapper-submit-button">
+							<button id="selector" type="button" aria-label="Jouer !">
+								<span>Inserer une piece</span>
+								<!-- <div class="coin"></div> -->
+								<div>
+									<div class="slot"></div>
+								</div>
+							</button>
+						</div>
+					</form>
+				</div>
+				<div class="wrapper-game">
+					<div class="wrapper-canvas card">
+						<canvas id="canvas" width="1179px" height="581px" tabindex="0"></canvas>
+					</div>
+					<div class="wrapper-controls card"></div>
+				</div>
+				<div class="wrapper-chat">
+					<div class="chat-display card">
+
+					</div>
+					<div class="chat-input card">
+
+					</div>
+				</div>
+			</div>
+		</main>
+	</body>
+</html>

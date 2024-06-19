@@ -6,6 +6,7 @@ function	forgottenPassword()
 	const link = document.getElementsByTagName("p")[0];
 	const pwd = document.getElementsByTagName("input")[1];
 	const button = document.getElementsByTagName("button")[0];
+	
 	link.addEventListener("click", function() { move(link, pwd, button); });
 }
 
@@ -79,5 +80,4 @@ function restore(link, pwd, button)
 /////////////////////////
 // Script
 /////////////////////////
-// loadGoogleButtonWidth();
 forgottenPassword();

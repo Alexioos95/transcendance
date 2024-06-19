@@ -1,7 +1,7 @@
 /////////////////////////
 // Script
 /////////////////////////
-startPong();
+// startPong();
 
 function	startPong()
 {

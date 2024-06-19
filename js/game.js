@@ -6,58 +6,59 @@ gameSelectorForm();
 function	gameSelectorForm()
 {
 	const button = document.getElementById("selector");
-
 	button.addEventListener("click", function() {
-		coinAnimation();
+		const prevCoin = document.getElementsByClassName("coin")[0];
+		if (prevCoin !== undefined)
+			return ;
+		const coin = getCoin(button);
+		const text = document.querySelectorAll("#selector span")[0];
+		setTimeout(() => handler(button, coin, text), 50);
 	});
 }
 
-function	coinAnimation()
+function	sleep(ms) { return (new Promise(resolve => setTimeout(resolve, ms))); }
+
+function	getCoin(button)
 {
-	const text = document.querySelectorAll("#selector span")[0];
-	const coin = document.getElementsByClassName("coin")[0];
-	text.style.opacity = 0;
-	text.style.animation = "none";
-	coin.style.transition = "margin 3s ease";
+	const coin = document.createElement("div");
+	coin.classList.add("coin");
+	button.appendChild(coin);
+	return (coin);
+}
+
+async function	handler(button, coin, text)
+{
+	await addAnimations(coin, text);
+	await checkValidation(button, coin, text);
+	button.removeChild(coin);
+}
+
+async function	addAnimations(coin, text)
+{
+	text.classList.add("active");
 	coin.classList.add("active");
-	setTimeout(() => {
-		checkValidation(coin, text);
-	}, 2500);
+	await sleep(4250);
 }
 
-function	removeCoinAnimation(coin, text)
+async function	rejectCoin(coin, text)
 {
-	console.log("CALL");
-	// coin.classList.remove("active");
 	coin.classList.add("fall");
-}
-
-function	restoreCoinAnimation(coin, text)
-{
-	coin.style.transition = "none";
 	coin.classList.remove("active");
-	text.style.opacity = 1;
-	text.style.animation = "fade 3s infinite";
+	await sleep(1000);
 }
 
-function	checkValidation(coin, text)
+async function	checkValidation(button, coin, text)
 {
 	const form = document.querySelector(".wrapper-options form");
 	const data = new FormData(form);
 	const game = data.get("game");
 	const mode = data.get("mode");
-	console.log(data);
-	console.log(game);
-	console.log(mode);
 	if (game === null || mode === null)
-	{
-		removeCoinAnimation(coin, text);
-		// restoreCoinAnimation(coin, text);
-	}
+		await rejectCoin(coin, text);
 	else
 	{
-		restoreCoinAnimation(coin, text);
+		await sleep(1000);
 		startPong();
-		restoreCoinAnimation(coin, text);
 	}
+	text.classList.remove("active");
 }

@@ -11,8 +11,9 @@ function	startPong()
 		paddles: getPaddles(canvas, undefined),
 		ball: getBall(canvas)
 	}
-	canvas.addEventListener("keydown", function(event) { enableMove(event, game.paddles); });
-	canvas.addEventListener("keyup", function(event) { disableMove(event, game.paddles); });
+	game.canvas.focus();
+	game.canvas.addEventListener("keydown", function(event) { enableMove(event, game.paddles); });
+	game.canvas.addEventListener("keyup", function(event) { disableMove(event, game.paddles); });
 	// document.defaultView.addEventListener("resize", function() {
 	// 	console.log("CALL");
 	// 	const canvas = document.getElementById("canvas");

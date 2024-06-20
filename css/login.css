@@ -13,7 +13,7 @@ html {
 body {
 	width: 100%;
 	height: 100%;
-	font: 0.9em "Poppins", sans-serif;
+	font: 0.9em "Inter", sans-serif;
 }
 
 /*//////////////*/
@@ -81,7 +81,7 @@ form {
 	gap: 5px;
 }
 
-input {
+form input {
 	height: 40px;
 	padding: 5px;
 	color: white;
@@ -89,6 +89,13 @@ input {
 	border: none;
 	border-bottom: 1px solid white;
 	margin-bottom: 15px;
+	transition: all 0.5s ease-out, background 0s;
+	opacity: 1;
+}
+
+form input.hidden {
+	visibility: hidden;
+	opacity: 0;
 }
 
 form button {
@@ -96,14 +103,29 @@ form button {
 	margin-top: 6px;
 	border-radius: 20px;
 	user-select: none;
+	transition: margin 0.7s ease-out, background 0s;
+	z-index: 1;
 }
 
-button:hover {
+form button.notransition {
+	transition: none;
+}
+
+form button:hover {
 	background: rgb(220, 220, 220);
 }
 
 form button:active {
 	margin-top: 8px;
+	margin-bottom: -2px;
+}
+
+form button.recovery {
+	margin-top: -50px;
+}
+
+form button.recovery:active {
+	margin-top: -48px;
 	margin-bottom: -2px;
 }
 

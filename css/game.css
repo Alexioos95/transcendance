@@ -13,7 +13,7 @@ html {
 body {
 	width: 100%;
 	height: 100%;
-	font: 0.9em "Poppins", sans-serif;
+	font: 0.9em "Inter", sans-serif;
 }
 
 /*///////////////*/
@@ -21,10 +21,23 @@ body {
 /*///////////////*/
 
 header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1% 2%;
 	height: 6%;
 	width: 100%;
+	color: white;
 	background-color: #2E2E2E;
 	border-bottom: 1px solid rgb(131, 126, 126);
+}
+
+h1 {
+	margin: 0;
+	width: 20%;
+	text-align: center;
+	cursor: default;
+	user-select: none;
 }
 
 /*/////////////*/
@@ -51,7 +64,7 @@ h2 {
 	margin: 0;
 	color: white;
 	user-select: none;
-	font-size: 25px;
+	font-size: 2em;
 }
 
 .wrapper-playzone {
@@ -70,7 +83,7 @@ h2 {
 .wrapper-options {
 	width: 20%;
 	height: 100%;
-	padding: 1%;
+	padding: 1% 1% 0.5% 1%;
 }
 
 .wrapper-options form {
@@ -94,7 +107,7 @@ h2 {
 
 .wrapper-options form h3 {
 	font-size: 1.5em;
-	margin: 5px 0px;
+	margin: 5px 0px 30px 0px;
 	user-select: none;
 }
 
@@ -158,9 +171,17 @@ h2 {
 	cursor: pointer;
 }
 
+.game-selector [type=radio]:hover + div {
+	background-color: rgb(100, 100, 100);
+}
+
 .game-selector [type=radio]:checked + div {
 	transform: translate(0em, 0.75em);
 	border: 2px ridge black;
+}
+
+.game-selector [type=radio]:checked + div:hover {
+	background: rgb(115, 115, 115);
 }
 
 .game-selector [type=radio]:checked + div::before {
@@ -176,31 +197,36 @@ h2 {
 	align-items: center;
 	width: 100%;
 	height: 37px;
+	margin-top: 5px;
 	position: relative;
 	cursor: pointer;
 	z-index: 1;
 }
 
-.mode-selector .circle {
+.wrapper-mode-selector {
+	margin-top: 2%;
+}
+
+.wrapper-mode-selector .circle {
 	height: 25px;
 	width: 25px;
 	position: absolute;
 	left: 7px;
 	background: #fc2c71;
 	box-shadow:
-		rgba(0, 0, 0, 0.3) 0px 0 1px 2px,
-		rgba(0, 0, 0, 0.8) 0 1px 1px inset,
-		#A14647 0 4px 5px inset,
-		rgba(0, 0, 0, 0.3) 0 5px 3px inset,
-		rgba(255, 255, 255, 0.3) 0 -1px 2px inset,
-		#A14647 0 -3px 10px inset;
+		rgba(0,0,0,.8) 0 0 1px 1px,
+		rgba(0,0,0,.8) 0 3px 3px inset,
+		#f5213d 0 8px 10px inset,
+		rgba(0,0,0,.3) 0 20px 5px inset,
+		rgba(255,255,255,.3) 0 -2px 3px inset,
+		#e9233e 0 -7px 20px inset;
 	border: #fc2c71 solid 1px;
 	border-radius: 100%;
 	cursor: pointer;
 	outline: none;
 }
 
-.mode-selector .circle:after {
+.wrapper-mode-selector .circle:after {
 	position: absolute;
 	bottom: -7px;
 	left: -7px;
@@ -208,7 +234,7 @@ h2 {
 	height: 35px;
 	width: 35px;
 	background: #fc2c71;
-	border: #fc2c71 1px solid;
+	border: black 1px solid;
 	border-radius: 100%;
 	box-shadow:
 	#CA235A 0 4px 5px inset,
@@ -218,7 +244,17 @@ h2 {
 	z-index: -2;
 }
 
-.mode-selector [type=radio]:checked + .circle {
+.wrapper-mode-selector [type=radio]:hover + .circle {
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0px 0 1px 2px,
+		rgba(0, 0, 0, 0.8) 0 1px 1px inset,
+		#A14647 0 4px 5px inset,
+		rgba(0, 0, 0, 0.3) 0 5px 3px inset,
+		rgba(255, 255, 255, 0.3) 0 -1px 2px inset,
+		#A14647 0 -3px 10px inset;
+}
+
+.wrapper-mode-selector [type=radio]:checked + .circle {
 	border-color: #19040B;
 	box-shadow:
 		rgba(0,0,0,.8) 0 0 1px 1px,
@@ -229,7 +265,31 @@ h2 {
 		#D1253B 0 -7px 20px inset;
 }
 
-.mode-selector span {
+.wrapper-mode-selector [type=radio]:disabled + .circle {
+	background: gray;
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0px 0 1px 2px,
+		rgba(0, 0, 0, 0.8) 0 1px 1px inset,
+		rgb(145, 145, 145) 0 4px 5px inset,
+		rgba(0, 0, 0, 0.3) 0 5px 3px inset,
+		rgba(255, 255, 255, 0.3) 0 -1px 2px inset,
+		rgb(145, 145, 145) -3px 10px inset;
+	border-color: rgb(145, 145, 145);
+}
+
+.wrapper-mode-selector [type=radio]:disabled + .circle:after {
+	background: rgb(145, 145, 145);
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0px 0 1px 2px,
+		rgba(0, 0, 0, 0.8) 0 1px 1px inset,
+		#726c6c 0 4px 5px inset,
+		rgba(0, 0, 0, 0.3) 0 5px 3px inset,
+		rgba(255, 255, 255, 0.3) 0 -1px 2px inset,
+		#8d8484 0 -3px 10px inset;
+	border-color: black;
+}
+
+.wrapper-mode-selector span {
 	width: 100%;
 	text-wrap: wrap;
 	text-align: start;
@@ -237,6 +297,10 @@ h2 {
 	font-size: 1.3em;
 	padding-left: 40%;
 	user-select: none;
+}
+
+.wrapper-mode-selector [type=radio]:disabled + .circle + span {
+	color: rgb(100, 100, 100);
 }
 
 .wrapper-submit-button {
@@ -248,7 +312,7 @@ h2 {
 
 .wrapper-submit-button button {
 	display: flex;
-	justify-content: center;
+	justify-content: space-between;
 	align-items: center;
 	text-align: center;
 	align-self: center;
@@ -398,7 +462,21 @@ canvas:focus {
 }
 
 .wrapper-controls {
+	display: flex;
+	justify-content: space-between;
 	height: 15%;
+	padding: 2%;
+}
+
+.player-control {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 50%;
+}
+
+.stick {
+	height: 100%;
 }
 
 /*/////////////*/

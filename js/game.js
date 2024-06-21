@@ -42,13 +42,6 @@ async function	addAnimations(coin, text)
 	await sleep(3100);
 }
 
-async function	rejectCoin(coin)
-{
-	coin.classList.add("fall");
-	coin.classList.remove("active");
-	await sleep(1000);
-}
-
 async function	checkValidation(coin, text, sticks)
 {
 	const form = document.querySelector(".wrapper-options form");
@@ -66,14 +59,15 @@ async function	checkValidation(coin, text, sticks)
 	text.classList.remove("active");
 }
 
+async function	rejectCoin(coin)
+{
+	coin.classList.add("fall");
+	coin.classList.remove("active");
+	await sleep(1000);
+}
+
 async function	activateStick(sticks)
 {
-	let move = {
-		leftTop: 0,
-		leftBot: 0,
-		rightTop: 0,
-		rightBot: 0
-	}
 	const canvas = document.getElementById("canvas");
 	const path = "../svg/stick/state";
 	const extension = ".svg";
@@ -84,18 +78,10 @@ async function	activateStick(sticks)
 		sticks[1].setAttribute("src", path + i + extension);
 		await sleep(60);
 	}
-	canvas.addEventListener("keydown", function(event) {
-		enableStickMove(event, sticks);
-	});
+	canvas.addEventListener("keydown", function(event) { enableStickMove(event, sticks); });
 	canvas.addEventListener("keyup", function(event) { disableStickMove(event, sticks); });
-	// setInterval( function() {
-	// 	moveSticks(sticks, move);
-	// }, 500);
 }
 
-/////////////////////////
-// Stick animation
-/////////////////////////
 function	enableStickMove(event, sticks)
 {
 	if (event.key == "w" || event.key == "W")
@@ -119,17 +105,3 @@ function	disableStickMove(event, sticks)
 	else if (event.key == "ArrowDown")
 		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
 }
-
-// function	moveSticks(sticks, move)
-// {
-// 	if (move.rightTop == 1)
-// 		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
-// 	if (move.rightBot == 1)
-// 		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
-// 	// if (move.rightTop == 0 && move.rightBot == 0)
-// 	// 	sticks[1].setAttribute("src", "../svg/stick/state4.svg");
-// 	if (move.leftTop == 1)
-// 		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
-// 	if (move.leftBot == 1)
-// 		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
-// }

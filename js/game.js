@@ -6,7 +6,10 @@ gameSelectorForm();
 function	gameSelectorForm()
 {
 	const button = document.getElementById("selector");
-	button.addEventListener("click", function() { handler(button) });
+	const elements = document.getElementsByClassName("stick");
+	const sticks = [elements[0], elements[1]];
+
+	button.addEventListener("click", function() { handler(button, sticks) });
 }
 
 function	sleep(ms) { return (new Promise(resolve => setTimeout(resolve, ms))); }
@@ -19,7 +22,7 @@ function	getCoin(button)
 	return (coin);
 }
 
-async function	handler(button)
+async function	handler(button, sticks)
 {
 	const prevCoin = document.getElementsByClassName("coin")[0];
 	if (prevCoin !== undefined)
@@ -28,7 +31,7 @@ async function	handler(button)
 	const text = document.querySelectorAll("#selector span")[0];
 	await sleep(50);
 	await addAnimations(coin, text);
-	await checkValidation(coin, text);
+	await checkValidation(coin, text, sticks);
 	button.removeChild(coin);
 }
 
@@ -36,7 +39,7 @@ async function	addAnimations(coin, text)
 {
 	text.classList.add("active");
 	coin.classList.add("active");
-	await sleep(3000);
+	await sleep(3100);
 }
 
 async function	rejectCoin(coin)
@@ -46,7 +49,7 @@ async function	rejectCoin(coin)
 	await sleep(1000);
 }
 
-async function	checkValidation(coin, text)
+async function	checkValidation(coin, text, sticks)
 {
 	const form = document.querySelector(".wrapper-options form");
 	const data = new FormData(form);
@@ -56,25 +59,77 @@ async function	checkValidation(coin, text)
 		await rejectCoin(coin);
 	else
 	{
-		await activateStick();
-		await sleep(100);
+		await activateStick(sticks);
+		await sleep(150);
 		startPong();
 	}
 	text.classList.remove("active");
 }
 
-async function	activateStick()
+async function	activateStick(sticks)
 {
-	const sticks = document.getElementsByClassName("stick");
-	const left = sticks[0];
-	const right = sticks[1];
+	let move = {
+		leftTop: 0,
+		leftBot: 0,
+		rightTop: 0,
+		rightBot: 0
+	}
+	const canvas = document.getElementById("canvas");
 	const path = "../svg/stick/state";
 	const extension = ".svg";
 
 	for (let i = 0; i < 5; i++)
 	{
-		left.setAttribute("src", path + i + extension);
-		right.setAttribute("src", path + i + extension);
-		await sleep(50);
+		sticks[0].setAttribute("src", path + i + extension);
+		sticks[1].setAttribute("src", path + i + extension);
+		await sleep(60);
 	}
+	canvas.addEventListener("keydown", function(event) {
+		enableStickMove(event, sticks);
+	});
+	canvas.addEventListener("keyup", function(event) { disableStickMove(event, sticks); });
+	// setInterval( function() {
+	// 	moveSticks(sticks, move);
+	// }, 500);
 }
+
+/////////////////////////
+// Stick animation
+/////////////////////////
+function	enableStickMove(event, sticks)
+{
+	if (event.key == "w" || event.key == "W")
+		sticks[0].setAttribute("src", "../svg/stick/state4.svg");
+	else if (event.key == "s" || event.key == "S")
+		sticks[0].setAttribute("src", "../svg/stick/down.svg");
+	else if (event.key == "ArrowUp")
+		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
+	else if (event.key == "ArrowDown")
+		sticks[1].setAttribute("src", "../svg/stick/down.svg");
+}
+
+function	disableStickMove(event, sticks)
+{
+	if (event.key == "w" || event.key == "W")
+		sticks[0].setAttribute("src", "../svg/stick/state4.svg");
+	else if (event.key == "s" || event.key == "S")
+		sticks[0].setAttribute("src", "../svg/stick/state4.svg");
+	else if (event.key == "ArrowUp")
+		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
+	else if (event.key == "ArrowDown")
+		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
+}
+
+// function	moveSticks(sticks, move)
+// {
+// 	if (move.rightTop == 1)
+// 		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
+// 	if (move.rightBot == 1)
+// 		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
+// 	// if (move.rightTop == 0 && move.rightBot == 0)
+// 	// 	sticks[1].setAttribute("src", "../svg/stick/state4.svg");
+// 	if (move.leftTop == 1)
+// 		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
+// 	if (move.leftBot == 1)
+// 		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
+// }

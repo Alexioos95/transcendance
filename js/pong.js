@@ -389,20 +389,23 @@ function	getPictures(paddles)
 {
 	const numbers = getNumbers(paddles);
 	let pictures = [0, 0, 0, 0];
+	const path = "../svg/number/";
+	const extension = ".svg";
+
 	if (numbers[0] != 0)
 	{
 		pictures[0] = new Image();
-		pictures[0].src = "../svg/" + numbers[0] + ".svg";
+		pictures[0].src = path + numbers[0] + extension;
 	}
 	pictures[1] = new Image();
-	pictures[1].src = "../svg/" + numbers[1] + ".svg";
+	pictures[1].src = path + numbers[1] + extension;
 	if (numbers[2] != 0)
 	{
 		pictures[2] = new Image();
-		pictures[2].src = "../svg/" + numbers[2] + ".svg";
+		pictures[2].src = path + numbers[2] + extension;
 	}
 	pictures[3] = new Image();
-	pictures[3].src = "../svg/" + numbers[3] + ".svg";
+	pictures[3].src = path + numbers[3] + extension;
 	return (pictures);
 }
 

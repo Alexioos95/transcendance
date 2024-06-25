@@ -85,11 +85,11 @@ async function	activateStick(sticks)
 function	enableStickMove(event, sticks)
 {
 	if (event.key == "w" || event.key == "W")
-		sticks[0].setAttribute("src", "../svg/stick/state4.svg");
+		sticks[0].setAttribute("src", "../svg/stick/up.svg");
 	else if (event.key == "s" || event.key == "S")
 		sticks[0].setAttribute("src", "../svg/stick/down.svg");
 	else if (event.key == "ArrowUp")
-		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
+		sticks[1].setAttribute("src", "../svg/stick/up.svg");
 	else if (event.key == "ArrowDown")
 		sticks[1].setAttribute("src", "../svg/stick/down.svg");
 }

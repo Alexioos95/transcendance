@@ -69,7 +69,7 @@ async function	rejectCoin(coin)
 async function	activateStick(sticks)
 {
 	const canvas = document.getElementById("canvas");
-	const path = "../svg/stick/state";
+	const path = "/svg/stick/state";
 	const extension = ".svg";
 
 	for (let i = 0; i < 5; i++)
@@ -85,23 +85,23 @@ async function	activateStick(sticks)
 function	enableStickMove(event, sticks)
 {
 	if (event.key == "w" || event.key == "W")
-		sticks[0].setAttribute("src", "../svg/stick/up.svg");
+		sticks[0].setAttribute("src", "/svg/stick/up.svg");
 	else if (event.key == "s" || event.key == "S")
-		sticks[0].setAttribute("src", "../svg/stick/down.svg");
+		sticks[0].setAttribute("src", "/svg/stick/down.svg");
 	else if (event.key == "ArrowUp")
-		sticks[1].setAttribute("src", "../svg/stick/up.svg");
+		sticks[1].setAttribute("src", "/svg/stick/up.svg");
 	else if (event.key == "ArrowDown")
-		sticks[1].setAttribute("src", "../svg/stick/down.svg");
+		sticks[1].setAttribute("src", "/svg/stick/down.svg");
 }
 
 function	disableStickMove(event, sticks)
 {
 	if (event.key == "w" || event.key == "W")
-		sticks[0].setAttribute("src", "../svg/stick/state4.svg");
+		sticks[0].setAttribute("src", "/svg/stick/state4.svg");
 	else if (event.key == "s" || event.key == "S")
-		sticks[0].setAttribute("src", "../svg/stick/state4.svg");
+		sticks[0].setAttribute("src", "/svg/stick/state4.svg");
 	else if (event.key == "ArrowUp")
-		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
+		sticks[1].setAttribute("src", "/svg/stick/state4.svg");
 	else if (event.key == "ArrowDown")
-		sticks[1].setAttribute("src", "../svg/stick/state4.svg");
+		sticks[1].setAttribute("src", "/svg/stick/state4.svg");
 }

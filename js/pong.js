@@ -389,7 +389,7 @@ function	getPictures(paddles)
 {
 	const numbers = getNumbers(paddles);
 	let pictures = [0, 0, 0, 0];
-	const path = "../svg/number/";
+	const path = "/svg/number/";
 	const extension = ".svg";
 
 	if (numbers[0] != 0)

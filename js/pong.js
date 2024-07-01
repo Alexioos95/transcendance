@@ -1,8 +1,6 @@
 /////////////////////////
 // Script
 /////////////////////////
-// startPong();
-
 function	startPong()
 {
 	let game = {

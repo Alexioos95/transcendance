@@ -7,8 +7,17 @@ function	gameSelectorForm()
 {
 	const button = document.getElementById("selector");
 	const elements = document.getElementsByClassName("stick");
-	const sticks = [elements[0], elements[1]];
-
+	let keys = {
+		w: 0,
+		s: 0,
+		up: 0,
+		down: 0
+	};
+	const sticks = {
+		left: elements[0],
+		right: elements[1],
+		keys: keys
+	};
 	button.addEventListener("click", function() { handler(button, sticks) });
 }
 
@@ -74,8 +83,8 @@ async function	activateStick(sticks)
 
 	for (let i = 0; i < 5; i++)
 	{
-		sticks[0].setAttribute("src", path + i + extension);
-		sticks[1].setAttribute("src", path + i + extension);
+		sticks.left.setAttribute("src", path + i + extension);
+		sticks.right.setAttribute("src", path + i + extension);
 		await sleep(60);
 	}
 	canvas.addEventListener("keydown", function(event) { enableStickMove(event, sticks); });
@@ -85,23 +94,59 @@ async function	activateStick(sticks)
 function	enableStickMove(event, sticks)
 {
 	if (event.key == "w" || event.key == "W")
-		sticks[0].setAttribute("src", "/svg/stick/up.svg");
+	{
+		sticks.keys.w = 1;
+		if (sticks.keys.s == 0)
+			sticks.left.setAttribute("src", "/svg/stick/up.svg");
+		else
+			sticks.left.setAttribute("src", "/svg/stick/state4.svg");
+	}
 	else if (event.key == "s" || event.key == "S")
-		sticks[0].setAttribute("src", "/svg/stick/down.svg");
+	{
+		sticks.keys.s = 1;
+		if (sticks.keys.w == 0)
+			sticks.left.setAttribute("src", "/svg/stick/down.svg");
+		else
+			sticks.left.setAttribute("src", "/svg/stick/state4.svg");
+	}
 	else if (event.key == "ArrowUp")
-		sticks[1].setAttribute("src", "/svg/stick/up.svg");
+	{
+		sticks.keys.up = 1;
+		if (sticks.keys.down == 0)
+			sticks.right.setAttribute("src", "/svg/stick/up.svg");
+		else
+			sticks.right.setAttribute("src", "/svg/stick/state4.svg");
+	}
 	else if (event.key == "ArrowDown")
-		sticks[1].setAttribute("src", "/svg/stick/down.svg");
+	{
+		sticks.keys.down = 1;
+		if (sticks.keys.up == 0)
+			sticks.right.setAttribute("src", "/svg/stick/down.svg");
+		else
+			sticks.right.setAttribute("src", "/svg/stick/state4.svg");
+	}
 }
 
 function	disableStickMove(event, sticks)
 {
 	if (event.key == "w" || event.key == "W")
-		sticks[0].setAttribute("src", "/svg/stick/state4.svg");
+	{
+		sticks.keys.w = 0;
+		sticks.left.setAttribute("src", "/svg/stick/state4.svg");
+	}
 	else if (event.key == "s" || event.key == "S")
-		sticks[0].setAttribute("src", "/svg/stick/state4.svg");
+	{
+		sticks.keys.s = 0;
+		sticks.left.setAttribute("src", "/svg/stick/state4.svg");
+	}
 	else if (event.key == "ArrowUp")
-		sticks[1].setAttribute("src", "/svg/stick/state4.svg");
+	{
+		sticks.keys.up = 0;
+		sticks.right.setAttribute("src", "/svg/stick/state4.svg");
+	}
 	else if (event.key == "ArrowDown")
-		sticks[1].setAttribute("src", "/svg/stick/state4.svg");
+	{
+		sticks.keys.down = 0;
+		sticks.right.setAttribute("src", "/svg/stick/state4.svg");
+	}
 }

@@ -1,8 +1,6 @@
 /////////////////////////
 // Script
 /////////////////////////
-forgottenPassword();
-
 function	forgottenPassword()
 {
 	const link = document.getElementsByTagName("p")[0];

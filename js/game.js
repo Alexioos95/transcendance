@@ -1,23 +1,12 @@
 /////////////////////////
 // Script
 /////////////////////////
-gameSelectorForm();
-
 function	gameSelectorForm()
 {
 	const button = document.getElementById("selector");
 	const elements = document.getElementsByClassName("stick");
-	let keys = {
-		w: 0,
-		s: 0,
-		up: 0,
-		down: 0
-	};
-	const sticks = {
-		left: elements[0],
-		right: elements[1],
-		keys: keys
-	};
+	const keys = { w: 0, s: 0, up: 0, down: 0 };
+	const sticks = { left: elements[0], right: elements[1], keys: keys };
 	button.addEventListener("click", function() { handler(button, sticks) });
 }
 
@@ -57,13 +46,16 @@ async function	checkValidation(coin, text, sticks)
 	const data = new FormData(form);
 	const game = data.get("game");
 	const mode = data.get("mode");
+	// if (game === null || mode === null || sticks.left.getAttribute("data-active") != "off" && sticks.right.getAttribute("data-active") != "off")
 	if (game === null || mode === null)
 		await rejectCoin(coin);
 	else
 	{
+		if (animationId != -1)
+			cancelAnimationFrame(animationId);
 		await activateStick(sticks);
 		await sleep(150);
-		startPong();
+		startPong(deactivateStick, sticks);
 	}
 	text.classList.remove("active");
 }
@@ -83,10 +75,12 @@ async function	activateStick(sticks)
 
 	for (let i = 0; i < 5; i++)
 	{
-		sticks.left.setAttribute("src", path + i + extension);
-		sticks.right.setAttribute("src", path + i + extension);
+		sticks.left.src = path + i + extension;
+		sticks.right.src = path + i + extension;
 		await sleep(60);
 	}
+	sticks.left.setAttribute("data-active", "on");
+	sticks.right.setAttribute("data-active", "on");
 	canvas.addEventListener("keydown", function(event) { enableStickMove(event, sticks); });
 	canvas.addEventListener("keyup", function(event) { disableStickMove(event, sticks); });
 }
@@ -97,33 +91,33 @@ function	enableStickMove(event, sticks)
 	{
 		sticks.keys.w = 1;
 		if (sticks.keys.s == 0)
-			sticks.left.setAttribute("src", "/svg/stick/up.svg");
+			sticks.left.src = "/svg/stick/up.svg";
 		else
-			sticks.left.setAttribute("src", "/svg/stick/state4.svg");
+			sticks.left.src = "/svg/stick/state4.svg";
 	}
 	else if (event.key == "s" || event.key == "S")
 	{
 		sticks.keys.s = 1;
 		if (sticks.keys.w == 0)
-			sticks.left.setAttribute("src", "/svg/stick/down.svg");
+			sticks.left.src = "/svg/stick/down.svg";
 		else
-			sticks.left.setAttribute("src", "/svg/stick/state4.svg");
+			sticks.left.src = "/svg/stick/state4.svg";
 	}
 	else if (event.key == "ArrowUp")
 	{
 		sticks.keys.up = 1;
 		if (sticks.keys.down == 0)
-			sticks.right.setAttribute("src", "/svg/stick/up.svg");
+			sticks.right.src = "/svg/stick/up.svg";
 		else
-			sticks.right.setAttribute("src", "/svg/stick/state4.svg");
+			sticks.right.src = "/svg/stick/state4.svg";
 	}
 	else if (event.key == "ArrowDown")
 	{
 		sticks.keys.down = 1;
 		if (sticks.keys.up == 0)
-			sticks.right.setAttribute("src", "/svg/stick/down.svg");
+			sticks.right.src = "/svg/stick/down.svg";
 		else
-			sticks.right.setAttribute("src", "/svg/stick/state4.svg");
+			sticks.right.src = "/svg/stick/state4.svg";
 	}
 }
 
@@ -132,21 +126,38 @@ function	disableStickMove(event, sticks)
 	if (event.key == "w" || event.key == "W")
 	{
 		sticks.keys.w = 0;
-		sticks.left.setAttribute("src", "/svg/stick/state4.svg");
+		sticks.left.src = "/svg/stick/state4.svg";
 	}
 	else if (event.key == "s" || event.key == "S")
 	{
 		sticks.keys.s = 0;
-		sticks.left.setAttribute("src", "/svg/stick/state4.svg");
+		sticks.left.src = "/svg/stick/state4.svg";
 	}
 	else if (event.key == "ArrowUp")
 	{
 		sticks.keys.up = 0;
-		sticks.right.setAttribute("src", "/svg/stick/state4.svg");
+		sticks.right.src = "/svg/stick/state4.svg";
 	}
 	else if (event.key == "ArrowDown")
 	{
 		sticks.keys.down = 0;
-		sticks.right.setAttribute("src", "/svg/stick/state4.svg");
+		sticks.right.src = "/svg/stick/state4.svg";
 	}
+}
+
+async function	deactivateStick(sticks)
+{
+	const canvas = document.getElementById("canvas");
+	const path = "/svg/stick/state";
+	const extension = ".svg";
+
+	for (let i = 4; i > -1; i--)
+	{
+		sticks.left.src = path + i + extension;
+		sticks.right.src = path + i + extension;
+		await sleep(60);
+	}
+	sticks.left.setAttribute("data-active", "off");
+	sticks.right.setAttribute("data-active", "off");
+	canvas.outerHTML = canvas.outerHTML;
 }

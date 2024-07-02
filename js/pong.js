@@ -1,9 +1,11 @@
 /////////////////////////
 // Script
 /////////////////////////
-function	startPong()
+let animationId = -1;
+
+function	startPong(callback, parameter)
 {
-	let game = {
+	const game = {
 		canvas: getCanvas(),
 		ctx: canvas.getContext("2d"),
 		paddles: getPaddles(canvas, undefined),
@@ -23,10 +25,10 @@ function	startPong()
 	// 	game.canvas.addEventListener("keydown", function(event) { enableMove(event, game.paddles); });
 	// 	game.canvas.addEventListener("keyup", function(event) { disableMove(event, game.paddles); });
 	// });
-	loop(game);
+	loop(game, callback, parameter);
 }
 
-function	loop(game)
+async function	loop(game, callback, parameter)
 {
 	game.ctx.fillStyle = "#2F2F2F";
 	game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
@@ -35,10 +37,15 @@ function	loop(game)
 		movePaddles(game.canvas, game.paddles)
 		moveBall(game);
 		render(game);
-		requestAnimationFrame(() => loop(game));
+		animationId = requestAnimationFrame(() => loop(game, callback, parameter));
 	}
 	else
+	{
+		await callback(parameter);
+		game.canvas = getCanvas();
+		game.ctx = game.canvas.getContext("2d");
 		renderFinalScore(game.ctx, game.paddles);
+	}
 }
 
 function	renderFinalScore(ctx, paddles)
@@ -174,8 +181,16 @@ function	updateScore(game)
 
 function	resetBall(game)
 {
-	game.ball.x = game.canvas.width / 2;
-	game.ball.y = game.canvas.height / 2;
+	if (game.paddles.left.score < 11 && game.paddles.right.score < 11)
+	{
+		game.ball.x = game.canvas.width / 2;
+		game.ball.y = game.canvas.height / 2;
+	}
+	else
+	{
+		game.ball.x = 0 - game.ball.radius;
+		game.ball.y = 0 - game.ball.radius;
+	}
 	game.ball.dir_x = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
 	game.ball.dir_y = generateDirY();
 }
@@ -318,7 +333,7 @@ function	getPaddles(canvas)
 {
 	const height = canvas.height / 5;
 	const width = canvas.width / 50;
-	let paddles = {
+	const paddles = {
 		height: height,
 		width: width,
 		speed: 10,
@@ -330,12 +345,12 @@ function	getPaddles(canvas)
 
 function	createPaddle(canvas, height, width, position)
 {
-	let paddle = {
+	const paddle = {
 		x: 0,
 		y: 0,
 		move_top: 0,
 		move_bot: 0,
-		score: 0
+		score: 8
 	}
 	if (position == "l")
 	{
@@ -352,7 +367,7 @@ function	createPaddle(canvas, height, width, position)
 
 function	actualizePaddles(canvas, previousIteration)
 {
-	let paddles = {
+	const paddles = {
 		height: canvas.height / 5,
 		width: canvas.width / 50,
 		speed: 10,
@@ -366,7 +381,7 @@ function	actualizePaddles(canvas, previousIteration)
 
 function	getBall(canvas)
 {
-	let ball = {
+	const ball = {
 		radius: 15,
 		x: canvas.width / 2,
 		y: canvas.height / 2,
@@ -386,7 +401,7 @@ function	generateDirY()
 function	getPictures(paddles)
 {
 	const numbers = getNumbers(paddles);
-	let pictures = [0, 0, 0, 0];
+	const pictures = [0, 0, 0, 0];
 	const path = "/svg/number/";
 	const extension = ".svg";
 

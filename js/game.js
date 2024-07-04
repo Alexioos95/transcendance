@@ -1,5 +1,14 @@
 /////////////////////////
-// Script
+// Login/Logout Button
+/////////////////////////
+function	loginButton()
+{
+	const button = document.getElementsByClassName("login-button")[0];
+	button.addEventListener("click", function() { navigate("login"); });
+}
+
+/////////////////////////
+// Game Selector Form
 /////////////////////////
 function	gameSelectorForm()
 {
@@ -151,6 +160,7 @@ async function	deactivateStick(sticks)
 	const path = "/svg/stick/state";
 	const extension = ".svg";
 
+	canvas.outerHTML = canvas.outerHTML;
 	for (let i = 4; i > -1; i--)
 	{
 		sticks.left.src = path + i + extension;
@@ -159,5 +169,4 @@ async function	deactivateStick(sticks)
 	}
 	sticks.left.setAttribute("data-active", "off");
 	sticks.right.setAttribute("data-active", "off");
-	canvas.outerHTML = canvas.outerHTML;
 }

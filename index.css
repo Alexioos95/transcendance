@@ -16,11 +16,16 @@ body {
 	font: 0.9em "Inter", sans-serif;
 }
 
+:root {
+	--mainColor: #2E2E2E;
+	--textColor: #F2F2F2;
+}
+
 /*////////////////*/
 /* Layer - Login */
 /*///////////////*/
 .layer {
-	color: #f2f2f2;
+	color: var(--textColor);
 	background-color: black;
 	display: flex;
 	justify-content: center;
@@ -38,7 +43,7 @@ body {
 /*//////////////*/
 
 .card {
-	background-color: #2E2E2E;
+	background-color: var(--mainColor);
 	border-radius: 10px;
 	box-shadow: 0 3px 10px 3px rgb(131, 126, 126);
 }
@@ -87,10 +92,10 @@ body {
 .layer form input {
 	height: 40px;
 	padding: 5px;
-	color: white;
-	background: #2E2E2E;
+	color: var(--textColor);
+	background: var(--mainColor);
 	border: none;
-	border-bottom: 1px solid white;
+	border-bottom: 1px solid var(--textColor);
 	margin-bottom: 15px;
 	transition: all 0.5s ease-out, background 0s;
 	opacity: 1;
@@ -174,7 +179,7 @@ body {
 
 .login-42 {
 	display: flex;
-	border: 1px solid #e5e5e5;
+	border: 1px solid #E5E5E5;
 }
 
 .svg {
@@ -185,11 +190,11 @@ body {
 
 .login-42:hover {
 	background-color: rgba(0, 0, 0, 0.5);
-	color: white;
+	color: var(--textColor);
 }
 
 .login-42:hover .svg {
-	fill: white;
+	fill: var(--textColor);
 }
 
 /*/////////////////////*/
@@ -265,11 +270,11 @@ header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 1% 2%;
+	padding: 0% 2%;
 	height: 6%;
 	width: 100%;
-	color: white;
-	background-color: #2E2E2E;
+	color: var(--textColor);
+	background-color: var(--mainColor);
 	border-bottom: 1px solid rgb(131, 126, 126);
 }
 
@@ -281,6 +286,64 @@ header h1 {
 	user-select: none;
 }
 
+.wrapper-user {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 18%;
+	height: 100%;
+}
+
+.user {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	gap: 25px;
+	background-color: inherit;
+	color: var(--textColor);
+	border: none;
+	padding: 0;
+	position: relative;
+	cursor: pointer;
+}
+
+.user span {
+	font-weight: 600;
+	text-align: left;
+	margin-right: 10px;
+}
+
+.menu {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	width: 100%;
+	height: 0%;
+	display: none;
+}
+
+.menu ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+.menu ul li {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	height: 35px;
+	margin: 0;
+	padding: 10px;
+	background: var(--mainColor);
+	list-style-type: none;
+}
+
+.user:hover .menu {
+	display: block;
+}
+
 /*/////////////*/
 /* Game - main */
 /*/////////////*/
@@ -290,7 +353,7 @@ main {
 	flex-direction: column;
 	height: 94%;
 	padding: 2%;
-	color: white;
+	color: var(--textColor);
 	background-color: black;
 }
 
@@ -298,7 +361,7 @@ h2 {
 	text-align: center;
 	margin: 5px 0;
 	height: 4%;
-	color: white;
+	color: var(--textColor);
 	user-select: none;
 	font-size: 2em;
 }
@@ -570,7 +633,7 @@ h2 {
 .wrapper-submit-button span {
 	font-family: 'Press Start 2P';
 	font-size: 1.5em;
-	color: white;
+	color: var(--textColor);
 	text-shadow: 0 0 5px #ec41bf, 0 0 10px #8606b6, 0 0 15px #fff, 0 0 20px #921982, 0 0 25px #770067;
 	animation: fade 3s infinite;
 }

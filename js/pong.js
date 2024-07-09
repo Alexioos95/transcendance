@@ -8,7 +8,7 @@ function	startPong(callback, parameter)
 	const game = {
 		canvas: getCanvas(),
 		ctx: canvas.getContext("2d"),
-		paddles: getPaddles(canvas, undefined),
+		paddles: getPaddles(canvas),
 		ball: getBall(canvas)
 	}
 	game.canvas.focus();

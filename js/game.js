@@ -55,7 +55,8 @@ async function	checkValidation(coin, text, sticks)
 	const data = new FormData(form);
 	const game = data.get("game");
 	const mode = data.get("mode");
-	// if (game === null || mode === null || sticks.left.getAttribute("data-active") != "off" && sticks.right.getAttribute("data-active") != "off")
+	const title = document.getElementsByTagName("h2")[0];
+
 	if (game === null || mode === null)
 		await rejectCoin(coin);
 	else
@@ -65,6 +66,7 @@ async function	checkValidation(coin, text, sticks)
 		await activateStick(sticks);
 		await sleep(150);
 		startPong(deactivateStick, sticks);
+		title.innerHTML = "PONG";
 	}
 	text.classList.remove("active");
 }
@@ -78,7 +80,7 @@ async function	rejectCoin(coin)
 
 async function	activateStick(sticks)
 {
-	const canvas = document.getElementById("canvas");
+	const wrapper = document.getElementsByClassName("wrapper-canvas")[0];
 	const path = "/svg/stick/state";
 	const extension = ".svg";
 
@@ -90,8 +92,8 @@ async function	activateStick(sticks)
 	}
 	sticks.left.setAttribute("data-active", "on");
 	sticks.right.setAttribute("data-active", "on");
-	canvas.addEventListener("keydown", function(event) { enableStickMove(event, sticks); });
-	canvas.addEventListener("keyup", function(event) { disableStickMove(event, sticks); });
+	wrapper.addEventListener("keydown", function(event) { enableStickMove(event, sticks); });
+	wrapper.addEventListener("keyup", function(event) { disableStickMove(event, sticks); });
 }
 
 function	enableStickMove(event, sticks)
@@ -157,10 +159,11 @@ function	disableStickMove(event, sticks)
 async function	deactivateStick(sticks)
 {
 	const canvas = document.getElementById("canvas");
+	const wrapper = document.getElementsByClassName("wrapper-canvas")[0];
 	const path = "/svg/stick/state";
 	const extension = ".svg";
 
-	canvas.outerHTML = canvas.outerHTML;
+	wrapper.outerHTML = wrapper.outerHTML;
 	for (let i = 4; i > -1; i--)
 	{
 		sticks.left.src = path + i + extension;

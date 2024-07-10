@@ -1,50 +1,54 @@
 /////////////////////////
 // Script
 /////////////////////////
-let animationId = -1;
-
-function	startPong(callback, parameter)
+function	getPongStruct()
 {
-	const game = {
+	const struct = {
+		name: "PONG",
 		canvas: getCanvas(),
 		ctx: canvas.getContext("2d"),
 		paddles: getPaddles(canvas),
-		ball: getBall(canvas)
-	}
-	game.canvas.focus();
-	game.canvas.addEventListener("keydown", function(event) { enableMove(event, game.paddles); });
-	game.canvas.addEventListener("keyup", function(event) { disableMove(event, game.paddles); });
+		ball: getBall(canvas),
+		animationId: -1,
+		run: startGame
+	};
+	return (struct);
+}
+
+function	startGame(struct)
+{
+	struct.game.canvas.focus();
+	struct.game.canvas.addEventListener("keydown", function(event) { enableMove(event, struct.game.paddles); });
+	struct.game.canvas.addEventListener("keyup", function(event) { disableMove(event, struct.game.paddles); });
 	// document.defaultView.addEventListener("resize", function() {
 	// 	console.log("CALL");
 	// 	const canvas = document.getElementById("canvas");
 	// 	if (canvas !== undefined)
 	// 		canvas.remove();
-	// 	game.canvas = getCanvas();
-	// 	game.ctx = game.canvas.getContext("2d");
-	// 	game.paddles = actualizePaddles(game.canvas, game.paddles);
-	// 	game.canvas.addEventListener("keydown", function(event) { enableMove(event, game.paddles); });
-	// 	game.canvas.addEventListener("keyup", function(event) { disableMove(event, game.paddles); });
+	// 	struct.game.canvas = getCanvas();
+	// 	struct.game.ctx = struct.game.canvas.getContext("2d");
+	// 	struct.game.paddles = actualizePaddles(struct.game.canvas, struct.game.paddles);
+	// 	struct.game.canvas.addEventListener("keydown", function(event) { enableMove(event, struct.game.paddles); });
+	// 	struct.game.canvas.addEventListener("keyup", function(event) { disableMove(event, struct.game.paddles); });
 	// });
-	loop(game, callback, parameter);
+	loop(struct.game, struct.sticks);
 }
 
-async function	loop(game, callback, parameter)
+async function	loop(struct, sticks)
 {
-	game.ctx.fillStyle = "#2F2F2F";
-	game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-	if (game.paddles.left.score < 11 && game.paddles.right.score < 11)
+	struct.ctx.fillStyle = "#2F2F2F";
+	struct.ctx.fillRect(0, 0, struct.canvas.width, struct.canvas.height);
+	if (struct.paddles.left.score < 11 && struct.paddles.right.score < 11)
 	{
-		movePaddles(game.canvas, game.paddles)
-		moveBall(game);
-		render(game);
-		animationId = requestAnimationFrame(() => loop(game, callback, parameter));
+		movePaddles(struct.canvas, struct.paddles)
+		moveBall(struct);
+		render(struct);
+		struct.animationId = requestAnimationFrame(() => loop(struct, sticks));
 	}
 	else
 	{
-		await callback(parameter);
-		game.canvas = getCanvas();
-		game.ctx = game.canvas.getContext("2d");
-		renderFinalScore(game.ctx, game.paddles);
+		await deactivateStick(struct, sticks);
+		renderFinalScore(struct.ctx, struct.paddles);
 	}
 }
 
@@ -63,12 +67,12 @@ function	renderFinalScore(ctx, paddles)
 /////////////////////////
 // Render
 /////////////////////////
-function	render(game)
+function	render(struct)
 {
-	game.ctx.fillStyle = "#FDFDFD";
-	renderPaddles(game.ctx, game.paddles);
-	renderBall(game.ctx, game.ball);
-	renderScore(game);
+	struct.ctx.fillStyle = "#FDFDFD";
+	renderPaddles(struct.ctx, struct.paddles);
+	renderBall(struct.ctx, struct.ball);
+	renderScore(struct);
 }
 
 function	renderPaddles(ctx, paddles)
@@ -85,15 +89,15 @@ function	renderBall(ctx, ball)
 	ctx.stroke();
 }
 
-function	renderScore(game)
+function	renderScore(struct)
 {
-	const pictures = getPictures(game.paddles);
+	const pictures = getPictures(struct.paddles);
 	if (pictures[0] != 0)
-		game.ctx.drawImage(pictures[0], ((((game.canvas.width / 2) / 2) - pictures[1].width) - 5), 20);
-	game.ctx.drawImage(pictures[1], ((game.canvas.width / 2) / 2) + 3, 20);
+		struct.ctx.drawImage(pictures[0], ((((struct.canvas.width / 2) / 2) - pictures[1].width) - 5), 20);
+	struct.ctx.drawImage(pictures[1], ((struct.canvas.width / 2) / 2) + 3, 20);
 	if (pictures[2] != 0)
-		game.ctx.drawImage(pictures[2], (game.canvas.width / 2) + ((((game.canvas.width / 2) / 2) - pictures[3].width) - 5), 20);
-	game.ctx.drawImage(pictures[3], (game.canvas.width / 2) + ((game.canvas.width / 2) / 2) - 3, 20);
+		struct.ctx.drawImage(pictures[2], (struct.canvas.width / 2) + ((((struct.canvas.width / 2) / 2) - pictures[3].width) - 5), 20);
+	struct.ctx.drawImage(pictures[3], (struct.canvas.width / 2) + ((struct.canvas.width / 2) / 2) - 3, 20);
 }
 
 /////////////////////////
@@ -135,29 +139,29 @@ function	movePaddles(canvas, paddles)
 		paddles.right.y += paddles.speed;
 }
 
-function	moveBall(game)
+function	moveBall(struct)
 {
-	if (game.ball.x <= -100 || game.ball.x >= (canvas.width + 100))
-		point(game);
+	if (struct.ball.x <= -100 || struct.ball.x >= (canvas.width + 100))
+		point(struct);
 	else
-		collision(game.paddles, game.ball);
-	movePXbyPX(game);
+		collision(struct.paddles, struct.ball);
+	movePXbyPX(struct);
 }
 
-function	movePXbyPX(game)
+function	movePXbyPX(struct)
 {
 	let i = 0;
-	while (i < game.ball.speed)
+	while (i < struct.ball.speed)
 	{
-		game.ctx.fillStyle = "#2E2E2E";
-		game.ctx.beginPath();
-		game.ctx.arc(game.ball.x, game.ball.y, game.ball.radius, 0, 2 * Math.PI);
-		game.ctx.stroke();
-		game.ball.x += game.ball.dir_x;
-		game.ball.y += game.ball.dir_y;
-		game.ctx.fillStyle = "#FDFDFD";
-		game.ctx.beginPath();
-		game.ctx.arc(game.ball.x, game.ball.y, game.ball.radius, 0, 2 * Math.PI);
+		struct.ctx.fillStyle = "#2E2E2E";
+		struct.ctx.beginPath();
+		struct.ctx.arc(struct.ball.x, struct.ball.y, struct.ball.radius, 0, 2 * Math.PI);
+		struct.ctx.stroke();
+		struct.ball.x += struct.ball.dir_x;
+		struct.ball.y += struct.ball.dir_y;
+		struct.ctx.fillStyle = "#FDFDFD";
+		struct.ctx.beginPath();
+		struct.ctx.arc(struct.ball.x, struct.ball.y, struct.ball.radius, 0, 2 * Math.PI);
 		i++;
 	}
 }
@@ -165,34 +169,34 @@ function	movePXbyPX(game)
 /////////////////////////
 // Point
 /////////////////////////
-function	point(game)
+function	point(struct)
 {
-	updateScore(game);
-	resetBall(game);
+	updateScore(struct);
+	resetBall(struct);
 }
 
-function	updateScore(game)
+function	updateScore(struct)
 {
-	if (game.ball.x <= -100 && game.paddles.right.score < 99)
-		game.paddles.right.score++;
-	else if (game.ball.x >= (canvas.width + 100) && game.paddles.left.score < 99)
-		game.paddles.left.score++;
+	if (struct.ball.x <= -100 && struct.paddles.right.score < 99)
+		struct.paddles.right.score++;
+	else if (struct.ball.x >= (canvas.width + 100) && struct.paddles.left.score < 99)
+		struct.paddles.left.score++;
 }
 
-function	resetBall(game)
+function	resetBall(struct)
 {
-	if (game.paddles.left.score < 11 && game.paddles.right.score < 11)
+	if (struct.paddles.left.score < 11 && struct.paddles.right.score < 11)
 	{
-		game.ball.x = game.canvas.width / 2;
-		game.ball.y = game.canvas.height / 2;
+		struct.ball.x = struct.canvas.width / 2;
+		struct.ball.y = struct.canvas.height / 2;
 	}
 	else
 	{
-		game.ball.x = 0 - game.ball.radius;
-		game.ball.y = 0 - game.ball.radius;
+		struct.ball.x = 0 - struct.ball.radius;
+		struct.ball.y = 0 - struct.ball.radius;
 	}
-	game.ball.dir_x = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
-	game.ball.dir_y = generateDirY();
+	struct.ball.dir_x = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
+	struct.ball.dir_y = generateDirY();
 }
 
 /////////////////////////
@@ -350,7 +354,7 @@ function	createPaddle(canvas, height, width, position)
 		y: 0,
 		move_top: 0,
 		move_bot: 0,
-		score: 8
+		score: 10
 	}
 	if (position == "l")
 	{

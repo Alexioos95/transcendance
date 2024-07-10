@@ -10,10 +10,7 @@ async function navigate(page)
 		.then(response => response.text())
 		.then(html => { container.innerHTML = html; })
 	if (page == "game")
-	{
-		gameSelectorForm();
-		loginButton();
-	}
+		run();
 	else if (page == "login")
 		forgottenPassword();
 }

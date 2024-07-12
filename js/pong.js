@@ -5,54 +5,55 @@ function	getPongStruct()
 {
 	const struct = {
 		name: "PONG",
-		canvas: getCanvas(),
-		ctx: canvas.getContext("2d"),
-		paddles: getPaddles(canvas),
-		ball: getBall(canvas),
-		animationId: -1,
-		run: startGame
+		canvas: undefined,
+		ctx: undefined,
+		paddles: undefined,
+		ball: undefined,
+		run: startGame,
+		running: 0
 	};
 	return (struct);
 }
 
-function	startGame(struct)
+async function	startGame(struct)
 {
+	initStruct(struct);
 	struct.game.canvas.focus();
 	struct.game.canvas.addEventListener("keydown", function(event) { enableMove(event, struct.game.paddles); });
 	struct.game.canvas.addEventListener("keyup", function(event) { disableMove(event, struct.game.paddles); });
-	// document.defaultView.addEventListener("resize", function() {
-	// 	console.log("CALL");
-	// 	const canvas = document.getElementById("canvas");
-	// 	if (canvas !== undefined)
-	// 		canvas.remove();
-	// 	struct.game.canvas = getCanvas();
-	// 	struct.game.ctx = struct.game.canvas.getContext("2d");
-	// 	struct.game.paddles = actualizePaddles(struct.game.canvas, struct.game.paddles);
-	// 	struct.game.canvas.addEventListener("keydown", function(event) { enableMove(event, struct.game.paddles); });
-	// 	struct.game.canvas.addEventListener("keyup", function(event) { disableMove(event, struct.game.paddles); });
-	// });
-	loop(struct.game, struct.sticks);
+	document.defaultView.addEventListener("resize", function() { resize(struct.game, struct.wrapperCanvas); });
+	loop(struct, struct.game);
 }
 
-async function	loop(struct, sticks)
+async function	initStruct(struct)
 {
-	struct.ctx.fillStyle = "#2F2F2F";
-	struct.ctx.fillRect(0, 0, struct.canvas.width, struct.canvas.height);
-	if (struct.paddles.left.score < 11 && struct.paddles.right.score < 11)
+	struct.game.canvas = getCanvas(struct.wrapperCanvas);
+	struct.game.ctx = struct.game.canvas.getContext("2d");
+	struct.game.paddles = getPaddles(struct.game.canvas);
+	struct.game.ball = getBall(struct.game.canvas);
+	struct.game.running = 1;
+}
+
+async function	loop(struct, game)
+{
+	game.ctx.fillStyle = "#2F2F2F";
+	game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
+	if (game.paddles.left.score < 11 && game.paddles.right.score < 11)
 	{
-		movePaddles(struct.canvas, struct.paddles)
-		moveBall(struct);
-		render(struct);
-		struct.animationId = requestAnimationFrame(() => loop(struct, sticks));
+		movePaddles(game.canvas, game.paddles)
+		moveBall(game);
+		render(game);
+		requestAnimationFrame(() => loop(struct, game));
 	}
 	else
 	{
-		await deactivateStick(struct, sticks);
-		renderFinalScore(struct.ctx, struct.paddles);
+		game.running = 0;
+		await endGame(struct);
+		renderFinalScore(game.canvas, game.ctx, game.paddles);
 	}
 }
 
-function	renderFinalScore(ctx, paddles)
+function	renderFinalScore(canvas, ctx, paddles)
 {
 	const pictures = getPictures(paddles);
 	const dim = getDimensions(canvas, pictures, paddles);
@@ -100,6 +101,47 @@ function	renderScore(struct)
 	struct.ctx.drawImage(pictures[3], (struct.canvas.width / 2) + ((struct.canvas.width / 2) / 2) - 3, 20);
 }
 
+function	resize(game, wrapper)
+{
+	const oldValues = {
+		width: game.canvas.width,
+		height: game.canvas.height
+	};
+	setCanvasDimensions(game.canvas, wrapper);
+	if (game.paddles.left.score < 11 && game.paddles.right.score < 11)
+	{
+		resizePaddles(oldValues, game.canvas, game.paddles);
+		resizeBall(oldValues, game.canvas, game.ball);
+	}
+	else
+	{
+		game.ctx.fillStyle = "#2F2F2F";
+		game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
+		renderFinalScore(game.canvas, game.ctx, game.paddles);
+	}
+}
+
+function	resizePaddles(oldValues, canvas, paddles)
+{
+	const percentOldLeft = paddles.left.y / oldValues.height * 100;
+	const percentOldRight = paddles.right.y / oldValues.height * 100;
+	paddles.height = canvas.height / 5;
+	paddles.width = canvas.width / 50;
+	paddles.left.x = canvas.width / 20;
+	paddles.left.y = canvas.height / 100 * percentOldLeft;
+	paddles.right.x = canvas.width - (canvas.width / 20) - paddles.width;
+	paddles.right.y = canvas.height / 100 * percentOldRight;
+}
+
+function	resizeBall(oldValues, canvas, ball)
+{
+	const percentOldX = ball.x / oldValues.width * 100;
+	const percentOldY = ball.y / oldValues.height * 100;
+	ball.x = canvas.width / 100 * percentOldX;
+	ball.y = canvas.height / 100 * percentOldY;
+	ball.speed = canvas.width / 100;
+}
+
 /////////////////////////
 // Animation
 /////////////////////////
@@ -141,10 +183,10 @@ function	movePaddles(canvas, paddles)
 
 function	moveBall(struct)
 {
-	if (struct.ball.x <= -100 || struct.ball.x >= (canvas.width + 100))
+	if (struct.ball.x <= -100 || struct.ball.x >= (struct.canvas.width + 100))
 		point(struct);
 	else
-		collision(struct.paddles, struct.ball);
+		collision(struct.canvas, struct.paddles, struct.ball);
 	movePXbyPX(struct);
 }
 
@@ -202,7 +244,7 @@ function	resetBall(struct)
 /////////////////////////
 // Collision
 /////////////////////////
-function	collision(paddles, ball)
+function	collision(canvas, paddles, ball)
 {
 	if (ball.y <= ball.radius || ball.y >= (canvas.height - ball.radius)) // WALL
 		ball.dir_y *= -1;
@@ -318,32 +360,36 @@ function	collisionBot(paddles, ball)
 /////////////////////////
 // Getters
 /////////////////////////
-function	getCanvas()
+function	getCanvas(wrapper)
 {
-	const wrapper = document.getElementById("canvas");
-	// const wrapper = document.getElementsByClassName("wrapper-canvas")[0];
-	// const width = wrapper.offsetWidth;
-	// const height = wrapper.offsetHeight;
-	// const canvas = document.createElement("canvas");
-	// canvas.setAttribute("id", "canvas");
-	// canvas.setAttribute("width", width);
-	// canvas.setAttribute("height", height);
-	// canvas.setAttribute("tabindex", "0");
-	// wrapper.appendChild(canvas);
+	const canvas = document.createElement("canvas");
+	canvas.setAttribute("id", "canvas");
+	canvas.setAttribute("tabindex", "0");
+	setCanvasDimensions(canvas, wrapper);
+	wrapper.appendChild(canvas);
 	return (canvas);
+}
+
+function	setCanvasDimensions(canvas, wrapper)
+{
+	const width = wrapper.clientWidth;
+	const height = wrapper.clientHeight;
+	canvas.setAttribute("width", width);
+	canvas.setAttribute("height", height);
 }
 
 function	getPaddles(canvas)
 {
 	const height = canvas.height / 5;
 	const width = canvas.width / 50;
-	const paddles = {
+	const paddles =
+	{
 		height: height,
 		width: width,
 		speed: 10,
 		left: createPaddle(canvas, height, width, "l"),
 		right: createPaddle(canvas, height, width, "r"),
-	}
+	};
 	return (paddles);
 }
 
@@ -355,7 +401,7 @@ function	createPaddle(canvas, height, width, position)
 		move_top: 0,
 		move_bot: 0,
 		score: 10
-	}
+	};
 	if (position == "l")
 	{
 		paddle.x = canvas.width / 20;
@@ -367,20 +413,6 @@ function	createPaddle(canvas, height, width, position)
 		paddle.y = (canvas.height / 2) - (height / 2);
 	}
 	return (paddle);
-}
-
-function	actualizePaddles(canvas, previousIteration)
-{
-	const paddles = {
-		height: canvas.height / 5,
-		width: canvas.width / 50,
-		speed: 10,
-		left: previousIteration.left,
-		right: previousIteration.right,
-	}
-	paddles.left.x = canvas.width / 20;
-	paddles.right.x = canvas.width - (canvas.width / 20) - paddles.width;
-	return (paddles);
 }
 
 function	getBall(canvas)

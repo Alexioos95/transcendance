@@ -5,59 +5,48 @@ async function	run()
 {
 	const struct = {
 		loginButton: document.getElementsByClassName("login-button")[0],
-		coinButton: document.getElementById("selector"),
+		insertCoinButton: document.getElementById("selector"),
+		wrapperCanvas: document.getElementsByClassName("wrapper-canvas")[0],
 		sticks: getSticksStruct(),
-		game: getPongStruct()
+		game: undefined,
+		tournament: getTournamentStruct(),
+		run: 1
 	};
 	struct.loginButton.addEventListener("click", function() {
-		if (struct.game.animationId !== undefined)
-			cancelAnimationFrame(struct.game.animationId);
+		struct.run = 0;
 		navigate("login");
 	});
-
-	//event listener sir abandon =>struc met game running a false
-	while (1)
+	// addEventListener abandonButton => stopper le jeu;
+	struct.wrapperCanvas.addEventListener("keydown", function(event) { enableStickMove(event, struct); });
+	struct.wrapperCanvas.addEventListener("keyup", function(event) { disableStickMove(event, struct); });
+	while (struct.run == 1)
 	{
-		//if (struct.game.running == false)
-		await getFormStruct(struct)
+		await waitCoin(struct)
 			.then(() => coinAnimation(struct))
 			.then(() => checkValidation(struct))
+			.then(() => setupTournament(struct))
 			.then(() => activateStick(struct))
-			.then(() => sleep(150))
-			.then(() => resetCoinButton(struct.coinButton))
 			.then(() => struct.game.run(struct))
 			.catch((e) => {
 				if (e === 0)
 					rejectCoin(struct);
-			})
-		//check si quelaue chose dns socket chat
-		//si la partie finie tu remets running a false
+			});
+		// Faire un await pour le chat (?);
 	}
 }
 
-function	getSticksStruct()
-{
-	const elements = document.getElementsByClassName("stick");
-	const struct = {
-		keys: { w: 0, s: 0, up: 0, down: 0 },
-		left: elements[0],
-		right: elements[1],
-	};
-	return (struct);
-}
-
-async function getFormStruct(struct) {
-	return new Promise((resolve, reject) => {
-		function handleClick() { resolve(); }
-		struct.coinButton.addEventListener("click", handleClick, { once: true });
-	});
-}
+function	sleep(ms)
+{ return new Promise(resolve => setTimeout(resolve, ms)); }
 
 /////////////////////////
 // Game Selector Form
 /////////////////////////
-function	sleep(ms)
-{ return new Promise(resolve => setTimeout(resolve, ms)); }
+async function waitCoin(struct) {
+	return new Promise((resolve, reject) => {
+		function handleClick() { resolve(); }
+		struct.insertCoinButton.addEventListener("click", handleClick, { once: true });
+	});
+}
 
 function	getCoin(button)
 {
@@ -69,25 +58,24 @@ function	getCoin(button)
 
 async function	coinAnimation(struct)
 {
+	if (struct.run == 0)
+		return new Promise ((resolve, reject) => { reject(); });
 	if (document.getElementsByClassName("coin")[0] !== undefined)
-		return new Promise ((resolve, reject) => { reject(undefined); });
-	const coin = getCoin(struct.coinButton);
+		return new Promise ((resolve, reject) => { reject(); });
+	const coin = getCoin(struct.insertCoinButton);
 	const text = document.querySelectorAll("#selector span")[0];
 	return new Promise ((resolve, reject) => {
 		sleep(50)
-		.then(() => addAnimations(coin, text))
-		.then(() => sleep(3100))
-		.then(() => resolve())
+			.then(() => addAnimations(coin, text))
+			.then(() => sleep(3100))
+			.then(() => resolve())
 	});
 }
 
 async function	addAnimations(coin, text)
 {
-	return new Promise((resolve, reject) => {
-		text.classList.add("active");
-		coin.classList.add("active");
-		resolve();
-	});
+	text.classList.add("active");
+	coin.classList.add("active");
 }
 
 async function	checkValidation(struct, data)
@@ -101,14 +89,39 @@ async function	checkValidation(struct, data)
 
 		if (game === null || mode === null)
 			return (reject(0));
-		if (struct.game.animationId != -1)
-		{
-			cancelAnimationFrame(struct.game.animationId);
+		if (game == "pong")
 			struct.game = getPongStruct();
-		}
+		// else if (game == "tetris")
+			// struct.game = getTetrisStruct();
+		if (mode == "tournament")
+			struct.tournament.on = true;
 		title.innerHTML = struct.game.name;
 		return (resolve());
 	});
+}
+
+async function	setupTournament(struct)
+{
+	if (struct.tournament.on == false || struct.game.name == "tetris")
+		return ;
+	showTournamentForm();
+	completeTournamentStruct(struct.tournament);
+	await waitTournamentForm(struct)
+		.then(() => addNamesToTournamentStruct(struct.tournament))
+		.then(() => createMatches(struct.tournament))
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 async function	rejectCoin(struct)
@@ -117,21 +130,34 @@ async function	rejectCoin(struct)
 	coin.classList.add("fall");
 	coin.classList.remove("active");
 	await sleep(1000);
-	resetCoinButton(struct.coinButton);
+	resetinsertCoinButton(struct.insertCoinButton);
 }
 
-function	resetCoinButton(button)
+function	resetinsertCoinButton(button)
 {
 	const text = document.querySelectorAll("#selector span")[0];
 	const coin = document.getElementsByClassName("coin")[0];
-
 	text.classList.remove("active")
 	button.removeChild(coin);
 }
 
+/////////////////////////
+// Sticks
+/////////////////////////
+function	getSticksStruct()
+{
+	const elements = document.getElementsByClassName("stick");
+	const struct = {
+		keys: { w: 0, s: 0, up: 0, down: 0 },
+		left: elements[0],
+		right: elements[1],
+	};
+	return (struct);
+}
+
+
 async function	activateStick(struct)
 {
-	const wrapper = document.getElementsByClassName("wrapper-canvas")[0];
 	const path = "/svg/stick/state";
 	const extension = ".svg";
 
@@ -143,80 +169,83 @@ async function	activateStick(struct)
 	}
 	struct.sticks.left.setAttribute("data-active", "on");
 	struct.sticks.right.setAttribute("data-active", "on");
-	wrapper.addEventListener("keydown", function(event) { enableStickMove(event, struct.sticks); });
-	wrapper.addEventListener("keyup", function(event) { disableStickMove(event, struct.sticks); });
+	await sleep(150);
 }
 
-function	enableStickMove(event, sticks)
+function	enableStickMove(event, struct)
 {
+	if (struct.game.running == 0)
+		return ;
 	if (event.key == "w" || event.key == "W")
 	{
-		sticks.keys.w = 1;
-		if (sticks.keys.s == 0)
-			sticks.left.src = "/svg/stick/up.svg";
+		struct.sticks.keys.w = 1;
+		if (struct.sticks.keys.s == 0)
+			struct.sticks.left.src = "/svg/stick/up.svg";
 		else
-			sticks.left.src = "/svg/stick/state4.svg";
+			struct.sticks.left.src = "/svg/stick/state4.svg";
 	}
 	else if (event.key == "s" || event.key == "S")
 	{
-		sticks.keys.s = 1;
-		if (sticks.keys.w == 0)
-			sticks.left.src = "/svg/stick/down.svg";
+		struct.sticks.keys.s = 1;
+		if (struct.sticks.keys.w == 0)
+			struct.sticks.left.src = "/svg/stick/down.svg";
 		else
-			sticks.left.src = "/svg/stick/state4.svg";
+			struct.sticks.left.src = "/svg/stick/state4.svg";
 	}
 	else if (event.key == "ArrowUp")
 	{
-		sticks.keys.up = 1;
-		if (sticks.keys.down == 0)
-			sticks.right.src = "/svg/stick/up.svg";
+		struct.sticks.keys.up = 1;
+		if (struct.sticks.keys.down == 0)
+			struct.sticks.right.src = "/svg/stick/up.svg";
 		else
-			sticks.right.src = "/svg/stick/state4.svg";
+			struct.sticks.right.src = "/svg/stick/state4.svg";
 	}
 	else if (event.key == "ArrowDown")
 	{
-		sticks.keys.down = 1;
-		if (sticks.keys.up == 0)
-			sticks.right.src = "/svg/stick/down.svg";
+		struct.sticks.keys.down = 1;
+		if (struct.sticks.keys.up == 0)
+			struct.sticks.right.src = "/svg/stick/down.svg";
 		else
-			sticks.right.src = "/svg/stick/state4.svg";
+			struct.sticks.right.src = "/svg/stick/state4.svg";
 	}
 }
 
-function	disableStickMove(event, sticks)
+function	disableStickMove(event, struct)
 {
+	if (struct.game.running == 0)
+		return ;
 	if (event.key == "w" || event.key == "W")
 	{
-		sticks.keys.w = 0;
-		sticks.left.src = "/svg/stick/state4.svg";
+		struct.sticks.keys.w = 0;
+		struct.sticks.left.src = "/svg/stick/state4.svg";
 	}
 	else if (event.key == "s" || event.key == "S")
 	{
-		sticks.keys.s = 0;
-		sticks.left.src = "/svg/stick/state4.svg";
+		struct.sticks.keys.s = 0;
+		struct.sticks.left.src = "/svg/stick/state4.svg";
 	}
 	else if (event.key == "ArrowUp")
 	{
-		sticks.keys.up = 0;
-		sticks.right.src = "/svg/stick/state4.svg";
+		struct.sticks.keys.up = 0;
+		struct.sticks.right.src = "/svg/stick/state4.svg";
 	}
 	else if (event.key == "ArrowDown")
 	{
-		sticks.keys.down = 0;
-		sticks.right.src = "/svg/stick/state4.svg";
+		struct.sticks.keys.down = 0;
+		struct.sticks.right.src = "/svg/stick/state4.svg";
 	}
 }
 
-async function	deactivateStick(struct, sticks)
+async function	endGame(struct)
 {
-	const wrapper = document.getElementsByClassName("wrapper-canvas")[0];
-	wrapper.outerHTML = wrapper.outerHTML;
-	const canvas = document.getElementById("canvas");
-	const ctx = canvas.getContext("2d");
+	resetinsertCoinButton(struct.insertCoinButton);
+	await deactivateStick(struct.sticks);
+}
+
+async function	deactivateStick(sticks)
+{
 	const path = "/svg/stick/state";
 	const extension = ".svg";
-	struct.canvas = canvas;
-	struct.ctx = ctx;
 	for (let i = 4; i > -1; i--)
 	{
 		sticks.left.src = path + i + extension;
@@ -225,4 +254,81 @@ async function	deactivateStick(struct, sticks)
 	}
 	sticks.left.setAttribute("data-active", "off");
 	sticks.right.setAttribute("data-active", "off");
+}
+
+/////////////////////////
+// Tournament
+/////////////////////////
+function	getTournamentStruct()
+{
+	const struct = {
+		on: false,
+		cancel: undefined,
+		validate: undefined,
+		names: [],
+		matches: []
+	};
+	return (struct);
+}
+
+function	showTournamentForm()
+{
+	const form = document.getElementsByClassName("tournament-form")[0];
+	form.classList.remove("hidden");
+}
+
+function	completeTournamentStruct(struct)
+{
+	struct.cancel = document.getElementsByTagName("tournament-form hidden i");
+	struct.validate = document.getElementsByTagName("tournament-form button");
+}
+
+async function	waitTournamentForm(struct)
+{
+	return new Promise((resolve, reject) => {
+		function handleClick() { resolve(); }
+		struct.validate.addEventListener("click", handleClick, { once: true });
+	});
+}
+
+async function	addNamesToTournamentStruct(struct)
+{
+	const form = document.getElementsByClassName("tournament-form")[0];
+	const data = new FormData(form);
+	let i = 0;
+	let j = 1;
+	let name;
+	const names = [];
+	while (i < 4)
+	{
+		name = data.get("p" + j);
+		if (name === "")
+			name = j.toString();
+		names.push(name);
+		i++;
+		j++;
+	}
+	struct.tournament.names = names;
+}
+
+async function	createMatches(struct)
+{
+	let match;
+	shuffle(struct.names);
+
+	match = [struct.names[0], struct.names[1]];
+	struct.matches.push(match);
+	match = [struct.names[2], struct.names[3]];
+	struct.matches.push(match);
+}
+
+function	shuffle(array)
+{
+	let i = array.length;
+	while (i != 0)
+	{
+	  let j = Math.floor(Math.random() * i);
+	  i--;
+	  [array[i], array[j]] = [array[j], array[i]];
+	}
 }

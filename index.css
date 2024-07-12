@@ -21,6 +21,18 @@ body {
 	--textColor: #F2F2F2;
 }
 
+.hidden {
+	display: none;
+	opacity: 0;
+	visibility: hidden;
+}
+
+.visible {
+	display: block;
+	opacity: 1;
+	visibility: visible;
+}
+
 /*////////////////*/
 /* Layer - Login */
 /*///////////////*/
@@ -101,7 +113,7 @@ body {
 	opacity: 1;
 }
 
-.layer form input.hidden {
+.layer form input.hideButton {
 	visibility: hidden;
 	opacity: 0;
 }
@@ -113,6 +125,8 @@ body {
 	user-select: none;
 	transition: margin 0.7s ease-out, background 0s;
 	z-index: 1;
+	cursor: pointer;
+
 }
 
 .layer form button.notransition {
@@ -300,6 +314,7 @@ nav ul {
 	padding: 0;
 	margin: 0;
 	max-height: 100%;
+	min-height: 100%;
 	list-style-type: none;
 }
 
@@ -309,6 +324,17 @@ nav ul li div {
 	align-items: center;
 	gap: 15px;
 	height: 100%;
+}
+
+.wrapper-avatar {
+	width: 48px;
+	max-width: 48px;
+	height: 48px;
+	max-height: 48px;
+}
+
+.wrapper-avatar img {
+	object-fit: fill;
 }
 
 nav ul li button {
@@ -349,7 +375,6 @@ main {
 h2 {
 	text-align: center;
 	margin: 0 0 10px 0;
-	height: 4%;
 	color: var(--textColor);
 	user-select: none;
 	font-size: 2em;
@@ -359,9 +384,8 @@ h2 {
 	display: flex;
 	justify-content: space-between;
 	gap: 2%;
-	height: 96%;
+	height: 100%;
 	width: 100%;
-	max-width: 3000px;
 }
 
 /*////////////////*/
@@ -723,9 +747,9 @@ h2 {
 @keyframes dirX { to { translate: -150px; } }
 @keyframes dirY { to { transform: translateY(85px); } }
 
-/*//////////////////////////*/
-/* Game - game and controls */
-/*//////////////////////////*/
+/*///////////////*/
+/* Game - screen */
+/*///////////////*/
 
 .wrapper-game {
 	display: flex;
@@ -736,18 +760,81 @@ h2 {
 }
 
 .wrapper-canvas {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	height: 81%;
 	overflow: hidden;
+
+	position: relative;
 }
 
 canvas {
-	height: 100%;
+	display: block;
+	position: absolute;
 	width: 100%;
+	height: 100%;
 }
 
 canvas:focus {
 	outline: none;
 }
+
+.tournament-form {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 50%;
+	height: 100%;
+	position: absolute;
+	z-index: 0;
+}
+
+.tournament-form p {
+	user-select: none;
+}
+
+.tournament-form i {
+	font-size: 20px;
+	position: absolute;
+	left: 0;
+	cursor: pointer;
+}
+
+.tournament-wrapper-input {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 5%;
+	height: 40%;
+}
+
+.tournament-wrapper-input input {
+	height: 40px;
+	padding: 5px;
+	color: var(--textColor);
+	background: var(--mainColor);
+	border: none;
+	border-bottom: 1px solid var(--textColor);
+	margin-bottom: 5px;
+	opacity: 1;
+}
+
+.tournament-form button {
+	height: 40px;
+	margin-top: 6px;
+	border-radius: 20px;
+	user-select: none;
+	transition: margin 0.7s ease-out, background 0s;
+	z-index: 1;
+	cursor: pointer;
+}
+
+/*/////////////////*/
+/* Game - controls */
+/*/////////////////*/
 
 .wrapper-controls {
 	display: flex;

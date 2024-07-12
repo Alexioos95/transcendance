@@ -8,7 +8,7 @@ function	forgottenPassword()
 	const button = document.getElementsByTagName("button")[0];
 
 	link.addEventListener("click", function() {
-		if (pwd.classList.contains("hidden"))
+		if (pwd.classList.contains("hideButton"))
 			restore(link, pwd, button);
 		else
 			move(link, pwd, button);
@@ -22,7 +22,7 @@ function	forgottenPassword()
 
 function	move(link, pwd, button)
 {
-	pwd.classList.add("hidden");
+	pwd.classList.add("hideButton");
 	button.classList.remove("notransition");
 	button.classList.add("recovery");
 	button.innerText = "Envoyer un mail de recuperation";
@@ -32,7 +32,7 @@ function	move(link, pwd, button)
 
 function restore(link, pwd, button)
 {
-	pwd.classList.remove("hidden");
+	pwd.classList.remove("hideButton");
 	button.classList.remove("notransition");
 	button.classList.remove("recovery");
 	button.innerText = "Connexion/Inscription";

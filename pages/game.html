@@ -4,7 +4,9 @@
 		<ul>
 			<li>
 				<div>
-					<img src="/favicon.ico"/>
+					<div class="wrapper-avatar">
+						<img src="/favicon.ico"/>
+					</div>
 					<span>Alexioos95</span>
 				</div>
 			</li>
@@ -59,7 +61,7 @@
 							<span>1v1 local</span>
 						</label>
 						<label class="mode-selector">
-							<input disabled type="radio" name="mode" value="tournament" aria-label="Tournoi a 4 joueurs en local"/>
+							<input type="radio" name="mode" value="tournament" aria-label="Tournoi a 4 joueurs en local"/>
 							<div class="circle"></div>
 							<span>Tournoi local a 4</span>
 						</label>
@@ -82,7 +84,18 @@
 		</div>
 		<div class="wrapper-game">
 			<div class="wrapper-canvas card">
-				<canvas id="canvas" width="1179px" height="581px" tabindex="0"></canvas>
+				<form class="tournament-form hidden">
+					<i class="fa-solid fa-circle-arrow-left"></i>
+					<p>Sélectionnez vos pseudonymes</p>
+					<div class="tournament-wrapper-input">
+						<input type="text" name="p1" placeholder="Joueur 1" aria-label="Pseudonyme du joueur 1"/>
+						<input type="text" name="p2" placeholder="Joueur 2" aria-label="Pseudonyme du joueur 2"/>
+						<input type="text" name="p3" placeholder="Joueur 3" aria-label="Pseudonyme du joueur 3"/>
+						<input type="text" name="p4" placeholder="Joueur 4" aria-label="Pseudonyme du joueur 4"/>
+					</div>
+					<button aria-label="Valider" >Valider</button>
+				</form>
+				
 			</div>
 			<div class="wrapper-controls card">
 				<div class="player-control player1">

@@ -9,7 +9,7 @@ async function	run()
 		wrapperCanvas: document.getElementsByClassName("wrapper-canvas")[0],
 		sticks: getSticksStruct(),
 		game: undefined,
-		tournament: getTournamentStruct(),
+		tournament: undefined,
 		run: 1
 	};
 	struct.loginButton.addEventListener("click", function() {
@@ -21,6 +21,7 @@ async function	run()
 	struct.wrapperCanvas.addEventListener("keyup", function(event) { disableStickMove(event, struct); });
 	while (struct.run == 1)
 	{
+		struct.tournament = getTournamentStruct();
 		await waitCoin(struct)
 			.then(() => coinAnimation(struct))
 			.then(() => checkValidation(struct))
@@ -95,33 +96,24 @@ async function	checkValidation(struct, data)
 			// struct.game = getTetrisStruct();
 		if (mode == "tournament")
 			struct.tournament.on = true;
-		title.innerHTML = struct.game.name;
+		title.style.opacity = 0;
+		sleep(450)
+			.then(() => title.style.opacity = 1)
+			.then(() => title.innerHTML = struct.game.name)
+		while (struct.wrapperCanvas.lastChild.nodeName != "FORM")
+			struct.wrapperCanvas.removeChild(struct.wrapperCanvas.lastChild);
 		return (resolve());
 	});
 }
 
 async function	setupTournament(struct)
 {
-	if (struct.tournament.on == false || struct.game.name == "tetris")
+	if (struct.tournament.on == false)
 		return ;
-	showTournamentForm();
-	completeTournamentStruct(struct.tournament);
-	await waitTournamentForm(struct)
+	await waitTournamentForm(struct.tournament)
 		.then(() => addNamesToTournamentStruct(struct.tournament))
 		.then(() => createMatches(struct.tournament))
-
-
-
-
-
-
-
-
-
-
-
-
-
+		.catch((e) => Promise.reject(0))
 }
 
 async function	rejectCoin(struct)
@@ -130,15 +122,21 @@ async function	rejectCoin(struct)
 	coin.classList.add("fall");
 	coin.classList.remove("active");
 	await sleep(1000);
-	resetinsertCoinButton(struct.insertCoinButton);
+	resetInsertCoinButton(struct.insertCoinButton);
 }
 
-function	resetinsertCoinButton(button)
+function	resetInsertCoinButton(button)
 {
 	const text = document.querySelectorAll("#selector span")[0];
 	const coin = document.getElementsByClassName("coin")[0];
 	text.classList.remove("active")
 	button.removeChild(coin);
+}
+
+async function	endGame(struct)
+{
+	resetInsertCoinButton(struct.insertCoinButton);
+	await deactivateStick(struct.sticks);
 }
 
 /////////////////////////
@@ -155,21 +153,19 @@ function	getSticksStruct()
 	return (struct);
 }
 
-
 async function	activateStick(struct)
 {
 	const path = "/svg/stick/state";
 	const extension = ".svg";
 
+	await sleep(450);
 	for (let i = 0; i < 5; i++)
 	{
 		struct.sticks.left.src = path + i + extension;
 		struct.sticks.right.src = path + i + extension;
 		await sleep(60);
 	}
-	struct.sticks.left.setAttribute("data-active", "on");
-	struct.sticks.right.setAttribute("data-active", "on");
-	await sleep(150);
+	await sleep(500);
 }
 
 function	enableStickMove(event, struct)
@@ -236,12 +232,6 @@ function	disableStickMove(event, struct)
 	}
 }
 
-async function	endGame(struct)
-{
-	resetinsertCoinButton(struct.insertCoinButton);
-	await deactivateStick(struct.sticks);
-}
-
 async function	deactivateStick(sticks)
 {
 	const path = "/svg/stick/state";
@@ -252,8 +242,6 @@ async function	deactivateStick(sticks)
 		sticks.right.src = path + i + extension;
 		await sleep(60);
 	}
-	sticks.left.setAttribute("data-active", "off");
-	sticks.right.setAttribute("data-active", "off");
 }
 
 /////////////////////////
@@ -263,31 +251,30 @@ function	getTournamentStruct()
 {
 	const struct = {
 		on: false,
-		cancel: undefined,
-		validate: undefined,
+		cancel: document.querySelector(".tournament-form .fa-circle-arrow-left"),
+		validate: document.querySelector(".tournament-form button"),
 		names: [],
 		matches: []
 	};
 	return (struct);
 }
 
-function	showTournamentForm()
+async function	waitTournamentForm(struct)
 {
 	const form = document.getElementsByClassName("tournament-form")[0];
 	form.classList.remove("hidden");
-}
-
-function	completeTournamentStruct(struct)
-{
-	struct.cancel = document.getElementsByTagName("tournament-form hidden i");
-	struct.validate = document.getElementsByTagName("tournament-form button");
-}
-
-async function	waitTournamentForm(struct)
-{
 	return new Promise((resolve, reject) => {
-		function handleClick() { resolve(); }
-		struct.validate.addEventListener("click", handleClick, { once: true });
+		function validate() {
+			form.classList.add("hidden");
+			resolve();
+		};
+		function resetTournamentForm() {
+			form.classList.add("hidden");
+			form.reset();
+			reject();
+		};
+		struct.validate.addEventListener("click", validate, { once: true });
+		struct.cancel.addEventListener("click", resetTournamentForm, { once: true });
 	});
 }
 
@@ -308,7 +295,7 @@ async function	addNamesToTournamentStruct(struct)
 		i++;
 		j++;
 	}
-	struct.tournament.names = names;
+	struct.names = names;
 }
 
 async function	createMatches(struct)
@@ -319,6 +306,8 @@ async function	createMatches(struct)
 	match = [struct.names[0], struct.names[1]];
 	struct.matches.push(match);
 	match = [struct.names[2], struct.names[3]];
+	struct.matches.push(match);
+	match = [];
 	struct.matches.push(match);
 }
 

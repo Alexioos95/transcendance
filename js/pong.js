@@ -400,7 +400,7 @@ function	createPaddle(canvas, height, width, position)
 		y: 0,
 		move_top: 0,
 		move_bot: 0,
-		score: 10
+		score: 0
 	};
 	if (position == "l")
 	{

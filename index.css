@@ -13,6 +13,8 @@ html {
 body {
 	width: 100%;
 	height: 100%;
+	margin: 0;
+	padding: 0;
 	font: 0.9em "Inter", sans-serif;
 }
 
@@ -33,7 +35,20 @@ body {
 	visibility: visible;
 }
 
-/*////////////////*/
+/* ::-webkit-scrollbar {
+	width: 8px;
+	border-radius: 100%;
+} ::-webkit-scrollbar-track {
+   background: #f1f1f1;
+   border-radius: 10px;
+} ::-webkit-scrollbar-thumb {
+	background: #888;
+	border-radius: 5px;
+} ::-webkit-scrollbar-thumb:hover {
+	background: #555;
+} */
+
+/*///////////////*/
 /* Layer - Login */
 /*///////////////*/
 .layer {
@@ -58,6 +73,7 @@ body {
 	background-color: var(--mainColor);
 	border-radius: 10px;
 	box-shadow: 0 3px 10px 3px rgb(131, 126, 126);
+	overflow: auto;
 }
 
 .wrapper-login {
@@ -126,7 +142,6 @@ body {
 	transition: margin 0.7s ease-out, background 0s;
 	z-index: 1;
 	cursor: pointer;
-
 }
 
 .layer form button.notransition {
@@ -378,13 +393,14 @@ h2 {
 	color: var(--textColor);
 	user-select: none;
 	font-size: 2em;
+	transition: opacity 0.5s;
 }
 
 .wrapper-playzone {
 	display: flex;
 	justify-content: space-between;
 	gap: 2%;
-	height: 100%;
+	height: 95%;
 	width: 100%;
 }
 
@@ -392,10 +408,18 @@ h2 {
 /* Game - options */
 /*////////////////*/
 
-.wrapper-options {
+.wrapper-overflow {
+	overflow: hidden;
 	width: 20%;
+}
+
+.wrapper-options {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
 	height: 100%;
-	padding: 1% 1% 0.5% 1%;
+	padding: 5% 3%;
+	overflow-y: auto;
 }
 
 .wrapper-options form {
@@ -405,6 +429,9 @@ h2 {
 	justify-content: space-between;
 	width: 100%;
 	height: 100%;
+
+
+	display: none;
 }
 
 .section-selector {
@@ -747,6 +774,49 @@ h2 {
 @keyframes dirX { to { translate: -150px; } }
 @keyframes dirY { to { transform: translateY(85px); } }
 
+/*////////////////////////////*/
+/* Game - tournament overview */
+/*////////////////////////////*/
+
+.tournament-overview {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 25px;
+}
+
+.tournament-match {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	width: 100%;
+}
+
+.tournament-match .player {
+	display: block;
+	width: 100%;
+	text-align: center;
+	word-wrap: break-word;
+}
+
+.tournament-match button {
+	height: 25px;
+	width: 100%;
+	margin-top: 6px;
+	border-radius: 20px;
+	user-select: none;
+	cursor: pointer;
+}
+
+.bar {
+	width: 85%;
+	height: 5px;
+	background-color: var(--textColor);
+	border-radius: 10px;
+	opacity: 0.8;
+}
+
 /*///////////////*/
 /* Game - screen */
 /*///////////////*/
@@ -780,6 +850,10 @@ canvas:focus {
 	outline: none;
 }
 
+/*////////////////////////*/
+/* Game - tournament form */
+/*////////////////////////*/
+
 .tournament-form {
 	display: flex;
 	flex-direction: column;
@@ -788,7 +862,6 @@ canvas:focus {
 	width: 50%;
 	height: 100%;
 	position: absolute;
-	z-index: 0;
 }
 
 .tournament-form p {
@@ -827,8 +900,6 @@ canvas:focus {
 	margin-top: 6px;
 	border-radius: 20px;
 	user-select: none;
-	transition: margin 0.7s ease-out, background 0s;
-	z-index: 1;
 	cursor: pointer;
 }
 

@@ -28,59 +28,97 @@
 <main>
 	<h2>LOADING</h2>
 	<div class="wrapper-playzone">
-		<div class="wrapper-options card">
-			<form>
-				<div class="section-selector">
-					<h3 aria-label="Choisissez le jeu: Pong ou Tetris">Jeu</h3>
-					<div>
-						<label class="game-selector">
-							<input type="radio" name="game" value="pong" aria-label="Pong"/>
-							<div>
-								<img src="/svg/pong.svg"/>
-							</div>
-						</label>
-						<label class="game-selector">
-							<input type="radio" name="game" value="tetris" aria-label="Tetris"/>
-							<div>
-								<img src="/svg/tetris.svg"/>
-							</div>
-						</label>
-					</div>
-				</div>
-				<div class="section-selector">
-					<h3 aria-label="Choisissez le mode de jeu: ">Mode</h3>
-					<div class="wrapper-mode-selector">
-						<label class="mode-selector">
-							<input disabled type="radio" name="mode" value="1vAI" aria-label="Joueur contre Ordinateur"/>
-							<div class="circle"></div>
-							<span>1vIA</span>
-						</label>
-						<label class="mode-selector">
-							<input type="radio" name="mode" value="1v1" aria-label="Joueur contre Joueur en local"/>
-							<div class="circle"></div>
-							<span>1v1 local</span>
-						</label>
-						<label class="mode-selector">
-							<input type="radio" name="mode" value="tournament" aria-label="Tournoi a 4 joueurs en local"/>
-							<div class="circle"></div>
-							<span>Tournoi local a 4</span>
-						</label>
-						<label class="mode-selector">
-							<input disabled type="radio" name="mode" value="online" aria-label="Joueur contre Joueur en ligne"/>
-							<div class="circle"></div>
-							<span>1v1 en ligne</span>
-						</label>
-					</div>
-				</div>
-				<div class="wrapper-submit-button">
-					<button id="selector" type="button" aria-label="Jouer !">
-						<span>Insérer une pièce</span>
+		<div class="wrapper-overflow card">
+			<div class="wrapper-options">
+				<form>
+					<div class="section-selector">
+						<h3 aria-label="Choisissez le jeu: Pong ou Tetris">Jeu</h3>
 						<div>
-							<div class="slot"></div>
+							<label class="game-selector">
+								<input type="radio" name="game" value="pong" aria-label="Pong"/>
+								<div>
+									<img src="/svg/pong.svg"/>
+								</div>
+							</label>
+							<label class="game-selector">
+								<input type="radio" name="game" value="tetris" aria-label="Tetris"/>
+								<div>
+									<img src="/svg/tetris.svg"/>
+								</div>
+							</label>
 						</div>
-					</button>
+					</div>
+					<div class="section-selector">
+						<h3 aria-label="Choisissez le mode de jeu: ">Mode</h3>
+						<div class="wrapper-mode-selector">
+							<label class="mode-selector">
+								<input disabled type="radio" name="mode" value="1vAI" aria-label="Joueur contre Ordinateur"/>
+								<div class="circle"></div>
+								<span>1vIA</span>
+							</label>
+							<label class="mode-selector">
+								<input type="radio" name="mode" value="1v1" aria-label="Joueur contre Joueur en local"/>
+								<div class="circle"></div>
+								<span>1v1 local</span>
+							</label>
+							<label class="mode-selector">
+								<input type="radio" name="mode" value="tournament" aria-label="Tournoi a 4 joueurs en local"/>
+								<div class="circle"></div>
+								<span>Tournoi local a 4</span>
+							</label>
+							<label class="mode-selector">
+								<input disabled type="radio" name="mode" value="online" aria-label="Joueur contre Joueur en ligne"/>
+								<div class="circle"></div>
+								<span>1v1 en ligne</span>
+							</label>
+						</div>
+					</div>
+					<div class="wrapper-submit-button">
+						<button id="selector" type="button" aria-label="Jouer !">
+							<span>Insérer une pièce</span>
+							<div>
+								<div class="slot"></div>
+							</div>
+						</button>
+					</div>
+				</form>
+				<div class="tournament-overview">
+					<div class="tournament-match">
+						<span class="player player-one">P1
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span>
+						<button type="button">Go !</button>
+						<span class="player player-two">P2
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+						</span>
+					</div>
+					<div class="bar"></div>
+					<div class="tournament-match">
+						<span class="player player-three">P3</span>
+						<button type="button">Go !</button>
+						<span class="player player-four">P4</span>
+					</div>
+					<div class="bar"></div>
+					<div class="tournament-match">
+						<span class="player winner-one">Winner 1</span>
+						<button type="button">Go !</button>
+						<span class="player winner-two">Winner 2</span>
+					</div>
 				</div>
-			</form>
+			</div>
 		</div>
 		<div class="wrapper-game">
 			<div class="wrapper-canvas card">
@@ -93,9 +131,8 @@
 						<input type="text" name="p3" placeholder="Joueur 3" aria-label="Pseudonyme du joueur 3"/>
 						<input type="text" name="p4" placeholder="Joueur 4" aria-label="Pseudonyme du joueur 4"/>
 					</div>
-					<button aria-label="Valider" >Valider</button>
+					<button type="button" aria-label="Valider" >Valider</button>
 				</form>
-				
 			</div>
 			<div class="wrapper-controls card">
 				<div class="player-control player1">

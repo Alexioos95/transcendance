@@ -24,9 +24,9 @@ body {
 }
 
 .hidden {
-	display: none;
-	opacity: 0;
-	visibility: hidden;
+	display: none !important;
+	opacity: 0 !important;
+	visibility: hidden !important;
 }
 
 .visible {
@@ -429,9 +429,6 @@ h2 {
 	justify-content: space-between;
 	width: 100%;
 	height: 100%;
-
-
-	display: none;
 }
 
 .section-selector {
@@ -781,9 +778,10 @@ h2 {
 .tournament-overview {
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
+	justify-content: space-around;
 	align-items: center;
 	gap: 25px;
+	height: 100%;
 }
 
 .tournament-match {
@@ -791,12 +789,18 @@ h2 {
 	flex-direction: column;
 	gap: 10px;
 	width: 100%;
+	padding: 2%;
 }
 
-.tournament-match .player {
+.tournament-player, .tournament-winner {
 	display: block;
+	min-height: 17px;
+	height: 17px;
+	max-height: 17px;
 	width: 100%;
 	text-align: center;
+	font-size: 1em;
+	font-weight: 700;
 	word-wrap: break-word;
 }
 
@@ -809,12 +813,31 @@ h2 {
 	cursor: pointer;
 }
 
+.tournament-marker {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 50px;
+	height: 50px;
+	max-height: 50px;
+	font-size: 20px;
+	font-weight: 900;
+	user-select: none;
+}
+
 .bar {
-	width: 85%;
-	height: 5px;
+	width: 70%;
+	height: 2px;
 	background-color: var(--textColor);
 	border-radius: 10px;
 	opacity: 0.8;
+}
+
+.tournament-play-button {
+	width: 50px;
+	height: 50px;
+	border-radius: 100%;
+	z-index: 1;
 }
 
 /*///////////////*/

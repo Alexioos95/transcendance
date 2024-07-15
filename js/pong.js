@@ -1,3 +1,4 @@
+"use strict";
 /////////////////////////
 // Script
 /////////////////////////
@@ -8,39 +9,41 @@ function	getPongStruct()
 		canvas: undefined,
 		ctx: undefined,
 		paddles: undefined,
+		scores: undefined,
 		ball: undefined,
-		run: startGame,
+		run: startPong,
 		running: 0
 	};
 	return (struct);
 }
 
-async function	startGame(struct)
+async function	startPong(struct)
 {
-	initStruct(struct);
-	struct.game.canvas.focus();
+	initPongStruct(struct.game, struct.wrapperCanvas);
 	struct.game.canvas.addEventListener("keydown", function(event) { enableMove(event, struct.game.paddles); });
 	struct.game.canvas.addEventListener("keyup", function(event) { disableMove(event, struct.game.paddles); });
 	document.defaultView.addEventListener("resize", function() { resize(struct.game, struct.wrapperCanvas); });
+	struct.game.canvas.focus();
 	loop(struct, struct.game);
 }
 
-async function	initStruct(struct)
+async function	initPongStruct(game, wrapperCanvas)
 {
-	struct.game.canvas = getCanvas(struct.wrapperCanvas);
-	struct.game.ctx = struct.game.canvas.getContext("2d");
-	struct.game.paddles = getPaddles(struct.game.canvas);
-	struct.game.ball = getBall(struct.game.canvas);
-	struct.game.running = 1;
+	game.canvas = getCanvas(wrapperCanvas);
+	game.ctx = game.canvas.getContext("2d");
+	game.paddles = getPaddles(game.canvas);
+	game.ball = getBall(game.canvas);
+	game.scores = [10, 10];
+	game.running = 1;
 }
 
 async function	loop(struct, game)
 {
 	game.ctx.fillStyle = "#2F2F2F";
 	game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-	if (game.paddles.left.score < 11 && game.paddles.right.score < 11)
+	if (game.scores[0] < 11 && game.scores[1] < 11)
 	{
-		movePaddles(game.canvas, game.paddles)
+		movePaddles(game.canvas, game.paddles);
 		moveBall(game);
 		render(game);
 		requestAnimationFrame(() => loop(struct, game));
@@ -49,31 +52,32 @@ async function	loop(struct, game)
 	{
 		game.running = 0;
 		await endGame(struct);
-		renderFinalScore(game.canvas, game.ctx, game.paddles);
+		renderFinalScore(game);
 	}
 }
 
-function	renderFinalScore(canvas, ctx, paddles)
+function	renderFinalScore(game)
 {
-	const pictures = getPictures(paddles);
-	const dim = getDimensions(canvas, pictures, paddles);
+	const pictures = getPictures(game.scores);
+	const dim = getDimensions(game, pictures);
+
 	if (pictures[0] != 0)
-		ctx.drawImage(pictures[0], dim.leftWidth[0], dim.leftHeight, dim.leftDimensions, dim.leftDimensions);
-	ctx.drawImage(pictures[1], dim.leftWidth[1], dim.leftHeight, dim.leftDimensions, dim.leftDimensions);
+		game.ctx.drawImage(pictures[0], dim.leftWidth[0], dim.leftHeight, dim.leftDimensions, dim.leftDimensions);
+	game.ctx.drawImage(pictures[1], dim.leftWidth[1], dim.leftHeight, dim.leftDimensions, dim.leftDimensions);
 	if (pictures[2] != 0)
-		ctx.drawImage(pictures[2], dim.rightWidth[0], dim.rightHeight, dim.rightDimensions, dim.rightDimensions);
-	ctx.drawImage(pictures[3], dim.rightWidth[1], dim.rightHeight, dim.rightDimensions, dim.rightDimensions);
+		game.ctx.drawImage(pictures[2], dim.rightWidth[0], dim.rightHeight, dim.rightDimensions, dim.rightDimensions);
+	game.ctx.drawImage(pictures[3], dim.rightWidth[1], dim.rightHeight, dim.rightDimensions, dim.rightDimensions);
 }
 
 /////////////////////////
 // Render
 /////////////////////////
-function	render(struct)
+function	render(game)
 {
-	struct.ctx.fillStyle = "#FDFDFD";
-	renderPaddles(struct.ctx, struct.paddles);
-	renderBall(struct.ctx, struct.ball);
-	renderScore(struct);
+	game.ctx.fillStyle = "#FDFDFD";
+	renderPaddles(game.ctx, game.paddles);
+	renderBall(game.ctx, game.ball);
+	renderScore(game);
 }
 
 function	renderPaddles(ctx, paddles)
@@ -90,15 +94,15 @@ function	renderBall(ctx, ball)
 	ctx.stroke();
 }
 
-function	renderScore(struct)
+function	renderScore(game)
 {
-	const pictures = getPictures(struct.paddles);
+	const pictures = getPictures(game.scores);
 	if (pictures[0] != 0)
-		struct.ctx.drawImage(pictures[0], ((((struct.canvas.width / 2) / 2) - pictures[1].width) - 5), 20);
-	struct.ctx.drawImage(pictures[1], ((struct.canvas.width / 2) / 2) + 3, 20);
+		game.ctx.drawImage(pictures[0], ((((game.canvas.width / 2) / 2) - pictures[1].width) - 5), 20);
+	game.ctx.drawImage(pictures[1], ((game.canvas.width / 2) / 2) + 3, 20);
 	if (pictures[2] != 0)
-		struct.ctx.drawImage(pictures[2], (struct.canvas.width / 2) + ((((struct.canvas.width / 2) / 2) - pictures[3].width) - 5), 20);
-	struct.ctx.drawImage(pictures[3], (struct.canvas.width / 2) + ((struct.canvas.width / 2) / 2) - 3, 20);
+		game.ctx.drawImage(pictures[2], (game.canvas.width / 2) + ((((game.canvas.width / 2) / 2) - pictures[3].width) - 5), 20);
+	game.ctx.drawImage(pictures[3], (game.canvas.width / 2) + ((game.canvas.width / 2) / 2) - 3, 20);
 }
 
 function	resize(game, wrapper)
@@ -107,8 +111,9 @@ function	resize(game, wrapper)
 		width: game.canvas.width,
 		height: game.canvas.height
 	};
+
 	setCanvasDimensions(game.canvas, wrapper);
-	if (game.paddles.left.score < 11 && game.paddles.right.score < 11)
+	if (game.scores[0] < 11 && game.scores[1] < 11)
 	{
 		resizePaddles(oldValues, game.canvas, game.paddles);
 		resizeBall(oldValues, game.canvas, game.ball);
@@ -117,7 +122,7 @@ function	resize(game, wrapper)
 	{
 		game.ctx.fillStyle = "#2F2F2F";
 		game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-		renderFinalScore(game.canvas, game.ctx, game.paddles);
+		renderFinalScore(game);
 	}
 }
 
@@ -125,6 +130,7 @@ function	resizePaddles(oldValues, canvas, paddles)
 {
 	const percentOldLeft = paddles.left.y / oldValues.height * 100;
 	const percentOldRight = paddles.right.y / oldValues.height * 100;
+	
 	paddles.height = canvas.height / 5;
 	paddles.width = canvas.width / 50;
 	paddles.left.x = canvas.width / 20;
@@ -137,6 +143,7 @@ function	resizeBall(oldValues, canvas, ball)
 {
 	const percentOldX = ball.x / oldValues.width * 100;
 	const percentOldY = ball.y / oldValues.height * 100;
+
 	ball.x = canvas.width / 100 * percentOldX;
 	ball.y = canvas.height / 100 * percentOldY;
 	ball.speed = canvas.width / 100;
@@ -181,29 +188,30 @@ function	movePaddles(canvas, paddles)
 		paddles.right.y += paddles.speed;
 }
 
-function	moveBall(struct)
+function	moveBall(game)
 {
-	if (struct.ball.x <= -100 || struct.ball.x >= (struct.canvas.width + 100))
-		point(struct);
+	if (game.ball.x <= -100 || game.ball.x >= (game.canvas.width + 100))
+		point(game);
 	else
-		collision(struct.canvas, struct.paddles, struct.ball);
-	movePXbyPX(struct);
+		collision(game.canvas, game.paddles, game.ball);
+	movePXbyPX(game);
 }
 
-function	movePXbyPX(struct)
+function	movePXbyPX(game)
 {
 	let i = 0;
-	while (i < struct.ball.speed)
+
+	while (i < game.ball.speed)
 	{
-		struct.ctx.fillStyle = "#2E2E2E";
-		struct.ctx.beginPath();
-		struct.ctx.arc(struct.ball.x, struct.ball.y, struct.ball.radius, 0, 2 * Math.PI);
-		struct.ctx.stroke();
-		struct.ball.x += struct.ball.dir_x;
-		struct.ball.y += struct.ball.dir_y;
-		struct.ctx.fillStyle = "#FDFDFD";
-		struct.ctx.beginPath();
-		struct.ctx.arc(struct.ball.x, struct.ball.y, struct.ball.radius, 0, 2 * Math.PI);
+		game.ctx.fillStyle = "#2E2E2E";
+		game.ctx.beginPath();
+		game.ctx.arc(game.ball.x, game.ball.y, game.ball.radius, 0, 2 * Math.PI);
+		game.ctx.stroke();
+		game.ball.x += game.ball.dir_x;
+		game.ball.y += game.ball.dir_y;
+		game.ctx.fillStyle = "#FDFDFD";
+		game.ctx.beginPath();
+		game.ctx.arc(game.ball.x, game.ball.y, game.ball.radius, 0, 2 * Math.PI);
 		i++;
 	}
 }
@@ -211,34 +219,34 @@ function	movePXbyPX(struct)
 /////////////////////////
 // Point
 /////////////////////////
-function	point(struct)
+function	point(game)
 {
-	updateScore(struct);
-	resetBall(struct);
+	updateScore(game);
+	resetBall(game);
 }
 
-function	updateScore(struct)
+function	updateScore(game)
 {
-	if (struct.ball.x <= -100 && struct.paddles.right.score < 99)
-		struct.paddles.right.score++;
-	else if (struct.ball.x >= (canvas.width + 100) && struct.paddles.left.score < 99)
-		struct.paddles.left.score++;
+	if (game.ball.x <= -100 && game.scores[1] < 99)
+		game.scores[1]++;
+	else if (game.ball.x >= (canvas.width + 100) && game.scores[0] < 99)
+		game.scores[0]++;
 }
 
-function	resetBall(struct)
+function	resetBall(game)
 {
-	if (struct.paddles.left.score < 11 && struct.paddles.right.score < 11)
+	if (game.scores[0] < 11 && game.scores[1] < 11)
 	{
-		struct.ball.x = struct.canvas.width / 2;
-		struct.ball.y = struct.canvas.height / 2;
+		game.ball.x = game.canvas.width / 2;
+		game.ball.y = game.canvas.height / 2;
 	}
 	else
 	{
-		struct.ball.x = 0 - struct.ball.radius;
-		struct.ball.y = 0 - struct.ball.radius;
+		game.ball.x = 0 - game.ball.radius;
+		game.ball.y = 0 - game.ball.radius;
 	}
-	struct.ball.dir_x = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
-	struct.ball.dir_y = generateDirY();
+	game.ball.dir_x = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
+	game.ball.dir_y = generateDirY();
 }
 
 /////////////////////////
@@ -274,6 +282,7 @@ function angle(paddleStartY, height, ball)
 	const edge = len / 3;
 	const fromTop = ball.y - paddleStartY;
 	const fromBot = ball.y - (paddleStartY + height);
+
 	if (fromTop >= 0 && fromTop <= len) // UPPER PART
 	{
 		if (fromTop >= 0 && fromTop <= edge) // TOP
@@ -363,6 +372,7 @@ function	collisionBot(paddles, ball)
 function	getCanvas(wrapper)
 {
 	const canvas = document.createElement("canvas");
+
 	canvas.setAttribute("id", "canvas");
 	canvas.setAttribute("tabindex", "0");
 	setCanvasDimensions(canvas, wrapper);
@@ -374,6 +384,7 @@ function	setCanvasDimensions(canvas, wrapper)
 {
 	const width = wrapper.clientWidth;
 	const height = wrapper.clientHeight;
+
 	canvas.setAttribute("width", width);
 	canvas.setAttribute("height", height);
 }
@@ -400,8 +411,8 @@ function	createPaddle(canvas, height, width, position)
 		y: 0,
 		move_top: 0,
 		move_bot: 0,
-		score: 0
 	};
+	
 	if (position == "l")
 	{
 		paddle.x = canvas.width / 20;
@@ -434,9 +445,9 @@ function	generateDirY()
 	return (Math.random() * sign);
 }
 
-function	getPictures(paddles)
+function	getPictures(score)
 {
-	const numbers = getNumbers(paddles);
+	const numbers = getNumbers(score);
 	const pictures = [0, 0, 0, 0];
 	const path = "/svg/number/";
 	const extension = ".svg";
@@ -458,37 +469,38 @@ function	getPictures(paddles)
 	return (pictures);
 }
 
-function	getNumbers(paddles)
+function	getNumbers(score)
 {
 	let numbers = [
-		Math.floor(paddles.left.score / 10),
-		Math.floor(paddles.left.score % 10),
-		Math.floor(paddles.right.score / 10),
-		Math.floor(paddles.right.score % 10)
+		Math.floor(score[0] / 10),
+		Math.floor(score[0] % 10),
+		Math.floor(score[1] / 10),
+		Math.floor(score[1] % 10)
 	];
 	return (numbers);
 }
 
-function	getDimensions(canvas, pictures, paddles)
+function	getDimensions(game, pictures)
 {
 	let dimensions = {
-		leftDimensions: canvas.height / 5,
-		leftHeight: (canvas.height / 2) - ((canvas.height / 5) / 2),
+		leftDimensions: game.canvas.height / 5,
+		leftHeight: (game.canvas.height / 2) - ((game.canvas.height / 5) / 2),
 		rightDimensions: pictures[1].height,
-		rightHeight: (canvas.height / 2) - (pictures[3].height / 2),
+		rightHeight: (game.canvas.height / 2) - (pictures[3].height / 2),
 		leftWidth: [0, 0],
 		rightWidth: [0, 0]
 	};
-	if (paddles.right.score > paddles.left.score)
+	
+	if (game.scores[1] > game.scores[0])
 	{
 		dimensions.leftDimensions = pictures[1].height;
-		dimensions.rightDimensions = canvas.height / 5;
-		dimensions.leftHeight = (canvas.height / 2) - (pictures[3].height / 2);
-		dimensions.rightHeight = (canvas.height / 2) - ((canvas.height / 5) / 2);
+		dimensions.rightDimensions = game.canvas.height / 5;
+		dimensions.leftHeight = (game.canvas.height / 2) - (pictures[3].height / 2);
+		dimensions.rightHeight = (game.canvas.height / 2) - ((game.canvas.height / 5) / 2);
 	}
-	dimensions.leftWidth[0] = ((canvas.width / 2) / 2) - (dimensions.leftDimensions + 20);
-	dimensions.leftWidth[1] = ((canvas.width / 2) / 2);
-	dimensions.rightWidth[0] = (canvas.width / 2) + ((canvas.width / 2) / 2) - (dimensions.rightDimensions + 20);
-	dimensions.rightWidth[1] = (canvas.width / 2) + ((canvas.width / 2) / 2);
+	dimensions.leftWidth[0] = ((game.canvas.width / 2) / 2) - (dimensions.leftDimensions + 20);
+	dimensions.leftWidth[1] = ((game.canvas.width / 2) / 2);
+	dimensions.rightWidth[0] = (game.canvas.width / 2) + ((game.canvas.width / 2) / 2) - (dimensions.rightDimensions + 20);
+	dimensions.rightWidth[1] = (game.canvas.width / 2) + ((game.canvas.width / 2) / 2);
 	return (dimensions);
 }

@@ -1,3 +1,4 @@
+"use strict";
 /////////////////////////
 // Script
 /////////////////////////
@@ -5,11 +6,11 @@ async function	run()
 {
 	const struct = {
 		loginButton: document.getElementsByClassName("login-button")[0],
-		insertCoinButton: document.getElementById("selector"),
+		menu: getMenuStruct(),
 		wrapperCanvas: document.getElementsByClassName("wrapper-canvas")[0],
 		sticks: getSticksStruct(),
 		game: undefined,
-		tournament: undefined,
+		tournament: getTournamentStruct(),
 		run: 1
 	};
 	struct.loginButton.addEventListener("click", function() {
@@ -21,27 +22,68 @@ async function	run()
 	struct.wrapperCanvas.addEventListener("keyup", function(event) { disableStickMove(event, struct); });
 	while (struct.run == 1)
 	{
-		struct.tournament = getTournamentStruct();
-		await waitCoin(struct)
+		await waitCoin(struct.menu)
 			.then(() => coinAnimation(struct))
 			.then(() => checkValidation(struct))
 			.then(() => setupTournament(struct))
-			.then(() => activateStick(struct))
-			.then(() => struct.game.run(struct))
+			.then(() => launchGame(struct))
 			.catch((e) => {
 				if (e === 0)
-					rejectCoin(struct);
+					rejectCoin(struct.menu);
 			});
 		// Faire un await pour le chat (?);
 	}
 }
 
-function	sleep(ms)
+async function	launchGame(struct)
+{
+	if (struct.tournament.on == false)
+	{
+		await activateStick(struct);
+		struct.game.run(struct)
+	}
+	else
+	{
+		await waitTournamentPlayButton(struct)
+			.then(() => removePreviousCanvas(struct.wrapperCanvas))
+			.then(() => activateStick(struct))
+			.then(() => updateTournamentMarkers(struct))
+			.then(() => struct.game.run(struct))
+	}
+}
+
+async function	endGame(struct)
+{
+	if (struct.tournament.on == false)
+		resetInsertCoinButton(struct.menu.insertCoinButton);
+	await deactivateStick(struct.sticks);
+	if (struct.tournament.on == true)
+	{
+		updateTournamentWinners(struct);
+		updateTournamentMarkers(struct);
+		struct.tournament.matches--;
+		if (struct.tournament.matches != 0)
+			launchGame(struct);
+		else
+			endOfTournament(struct);
+	}
+}
+
+async function	sleep(ms)
 { return new Promise(resolve => setTimeout(resolve, ms)); }
 
 /////////////////////////
 // Game Selector Form
 /////////////////////////
+function	getMenuStruct()
+{
+	const struct = {
+		form: document.querySelector(".wrapper-options form"),
+		insertCoinButton: document.getElementById("selector"),
+	};
+	return (struct);
+}
+
 async function waitCoin(struct) {
 	return new Promise((resolve, reject) => {
 		function handleClick() { resolve(); }
@@ -63,12 +105,11 @@ async function	coinAnimation(struct)
 		return new Promise ((resolve, reject) => { reject(); });
 	if (document.getElementsByClassName("coin")[0] !== undefined)
 		return new Promise ((resolve, reject) => { reject(); });
-	const coin = getCoin(struct.insertCoinButton);
-	const text = document.querySelectorAll("#selector span")[0];
+	const coin = getCoin(struct.menu.insertCoinButton);
+	const text = document.querySelector("#selector span");
 	return new Promise ((resolve, reject) => {
 		sleep(50)
 			.then(() => addAnimations(coin, text))
-			.then(() => sleep(3100))
 			.then(() => resolve())
 	});
 }
@@ -77,6 +118,7 @@ async function	addAnimations(coin, text)
 {
 	text.classList.add("active");
 	coin.classList.add("active");
+	await sleep(3100);
 }
 
 async function	checkValidation(struct, data)
@@ -100,25 +142,29 @@ async function	checkValidation(struct, data)
 		sleep(450)
 			.then(() => title.style.opacity = 1)
 			.then(() => title.innerHTML = struct.game.name)
-		while (struct.wrapperCanvas.lastChild.nodeName != "FORM")
-			struct.wrapperCanvas.removeChild(struct.wrapperCanvas.lastChild);
-		return (resolve());
+		removePreviousCanvas(struct.wrapperCanvas);
+		resolve();
 	});
 }
 
-async function	setupTournament(struct)
+async function	removePreviousCanvas(wrapper)
 {
-	if (struct.tournament.on == false)
-		return ;
-	await waitTournamentForm(struct.tournament)
-		.then(() => addNamesToTournamentStruct(struct.tournament))
-		.then(() => createMatches(struct.tournament))
-		.catch((e) => Promise.reject(0))
+	while (wrapper.lastChild.nodeName != "FORM")
+		wrapper.removeChild(wrapper.lastChild);
 }
 
 async function	rejectCoin(struct)
 {
+	const title = document.getElementsByTagName("h2")[0];
 	const coin = document.getElementsByClassName("coin")[0];
+
+	if (title.innerHTML !== "LOADING")
+	{
+		title.style.opacity = 0;
+		sleep(450)
+			.then(() => title.style.opacity = 1)
+			.then(() => title.innerHTML = "LOADING")
+	}
 	coin.classList.add("fall");
 	coin.classList.remove("active");
 	await sleep(1000);
@@ -127,16 +173,11 @@ async function	rejectCoin(struct)
 
 function	resetInsertCoinButton(button)
 {
-	const text = document.querySelectorAll("#selector span")[0];
+	const text = document.querySelector("#selector span");
 	const coin = document.getElementsByClassName("coin")[0];
+
 	text.classList.remove("active")
 	button.removeChild(coin);
-}
-
-async function	endGame(struct)
-{
-	resetInsertCoinButton(struct.insertCoinButton);
-	await deactivateStick(struct.sticks);
 }
 
 /////////////////////////
@@ -165,7 +206,6 @@ async function	activateStick(struct)
 		struct.sticks.right.src = path + i + extension;
 		await sleep(60);
 	}
-	await sleep(500);
 }
 
 function	enableStickMove(event, struct)
@@ -236,6 +276,7 @@ async function	deactivateStick(sticks)
 {
 	const path = "/svg/stick/state";
 	const extension = ".svg";
+
 	for (let i = 4; i > -1; i--)
 	{
 		sticks.left.src = path + i + extension;
@@ -253,10 +294,27 @@ function	getTournamentStruct()
 		on: false,
 		cancel: document.querySelector(".tournament-form .fa-circle-arrow-left"),
 		validate: document.querySelector(".tournament-form button"),
+		overview: document.getElementsByClassName("tournament-overview")[0],
+		players: document.getElementsByClassName("tournament-player"),
+		winners: document.getElementsByClassName("tournament-winner"),
+		markers: document.getElementsByClassName("tournament-marker"),
+		markerArray: [["EN COURS", "SUIVANT", "PROCHAINEMENT"], ["", "EN ATTENTE", "PROCHAINEMENT"], ["", "EN COURS", "PROCHAINEMENT"], ["", "", "EN ATTENTE"], ["", "", "EN COURS"], ["", "", ""]],
 		names: [],
-		matches: []
+		matches: 3
 	};
 	return (struct);
+}
+
+async function	setupTournament(struct)
+{
+	if (struct.tournament.on == false)
+		return ;
+	await waitTournamentForm(struct.tournament)
+		.then(() => addNamesToTournamentStruct(struct.tournament))
+		.then(() => shuffle(struct.tournament.names))
+		.then(() => showTournamentOverview(struct))
+		.then(() => Promise.resolve())
+		.catch((e) => Promise.reject(0))
 }
 
 async function	waitTournamentForm(struct)
@@ -286,6 +344,7 @@ async function	addNamesToTournamentStruct(struct)
 	let j = 1;
 	let name;
 	const names = [];
+
 	while (i < 4)
 	{
 		name = data.get("p" + j);
@@ -298,20 +357,7 @@ async function	addNamesToTournamentStruct(struct)
 	struct.names = names;
 }
 
-async function	createMatches(struct)
-{
-	let match;
-	shuffle(struct.names);
-
-	match = [struct.names[0], struct.names[1]];
-	struct.matches.push(match);
-	match = [struct.names[2], struct.names[3]];
-	struct.matches.push(match);
-	match = [];
-	struct.matches.push(match);
-}
-
-function	shuffle(array)
+async function	shuffle(array)
 {
 	let i = array.length;
 	while (i != 0)
@@ -320,4 +366,76 @@ function	shuffle(array)
 	  i--;
 	  [array[i], array[j]] = [array[j], array[i]];
 	}
+}
+
+async function	showTournamentOverview(struct)
+{
+	struct.tournament.players[0].innerHTML = struct.tournament.names[0];
+	struct.tournament.players[1].innerHTML = struct.tournament.names[1];
+	struct.tournament.players[2].innerHTML = struct.tournament.names[2];
+	struct.tournament.players[3].innerHTML = struct.tournament.names[3];
+	struct.tournament.winners[0].innerHTML = "-";
+	struct.tournament.winners[0].style.opacity = 0;
+	struct.tournament.winners[1].innerHTML = "-";
+	struct.tournament.winners[1].style.opacity = 0;
+	struct.tournament.markers[0].innerHTML = "EN ATTENTE";
+	struct.tournament.markers[1].innerHTML = "SUIVANT";
+	struct.tournament.markers[2].innerHTML = "PROCHAINEMENT";
+	struct.menu.form.classList.add("hidden");
+	struct.tournament.overview.classList.remove("hidden");
+}
+
+async function	waitTournamentPlayButton(struct)
+{
+	return new Promise((resolve, reject) => {
+		const button = document.createElement("button");
+		button.classList.add("tournament-play-button");
+		button.type = "button";
+		button.innerHTML = "GO!"
+		struct.wrapperCanvas.appendChild(button);
+		button.addEventListener("click", function() {
+			button.remove();
+			resolve();
+		}, { once: true });
+	});
+}
+
+async function	updateTournamentMarkers(struct)
+{
+	struct.tournament.markers[0].innerHTML = struct.tournament.markerArray[0][0];
+	struct.tournament.markers[1].innerHTML = struct.tournament.markerArray[0][1];
+	struct.tournament.markers[2].innerHTML = struct.tournament.markerArray[0][2];
+	struct.tournament.markerArray.shift();
+}
+
+async function	updateTournamentWinners(struct)
+{
+	if (struct.tournament.winners[0].dataset.decided == "tbd")
+	{
+		if (struct.game.scores[0] > struct.game.scores[1])
+			struct.tournament.winners[0].innerHTML = struct.tournament.names[0];
+		else
+			struct.tournament.winners[0].innerHTML = struct.tournament.names[1];
+		struct.tournament.winners[0].style.opacity = 1;
+		struct.tournament.winners[0].setAttribute("data-decided", "yes");
+	}
+	else if (struct.tournament.winners[1].dataset.decided == "tbd")
+	{
+		if (struct.game.scores[0] > struct.game.scores[1])
+			struct.tournament.winners[1].innerHTML = struct.tournament.names[2];
+		else
+			struct.tournament.winners[1].innerHTML = struct.tournament.names[3];
+		struct.tournament.winners[1].style.opacity = 1;
+		struct.tournament.winners[1].setAttribute("data-decided", "yes");
+	}
+}
+
+function	endOfTournament(struct)
+{
+	struct.menu.form.classList.remove("hidden");
+	struct.tournament.overview.classList.add("hidden");
+	struct.tournament.winners[0].setAttribute("data-decided", "tbd");
+	struct.tournament.winners[1].setAttribute("data-decided", "tbd");
+	resetInsertCoinButton(struct.menu.insertCoinButton);
+	struct.tournament = getTournamentStruct();
 }

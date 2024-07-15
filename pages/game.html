@@ -82,40 +82,23 @@
 						</button>
 					</div>
 				</form>
-				<div class="tournament-overview">
+				<div class="tournament-overview hidden">
 					<div class="tournament-match">
-						<span class="player player-one">P1
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span>
-						<button type="button">Go !</button>
-						<span class="player player-two">P2
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-							aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-						</span>
+						<span class="tournament-player"></span>
+						<span class="tournament-marker"></span>
+						<span class="tournament-player"></span>
 					</div>
 					<div class="bar"></div>
 					<div class="tournament-match">
-						<span class="player player-three">P3</span>
-						<button type="button">Go !</button>
-						<span class="player player-four">P4</span>
+						<span class="tournament-player"></span>
+						<span class="tournament-marker"></span>
+						<span class="tournament-player"></span>
 					</div>
 					<div class="bar"></div>
 					<div class="tournament-match">
-						<span class="player winner-one">Winner 1</span>
-						<button type="button">Go !</button>
-						<span class="player winner-two">Winner 2</span>
+						<span class="tournament-winner" data-decided="tbd"></span>
+						<span class="tournament-marker"></span>
+						<span class="tournament-winner" data-decided="tbd"></span>
 					</div>
 				</div>
 			</div>
@@ -126,10 +109,10 @@
 					<i class="fa-solid fa-circle-arrow-left"></i>
 					<p>Sélectionnez vos pseudonymes</p>
 					<div class="tournament-wrapper-input">
-						<input type="text" name="p1" placeholder="Joueur 1" aria-label="Pseudonyme du joueur 1"/>
-						<input type="text" name="p2" placeholder="Joueur 2" aria-label="Pseudonyme du joueur 2"/>
-						<input type="text" name="p3" placeholder="Joueur 3" aria-label="Pseudonyme du joueur 3"/>
-						<input type="text" name="p4" placeholder="Joueur 4" aria-label="Pseudonyme du joueur 4"/>
+						<input type="text" name="p1" maxlength="30" placeholder="Joueur 1" aria-label="Pseudonyme du joueur 1"/>
+						<input type="text" name="p2" maxlength="30" placeholder="Joueur 2" aria-label="Pseudonyme du joueur 2"/>
+						<input type="text" name="p3" maxlength="30" placeholder="Joueur 3" aria-label="Pseudonyme du joueur 3"/>
+						<input type="text" name="p4" maxlength="30" placeholder="Joueur 4" aria-label="Pseudonyme du joueur 4"/>
 					</div>
 					<button type="button" aria-label="Valider" >Valider</button>
 				</form>

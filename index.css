@@ -29,29 +29,16 @@ body {
 	visibility: hidden !important;
 }
 
-.visible {
-	display: block;
-	opacity: 1;
-	visibility: visible;
+@keyframes fade {
+	0% { opacity: 1; }
+	50% { opacity: 0; }
+	100% { opacity: 1; }
 }
 
-/* ::-webkit-scrollbar {
-	width: 8px;
-	border-radius: 100%;
-} ::-webkit-scrollbar-track {
-   background: #f1f1f1;
-   border-radius: 10px;
-} ::-webkit-scrollbar-thumb {
-	background: #888;
-	border-radius: 5px;
-} ::-webkit-scrollbar-thumb:hover {
-	background: #555;
-} */
-
-/*///////////////*/
-/* Layer - Login */
-/*///////////////*/
-.layer {
+/*////////////*/
+/* Login Page */
+/*////////////*/
+.login-form {
 	color: var(--textColor);
 	background-color: black;
 	display: flex;
@@ -111,13 +98,13 @@ body {
 /* Login - sign in */
 /*/////////////////*/
 
-.layer form {
+.login-form form {
 	display: flex;
 	flex-direction: column;
 	gap: 5px;
 }
 
-.layer form input {
+.login-form form input {
 	height: 40px;
 	padding: 5px;
 	color: var(--textColor);
@@ -129,12 +116,12 @@ body {
 	opacity: 1;
 }
 
-.layer form input.hideButton {
+.login-form form input.hideButton {
 	visibility: hidden;
 	opacity: 0;
 }
 
-.layer form button {
+.login-form form button {
 	height: 40px;
 	margin-top: 6px;
 	border-radius: 20px;
@@ -144,29 +131,29 @@ body {
 	cursor: pointer;
 }
 
-.layer form button.notransition {
+.login-form form button.notransition {
 	transition: none;
 }
 
-.layer form button:hover {
+.login-form form button:hover {
 	background: rgb(220, 220, 220);
 }
 
-.layer form button:active {
+.login-form form button:active {
 	margin-top: 8px;
 	margin-bottom: -2px;
 }
 
-.layer form button.recovery {
+.login-form form button.recovery {
 	margin-top: -50px;
 }
 
-.layer form button.recovery:active {
+.login-form form button.recovery:active {
 	margin-top: -48px;
 	margin-bottom: -2px;
 }
 
-.layer form p {
+.login-form form p {
 	align-self: center;
 	font-size: 85%;
 	margin: 1% 0%;
@@ -326,10 +313,9 @@ nav ul {
 	justify-content: flex-end;
 	align-items: stretch;
 	gap: 5%;
+	height: 100%;
 	padding: 0;
 	margin: 0;
-	max-height: 100%;
-	min-height: 100%;
 	list-style-type: none;
 }
 
@@ -342,13 +328,11 @@ nav ul li div {
 }
 
 .wrapper-avatar {
-	width: 48px;
-	max-width: 48px;
-	height: 48px;
-	max-height: 48px;
+	height: 100%;
 }
 
 .wrapper-avatar img {
+	height: 100%;
 	object-fit: fill;
 }
 
@@ -680,12 +664,6 @@ h2 {
 	animation: none;
 }
 
-@keyframes fade {
-	0% { opacity: 1; }
-	50% { opacity: 0; }
-	100% { opacity: 1; }
-}
-
 .slot {
 	height: 70px;
 	width: 15px;
@@ -796,7 +774,6 @@ h2 {
 	display: block;
 	min-height: 17px;
 	height: 17px;
-	max-height: 17px;
 	width: 100%;
 	text-align: center;
 	font-size: 1em;
@@ -833,13 +810,6 @@ h2 {
 	opacity: 0.8;
 }
 
-.tournament-play-button {
-	width: 50px;
-	height: 50px;
-	border-radius: 100%;
-	z-index: 1;
-}
-
 /*///////////////*/
 /* Game - screen */
 /*///////////////*/
@@ -873,6 +843,15 @@ canvas:focus {
 	outline: none;
 }
 
+.go-button {
+	width: 50px;
+	height: 50px;
+	font-weight: 600;
+	border-radius: 100%;
+	cursor: pointer;
+	z-index: 1;
+}
+
 /*////////////////////////*/
 /* Game - tournament form */
 /*////////////////////////*/
@@ -887,7 +866,7 @@ canvas:focus {
 	position: absolute;
 }
 
-.tournament-form p {
+.tournament-form span {
 	user-select: none;
 }
 
@@ -932,20 +911,109 @@ canvas:focus {
 
 .wrapper-controls {
 	display: flex;
-	justify-content: space-between;
 	height: 15%;
-	padding: 2%;
+}
+
+.wrapper-controls-svg {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	width: 12%;
 }
 
 .player-control {
 	display: flex;
 	justify-content: center;
-	align-items: center;
+	align-items: end;
+	gap: 25px;
 	width: 50%;
+	padding: 1% 2%;
+	position: relative;
+	user-select: none;
+}
+
+.player-control .player-pseudo {
+	position: absolute;
+	bottom: 1%;
+	margin: 0;
+	padding: 0;
+	font-weight: 700;
+}
+
+.player-pseudo-left {
+	left: 2%;
+}
+
+.player-pseudo-right {
+	right: 2%;
 }
 
 .stick {
 	height: 100%;
+	width: 100%;
+}
+
+.rotate {
+	width: 100%;
+}
+
+.wrapper-controls-keys {
+	width: 153%;
+	height: 100%;
+	position: absolute;
+	left: -23%;
+	display: none;
+}
+
+.key {
+	position: absolute;
+	bottom: 10%;
+	height: 100%;
+	width: 50%;
+	background-color: var(--textColor);
+	border-radius: 0.3em;
+	box-shadow: 0 0.2em 0 0.05em #9b9595;
+	display: none;
+}
+
+.key-top {
+	height: 33%;
+	width: 33%;
+	top: 0;
+	left: 33%;
+}
+
+.key-left {
+	height: 33%;
+	width: 33%;
+	top: 33%;
+	left: 0;
+}
+
+.key-right {
+	height: 33%;
+	width: 33%;
+	top: 33%;
+	left: 66%;
+}
+
+.key-bottom {
+	height: 33%;
+	width: 33%;
+	top: 66%;
+	left: 33%;
+}
+
+.wrapper-controls:hover .stick, .wrapper-controls:hover .rotate,
+.wrapper-controls-hover .stick, .wrapper-controls-hover .rotate {
+	opacity: 0.3;
+}
+
+.wrapper-controls:hover .key, .wrapper-controls:hover .wrapper-controls-keys,
+.wrapper-controls-hover .key, .wrapper-controls-hover .wrapper-controls-keys {
+	display: block;
+	opacity: 1;
 }
 
 /*/////////////*/
@@ -967,4 +1035,28 @@ canvas:focus {
 .chat-input {
 	height: 15%;
 	width: 100%;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	padding: 2%;
+	position: relative;
+}
+
+.chat-input i {
+	position: absolute;
+	top: 10%;
+	left: 0;
+	font-size: 2em;
+	animation: fade 3s infinite;
+}
+
+.chat-input textarea {
+	height: 100%;
+	width: 100%;
+	padding: 5%;
+	background: var(--mainColor);
+	color: var(--textColor);
+	word-break: break-all;
+	border: none;
+	resize: none;
 }

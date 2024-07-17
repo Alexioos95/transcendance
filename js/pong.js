@@ -146,6 +146,7 @@ function	resizeBall(oldValues, canvas, ball)
 
 	ball.x = canvas.width / 100 * percentOldX;
 	ball.y = canvas.height / 100 * percentOldY;
+	ball.radius = canvas.width / 66;
 	ball.speed = canvas.width / 100;
 }
 
@@ -429,7 +430,7 @@ function	createPaddle(canvas, height, width, position)
 function	getBall(canvas)
 {
 	const ball = {
-		radius: 15,
+		radius: canvas.width / 66,
 		x: canvas.width / 2,
 		y: canvas.height / 2,
 		dir_x: (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1,

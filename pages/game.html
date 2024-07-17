@@ -107,7 +107,7 @@
 			<div class="wrapper-canvas card">
 				<form class="tournament-form hidden">
 					<i class="fa-solid fa-circle-arrow-left"></i>
-					<p>Sélectionnez vos pseudonymes</p>
+					<span>Sélectionnez vos pseudonymes</span>
 					<div class="tournament-wrapper-input">
 						<input type="text" name="p1" maxlength="30" placeholder="Joueur 1" aria-label="Pseudonyme du joueur 1"/>
 						<input type="text" name="p2" maxlength="30" placeholder="Joueur 2" aria-label="Pseudonyme du joueur 2"/>
@@ -118,11 +118,45 @@
 				</form>
 			</div>
 			<div class="wrapper-controls card">
-				<div class="player-control player1">
-					<img class="stick" src="/svg/stick/state0.svg"/>
+				<div class="player-control">
+					<span class="player-pseudo player-pseudo-left"></span>
+					<div class="wrapper-controls-svg">
+						<img class="rotate" src="/svg/rotate/left.svg"/>
+						<div class="key"></div>
+					</div>
+					<div class="wrapper-controls-svg">
+						<img class="rotate" src="/svg/rotate/right.svg"/>
+						<div class="key"></div>
+					</div>
+					<div class="wrapper-controls-svg">
+						<img class="stick" src="/svg/stick/state0.svg"/>
+						<div class="wrapper-controls-keys">
+							<div class="key key-top"></div>
+							<div class="key key-left"></div>
+							<div class="key key-right"></div>
+							<div class="key key-bottom"></div>
+						</div>
+					</div>
 				</div>
-				<div class=" player-control player2">
-					<img class="stick" src="/svg/stick/state0.svg"/>
+				<div class="player-control">
+					<span class="player-pseudo player-pseudo-right"></span>
+					<div class="wrapper-controls-svg">
+						<img class="rotate" src="/svg/rotate/left.svg"/>
+						<div class="key"></div>
+					</div>
+					<div class="wrapper-controls-svg">
+						<img class="rotate" src="/svg/rotate/right.svg"/>
+						<div class="key"></div>
+					</div>
+					<div class="wrapper-controls-svg">
+						<img class="stick" src="/svg/stick/state0.svg"/>
+						<div class="wrapper-controls-keys">
+							<div class="key key-top"></div>
+							<div class="key key-left"></div>
+							<div class="key key-right"></div>
+							<div class="key key-bottom"></div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -131,7 +165,8 @@
 
 			</div>
 			<div class="chat-input card">
-
+				<i class="fa-solid fa-caret-right"></i>
+				<textarea maxlength="255"></textarea>
 			</div>
 		</div>
 	</div>

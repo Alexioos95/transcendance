@@ -6,6 +6,7 @@ async function	run()
 {
 	const struct = {
 		loginButton: document.getElementsByClassName("login-button")[0],
+		allElements: document.getElementsByClassName("wrapper-playzone")[0].children,
 		menu: getMenuStruct(),
 		screen: getScreenStruct(),
 		tournament: getTournamentStruct(),
@@ -26,6 +27,13 @@ async function	run()
 			});
 		// Faire un await pour le chat (?);
 	}
+}
+
+function	isOnPhone()
+{
+	if (window.innerWidth < 1024)
+		return (true);
+	return (false);
 }
 
 function	setupEventListeners(struct)
@@ -72,7 +80,15 @@ async function	launchGame(struct)
 async function	endGame(struct)
 {
 	if (struct.tournament.on == false)
+	{
+		if (isOnPhone())
+		{
+			sleep(2500)
+				.then(() => struct.allElements[0].classList.remove("zindex"))
+				.then(() => struct.allElements[1].classList.add("zindex"))
+		}
 		resetInsertCoinButton(struct.menu.insertCoinButton);
+	}
 	await deactivateStick(struct.screen.sticks);
 	if (struct.tournament.on == true)
 	{
@@ -214,6 +230,11 @@ async function	checkGameSelectorValidation(struct)
 			.then(() => title.style.opacity = 1)
 			.then(() => title.innerHTML = struct.screen.game.name)
 		clearScreen(struct.screen.wrapperCanvas);
+		if (isOnPhone())
+		{
+			struct.allElements[0].classList.add("zindex");
+			struct.allElements[1].classList.remove("zindex");
+		}
 		resolve();
 	});
 }

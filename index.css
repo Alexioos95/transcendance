@@ -41,6 +41,10 @@ body {
 	visibility: hidden !important;
 }
 
+.zindex {
+	z-index: 1;
+}
+
 @keyframes fade {
 	0% { opacity: 1; }
 	50% { opacity: 0; }
@@ -1223,32 +1227,36 @@ canvas:focus {
 	.for-phone {
 		display: block;
 	}
+	.zindex {
+		z-index: -1;
+	}
 	.card {
 		border-radius: 0;
 		box-shadow: none;
 		min-width: 100%;
 		width: 100%;
 		height: 100%;
+		position: absolute;
 	}
-	h2 {
-		display: none;
-	}
-	.wrapper-bottom-section {
-		display: none;
-	}
-	header h1 {
-		font-size: 16px;
-	}
-	nav ul li button span {
+	header, h2, .wrapper-bottom-section {
 		display: none;
 	}
 	main {
-		padding: 2% 0 0 0;
+		height: 100%;
+		padding: 0;
+	}
+	.wrapper-left-section form h3,
+	.wrapper-submit-button span {
+		font-size: 1.5rem;
+	}
+	.wrapper-mode-selector span {
+		font-size: 1rem;
 	}
 	.wrapper-playzone {
 		height: 100%;
 		gap: 0;
 		overflow: hidden;
+		position: relative;
 	}
 	.wrapper-left-section {
 		padding: 0;
@@ -1268,7 +1276,9 @@ canvas:focus {
 		justify-content: space-around;
 	}
 	.game-selector {
-		height: 23%;
+		height: 50%;
+		justify-content: center;
+		align-items: center;
 	}
 	.wrapper-mode-selectors {
 		display: flex;
@@ -1279,7 +1289,6 @@ canvas:focus {
 		width: 80%;
 	}
 	.wrapper-submit-button button {
-
 		justify-content: center;
 		align-items: center;
 	}
@@ -1290,5 +1299,9 @@ canvas:focus {
 	.coin {
 		width: 3.701%;
 		height: 60%;
+	}
+	.go-button {
+		width: 10%;
+		font-size: 1.5rem;
 	}
 }

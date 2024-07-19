@@ -1262,7 +1262,6 @@ canvas:focus {
 		padding: 0;
 	}
 	.wrapper-left-section form {
-		justify-content: unset;
 		align-items: center;
 	}
 	.wrapper-selectors {
@@ -1276,9 +1275,12 @@ canvas:focus {
 		justify-content: space-around;
 	}
 	.game-selector {
-		height: 50%;
+		height: 25%;
 		justify-content: center;
 		align-items: center;
+	}
+	.game-selector div {
+		height: 100%;
 	}
 	.wrapper-mode-selectors {
 		display: flex;

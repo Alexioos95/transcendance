@@ -20,8 +20,11 @@ function	getPongStruct()
 async function	startPong(struct)
 {
 	initPongStruct(struct.screen.game, struct.screen.wrapperCanvas);
-	struct.screen.game.canvas.addEventListener("keydown", function(event) { enableMove(event, struct.screen.game.paddles); });
-	struct.screen.game.canvas.addEventListener("keyup", function(event) { disableMove(event, struct.screen.game.paddles); });
+	struct.screen.game.canvas.addEventListener("keydown", function(event) { enableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
+	struct.screen.game.canvas.addEventListener("keyup", function(event) { disableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
+	struct.screen.game.canvas.addEventListener("mousedown", function(event) { enableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
+	struct.screen.game.canvas.addEventListener("mousemove", function(event) { enableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
+	struct.screen.game.canvas.addEventListener("mouseup", function(event) { disableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
 	document.defaultView.addEventListener("resize", function() { resize(struct.screen.game, struct.screen.wrapperCanvas); });
 	struct.screen.game.canvas.focus();
 	loop(struct, struct.screen.game);
@@ -33,7 +36,7 @@ async function	initPongStruct(game, wrapperCanvas)
 	game.ctx = game.canvas.getContext("2d");
 	game.paddles = getPaddles(game.canvas);
 	game.ball = getBall(game.canvas);
-	game.scores = [10, 10];
+	game.scores = [0, 0];
 	game.running = 1;
 }
 
@@ -107,14 +110,11 @@ function	renderScore(game)
 
 function	resize(game, wrapper)
 {
-	console.log("CALL")
 	const oldValues = {
 		width: game.canvas.width,
 		height: game.canvas.height
 	};
-	console.log(oldValues);
 	setCanvasDimensions(game.canvas, wrapper);
-	console.log(game.canvas);
 	resizePaddles(oldValues, game.canvas, game.paddles);
 	resizeBall(oldValues, game.canvas, game.ball);
 	if (game.scores[0] > 10 || game.scores[1] > 10)
@@ -152,9 +152,43 @@ function	resizeBall(oldValues, canvas, ball)
 /////////////////////////
 // Animation
 /////////////////////////
-function	enableMove(event, paddles)
+function	enableMove(event, canvas, paddles)
 {
-	if (event.key == "w" || event.key == "W")
+	if (event.type == "mousedown")
+	{
+		paddles.left.mouse = 1;
+		paddles.right.mouse = 1;
+	}
+	else if (event.type == "mousemove")
+	{
+		if (event.offsetY < canvas.height / 2)
+		{
+			if (paddles.left.mouse == 1)
+			{
+				paddles.left.move_top = 1;
+				paddles.left.move_bot = 0;
+			}
+			else if (paddles.right.mouse == 1)
+			{
+				paddles.right.move_top = 1;
+				paddles.right.move_bot = 0;
+			}
+		}
+		else
+		{
+			if (paddles.left.mouse == 1)
+			{
+				paddles.left.move_top = 0;
+				paddles.left.move_bot = 1;
+			}
+			else if (paddles.right.mouse == 1)
+			{
+				paddles.right.move_top = 0;
+				paddles.right.move_bot = 1;
+			}
+		}
+	}
+	else if (event.key == "w" || event.key == "W")
 		paddles.left.move_top = 1;
 	else if (event.key == "s" || event.key == "S")
 		paddles.left.move_bot = 1;
@@ -164,8 +198,17 @@ function	enableMove(event, paddles)
 		paddles.right.move_bot = 1;
 }
 
-function	disableMove(event, paddles)
+function	disableMove(event, canvas, paddles)
 {
+	if (event.type == "mouseup")
+	{
+		paddles.left.mouse = 0;
+		paddles.right.mouse = 0;
+		paddles.left.move_top = 0;
+		paddles.right.move_top = 0;
+		paddles.left.move_bot = 0;
+		paddles.right.move_bot = 0;
+	}
 	if (event.key == "w" || event.key == "W")
 		paddles.left.move_top = 0;
 	else if (event.key == "s" || event.key == "S")
@@ -411,6 +454,7 @@ function	createPaddle(canvas, height, width, position)
 		y: 0,
 		move_top: 0,
 		move_bot: 0,
+		mouse: 0
 	};
 	
 	if (position == "l")

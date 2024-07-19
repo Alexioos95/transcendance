@@ -275,7 +275,7 @@ function	resetInsertCoinButton(button)
 /////////////////////////
 async function	activateStick(struct)
 {
-	const path = "/svg/stick/state";
+	const path = "../svg/stick/state";
 	const extension = ".svg";
 
 	await sleep(450);
@@ -353,7 +353,7 @@ function	disableStickMove(event, struct)
 
 async function	deactivateStick(sticks)
 {
-	const path = "/svg/stick/state";
+	const path = "../svg/stick/state";
 	const extension = ".svg";
 
 	for (let i = 4; i > -1; i--)

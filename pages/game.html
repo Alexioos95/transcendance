@@ -1,3 +1,7 @@
+<div class="please-rotate">
+	<div class="phone"></div>
+	<p>Veuillez tourner votre écran sur le côté</p>
+</div>
 <header>
 	<h1>ft_transcendance</h1>
 	<nav>
@@ -9,6 +13,16 @@
 					</div>
 					<span>Alexioos95</span>
 				</div>
+			</li>
+			<li class="for-phone">
+				<button>
+					<i class="fa-solid fa-message"></i>
+				</button>
+			</li>
+			<li class="for-phone">
+				<button>
+					<i class="fa-solid fa-user"></i>
+				</button>
 			</li>
 			<li>
 				<button>
@@ -29,54 +43,72 @@
 	<h2>LOADING</h2>
 	<div class="wrapper-playzone">
 		<div class="wrapper-overflow card">
-			<div class="wrapper-options">
+			<section class="wrapper-left-section">
 				<form>
-					<div class="section-selector">
-						<h3 aria-label="Choisissez le jeu: Pong ou Tetris">Jeu</h3>
-						<div>
-							<label class="game-selector">
-								<input type="radio" name="game" value="pong" aria-label="Pong"/>
-								<div>
-									<img src="/svg/pong.svg"/>
-								</div>
-							</label>
-							<label class="game-selector">
-								<input type="radio" name="game" value="tetris" aria-label="Tetris"/>
-								<div>
-									<img src="/svg/tetris.svg"/>
-								</div>
-							</label>
+					<div class="wrapper-selectors">
+						<div class="wrapper-game-selectors">
+							<h3 aria-label="Choisissez le jeu: Pong ou Tetris">Jeu</h3>
+							<div class="wrapper-game-selector">
+								<label class="game-selector">
+									<input type="radio" name="game" value="pong" aria-label="Pong"/>
+									<div>
+										<img src="/svg/pong.svg"/>
+									</div>
+								</label>
+								<label class="game-selector">
+									<input type="radio" name="game" value="tetris" aria-label="Tetris"/>
+									<div>
+										<img src="/svg/tetris.svg"/>
+									</div>
+								</label>
+							</div>
 						</div>
-					</div>
-					<div class="section-selector">
-						<h3 aria-label="Choisissez le mode de jeu: ">Mode</h3>
-						<div class="wrapper-mode-selector">
-							<label class="mode-selector">
-								<input disabled type="radio" name="mode" value="1vAI" aria-label="Joueur contre Ordinateur"/>
-								<div class="circle"></div>
-								<span>1vIA</span>
-							</label>
-							<label class="mode-selector">
-								<input type="radio" name="mode" value="1v1" aria-label="Joueur contre Joueur en local"/>
-								<div class="circle"></div>
-								<span>1v1 local</span>
-							</label>
-							<label class="mode-selector">
-								<input type="radio" name="mode" value="tournament" aria-label="Tournoi a 4 joueurs en local"/>
-								<div class="circle"></div>
-								<span>Tournoi local a 4</span>
-							</label>
-							<label class="mode-selector">
-								<input disabled type="radio" name="mode" value="online" aria-label="Joueur contre Joueur en ligne"/>
-								<div class="circle"></div>
-								<span>1v1 en ligne</span>
-							</label>
+						<div class="wrapper-mode-selectors">
+							<h3 aria-label="Choisissez le mode de jeu: ">Mode</h3>
+							<div class="wrapper-mode-selector">
+								<label class="mode-selector">
+									<input disabled type="radio" name="mode" value="1vAI" aria-label="Joueur contre Ordinateur"/>
+									<div class="wrapper-circle">
+										<div class="base-circle">
+											<div class="top-circle"></div>
+										</div>
+									</div>
+									<span>1vIA</span>
+								</label>
+								<label class="mode-selector" title="Ce mode est désactivé sur téléphone et tablette">
+									<input type="radio" name="mode" value="1v1" aria-label="Joueur contre Joueur en local"/>
+									<div class="wrapper-circle">
+										<div class="base-circle">
+											<div class="top-circle"></div>
+										</div>
+									</div>
+									<span>1v1 local</span>
+								</label>
+								<label class="mode-selector" title="Ce mode est désactivé sur téléphone et tablette">
+									<input type="radio" name="mode" value="tournament" aria-label="Tournoi a 4 joueurs en local"/>
+									<div class="wrapper-circle">
+										<div class="base-circle">
+											<div class="top-circle"></div>
+										</div>
+									</div>
+									<span>Tournoi local a 4</span>
+								</label>
+								<label class="mode-selector" title="Ce mode est désactivé si vous n'êtes pas connecté">
+									<input disabled type="radio" name="mode" value="online" aria-label="Joueur contre Joueur en ligne"/>
+									<div class="wrapper-circle">
+										<div class="base-circle">
+											<div class="top-circle"></div>
+										</div>
+									</div>
+									<span>1v1 en ligne</span>
+								</label>
+							</div>
 						</div>
 					</div>
 					<div class="wrapper-submit-button">
 						<button id="selector" type="button" aria-label="Jouer !">
 							<span>Insérer une pièce</span>
-							<div>
+							<div class="wrapper-slot">
 								<div class="slot"></div>
 							</div>
 						</button>
@@ -101,14 +133,14 @@
 						<span class="tournament-winner" data-decided="tbd"></span>
 					</div>
 				</div>
-			</div>
+			</section>
 		</div>
-		<div class="wrapper-game">
+		<div class="wrapper-screen">
 			<div class="wrapper-canvas card">
 				<form class="tournament-form hidden">
 					<i class="fa-solid fa-circle-arrow-left"></i>
 					<span>Sélectionnez vos pseudonymes</span>
-					<div class="tournament-wrapper-input">
+					<div class="tournament-wrapper-inputs">
 						<input type="text" name="p1" maxlength="30" placeholder="Joueur 1" aria-label="Pseudonyme du joueur 1"/>
 						<input type="text" name="p2" maxlength="30" placeholder="Joueur 2" aria-label="Pseudonyme du joueur 2"/>
 						<input type="text" name="p3" maxlength="30" placeholder="Joueur 3" aria-label="Pseudonyme du joueur 3"/>
@@ -117,9 +149,9 @@
 					<button type="button" aria-label="Valider" >Valider</button>
 				</form>
 			</div>
-			<div class="wrapper-controls card">
-				<div class="player-control">
-					<span class="player-pseudo player-pseudo-left"></span>
+			<section class="wrapper-bottom-section card">
+				<div class="wrapper-player-controls">
+					<span class="playername playername-left"></span>
 					<div class="wrapper-controls-svg">
 						<img class="rotate" src="/svg/rotate/left.svg"/>
 						<div class="key"></div>
@@ -138,8 +170,8 @@
 						</div>
 					</div>
 				</div>
-				<div class="player-control">
-					<span class="player-pseudo player-pseudo-right"></span>
+				<div class="wrapper-player-controls">
+					<span class="playername playername-right"></span>
 					<div class="wrapper-controls-svg">
 						<img class="rotate" src="/svg/rotate/left.svg"/>
 						<div class="key"></div>
@@ -158,16 +190,80 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</s>
 		</div>
-		<div class="wrapper-chat">
-			<div class="chat-display card">
-
+		<section class="wrapper-right-section">
+			<div class="wrapper-tabs card">
+				<div class="wrapper-tabs-button">
+					<button type="button" class="active"><h3>Chat</h3></button>
+					<button type="button"><h3>Amis</h3></button>
+				</div>
+				<div class="wrapper-tabs-tables">
+					<table class="tab-chat active">
+						<tbody>
+							<tr><td>
+								<img src="/favicon.ico"/>User: MSG
+							</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: MSG</td></tr>
+							<tr><td>User: LONG_ASS_MSG_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</td></tr>
+							<tr><td>User: LONG_ASS_MSG_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</td></tr>
+						</tbody>
+					</table>
+					<table class="tab-friends">
+						<tbody>
+							<tr><td>abc</td></tr>
+							<tr><td>def</td></tr>
+							<tr><td>ghi</td></tr>
+							<tr><td>jkl</td></tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 			<div class="chat-input card">
 				<i class="fa-solid fa-caret-right"></i>
-				<textarea maxlength="255"></textarea>
+				<textarea maxlength="200"></textarea>
 			</div>
-		</div>
+		</s>
 	</div>
 </main>

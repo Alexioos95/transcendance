@@ -19,12 +19,12 @@ function	getPongStruct()
 
 async function	startPong(struct)
 {
-	initPongStruct(struct.game, struct.wrapperCanvas);
-	struct.game.canvas.addEventListener("keydown", function(event) { enableMove(event, struct.game.paddles); });
-	struct.game.canvas.addEventListener("keyup", function(event) { disableMove(event, struct.game.paddles); });
-	document.defaultView.addEventListener("resize", function() { resize(struct.game, struct.wrapperCanvas); });
-	struct.game.canvas.focus();
-	loop(struct, struct.game);
+	initPongStruct(struct.screen.game, struct.screen.wrapperCanvas);
+	struct.screen.game.canvas.addEventListener("keydown", function(event) { enableMove(event, struct.screen.game.paddles); });
+	struct.screen.game.canvas.addEventListener("keyup", function(event) { disableMove(event, struct.screen.game.paddles); });
+	document.defaultView.addEventListener("resize", function() { resize(struct.screen.game, struct.screen.wrapperCanvas); });
+	struct.screen.game.canvas.focus();
+	loop(struct, struct.screen.game);
 }
 
 async function	initPongStruct(game, wrapperCanvas)
@@ -107,18 +107,17 @@ function	renderScore(game)
 
 function	resize(game, wrapper)
 {
+	console.log("CALL")
 	const oldValues = {
 		width: game.canvas.width,
 		height: game.canvas.height
 	};
-
+	console.log(oldValues);
 	setCanvasDimensions(game.canvas, wrapper);
-	if (game.scores[0] < 11 && game.scores[1] < 11)
-	{
-		resizePaddles(oldValues, game.canvas, game.paddles);
-		resizeBall(oldValues, game.canvas, game.ball);
-	}
-	else
+	console.log(game.canvas);
+	resizePaddles(oldValues, game.canvas, game.paddles);
+	resizeBall(oldValues, game.canvas, game.ball);
+	if (game.scores[0] > 10 || game.scores[1] > 10)
 	{
 		game.ctx.fillStyle = "#2F2F2F";
 		game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
@@ -398,7 +397,7 @@ function	getPaddles(canvas)
 	{
 		height: height,
 		width: width,
-		speed: 10,
+		speed: canvas.width / 100,
 		left: createPaddle(canvas, height, width, "l"),
 		right: createPaddle(canvas, height, width, "r"),
 	};

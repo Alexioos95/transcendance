@@ -5,8 +5,9 @@
 async function	run()
 {
 	const struct = {
-		loginButton: document.getElementsByClassName("login-button")[0],
-		allElements: document.getElementsByClassName("wrapper-playzone")[0].children,
+		header: document.getElementsByTagName("header")[0],
+		headerButtons: document.querySelectorAll("header button"),
+		playzoneCards: document.getElementsByClassName("wrapper-playzone")[0].children,
 		menu: getMenuStruct(),
 		screen: getScreenStruct(),
 		tournament: getTournamentStruct(),
@@ -38,7 +39,33 @@ function	isOnPhone()
 
 function	setupEventListeners(struct)
 {	
-	struct.loginButton.addEventListener("click", function() {
+	// Game Selector
+	struct.headerButtons[0].addEventListener("click", function() {
+		resetPhoneClasses(struct);
+		struct.playzoneCards[0].classList.remove("zindex");
+	});
+	// Chat
+	struct.headerButtons[1].addEventListener("click", function() {
+		resetPhoneClasses(struct);
+		struct.playzoneCards[2].classList.remove("zindex");
+		struct.chat.tabs[0].classList.add("active");
+		struct.chat.tabs[1].classList.remove("active");
+		struct.chat.tables[0].classList.add("active");
+		struct.chat.tables[1].classList.remove("active");
+	});
+	// Friend list
+	struct.headerButtons[2].addEventListener("click", function() {
+		resetPhoneClasses(struct);
+		struct.playzoneCards[2].classList.remove("zindex");
+		struct.chat.tabs[0].classList.remove("active");
+		struct.chat.tabs[1].classList.add("active");
+		struct.chat.tables[0].classList.remove("active");
+		struct.chat.tables[1].classList.add("active");
+	});
+	struct.headerButtons[3].addEventListener("click", function() {
+		// Options
+	});
+	struct.headerButtons[4].addEventListener("click", function() {
 		struct.run = 0;
 		navigate("login");
 	});
@@ -57,6 +84,13 @@ function	setupEventListeners(struct)
 	});
 	struct.screen.wrapperCanvas.addEventListener("keydown", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("keyup", function(event) { disableStickMove(event, struct); });
+}
+
+function	resetPhoneClasses(struct)
+{
+	struct.playzoneCards[0].classList.add("zindex");
+	struct.playzoneCards[1].classList.add("zindex");
+	struct.playzoneCards[2].classList.add("zindex");
 }
 
 async function	launchGame(struct)
@@ -82,11 +116,10 @@ async function	endGame(struct)
 	if (struct.tournament.on == false)
 	{
 		if (isOnPhone())
-		{
-			sleep(2500)
-				.then(() => struct.allElements[0].classList.remove("zindex"))
-				.then(() => struct.allElements[1].classList.add("zindex"))
-		}
+			await sleep(2500);
+		struct.playzoneCards[0].classList.remove("zindex");
+		struct.playzoneCards[1].classList.add("zindex");
+		struct.header.classList.remove("zindex");
 		resetInsertCoinButton(struct.menu.insertCoinButton);
 	}
 	await deactivateStick(struct.screen.sticks);
@@ -230,11 +263,9 @@ async function	checkGameSelectorValidation(struct)
 			.then(() => title.style.opacity = 1)
 			.then(() => title.innerHTML = struct.screen.game.name)
 		clearScreen(struct.screen.wrapperCanvas);
-		if (isOnPhone())
-		{
-			struct.allElements[0].classList.add("zindex");
-			struct.allElements[1].classList.remove("zindex");
-		}
+		resetPhoneClasses(struct)
+		struct.playzoneCards[1].classList.remove("zindex");
+		struct.header.classList.add("zindex");
 		resolve();
 	});
 }

@@ -266,18 +266,15 @@ body {
 	main {
 		padding: 0;
 	}
-
 	.wrapper-login {
 		width: 100%;
 		height: 100%;
 		max-width: none;
 		max-height: none;
 	}
-
 	.wrapper-sp-login {
 		height: auto;
 	}
-
 	.sp-login {
 		margin-bottom: 10px;
 		height: 45px;
@@ -1214,6 +1211,9 @@ canvas:focus {
 /*/////////////////////*/
 
 @media only screen and (max-width: 1023px) and (orientation: portrait) {
+	/*/////////////////*/
+	/* Force landscape */
+	/*/////////////////*/
 	.please-rotate {
 		display: flex;
 		position: absolute;
@@ -1224,6 +1224,9 @@ canvas:focus {
 }
 
 @media only screen and (max-width: 1023px) and (orientation: landscape) {
+	/*/////////*/
+	/* General */
+	/*/////////*/
 	.for-phone {
 		display: block;
 	}
@@ -1234,29 +1237,81 @@ canvas:focus {
 		border-radius: 0;
 		box-shadow: none;
 		min-width: 100%;
-		width: 100%;
+		width: 93%;
 		height: 100%;
 		position: absolute;
+		top: 0;
+		left: 0;
 	}
-	header, h2, .wrapper-bottom-section {
+	h2, .wrapper-bottom-section, .wrapper-tabs-button {
 		display: none;
 	}
 	main {
 		height: 100%;
 		padding: 0;
 	}
+	.wrapper-playzone {
+		height: 100%;
+		width: 100%;
+		gap: 0;
+		overflow: hidden;
+		position: relative;
+	}
+	/*/////////////*/
+	/* Menu/Header */
+	/*/////////////*/
+	header {
+		position: absolute;
+		right: 0;
+		padding: 2% 0%;
+		height: 100%;
+		width: 7%;
+		border-bottom: unset;
+		border-left: 1px solid rgb(131, 126, 126);
+		z-index: 1;
+	}
+	header img, header h1 {
+		display: none;
+	}
+	nav {
+		width: 100%;
+		font-size: 1rem;
+	}
+	nav ul {
+		flex-direction: column;
+	}
+	nav ul {
+		width: 100%;
+		height: 100%;
+	}
+	nav ul li {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+		width: 100%;
+		height: 100%;
+	}
+	.wrapper-nav-user {
+		display: none;
+	}
+	nav ul li button {
+		display: block;
+		height: 100%;
+		width: 100%;
+	}
+	nav span {
+		display: none;
+	}
+	/*///////////*/
+	/* Selectors */
+	/*///////////*/
 	.wrapper-left-section form h3,
 	.wrapper-submit-button span {
 		font-size: 1.5rem;
 	}
 	.wrapper-mode-selector span {
 		font-size: 1rem;
-	}
-	.wrapper-playzone {
-		height: 100%;
-		gap: 0;
-		overflow: hidden;
-		position: relative;
 	}
 	.wrapper-left-section {
 		padding: 0;
@@ -1289,6 +1344,7 @@ canvas:focus {
 	}
 	.wrapper-submit-button {
 		width: 80%;
+		margin-bottom: 1.5%;
 	}
 	.wrapper-submit-button button {
 		justify-content: center;
@@ -1305,5 +1361,21 @@ canvas:focus {
 	.go-button {
 		width: 10%;
 		font-size: 1.5rem;
+	}
+	/*//////*/
+	/* Chat */
+	/*//////*/
+	.wrapper-tabs-tables {
+		height: 85%;
+	}
+	.wrapper-tabs-tables table {
+		height: 100%;
+		width: 93%;
+	}
+	.chat-input {
+		top: auto;
+		bottom: 0;
+		height: 10%;
+		width: 100%;
 	}
 }

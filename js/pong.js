@@ -22,9 +22,9 @@ async function	startPong(struct)
 	initPongStruct(struct.screen.game, struct.screen.wrapperCanvas);
 	struct.screen.game.canvas.addEventListener("keydown", function(event) { enableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
 	struct.screen.game.canvas.addEventListener("keyup", function(event) { disableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
-	struct.screen.game.canvas.addEventListener("mousedown", function(event) { enableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
-	struct.screen.game.canvas.addEventListener("mousemove", function(event) { enableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
-	struct.screen.game.canvas.addEventListener("mouseup", function(event) { disableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
+	struct.screen.game.canvas.addEventListener("touchstart", function(event) { enableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
+	struct.screen.game.canvas.addEventListener("touchmove", function(event) { enableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
+	struct.screen.game.canvas.addEventListener("touchend", function(event) { disableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
 	document.defaultView.addEventListener("resize", function() { resize(struct.screen.game, struct.screen.wrapperCanvas); });
 	struct.screen.game.canvas.focus();
 	loop(struct, struct.screen.game);
@@ -36,7 +36,7 @@ async function	initPongStruct(game, wrapperCanvas)
 	game.ctx = game.canvas.getContext("2d");
 	game.paddles = getPaddles(game.canvas);
 	game.ball = getBall(game.canvas);
-	game.scores = [0, 0];
+	game.scores = [10, 10];
 	game.running = 1;
 }
 
@@ -54,8 +54,8 @@ async function	loop(struct, game)
 	else
 	{
 		game.running = 0;
-		await endGame(struct);
 		renderFinalScore(game);
+		await endGame(struct);
 	}
 }
 
@@ -154,21 +154,31 @@ function	resizeBall(oldValues, canvas, ball)
 /////////////////////////
 function	enableMove(event, canvas, paddles)
 {
-	if (event.type == "mousedown")
+	if (event.type == "touchstart")
 	{
-		paddles.left.mouse = 1;
-		paddles.right.mouse = 1;
-	}
-	else if (event.type == "mousemove")
-	{
+		paddles.left.touch = 1;
+		paddles.right.touch = 1;
 		if (event.offsetY < canvas.height / 2)
 		{
-			if (paddles.left.mouse == 1)
+			paddles.left.move_top = 1;
+			paddles.right.move_top = 1;
+		}
+		else
+		{
+			paddles.left.move_bot = 1;
+			paddles.right.move_bot = 1;
+		}
+	}
+	else if (event.type == "touchmove")
+	{
+		if (event.changedTouches[0].pageY < canvas.height / 2)
+		{
+			if (paddles.left.touch == 1)
 			{
 				paddles.left.move_top = 1;
 				paddles.left.move_bot = 0;
 			}
-			else if (paddles.right.mouse == 1)
+			if (paddles.right.touch == 1)
 			{
 				paddles.right.move_top = 1;
 				paddles.right.move_bot = 0;
@@ -176,12 +186,12 @@ function	enableMove(event, canvas, paddles)
 		}
 		else
 		{
-			if (paddles.left.mouse == 1)
+			if (paddles.left.touch == 1)
 			{
 				paddles.left.move_top = 0;
 				paddles.left.move_bot = 1;
 			}
-			else if (paddles.right.mouse == 1)
+			if (paddles.right.touch == 1)
 			{
 				paddles.right.move_top = 0;
 				paddles.right.move_bot = 1;
@@ -200,10 +210,10 @@ function	enableMove(event, canvas, paddles)
 
 function	disableMove(event, canvas, paddles)
 {
-	if (event.type == "mouseup")
+	if (event.type == "touchend")
 	{
-		paddles.left.mouse = 0;
-		paddles.right.mouse = 0;
+		paddles.left.touch = 0;
+		paddles.right.touch = 0;
 		paddles.left.move_top = 0;
 		paddles.right.move_top = 0;
 		paddles.left.move_bot = 0;
@@ -454,7 +464,7 @@ function	createPaddle(canvas, height, width, position)
 		y: 0,
 		move_top: 0,
 		move_bot: 0,
-		mouse: 0
+		touch: 0
 	};
 	
 	if (position == "l")

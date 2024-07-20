@@ -53,6 +53,17 @@ body {
 	z-index: 1;
 }
 
+/*////////////*/
+/* Font sizes */
+/*////////////*/
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.5rem; }
+span { font-size: 1rem; }
+td { font-size: 0.8rem; }
+textarea { font-size: 0.8rem; }
+
 /*///////////////*/
 /* Please rotate */
 /*///////////////*/
@@ -261,7 +272,7 @@ body {
 }
 
 /*///////////////////////*/
-/* Media queries - Phone */
+/* Media queries - Login */
 /*///////////////////////*/
 
 @media only screen and (max-width: 700px) and (orientation: portrait) {
@@ -331,7 +342,6 @@ header {
 }
 
 header h1 {
-	font-size: 2.4rem;
 	margin: 0;
 	cursor: default;
 	user-select: none;
@@ -341,7 +351,6 @@ nav {
 	width: 50%;
 	height: 100%;
 	padding: 0 0.5%;
-	font-size: 0.9rem;
 }
 
 nav ul {
@@ -413,11 +422,10 @@ h2 {
 	margin: 0 0 10px 0;
 	color: var(--textColor);
 	user-select: none;
-	font-size: 1.6rem;
 	transition: opacity 0.5s;
 }
 
-.wrapper-playzone {
+.wrapper-sections {
 	display: flex;
 	gap: 2%;
 	height: 95%;
@@ -443,7 +451,6 @@ h2 {
 }
 
 .wrapper-left-section form h3 {
-	font-size: 1.4rem;
 	margin: 5% 0;
 	user-select: none;
 }
@@ -457,7 +464,7 @@ h2 {
 .wrapper-game-selectors, .wrapper-game-selector {
 	display: flex;
 	flex-direction: column;
-	gap: 15px;
+	gap: 6%;
 	height: 100%;
 }
 
@@ -472,7 +479,6 @@ h2 {
 	align-self: center;
 	height: 100%;
 	width: 100%;
-	max-width: 214px;
 	pointer-events: none;
 }
 
@@ -496,7 +502,7 @@ h2 {
 	background: rgb(150, 150, 150);
 	border-radius: inherit;
 	box-shadow: 0 0 0 2px rgb(88, 88, 88), 0 7px 0 0 rgb(88, 88, 88);
-	transform: translate3d(0, 7px, -1em);
+	transform: translate3d(0, 10%, -1em);
 	transition: all 175ms cubic-bezier(0, 0, 1, 1);
 }
 
@@ -517,6 +523,9 @@ h2 {
 }
 
 .game-selector [type=radio] + div {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	padding: 5px;
 	background: rgb(115, 115, 115);
 	cursor: pointer;
@@ -549,7 +558,7 @@ h2 {
 .wrapper-mode-selector {
 	display: flex;
 	flex-direction: column;
-	gap: 5%;
+	justify-content: space-between;
 	height: 83%;
 }
 
@@ -557,7 +566,7 @@ h2 {
 	display: flex;
 	align-items: center;
 	width: 100%;
-	height: 37px;
+	height: 15%;
 	margin-top: 5px;
 	position: relative;
 	cursor: pointer;
@@ -569,7 +578,7 @@ h2 {
 	justify-content: center;
 	align-items: center;
 	aspect-ratio: 1 / 1;
-	width: 15%;
+	height: 100%;
 }
 
 .base-circle {
@@ -591,7 +600,7 @@ h2 {
 
 .top-circle {
 	aspect-ratio: 1 / 1;
-	width: 67%;
+	height: 66%;
 	background: #fc2c71;
 	box-shadow:
 		rgba(0,0,0,.8) 0 0 1px 1px,
@@ -643,7 +652,6 @@ h2 {
 .wrapper-mode-selector [type=radio]:disabled ~ .wrapper-circle .base-circle {
 	background: rgb(145, 145, 145);
 	box-shadow:
-		rgba(0, 0, 0, 0.3) 0px 0 1px 2px,
 		rgba(0, 0, 0, 0.8) 0 1px 1px inset,
 		#726c6c 0 4px 5px inset,
 		rgba(0, 0, 0, 0.3) 0 5px 3px inset,
@@ -653,12 +661,14 @@ h2 {
 }
 
 .wrapper-mode-selector span {
+	display: flex;
+	align-items: center;
+	height: 100%;
 	width: 100%;
+	padding-left: 10%;
+	font-weight: 600;
 	text-wrap: wrap;
 	text-align: start;
-	font-weight: bolder;
-	font-size: 1rem;
-	padding-left: 25%;
 	user-select: none;
 }
 
@@ -692,8 +702,7 @@ h2 {
 .wrapper-submit-button span {
 	width: 100%;
 	text-align: center;
-	font-family: 'Press Start 2P';
-	font-size: 1.3rem;
+	font: 2.5vh "Press Start 2P", sans-serif;
 	color: var(--textColor);
 	text-shadow: 0 0 5px #ec41bf, 0 0 10px #8606b6, 0 0 15px #fff, 0 0 20px #921982, 0 0 25px #770067;
 	animation: fade 3s infinite;
@@ -802,7 +811,7 @@ h2 {
 	flex-direction: column;
 	justify-content: space-around;
 	align-items: center;
-	gap: 25px;
+	gap: 4.5%;
 	height: 100%;
 }
 
@@ -909,6 +918,7 @@ canvas:focus {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	gap: 3%;
 	width: 50%;
 	height: 100%;
 	position: absolute;
@@ -919,7 +929,7 @@ canvas:focus {
 }
 
 .tournament-form i {
-	font-size: 20px;
+	font-size: 2.5vh;
 	position: absolute;
 	left: 0;
 	cursor: pointer;
@@ -1102,7 +1112,6 @@ canvas:focus {
 }
 
 .wrapper-tabs-button h3 {
-	font-size: 1.4rem;
 	margin: 0;
 	user-select: none;
 }
@@ -1154,7 +1163,6 @@ canvas:focus {
 	height: auto;
 	width: 100%;
 	padding: 0;
-	font-size: 0.8rem;
 	text-wrap: wrap;
 	word-break: break-all;
 }
@@ -1176,7 +1184,7 @@ canvas:focus {
 	position: absolute;
 	top: 10px;
 	left: 0;
-	font-size: 1.5rem;
+	font-size: 1.4rem;
 	animation: fade 3s infinite;
 }
 
@@ -1186,7 +1194,6 @@ canvas:focus {
 	padding: 15px;
 	background: var(--mainColor);
 	color: var(--textColor);
-	font-size: 0.8rem;
 	word-break: break-all;
 	border: none;
 	resize: none;
@@ -1194,14 +1201,11 @@ canvas:focus {
 	border: none;
 }
 
-/*/////////////////////*/
-/* Media Query - Phone */
-/*/////////////////////*/
+/*//////////////////////*/
+/* Media Queries - Game */
+/*//////////////////////*/
 
 @media only screen and (max-width: 1023px) and (orientation: portrait) {
-	/*/////////////////*/
-	/* Force landscape */
-	/*/////////////////*/
 	.please-rotate {
 		display: flex;
 		position: absolute;
@@ -1212,15 +1216,9 @@ canvas:focus {
 }
 
 @media only screen and (max-width: 1023px) and (orientation: landscape) {
-	/*/////////*/
-	/* General */
-	/*/////////*/
-	.for-phone {
-		display: block;
-	}
-	.zindex {
-		z-index: -1;
-	}
+	/*////////////////*/
+	/* Useful Classes */
+	/*////////////////*/
 	.card {
 		border-radius: 0;
 		box-shadow: none;
@@ -1231,23 +1229,23 @@ canvas:focus {
 		top: 0;
 		left: 0;
 	}
-	header h1, .nav-user, h2,
+	.for-phone {
+		display: block;
+	}
+	.zindex {
+		z-index: -1;
+	}
+	/*//////*/
+	/* Hide */
+	/*//////*/
+	header h1, .nav-user, nav span, h2,
 	.wrapper-bottom-section,
 	.wrapper-tabs-button {
 		display: none;
 	}
-	main {
-		height: 100%;
-		padding: 0;
-	}
-	.wrapper-playzone {
-		height: 100%;
-		gap: 0;
-		position: relative;
-	}
-	/*////////*/
-	/* Header */
-	/*////////*/
+	/*///////////////*/
+	/* Game - header */
+	/*///////////////*/
 	header {
 		position: absolute;
 		right: 0;
@@ -1260,7 +1258,6 @@ canvas:focus {
 	}
 	nav {
 		width: 100%;
-		font-size: 1rem;
 	}
 	nav ul {
 		flex-direction: column;
@@ -1274,12 +1271,21 @@ canvas:focus {
 		height: 100%;
 		width: 100%;
 	}
-	nav span {
-		display: none;
+	/*/////////////*/
+	/* Game - main */
+	/*/////////////*/
+	main {
+		height: 100%;
+		padding: 0;
 	}
-	/*////////////////////*/
-	/* Game selector Form */
-	/*////////////////////*/
+	.wrapper-sections {
+		height: 100%;
+		gap: 0;
+		position: relative;
+	}
+	/*///////////////////////////*/
+	/* Game - Game selector Form */
+	/*///////////////////////////*/
 	.wrapper-left-section {
 		padding: 0;
 	}
@@ -1289,17 +1295,14 @@ canvas:focus {
 		padding: 2% 0%;
 	}
 	.wrapper-left-section form h3 {
-		font-size: 1.5rem;
 		margin: 10px 0;
-	}
-	.wrapper-submit-button span {
-		font-size: 1.25rem;
 	}
 	.wrapper-selectors {
 		width: 100%;
-		height: 80%;
+		height: 87.5%;
+		padding: 0% 10%;
 		flex-direction: row;
-		justify-content: space-around;
+		justify-content: space-between;
 	}
 	.wrapper-game-selector {
 		height: 65%;
@@ -1316,13 +1319,10 @@ canvas:focus {
 	.wrapper-mode-selectors {
 		display: flex;
 		flex-direction: column;
-		width: 30%;
+		width: 33%;
 	}
 	.wrapper-mode-selector {
 		justify-content: space-around;
-	}
-	.wrapper-mode-selector span {
-		font-size: 1rem;
 	}
 	.wrapper-submit-button {
 		width: 80%;
@@ -1332,17 +1332,25 @@ canvas:focus {
 		justify-content: center;
 		align-items: center;
 	}
+	.wrapper-submit-button span {
+		font-size: 2.5vw;
+	}
 	.wrapper-slot {
 		width: 1.712%;
 		height: 80%;
+	}
+	.slot {
+		margin-top: 5px;
 	}
 	.coin {
 		width: 3.701%;
 		height: 60%;
 	}
+	/*///////////////*/
+	/* Game - Screen */
+	/*///////////////*/	
 	.go-button {
-		width: 10%;
-		font-size: 1.3rem;
+		font-size: 2.5vh;
 	}
 	/*//////*/
 	/* Chat */
@@ -1360,5 +1368,68 @@ canvas:focus {
 		bottom: 0;
 		height: 10%;
 		width: 100%;
+	}
+}
+
+@media only screen and (max-height: 320px) and (orientation: landscape) {
+	/*////////////*/
+	/* Font sizes */
+	/*////////////*/
+	nav { font-size: 0.8rem; }
+	h3 { font-size: 0.8rem; }
+	span { font-size: 0.5rem; }
+	td { font-size: 0.5rem; }
+	textarea { font-size: 0.5rem; }
+	.wrapper-left-section form h3 {
+		margin: 0 0 3px 0;
+	}
+	.wrapper-submit-button span {
+		font-size: 0.8rem;
+		text-shadow:
+			0 0 2px #ec41bf,
+			0 0 5px #8606b6,
+			0 0 7px #fff,
+			0 0 10px #921982,
+			0 0 12px #770067;
+	}
+	.wrapper-slot {
+		width: 1.2%;
+	}
+	.slot {
+		margin-top: 0;
+		border: 1px solid #CCC;
+	}
+	.coin {
+		margin-bottom: 5px;
+	}
+	.go-button {
+		font-size: 2.5vh;
+	}
+	/*/////////////////*/
+	/* Tournament form */
+	/*/////////////////*/
+	.tournament-form {
+		justify-content: space-between;
+		width: 80%;
+		height: 90%;
+	}
+	.tournament-form span {
+		font-size: 100%;
+		text-align: center;
+		width: 80%;
+	}
+	.tournament-form i {
+		font-size: 10vh;
+		top: calc(50% - 5vh);
+	}
+	.tournament-wrapper-inputs input {
+		height: 20px;
+		width: 50%;
+	}
+	.tournament-form button {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 20px;
 	}
 }

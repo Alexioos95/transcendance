@@ -173,7 +173,7 @@ function	getHeaderStruct()
 
 function	getCardsStruct()
 {
-	const cards = document.getElementsByClassName("wrapper-playzone")[0].children;
+	const cards = document.getElementsByClassName("wrapper-sections")[0].children;
 	const struct = {
 		gameSelector: cards[0],
 		screen: cards[1],
@@ -458,7 +458,7 @@ async function	setupTournament(struct)
 {
 	if (struct.tournament.on == false)
 		return ;
-	await waitTournamentForm(struct.tournament)
+	await waitTournamentForm(struct)
 		.then(() => getTournamentNames(struct.tournament))
 		.then(() => shuffle(struct.tournament.names))
 		.then(() => showTournamentOverview(struct))
@@ -477,12 +477,15 @@ async function	waitTournamentForm(struct)
 			resolve();
 		};
 		function resetTournamentForm() {
+			struct.cards.gameSelector.classList.remove("zindex");
+			struct.cards.screen.classList.add("zindex");
+			struct.header.wrapper.classList.remove("zindex");
 			form.classList.add("hidden");
 			form.reset();
 			reject();
 		};
-		struct.validate.addEventListener("click", validate, { once: true });
-		struct.cancel.addEventListener("click", resetTournamentForm, { once: true });
+		struct.tournament.validate.addEventListener("click", validate, { once: true });
+		struct.tournament.cancel.addEventListener("click", resetTournamentForm, { once: true });
 	});
 }
 
@@ -586,4 +589,5 @@ async function	endOfTournament(struct)
 	alert("👑 " + winner + " 👑");
 	struct.tournament = getTournamentStruct();
 	resetInsertCoinButton(struct.menu.insertCoinButton);
+	resetPhoneClasses(struct, struct.cards.gameSelector);
 }

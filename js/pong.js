@@ -110,6 +110,8 @@ function	renderScore(game)
 
 function	resize(game, wrapper)
 {
+	if (wrapper === undefined)
+		return ;
 	const oldValues = {
 		width: game.canvas.width,
 		height: game.canvas.height

@@ -5,9 +5,8 @@
 async function	run()
 {
 	const struct = {
-		header: document.getElementsByTagName("header")[0],
-		headerButtons: document.querySelectorAll("header button"),
-		playzoneCards: document.getElementsByClassName("wrapper-playzone")[0].children,
+		header: getHeaderStruct(),
+		cards: getCardsStruct(),
 		menu: getMenuStruct(),
 		screen: getScreenStruct(),
 		tournament: getTournamentStruct(),
@@ -30,42 +29,29 @@ async function	run()
 	}
 }
 
-function	isOnPhone()
-{
-	if (window.innerWidth < 1024)
-		return (true);
-	return (false);
-}
-
 function	setupEventListeners(struct)
 {	
-	// Game Selector
-	struct.headerButtons[0].addEventListener("click", function() {
-		resetPhoneClasses(struct);
-		struct.playzoneCards[0].classList.remove("zindex");
+	struct.header.gameSelectorButton.addEventListener("click", function() {
+		resetPhoneClasses(struct, struct.cards.gameSelector);
 	});
-	// Chat
-	struct.headerButtons[1].addEventListener("click", function() {
-		resetPhoneClasses(struct);
-		struct.playzoneCards[2].classList.remove("zindex");
+	struct.header.chatButton.addEventListener("click", function() {
+		resetPhoneClasses(struct, struct.cards.chat);
 		struct.chat.tabs[0].classList.add("active");
 		struct.chat.tabs[1].classList.remove("active");
 		struct.chat.tables[0].classList.add("active");
 		struct.chat.tables[1].classList.remove("active");
 	});
-	// Friend list
-	struct.headerButtons[2].addEventListener("click", function() {
-		resetPhoneClasses(struct);
-		struct.playzoneCards[2].classList.remove("zindex");
+	struct.header.friendButton.addEventListener("click", function() {
+		resetPhoneClasses(struct, struct.cards.chat);
 		struct.chat.tabs[0].classList.remove("active");
 		struct.chat.tabs[1].classList.add("active");
 		struct.chat.tables[0].classList.remove("active");
 		struct.chat.tables[1].classList.add("active");
 	});
-	struct.headerButtons[3].addEventListener("click", function() {
+	struct.header.optionButton.addEventListener("click", function() {
 		// Options
 	});
-	struct.headerButtons[4].addEventListener("click", function() {
+	struct.header.logoutButton.addEventListener("click", function() {
 		struct.run = 0;
 		navigate("login");
 	});
@@ -84,13 +70,6 @@ function	setupEventListeners(struct)
 	});
 	struct.screen.wrapperCanvas.addEventListener("keydown", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("keyup", function(event) { disableStickMove(event, struct); });
-}
-
-function	resetPhoneClasses(struct)
-{
-	struct.playzoneCards[0].classList.add("zindex");
-	struct.playzoneCards[1].classList.add("zindex");
-	struct.playzoneCards[2].classList.add("zindex");
 }
 
 async function	launchGame(struct)
@@ -117,9 +96,9 @@ async function	endGame(struct)
 	{
 		if (isOnPhone())
 			await sleep(2500);
-		struct.playzoneCards[0].classList.remove("zindex");
-		struct.playzoneCards[1].classList.add("zindex");
-		struct.header.classList.remove("zindex");
+		struct.cards.gameSelector.classList.remove("zindex");
+		struct.cards.screen.classList.add("zindex");
+		struct.header.wrapper.classList.remove("zindex");
 		resetInsertCoinButton(struct.menu.insertCoinButton);
 	}
 	await deactivateStick(struct.screen.sticks);
@@ -136,12 +115,73 @@ async function	endGame(struct)
 	}
 }
 
+/////////////////////////
+// Utility
+/////////////////////////
 async function	sleep(ms)
 { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+function	isOnPhone()
+{
+	if (window.innerWidth < 1024)
+		return (true);
+	return (false);
+}
+
+function	resetPhoneClasses(struct, except)
+{
+	struct.cards.gameSelector.classList.add("zindex");
+	struct.cards.screen.classList.add("zindex");
+	struct.cards.chat.classList.add("zindex");
+	if (except !== undefined)
+		except.classList.remove("zindex");
+}
+
+function	clearScreen(wrapper)
+{
+	while (wrapper.lastChild.nodeName != "FORM")
+		wrapper.removeChild(wrapper.lastChild);
+}
+
+function	shuffle(array)
+{
+	let i = array.length;
+	while (i != 0)
+	{
+	  let j = Math.floor(Math.random() * i);
+	  i--;
+	  [array[i], array[j]] = [array[j], array[i]];
+	}
+}
 
 //////////////////////////////////////////////////////
 // Get(?)Struct
 //////////////////////////////////////////////////////
+function	getHeaderStruct()
+{
+	const buttons = document.querySelectorAll("header button");
+	const struct = {
+		wrapper: document.getElementsByTagName("header")[0],
+		gameSelectorButton: buttons[0],
+		chatButton: buttons[1],
+		friendButton: buttons[2],
+		optionButton: buttons[3],
+		logoutButton: buttons[4]
+	};
+	return (struct);
+}
+
+function	getCardsStruct()
+{
+	const cards = document.getElementsByClassName("wrapper-playzone")[0].children;
+	const struct = {
+		gameSelector: cards[0],
+		screen: cards[1],
+		chat: cards[2]
+	};
+	return (struct);
+}
+
 function	getMenuStruct()
 {
 	const struct = {
@@ -204,6 +244,7 @@ function	getChatStruct()
 //////////////////////////////////////////////////////
 // Menu (Game selector's form; Tournament Overview)
 //////////////////////////////////////////////////////
+
 async function waitCoin(struct) {
 	return new Promise((resolve, reject) => {
 		function handleClick() { resolve(); }
@@ -264,8 +305,8 @@ async function	checkGameSelectorValidation(struct)
 			.then(() => title.innerHTML = struct.screen.game.name)
 		clearScreen(struct.screen.wrapperCanvas);
 		resetPhoneClasses(struct)
-		struct.playzoneCards[1].classList.remove("zindex");
-		struct.header.classList.add("zindex");
+		struct.cards.screen.classList.remove("zindex");
+		struct.header.wrapper.classList.add("zindex");
 		resolve();
 	});
 }
@@ -287,12 +328,6 @@ async function	waitGoButton(struct)
 			resolve();
 		}, { once: true });
 	});
-}
-
-function	clearScreen(wrapper)
-{
-	while (wrapper.lastChild.nodeName != "FORM")
-		wrapper.removeChild(wrapper.lastChild);
 }
 
 async function	rejectCoin(struct)
@@ -470,17 +505,6 @@ function	getTournamentNames(struct)
 		j++;
 	}
 	struct.names = names;
-}
-
-function	shuffle(array)
-{
-	let i = array.length;
-	while (i != 0)
-	{
-	  let j = Math.floor(Math.random() * i);
-	  i--;
-	  [array[i], array[j]] = [array[j], array[i]];
-	}
 }
 
 function	showTournamentOverview(struct)

@@ -9,11 +9,13 @@
 html {
 	width: 100%;
 	height: 100%;
+	font-size: 16px;
 }
 
 body {
 	width: 100%;
 	height: 100%;
+	background-color: var(--mainColor);
 	font: 1rem "Inter", sans-serif;
 }
 
@@ -63,6 +65,13 @@ h3 { font-size: 1.5rem; }
 span { font-size: 1rem; }
 td { font-size: 0.8rem; }
 textarea { font-size: 0.8rem; }
+
+@media (min-width: 2880px) { html { font-size: 35px; } }
+@media (max-width: 2880px) { html { font-size: 20px; } }
+@media (max-width: 1920px) { html { font-size: 16px; } }
+@media (max-width: 1200px) { html { font-size: 15px; } }
+@media (max-width: 768px) { html { font-size: 14px; } }
+@media (max-width: 480px) { html { font-size: 13px; } }
 
 /*///////////////*/
 /* Please rotate */
@@ -417,7 +426,7 @@ main {
 }
 
 h2 {
-	max-height: 5%;
+	height: 5%;
 	text-align: center;
 	margin: 0 0 10px 0;
 	color: var(--textColor);
@@ -702,7 +711,8 @@ h2 {
 .wrapper-submit-button span {
 	width: 100%;
 	text-align: center;
-	font: 2.5vh "Press Start 2P", sans-serif;
+	font-size: calc(0.6rem + 1vh);
+	font-family: "Press Start 2P", sans-serif;
 	color: var(--textColor);
 	text-shadow: 0 0 5px #ec41bf, 0 0 10px #8606b6, 0 0 15px #fff, 0 0 20px #921982, 0 0 25px #770067;
 	animation: fade 3s infinite;
@@ -1332,9 +1342,6 @@ canvas:focus {
 		justify-content: center;
 		align-items: center;
 	}
-	.wrapper-submit-button span {
-		font-size: 2.5vw;
-	}
 	.wrapper-slot {
 		width: 1.712%;
 		height: 80%;
@@ -1375,16 +1382,10 @@ canvas:focus {
 	/*////////////*/
 	/* Font sizes */
 	/*////////////*/
-	nav { font-size: 0.8rem; }
-	h3 { font-size: 0.8rem; }
-	span { font-size: 0.5rem; }
-	td { font-size: 0.5rem; }
-	textarea { font-size: 0.5rem; }
 	.wrapper-left-section form h3 {
 		margin: 0 0 3px 0;
 	}
 	.wrapper-submit-button span {
-		font-size: 0.8rem;
 		text-shadow:
 			0 0 2px #ec41bf,
 			0 0 5px #8606b6,

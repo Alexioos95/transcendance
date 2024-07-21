@@ -107,7 +107,7 @@ async function	endGame(struct)
 		struct.tournament.matches--;
 		updateTournamentWinners(struct);
 		updateTournamentMarkers(struct);
-		updateTournamentControlNames(struct);
+		updateTournamentNames(struct, struct.screen.playerOnControls);
 		if (struct.tournament.matches != 0)
 			launchGame(struct);
 		else
@@ -316,11 +316,19 @@ async function	waitGoButton(struct)
 	return new Promise((resolve, reject) => {
 		const button = document.createElement("button");
 		const controls = document.getElementsByClassName("wrapper-bottom-section")[0];
+		const span1 = document.createElement("span");
+		const span2 = document.createElement("span");
 
 		button.classList.add("go-button");
 		button.type = "button";
 		button.innerHTML = "GO!";
+		span1.classList.add("canvas-user-1");
+		span2.classList.add("canvas-user-2");
+		const names = [span1, span2];
+		updateTournamentNames(struct, names);
 		struct.screen.wrapperCanvas.appendChild(button);
+		struct.screen.wrapperCanvas.appendChild(span1);
+		struct.screen.wrapperCanvas.appendChild(span2);
 		controls.classList.add("wrapper-bottom-section-hover");
 		button.addEventListener("click", function() {
 			controls.classList.remove("wrapper-bottom-section-hover");
@@ -462,7 +470,7 @@ async function	setupTournament(struct)
 		.then(() => getTournamentNames(struct.tournament))
 		.then(() => shuffle(struct.tournament.names))
 		.then(() => showTournamentOverview(struct))
-		.then(() => updateTournamentControlNames(struct))
+		.then(() => updateTournamentNames(struct, struct.screen.playerOnControls))
 		.then(() => Promise.resolve())
 		.catch((e) => Promise.reject(0))
 }
@@ -527,7 +535,7 @@ function	showTournamentOverview(struct)
 	struct.tournament.overview.classList.remove("hidden");
 }
 
-function	updateTournamentControlNames(struct)
+function	updateTournamentNames(struct, elements)
 {
 	let i;
 
@@ -537,13 +545,13 @@ function	updateTournamentControlNames(struct)
 		i = 2;
 	if (struct.tournament.matches != 1)
 	{
-		struct.screen.playerOnControls[0].innerHTML = struct.tournament.names[i];
-		struct.screen.playerOnControls[1].innerHTML = struct.tournament.names[i + 1];
+		elements[0].innerHTML = struct.tournament.names[i];
+		elements[1].innerHTML = struct.tournament.names[i + 1];
 	}
 	else
 	{
-		struct.screen.playerOnControls[0].innerHTML = struct.tournament.winners[0].innerHTML;
-		struct.screen.playerOnControls[1].innerHTML = struct.tournament.winners[1].innerHTML;
+		elements[0].innerHTML = struct.tournament.winners[0].innerHTML;
+		elements[1].innerHTML = struct.tournament.winners[1].innerHTML;
 	}
 }
 

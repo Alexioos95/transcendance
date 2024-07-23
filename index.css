@@ -716,7 +716,10 @@ label:has(> [type=radio]:focus) {
 	font-size: calc(0.6rem + 1vh);
 	font-family: "Press Start 2P", sans-serif;
 	color: var(--textColor);
-	text-shadow: 0 0 5px #ec41bf, 0 0 10px #8606b6, 0 0 15px #fff, 0 0 20px #921982, 0 0 25px #770067;
+	text-shadow:
+		0 0 5px #ec41bf, 0 0 10px #8606b6,
+		0 0 15px #fff, 0 0 20px #921982,
+		0 0 25px #770067;
 	animation: fade 3s infinite;
 }
 
@@ -1180,17 +1183,36 @@ canvas:focus {
 	display: flex;
 	flex-direction: column;
 	width: 100%;
-	margin-bottom: 10px;
 }
 
 .tab-chat td {
 	display: flex;
+	align-items: center;
 	gap: 3%;
 	height: auto;
 	width: 100%;
 	padding: 0;
+	margin-bottom: 0.625rem;
 	text-wrap: wrap;
 	word-break: break-all;
+}
+
+.tab-chat .chat-user-avatar {
+	height: 1.5rem;
+	width: 1.5rem;
+	display: flex;
+}
+
+.tab-chat .chat-user-avatar img {
+	object-fit: contain;
+}
+
+.tab-chat p {
+	margin: 0;
+}
+
+.tab-chat span {
+	font-weight: 600;
 }
 
 /*///////////////*/
@@ -1218,13 +1240,13 @@ canvas:focus {
 
 .wrapper-inputs div.active {
 	z-index: 1;
-	order: 0;
+	order: 1;
 }
 
 .wrapper-inputs textarea {
 	height: 100%;
 	width: 100%;
-	padding: 5% 6%;
+	padding: 1rem;
 	background: var(--mainColor);
 	color: var(--textColor);
 	word-break: break-all;
@@ -1235,10 +1257,11 @@ canvas:focus {
 
 .wrapper-inputs i {
 	position: absolute;
-	top: calc(5% + 5px);
+	top: 0.8rem;
 	left: 0;
 	font-size: 1.4rem;
 	animation: fade 3s infinite;
+	z-index: 2;
 }
 
 /*//////////////////////*/
@@ -1389,22 +1412,41 @@ canvas:focus {
 	.go-button {
 		font-size: 2.5vh;
 	}
-	/*//////*/
-	/* Chat */
-	/*//////*/
+	/*/////////////*/
+	/* Game - Tabs */
+	/*/////////////*/	
 	.wrapper-tabs-tables {
-		height: 85%;
+		min-height: 88%;
+		height: 88%;
 	}
 	.wrapper-tabs-tables table {
 		height: 100%;
 		width: 92%;
 		padding: 2%;
 	}
-	.chat-input {
+	/*///////////////*/
+	/* Game - Inputs */
+	/*///////////////*/
+	.wrapper-inputs {
 		top: auto;
 		bottom: 0;
-		height: 10%;
+		height: 12%;
+		min-height: 12%;
+		width: 92%;
+		min-width: 92%;
+	}
+	.wrapper-inputs textarea {
+		height: 100%;
 		width: 100%;
+		padding: 1.6% 1rem;
+		border-top: 1px solid rgb(131, 126, 126);
+	}
+	.wrapper-inputs i {
+		top: 23.6%;
+		left: 0;
+		font-size: 1rem;
+		animation: fade 3s infinite;
+		z-index: 2;
 	}
 }
 

@@ -16,14 +16,14 @@ async function	run()
 	setupEventListeners(struct);
 	while (struct.run == 1)
 	{
-		await waitCoin(struct.menu)
+		await waitCoin(struct.gameForm)
 			.then(() => coinAnimation(struct))
 			.then(() => checkGameSelectorValidation(struct))
 			.then(() => setupTournament(struct))
 			.then(() => launchGame(struct))
 			.catch((e) => {
 				if (e === 0)
-					rejectCoin(struct.menu);
+					rejectCoin(struct.gameForm);
 			});
 		// Faire un await pour le chat (?);
 	}
@@ -31,9 +31,8 @@ async function	run()
 
 function	setupEventListeners(struct)
 {	
-	struct.header.gameSelectorButton.addEventListener("click", function() {
-		resetPhoneClasses(struct, struct.cards.gameSelector);
-	});
+	// addEventListener abandonButton => stopper le jeu;
+	struct.header.gameSelectorButton.addEventListener("click", function() { resetPhoneClasses(struct, struct.cards.gameSelector); });
 	struct.header.chatButton.addEventListener("click", function() {
 		resetPhoneClasses(struct, struct.cards.chat);
 		showTab(struct.tabs.chat, struct.tabs.friend)
@@ -49,7 +48,6 @@ function	setupEventListeners(struct)
 		struct.run = 0;
 		navigate("login");
 	});
-	// addEventListener abandonButton => stopper le jeu;
 	struct.tabs.chat.button.addEventListener("click", function() {
 		showTab(struct.tabs.chat, struct.tabs.friend)
 	});
@@ -87,7 +85,7 @@ async function	endGame(struct)
 		struct.cards.gameSelector.classList.remove("zindex");
 		struct.cards.screen.classList.add("zindex");
 		struct.header.wrapper.classList.remove("zindex");
-		resetInsertCoinButton(struct.menu.insertCoinButton);
+		resetInsertCoinButton(struct.gameForm.insertCoinButton);
 	}
 	await deactivateStick(struct.screen.sticks);
 	if (struct.tournament.on == true)
@@ -276,7 +274,7 @@ async function	coinAnimation(struct)
 		return new Promise ((resolve, reject) => { reject(); });
 	if (document.getElementsByClassName("coin")[0] !== undefined)
 		return new Promise ((resolve, reject) => { reject(); });
-	const coin = getCoin(struct.menu.insertCoinButton);
+	const coin = getCoin(struct.gameForm.insertCoinButton);
 	const text = document.querySelector("#selector span");
 	return new Promise ((resolve, reject) => {
 		sleep(50)
@@ -495,6 +493,7 @@ async function	waitTournamentForm(struct)
 			resolve();
 		};
 		function resetTournamentForm() {
+			struct.tournament.on = false;
 			struct.cards.gameSelector.classList.remove("zindex");
 			struct.cards.screen.classList.add("zindex");
 			struct.header.wrapper.classList.remove("zindex");
@@ -541,7 +540,7 @@ function	showTournamentOverview(struct)
 	struct.tournament.markers[0].innerHTML = "EN ATTENTE";
 	struct.tournament.markers[1].innerHTML = "SUIVANT";
 	struct.tournament.markers[2].innerHTML = "PROCHAINEMENT";
-	struct.menu.form.classList.add("hidden");
+	struct.gameForm.form.classList.add("hidden");
 	struct.tournament.overview.classList.remove("hidden");
 }
 
@@ -598,7 +597,7 @@ function	updateTournamentWinners(struct)
 async function	endOfTournament(struct)
 {
 	const winner = (struct.screen.game.scores[0] > struct.screen.game.scores[1]) ? struct.tournament.winners[0].innerHTML : struct.tournament.winners[1].innerHTML;
-	struct.menu.form.classList.remove("hidden");
+	struct.gameForm.form.classList.remove("hidden");
 	struct.tournament.overview.classList.add("hidden");
 	struct.tournament.winners[0].setAttribute("data-decided", "tbd");
 	struct.tournament.winners[1].setAttribute("data-decided", "tbd");
@@ -606,6 +605,6 @@ async function	endOfTournament(struct)
 	struct.screen.playerOnControls[1].innerHTML = "";
 	alert("👑 " + winner + " 👑");
 	struct.tournament = getTournamentStruct();
-	resetInsertCoinButton(struct.menu.insertCoinButton);
+	resetInsertCoinButton(struct.gameForm.insertCoinButton);
 	resetPhoneClasses(struct, struct.cards.gameSelector);
 }

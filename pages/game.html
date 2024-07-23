@@ -8,7 +8,7 @@
 		<ul>
 			<li class="nav-user">
 				<div class="nav-user-avatar">
-					<img src="../favicon.ico"/>
+					<img src="../favicon.ico" alt="Avatar de l'utilisateur">
 				</div>
 				<span>Alexioos95</span>
 			</li>
@@ -52,16 +52,16 @@
 						<h3 aria-label="Choisissez le jeu: Pong ou Tetris">Jeu</h3>
 						<div class="wrapper-game-selector">
 							<label class="game-selector">
-								<input type="radio" name="game" value="pong" aria-label="Pong"/>
-								<div>
-									<img src="../svg/pong.svg"/>
-								</div>
+								<input type="radio" name="game" value="pong" aria-label="Pong">
+								<span>
+									<img src="../svg/pong.svg" alt="Pong">
+								</span>
 							</label>
 							<label class="game-selector">
-								<input type="radio" name="game" value="tetris" aria-label="Tetris"/>
-								<div>
-									<img src="../svg/tetris.svg"/>
-								</div>
+								<input type="radio" name="game" value="tetris" aria-label="Tetris">
+								<span>
+									<img src="../svg/tetris.svg" alt="Tetris">
+								</span>
 							</label>
 						</div>
 					</div>
@@ -69,50 +69,50 @@
 						<h3 aria-label="Choisissez le mode de jeu: ">Mode</h3>
 						<div class="wrapper-mode-selector">
 							<label class="mode-selector">
-								<input disabled type="radio" name="mode" value="1vAI" aria-label="Joueur contre Ordinateur"/>
-								<div class="wrapper-circle">
-									<div class="base-circle">
-										<div class="top-circle"></div>
-									</div>
-								</div>
-								<span>1vIA</span>
+								<input disabled type="radio" name="mode" value="1vAI" aria-label="Joueur contre Ordinateur">
+								<span class="wrapper-circle">
+									<span class="base-circle">
+										<span class="top-circle"></span>
+									</span>
+								</span>
+								<span class="mode-text">1vIA</span>
 							</label>
 							<label class="mode-selector" title="Ce mode est désactivé sur téléphone et tablette">
-								<input type="radio" name="mode" value="1v1" aria-label="Joueur contre Joueur en local"/>
-								<div class="wrapper-circle">
-									<div class="base-circle">
-										<div class="top-circle"></div>
-									</div>
-								</div>
-								<span>1v1 local</span>
+								<input type="radio" name="mode" value="1v1" aria-label="Joueur contre Joueur en local">
+								<span class="wrapper-circle">
+									<span class="base-circle">
+										<span class="top-circle"></span>
+									</span>
+								</span>
+								<span class="mode-text">1v1 local</span>
 							</label>
 							<label class="mode-selector" title="Ce mode est désactivé sur téléphone et tablette">
-								<input type="radio" name="mode" value="tournament" aria-label="Tournoi a 4 joueurs en local"/>
-								<div class="wrapper-circle">
-									<div class="base-circle">
-										<div class="top-circle"></div>
-									</div>
-								</div>
-								<span>Tournoi local a 4</span>
+								<input type="radio" name="mode" value="tournament" aria-label="Tournoi a 4 joueurs en local">
+								<span class="wrapper-circle">
+									<span class="base-circle">
+										<span class="top-circle"></span>
+									</span>
+								</span>
+								<span class="mode-text">Tournoi local a 4</span>
 							</label>
 							<label class="mode-selector" title="Ce mode est désactivé si vous n'êtes pas connecté">
-								<input disabled type="radio" name="mode" value="online" aria-label="Joueur contre Joueur en ligne"/>
-								<div class="wrapper-circle">
-									<div class="base-circle">
-										<div class="top-circle"></div>
-									</div>
-								</div>
-								<span>1v1 en ligne</span>
+								<input disabled type="radio" name="mode" value="online" aria-label="Joueur contre Joueur en ligne">
+								<span class="wrapper-circle">
+									<span class="base-circle">
+										<span class="top-circle"></span>
+									</span>
+								</span>
+								<span class="mode-text">1v1 en ligne</span>
 							</label>
 						</div>
 					</div>
 				</div>
 				<div class="wrapper-submit-button">
 					<button id="selector" type="button" aria-label="Jouer !">
-						<span>Insérer une pièce</span>
-						<div class="wrapper-slot">
-							<div class="slot"></div>
-						</div>
+						<span class="coin-text">Insérer une pièce</span>
+						<span class="wrapper-slot">
+							<span class="slot"></span>
+						</span>
 					</button>
 				</div>
 			</form>
@@ -142,10 +142,10 @@
 					<i class="fa-solid fa-circle-arrow-left"></i>
 					<span>Sélectionnez vos pseudonymes</span>
 					<div class="tournament-wrapper-inputs">
-						<input type="text" name="p1" maxlength="30" placeholder="Joueur 1" aria-label="Pseudonyme du joueur 1"/>
-						<input type="text" name="p2" maxlength="30" placeholder="Joueur 2" aria-label="Pseudonyme du joueur 2"/>
-						<input type="text" name="p3" maxlength="30" placeholder="Joueur 3" aria-label="Pseudonyme du joueur 3"/>
-						<input type="text" name="p4" maxlength="30" placeholder="Joueur 4" aria-label="Pseudonyme du joueur 4"/>
+						<input type="text" name="p1" maxlength="30" placeholder="Joueur 1" aria-label="Pseudonyme du joueur 1">
+						<input type="text" name="p2" maxlength="30" placeholder="Joueur 2" aria-label="Pseudonyme du joueur 2">
+						<input type="text" name="p3" maxlength="30" placeholder="Joueur 3" aria-label="Pseudonyme du joueur 3">
+						<input type="text" name="p4" maxlength="30" placeholder="Joueur 4" aria-label="Pseudonyme du joueur 4">
 					</div>
 					<button type="button" aria-label="Valider" >Valider</button>
 				</form>
@@ -154,15 +154,15 @@
 				<div class="wrapper-player-controls">
 					<span class="playername playername-left"></span>
 					<div class="wrapper-controls-svg">
-						<img class="rotate" src="../svg/rotate/left.svg"/>
+						<img class="rotate" src="../svg/rotate/left.svg" alt="Tourner à gauche">
 						<div class="key"></div>
 					</div>
 					<div class="wrapper-controls-svg">
-						<img class="rotate" src="../svg/rotate/right.svg"/>
+						<img class="rotate" src="../svg/rotate/right.svg" alt="Tourner à droite">
 						<div class="key"></div>
 					</div>
 					<div class="wrapper-controls-svg">
-						<img class="stick" src="../svg/stick/state0.svg"/>
+						<img class="stick" src="../svg/stick/state0.svg" alt="Stick analogique (décoration)">
 						<div class="wrapper-controls-keys">
 							<div class="key key-top"></div>
 							<div class="key key-left"></div>
@@ -174,15 +174,15 @@
 				<div class="wrapper-player-controls">
 					<span class="playername playername-right"></span>
 					<div class="wrapper-controls-svg">
-						<img class="rotate" src="../svg/rotate/left.svg"/>
+						<img class="rotate" src="../svg/rotate/left.svg" alt="Tourner à gauche">
 						<div class="key"></div>
 					</div>
 					<div class="wrapper-controls-svg">
-						<img class="rotate" src="../svg/rotate/right.svg"/>
+						<img class="rotate" src="../svg/rotate/right.svg" alt="Tourner à droite">
 						<div class="key"></div>
 					</div>
 					<div class="wrapper-controls-svg">
-						<img class="stick" src="../svg/stick/state0.svg"/>
+						<img class="stick" src="../svg/stick/state0.svg" alt="Stick analogique (décoration)">
 						<div class="wrapper-controls-keys">
 							<div class="key key-top"></div>
 							<div class="key key-left"></div>
@@ -191,20 +191,22 @@
 						</div>
 					</div>
 				</div>
-			</s>
+			</section>
 		</div>
 		<section class="wrapper-right-section zindex">
 			<div class="wrapper-tabs card">
 				<div class="wrapper-tabs-button">
-					<button type="button" class="active"><h3>Chat</h3></button>
-					<button type="button"><h3>Amis</h3></button>
+					<button type="button" class="active"><span class="h3">Chat</span></button>
+					<button type="button"><span class="h3">Amis</span></button>
 				</div>
 				<div class="wrapper-tabs-tables">
 					<table class="tab-chat active">
 						<tbody>
-							<tr><td>
-								<img src="../favicon.ico"/>User: MSG
-							</td></tr>
+							<tr>
+								<td>
+									<img src="../favicon.ico" alt="Avatar de l'utilisateur">User: MSG
+								</td>
+							</tr>
 							<tr><td>User: MSG</td></tr>
 							<tr><td>User: MSG</td></tr>
 							<tr><td>User: MSG</td></tr>
@@ -261,10 +263,15 @@
 					</table>
 				</div>
 			</div>
-			<div class="chat-input card">
+			<div class="wrapper-inputs card">
 				<i class="fa-solid fa-caret-right"></i>
-				<textarea maxlength="200"></textarea>
+				<div class="chat-input active">
+					<textarea maxlength="200"></textarea>
+				</div>
+				<div class="friend-input">
+					<textarea maxlength="200"></textarea>
+				</div>
 			</div>
-		</s>
+		</section>
 	</div>
 </main>

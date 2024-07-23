@@ -7,10 +7,10 @@ async function	run()
 	const struct = {
 		header: getHeaderStruct(),
 		cards: getCardsStruct(),
-		menu: getMenuStruct(),
+		gameForm: getGameFormStruct(),
 		screen: getScreenStruct(),
 		tournament: getTournamentStruct(),
-		chat: getChatStruct(),
+		tabs: getTabsStruct(),
 		run: 1
 	};
 	setupEventListeners(struct);
@@ -36,17 +36,11 @@ function	setupEventListeners(struct)
 	});
 	struct.header.chatButton.addEventListener("click", function() {
 		resetPhoneClasses(struct, struct.cards.chat);
-		struct.chat.tabs[0].classList.add("active");
-		struct.chat.tabs[1].classList.remove("active");
-		struct.chat.tables[0].classList.add("active");
-		struct.chat.tables[1].classList.remove("active");
+		showTab(struct.tabs.chat, struct.tabs.friend)
 	});
 	struct.header.friendButton.addEventListener("click", function() {
 		resetPhoneClasses(struct, struct.cards.chat);
-		struct.chat.tabs[0].classList.remove("active");
-		struct.chat.tabs[1].classList.add("active");
-		struct.chat.tables[0].classList.remove("active");
-		struct.chat.tables[1].classList.add("active");
+		showTab(struct.tabs.friend, struct.tabs.chat)
 	});
 	struct.header.optionButton.addEventListener("click", function() {
 		// Options
@@ -56,17 +50,11 @@ function	setupEventListeners(struct)
 		navigate("login");
 	});
 	// addEventListener abandonButton => stopper le jeu;
-	struct.chat.tabs[0].addEventListener("click", function() {
-		struct.chat.tabs[0].classList.add("active");
-		struct.chat.tabs[1].classList.remove("active");
-		struct.chat.tables[0].classList.add("active");
-		struct.chat.tables[1].classList.remove("active");
+	struct.tabs.chat.button.addEventListener("click", function() {
+		showTab(struct.tabs.chat, struct.tabs.friend)
 	});
-	struct.chat.tabs[1].addEventListener("click", function() {
-		struct.chat.tabs[0].classList.remove("active");
-		struct.chat.tabs[1].classList.add("active");
-		struct.chat.tables[0].classList.remove("active");
-		struct.chat.tables[1].classList.add("active");
+	struct.tabs.friend.button.addEventListener("click", function() {
+		showTab(struct.tabs.friend, struct.tabs.chat)
 	});
 	struct.screen.wrapperCanvas.addEventListener("keydown", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("keyup", function(event) { disableStickMove(event, struct); });
@@ -154,6 +142,16 @@ function	shuffle(array)
 	}
 }
 
+function	showTab(show, hide)
+{
+	hide.button.classList.remove("active");
+	hide.table.classList.remove("active");
+	hide.input.classList.remove("active");
+	show.button.classList.add("active");
+	show.table.classList.add("active");
+	show.input.classList.add("active");
+}
+
 //////////////////////////////////////////////////////
 // Get(?)Struct
 //////////////////////////////////////////////////////
@@ -182,7 +180,7 @@ function	getCardsStruct()
 	return (struct);
 }
 
-function	getMenuStruct()
+function	getGameFormStruct()
 {
 	const struct = {
 		form: document.querySelector(".wrapper-left-section form"),
@@ -231,12 +229,24 @@ function	getTournamentStruct()
 	return (struct);
 }
 
-function	getChatStruct()
+function	getTabsStruct()
 {
+	const buttons = document.querySelectorAll(".wrapper-tabs-button button");
+	const tables = document.querySelectorAll(".wrapper-tabs-tables table");
+	const inputs = document.querySelectorAll(".wrapper-inputs div");
+	const chatStruct = {
+		button: buttons[0],
+		table: tables[0],
+		input: inputs[0]
+	};
+	const friendStruct = {
+		button: buttons[1],
+		table: tables[1],
+		input: inputs[1]
+	};
 	const struct = {
-		tabs: document.querySelectorAll(".wrapper-tabs-button button"),
-		tables: document.querySelectorAll(".wrapper-tabs-tables table"),
-		input: document.querySelector(".chat-input input")
+		chat: chatStruct,
+		friend: friendStruct
 	};
 	return (struct);
 }

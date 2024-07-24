@@ -14,28 +14,28 @@
 			</li>
 			<li class="for-phone">
 				<button>
-					<i class="fa-solid fa-gamepad"></i>
+					<i class="fa-solid fa-gamepad" title="Jouer à un jeu"></i>
 				</button>
 			</li>
 			<li class="for-phone">
 				<button>
-					<i class="fa-solid fa-message"></i>
+					<i class="fa-solid fa-message" title="Parler aux autres joueurs"></i>
 				</button>
 			</li>
 			<li class="for-phone">
 				<button>
-					<i class="fa-solid fa-user"></i>
+					<i class="fa-solid fa-address-book" title="Liste d'amis"></i>
 				</button>
 			</li>
 			<li>
 				<button>
-					<i class="fa-solid fa-gear"></i>
+					<i class="fa-solid fa-gear" title="Options"></i>
 					<span>Options</span>
 				</button>
 			</li>
 			<li>
 				<button>
-					<i class="fa-solid fa-arrow-right-to-bracket"></i>
+					<i class="fa-solid fa-arrow-right-to-bracket" title="Se déconnecter"></i>
 					<span>Se deconnecter</span>
 				</button>
 			</li>
@@ -204,56 +204,41 @@
 						<tbody>
 							<tr>
 								<td>
-									<div class="chat-user-avatar">
-										<img src="/favicon.ico" alt="Avatar de l'utilisateur">
+									<div class="chat-message">
+										<div class="chat-user-avatar">
+											<img src="/favicon.ico" alt="Avatar de l'utilisateur">
+										</div>
+										<p><span>User</span>: MSG</p>
+										<div class="for-phone">
+											<button>
+												<i class="fa-solid fa-user-plus" title="Ajouter en amis"></i>
+											</button>
+											<button>
+												<i class="fa-solid fa-table-tennis-paddle-ball" title="Proposer une partie"></i>
+											</button>
+											<button>
+												<i class="fa-solid fa-circle-xmark" title="Bloquer"></i>
+											</button>
+										</div>
 									</div>
-									<p><span>User</span>: MSG</p>
+									<div class="chat-options">
+										<button type="button" class="hover-green">
+											<i class="fa-solid fa-user-plus"></i>
+											Ajouter en amis
+										</button>
+										<i class="fa-solid fa-circle-dot"></i>
+										<button type="button" class="hover-blue">
+											<i class="fa-solid fa-table-tennis-paddle-ball"></i>
+											Inviter à jouer
+										</button>
+										<i class="fa-solid fa-circle-dot"></i>
+										<button type="button" class="hover-red">
+											<i class="fa-solid fa-circle-xmark"></i>
+											Bloquer
+										</button>
+									</div>
 								</td>
 							</tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: MSG</td></tr>
-							<tr><td>User: LONG_ASS_MSG_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</td></tr>
-							<tr><td>User: LONG_ASS_MSG_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</td></tr>
 						</tbody>
 					</table>
 					<table class="tab-friends">
@@ -267,7 +252,7 @@
 				</div>
 			</div>
 			<div class="wrapper-inputs card">
-				<i class="fa-solid fa-caret-right"></i>
+				<i class="fa-solid fa-caret-right" title="Ecrivez aux autres joueurs !"></i>
 				<div class="chat-input active">
 					<textarea maxlength="200"></textarea>
 				</div>

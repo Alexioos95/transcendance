@@ -204,37 +204,53 @@
 						<tbody>
 							<tr>
 								<td>
+									<p class="chat-announcement">User est en ligne.</p>
+								</td>
+							</tr>
+							<tr>
+								<td tabindex="0">
 									<div class="chat-message">
 										<div class="chat-user-avatar">
 											<img src="/favicon.ico" alt="Avatar de l'utilisateur">
 										</div>
 										<p><span>User</span>: MSG</p>
-										<div class="for-phone">
-											<button>
-												<i class="fa-solid fa-user-plus" title="Ajouter en amis"></i>
-											</button>
-											<button>
-												<i class="fa-solid fa-table-tennis-paddle-ball" title="Proposer une partie"></i>
-											</button>
-											<button>
-												<i class="fa-solid fa-circle-xmark" title="Bloquer"></i>
-											</button>
-										</div>
 									</div>
 									<div class="chat-options">
-										<button type="button" class="hover-green">
+										<button type="button" class="hover-green" title="Ajouter en ami">
 											<i class="fa-solid fa-user-plus"></i>
-											Ajouter en amis
 										</button>
-										<i class="fa-solid fa-circle-dot"></i>
-										<button type="button" class="hover-blue">
+										<button type="button" class="hover-purple" title="Voir l'historique">
+											<i class="fa-solid fa-clock-rotate-left"></i>
+										</button>
+										<button type="button" class="hover-blue" title="Inviter pour un Pong">
 											<i class="fa-solid fa-table-tennis-paddle-ball"></i>
-											Inviter à jouer
 										</button>
-										<i class="fa-solid fa-circle-dot"></i>
-										<button type="button" class="hover-red">
+										<button type="button" class="hover-red" title="Bloquer l'utilisateur">
 											<i class="fa-solid fa-circle-xmark"></i>
-											Bloquer
+										</button>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td tabindex="0">
+									<div class="chat-message">
+										<div class="chat-user-avatar">
+											<img src="/favicon.ico" alt="Avatar de l'utilisateur">
+										</div>
+										<p><span>User</span>: MSG</p>
+									</div>
+									<div class="chat-options">
+										<button type="button" class="hover-green" title="Ajouter en ami">
+											<i class="fa-solid fa-user-plus"></i>
+										</button>
+										<button type="button" class="hover-purple" title="Voir l'historique">
+											<i class="fa-solid fa-clock-rotate-left"></i>
+										</button>
+										<button type="button" class="hover-blue" title="Inviter pour un Pong">
+											<i class="fa-solid fa-table-tennis-paddle-ball"></i>
+										</button>
+										<button type="button" class="hover-red" title="Bloquer l'utilisateur">
+											<i class="fa-solid fa-circle-xmark"></i>
 										</button>
 									</div>
 								</td>
@@ -243,10 +259,58 @@
 					</table>
 					<table class="tab-friends">
 						<tbody>
-							<tr><td>abc</td></tr>
-							<tr><td>def</td></tr>
-							<tr><td>ghi</td></tr>
-							<tr><td>jkl</td></tr>
+							<tr tabindex="0">
+								<td>
+									<div class="friend-card">
+										<div class="friend-user-avatar">
+											<img src="/favicon.ico" alt="Avatar de l'utilisateur">
+										</div>
+										<div class="friend-user">
+											<div>
+												<span>User</span>
+												<i class="fa-solid fa-circle-dot"></i>
+											</div>
+											<div class="friend-options">
+												<button type="button" class="hover-purple" title="Voir l'historique">
+													<i class="fa-solid fa-clock-rotate-left"></i>
+												</button>
+												<button type="button" class="hover-blue" title="Inviter pour un Pong">
+													<i class="fa-solid fa-table-tennis-paddle-ball"></i>
+												</button>
+												<button type="button" class="hover-red" title="Retirer de la liste d'amis">
+													<i class="fa-solid fa-user-minus"></i>
+												</button>
+											</div>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<tr tabindex="0">
+								<td>
+									<div class="friend-card">
+										<div class="friend-user-avatar">
+											<img src="/favicon.ico" alt="Avatar de l'utilisateur">
+										</div>
+										<div class="friend-user">
+											<div>
+												<span>User</span>
+												<i class="fa-solid fa-circle-dot"></i>
+											</div>
+											<div class="friend-options">
+												<button type="button" class="hover-purple" title="Voir l'historique">
+													<i class="fa-solid fa-clock-rotate-left"></i>
+												</button>
+												<button type="button" class="hover-blue" title="Inviter pour un Pong">
+													<i class="fa-solid fa-table-tennis-paddle-ball"></i>
+												</button>
+												<button type="button" class="hover-red" title="Retirer de la liste d'amis">
+													<i class="fa-solid fa-user-minus"></i>
+												</button>
+											</div>
+										</div>
+									</div>
+								</td>
+							</tr>
 						</tbody>
 					</table>
 				</div>
@@ -257,7 +321,7 @@
 					<textarea maxlength="200"></textarea>
 				</div>
 				<div class="friend-input">
-					<textarea maxlength="200"></textarea>
+					<textarea maxlength="30"></textarea>
 				</div>
 			</div>
 		</section>

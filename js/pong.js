@@ -20,17 +20,12 @@ function	getPongStruct()
 async function	startPong(struct)
 {
 	initPongStruct(struct.screen.game, struct.screen.wrapperCanvas);
-	struct.screen.game.canvas.addEventListener("keydown", function(event) { enableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
-	struct.screen.game.canvas.addEventListener("keyup", function(event) { disableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
-	struct.screen.game.canvas.addEventListener("touchstart", function(event) { enableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
-	struct.screen.game.canvas.addEventListener("touchmove", function(event) { enableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
-	struct.screen.game.canvas.addEventListener("touchend", function(event) { disableMove(event, struct.screen.game.canvas, struct.screen.game.paddles); });
-	document.defaultView.addEventListener("resize", function() { resize(struct.screen.game, struct.screen.wrapperCanvas); });
+	setupPongEventListeners(struct.screen);
 	struct.screen.game.canvas.focus();
 	loop(struct, struct.screen.game);
 }
 
-async function	initPongStruct(game, wrapperCanvas)
+function	initPongStruct(game, wrapperCanvas)
 {
 	game.canvas = getCanvas(wrapperCanvas);
 	game.ctx = game.canvas.getContext("2d");
@@ -38,6 +33,25 @@ async function	initPongStruct(game, wrapperCanvas)
 	game.ball = getBall(game.canvas);
 	game.scores = [10, 10];
 	game.running = 1;
+}
+
+function	setupPongEventListeners(screen)
+{
+	// Keyboard
+	screen.game.canvas.addEventListener("keydown", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
+	screen.game.canvas.addEventListener("keyup", function(event) { disableMove(event, screen.game.canvas, screen.game.paddles); });
+	// Mouse
+	// ! TODO
+	// screen.game.canvas.addEventListener("mousedown", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
+	// screen.game.canvas.addEventListener("mousemove", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
+	// screen.game.canvas.addEventListener("mouseup", function(event) { disableMove(event, screen.game.canvas, screen.game.paddles); });
+	// Touchscreen
+	// ! TODO
+	// screen.game.canvas.addEventListener("touchstart", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
+	// screen.game.canvas.addEventListener("touchmove", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
+	// screen.game.canvas.addEventListener("touchend", function(event) { disableMove(event, screen.game.canvas, screen.game.paddles); });
+	// Resizing
+	document.defaultView.addEventListener("resize", function() { resize(screen.game, screen.wrapperCanvas); });
 }
 
 async function	loop(struct, game)
@@ -102,7 +116,7 @@ function	renderScore(game)
 	const pictures = getPictures(game.scores);
 	if (pictures[0] != 0)
 		game.ctx.drawImage(pictures[0], ((((game.canvas.width / 2) / 2) - pictures[1].width) - 5), 20);
-	game.ctx.drawImage(pictures[1], ((game.canvas.width / 2) / 2) + 3, 20);
+	game.ctx.drawImage(pictures[1], ((game.canvas.width / 2) / 2) + 3, (game.canvas.height - game.canvas.height + 20));
 	if (pictures[2] != 0)
 		game.ctx.drawImage(pictures[2], (game.canvas.width / 2) + ((((game.canvas.width / 2) / 2) - pictures[3].width) - 5), 20);
 	game.ctx.drawImage(pictures[3], (game.canvas.width / 2) + ((game.canvas.width / 2) / 2) - 3, 20);
@@ -136,8 +150,10 @@ function	resizePaddles(oldValues, canvas, paddles)
 	paddles.width = canvas.width / 50;
 	paddles.left.x = canvas.width / 20;
 	paddles.left.y = canvas.height / 100 * percentOldLeft;
+	paddles.left.mouse = 0;
 	paddles.right.x = canvas.width - (canvas.width / 20) - paddles.width;
 	paddles.right.y = canvas.height / 100 * percentOldRight;
+	paddles.right.mouse = 0;
 }
 
 function	resizeBall(oldValues, canvas, ball)
@@ -156,51 +172,40 @@ function	resizeBall(oldValues, canvas, ball)
 /////////////////////////
 function	enableMove(event, canvas, paddles)
 {
-	if (event.type == "touchstart")
-	{
-		paddles.left.touch = 1;
-		paddles.right.touch = 1;
-		if (event.offsetY < canvas.height / 2)
-		{
-			paddles.left.move_top = 1;
-			paddles.right.move_top = 1;
-		}
-		else
-		{
-			paddles.left.move_bot = 1;
-			paddles.right.move_bot = 1;
-		}
-	}
-	else if (event.type == "touchmove")
-	{
-		if (event.changedTouches[0].pageY < canvas.height / 2)
-		{
-			if (paddles.left.touch == 1)
-			{
-				paddles.left.move_top = 1;
-				paddles.left.move_bot = 0;
-			}
-			if (paddles.right.touch == 1)
-			{
-				paddles.right.move_top = 1;
-				paddles.right.move_bot = 0;
-			}
-		}
-		else
-		{
-			if (paddles.left.touch == 1)
-			{
-				paddles.left.move_top = 0;
-				paddles.left.move_bot = 1;
-			}
-			if (paddles.right.touch == 1)
-			{
-				paddles.right.move_top = 0;
-				paddles.right.move_bot = 1;
-			}
-		}
-	}
-	else if (event.key == "w" || event.key == "W")
+	// ! TODO
+// 	if (event.type == "mousedown")
+// 	{
+// 		paddles.left.mouse = 1;
+// 		paddles.right.mouse = 1;
+// 		if (event.offsetY < canvas.height / 2)
+// 		{
+// 			paddles.left.move_top = 1;
+// 			paddles.right.move_top = 1;
+// 		}
+// 		else
+// 		{
+// 			paddles.left.move_bot = 1;
+// 			paddles.right.move_bot = 1;
+// 		}
+// 	}
+// 	else if (event.type == "mousemove")
+// 	{
+// 		paddles.left.move_top = 0;
+// 		paddles.left.move_bot = 0;
+// 		paddles.right.move_top = 0;
+// 		paddles.right.move_bot = 0;
+// 		if (paddles.left.mouse == 1 && event.movementY < 0)
+// 		{
+// 			paddles.left.move_top = 1;
+// 			paddles.right.move_top = 1;
+// 		}
+// 		else if (paddles.left.mouse == 1 && event.movementY > 0)
+// 		{
+// 			paddles.left.move_bot = 1;
+// 			paddles.right.move_bot = 1;
+// 		}
+// 	}
+	if (event.key == "w" || event.key == "W")
 		paddles.left.move_top = 1;
 	else if (event.key == "s" || event.key == "S")
 		paddles.left.move_bot = 1;
@@ -214,8 +219,17 @@ function	disableMove(event, canvas, paddles)
 {
 	if (event.type == "touchend")
 	{
-		paddles.left.touch = 0;
-		paddles.right.touch = 0;
+		paddles.left.mouse = 0;
+		paddles.right.mouse = 0;
+		paddles.left.move_top = 0;
+		paddles.right.move_top = 0;
+		paddles.left.move_bot = 0;
+		paddles.right.move_bot = 0;
+	}
+	if (event.type == "mouseup")
+	{
+		paddles.left.mouse = 0;
+		paddles.right.mouse = 0;
 		paddles.left.move_top = 0;
 		paddles.right.move_top = 0;
 		paddles.left.move_bot = 0;
@@ -245,7 +259,7 @@ function	movePaddles(canvas, paddles)
 
 function	moveBall(game)
 {
-	if (game.ball.x <= -100 || game.ball.x >= (game.canvas.width + 100))
+	if (game.ball.x <= -200 || game.ball.x >= (game.canvas.width + 200))
 		point(game);
 	else
 		collision(game.canvas, game.paddles, game.ball);
@@ -466,7 +480,7 @@ function	createPaddle(canvas, height, width, position)
 		y: 0,
 		move_top: 0,
 		move_bot: 0,
-		touch: 0
+		mouse: 0
 	};
 	
 	if (position == "l")

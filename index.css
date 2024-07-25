@@ -51,8 +51,20 @@ body {
 	visibility: hidden !important;
 }
 
-.zindex {
-	z-index: 1;
+.hover-green:hover, .hover-green:focus {
+	color: #32CD32;
+}
+
+.hover-blue:hover, .hover-blue:focus {
+	color: #1E90FF;
+}
+
+.hover-red:hover, .hover-red:focus {
+	color: #FF6347;
+}
+
+.hover-purple:hover, .hover-purple:focus {
+	color: #BA55D3;
 }
 
 /*////////////*/
@@ -357,13 +369,13 @@ header h1 {
 	user-select: none;
 }
 
-nav {
+header nav {
 	width: 100%;
 	height: 100%;
 	padding: 0 0.5%;
 }
 
-nav ul {
+header nav ul {
 	display: flex;
 	justify-content: flex-end;
 	gap: 5%;
@@ -373,7 +385,7 @@ nav ul {
 	list-style-type: none;
 }
 
-.nav-user {
+header nav ul .nav-user {
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -428,6 +440,7 @@ main {
 
 h2 {
 	height: 5%;
+	min-height: 5%;
 	text-align: center;
 	margin: 0 0 10px 0;
 	color: var(--textColor);
@@ -898,7 +911,6 @@ label:has(> [type=radio]:focus) {
 	align-items: center;
 	height: 81%;
 	overflow: hidden;
-
 	position: relative;
 }
 
@@ -964,6 +976,14 @@ canvas:focus {
 	cursor: pointer;
 }
 
+.tournament-form button {
+	height: 40px;
+	margin-top: 6px;
+	border-radius: 20px;
+	user-select: none;
+	cursor: pointer;
+}
+
 .tournament-wrapper-inputs {
 	display: flex;
 	flex-direction: column;
@@ -983,14 +1003,6 @@ canvas:focus {
 	border-bottom: 1px solid var(--textColor);
 	margin-bottom: 5px;
 	opacity: 1;
-}
-
-.tournament-form button {
-	height: 40px;
-	margin-top: 6px;
-	border-radius: 20px;
-	user-select: none;
-	cursor: pointer;
 }
 
 /*////////////////////*/
@@ -1164,28 +1176,41 @@ canvas:focus {
 }
 
 .wrapper-tabs-tables table {
-	display: flex;
+	display: none;
 	height: 100%;
 	min-height: 100%;
 	width: 100%;
 	padding: 3%;
 	overflow: auto;
-	z-index: -1;
-	order: 1;
 }
 
 .wrapper-tabs-tables table.active {
-	z-index: 1;
-	order: 0;
+	display: flex;
 }
 
-.tab-chat tr {
+.wrapper-tabs-tables table tbody {
+	width: 100%;
+}
+
+.wrapper-tabs-tables table img {
+	object-fit: contain;
+}
+
+.wrapper-tabs-tables table button {
+	background-color: var(--mainColor);
+	color: var(--textColor);
+	padding: 0;
+	border: none;
+	cursor: pointer;
+}
+
+.wrapper-tabs-tables table tr {
 	display: flex;
 	flex-direction: column;
 	width: 100%;
 }
 
-.tab-chat td {
+.wrapper-tabs-tables table td {
 	display: flex;
 	flex-direction: column;
 	gap: 3%;
@@ -1209,13 +1234,15 @@ canvas:focus {
 	display: flex;
 }
 
-.tab-chat .chat-message .chat-user-avatar img {
-	object-fit: contain;
-}
-
 .tab-chat .chat-message p {
 	margin: 0;
 	width: 100%;
+}
+
+.tab-chat .chat-announcement {
+	margin: 0;
+	width: 100%;
+	color: #FFD700;
 }
 
 .tab-chat .chat-message span {
@@ -1227,38 +1254,64 @@ canvas:focus {
 	justify-content: center;
 	align-items: center;
 	text-align: center;
-	flex-wrap: wrap;
-	gap: 0.3rem;
+	gap: 1rem;
 	margin-top: 0.3rem;
-	font-size: 0.73rem;
+	word-break: auto-phrase;
 }
 
-.tab-chat .chat-options button {
-	background-color: var(--mainColor);
-	color: var(--textColor);
-	border: none;
-	cursor: pointer;
-}
-
-.tab-chat .chat-options button.hover-green:hover {
-	color: rgb(25, 175, 25);
-}
-
-.tab-chat .chat-options button.hover-blue:hover {
-	color: rgb(40, 175, 230);
-}
-
-.tab-chat .chat-options button.hover-red:hover {
-	color: rgb(240, 20, 20);
+.tab-chat .chat-options button span, .tab-chat .chat-options button i {
+	font-size: 0.8rem;
 }
 
 .tab-chat .chat-options .fa-circle-dot {
-	margin-top: 0.313rem;
-	font-size: 0.3rem;
+	font-size: 0.4rem;
+	margin-top: 0.1rem;
 }
 
-.tab-chat td:hover .chat-options {
+.tab-chat td:hover .chat-options, .tab-chat td:focus .chat-options, .tab-chat td:focus-within .chat-options {
 	display: flex;
+}
+
+.tab-friends .friend-card {
+	display: flex;
+	align-items: center;
+	gap: 0.3rem;
+	width: 100%;
+}
+
+.tab-friends .friend-card .friend-user-avatar {
+	height: 3rem;
+	width: 3rem;
+	display: flex;
+}
+
+.tab-friends .friend-card .friend-user {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.tab-friends .friend-card .friend-user div {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.tab-friends .friend-card .friend-user div span {
+	word-break: break-all;
+	font-weight: 600;
+}
+
+.tab-friends .friend-card .fa-circle-dot {
+	color: #32CD32;
+	font-size: 0.6rem;
+}
+
+.tab-friends .friend-card .friend-options {
+	display: flex;
+	gap: 0.7rem;
+	margin-top: 0.5rem;
+	font-size: 0.8rem;
 }
 
 /*///////////////*/
@@ -1272,21 +1325,21 @@ canvas:focus {
 	align-items: center;
 	height: 15%;
 	min-height: 15%;
+	max-height: 15%;
 	width: 100%;
 	overflow: hidden;
 	position: relative;
 }
 
 .wrapper-inputs div {
-	display: flex;
+	display: none;
 	height: 100%;
 	min-height: 100%;
 	width: 100%;
 }
 
 .wrapper-inputs div.active {
-	z-index: 1;
-	order: 1;
+	display: flex;
 }
 
 .wrapper-inputs textarea {
@@ -1307,7 +1360,6 @@ canvas:focus {
 	left: 0;
 	font-size: 1.4rem;
 	animation: fade 3s infinite;
-	z-index: 2;
 }
 
 /*//////////////////////*/
@@ -1332,7 +1384,7 @@ canvas:focus {
 		border-radius: 0;
 		box-shadow: none;
 		min-width: 100%;
-		width: 92%;
+		width: 100%;
 		height: 100%;
 		position: absolute;
 		top: 0;
@@ -1342,7 +1394,6 @@ canvas:focus {
 		display: block;
 	}
 	.zindex {
-		/* z-index: -1; */
 		display: none;
 	}
 	/*//////*/
@@ -1376,6 +1427,10 @@ canvas:focus {
 		width: 100%;
 		height: 100%;
 	}
+	.nav-user-avatar {
+		width: 50%;
+		height: auto;
+	}
 	nav ul li button {
 		display: block;
 		height: 100%;
@@ -1386,10 +1441,12 @@ canvas:focus {
 	/*/////////////*/
 	main {
 		height: 100%;
+		width: 100%;
 		padding: 0;
 	}
 	.wrapper-sections {
 		height: 100%;
+		width: 100%;
 		gap: 0;
 		position: relative;
 	}
@@ -1397,11 +1454,13 @@ canvas:focus {
 	/* Game - Game selector Form */
 	/*///////////////////////////*/
 	.wrapper-left-section {
+		min-width: 92%;
+		width: 92%;
 		padding: 0;
 	}
 	.wrapper-left-section form {
 		align-items: center;
-		width: 92%;
+		width: 100%;
 		padding: 2% 0%;
 	}
 	.wrapper-left-section form h3 {
@@ -1455,13 +1514,20 @@ canvas:focus {
 	}
 	/*///////////////*/
 	/* Game - Screen */
-	/*///////////////*/	
+	/*///////////////*/
+	.wrapper-screen {
+		width: 100%;
+	}
 	.go-button {
 		font-size: 2.5vh;
 	}
 	/*/////////////*/
 	/* Game - Tabs */
-	/*/////////////*/	
+	/*/////////////*/
+	.wrapper-right-section {
+		width: 92%;
+		position: relative;
+	}
 	.wrapper-tabs-tables {
 		min-height: 88%;
 		height: 88%;
@@ -1471,16 +1537,27 @@ canvas:focus {
 		width: 92%;
 		padding: 2%;
 	}
-	.tab-chat td:hover .chat-options {
+	.wrapper-tabs-tables table button {
+		height: 1.5rem;
+		width: 3rem;
+		background-image: linear-gradient(to bottom, #e4e4e4, #f7f7f7);
+		border: 1px solid #afafaf;
+	}
+	.wrapper-tabs-tables table button i {
+		color: var(--mainColor)
+	}
+	.tab-chat td {
+		flex-direction: row;
+	}
+	.tab-chat .chat-options {
+		display: block;
+		text-align: start;
+	}
+	.tab-chat .chat-options button span {
 		display: none;
 	}
-	.tab-chat td .for-phone {
-		display: flex;
-		gap: 5px;
-		margin-left: 20px;
-	}
-	.tab-chat td .for-phone button {
-		width: 5rem;
+	.tab-chat td:hover .chat-options, .tab-chat td:focus .chat-options, .tab-chat td:focus-within .chat-options {
+		display: block;
 	}
 	/*///////////////*/
 	/* Game - Inputs */
@@ -1490,8 +1567,8 @@ canvas:focus {
 		bottom: 0;
 		height: 12%;
 		min-height: 12%;
-		width: 92%;
-		min-width: 92%;
+		width: 100%;
+		min-width: 100%;
 	}
 	.wrapper-inputs textarea {
 		height: 100%;

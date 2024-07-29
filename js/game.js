@@ -10,6 +10,7 @@ async function	run()
 		gameForm: getGameFormStruct(),
 		screen: getScreenStruct(),
 		tournament: getTournamentStruct(),
+		history: getHistoryStruct(),
 		tabs: getTabsStruct(),
 		run: 1
 	};
@@ -32,13 +33,22 @@ async function	run()
 function	setupEventListeners(struct)
 {	
 	// addEventListener abandonButton => stopper le jeu;
+	struct.header.historyButton.addEventListener("click", function() {
+		resetPhoneClasses(struct, struct.cards.chat);
+		struct.tabs.wrapperTabs.classList.add("hidden");
+		struct.tabs.wrapperInputs.classList.add("zindex");
+		struct.history.wrapper.classList.remove("zindex");
+		struct.history.wrapper.classList.remove("hidden");
+	});
 	struct.header.gameSelectorButton.addEventListener("click", function() { resetPhoneClasses(struct, struct.cards.gameSelector); });
 	struct.header.chatButton.addEventListener("click", function() {
 		resetPhoneClasses(struct, struct.cards.chat);
+		resetHistoryClasses(struct);
 		showTab(struct.tabs.chat, struct.tabs.friend)
 	});
 	struct.header.friendButton.addEventListener("click", function() {
 		resetPhoneClasses(struct, struct.cards.chat);
+		resetHistoryClasses(struct);
 		showTab(struct.tabs.friend, struct.tabs.chat)
 	});
 	struct.header.optionButton.addEventListener("click", function() {
@@ -47,6 +57,9 @@ function	setupEventListeners(struct)
 	struct.header.logoutButton.addEventListener("click", function() {
 		struct.run = 0;
 		navigate("login");
+	});
+	struct.history.leaveButton.addEventListener("click", function() {		
+		resetHistoryClasses(struct);
 	});
 	struct.tabs.chat.button.addEventListener("click", function() {
 		showTab(struct.tabs.chat, struct.tabs.friend)
@@ -119,8 +132,17 @@ function	resetPhoneClasses(struct, except)
 	struct.cards.gameSelector.classList.add("zindex");
 	struct.cards.screen.classList.add("zindex");
 	struct.cards.chat.classList.add("zindex");
+	struct.history.wrapper.classList.add("zindex");
 	if (except !== undefined)
 		except.classList.remove("zindex");
+}
+
+function	resetHistoryClasses(struct)
+{
+	struct.tabs.wrapperTabs.classList.remove("hidden");
+	struct.tabs.wrapperInputs.classList.remove("zindex");
+	struct.history.wrapper.classList.add("zindex");
+	struct.history.wrapper.classList.add("hidden");
 }
 
 function	clearScreen(wrapper)
@@ -145,9 +167,12 @@ function	showTab(show, hide)
 	hide.button.classList.remove("active");
 	hide.table.classList.remove("active");
 	hide.input.classList.remove("active");
-	show.button.classList.add("active");
-	show.table.classList.add("active");
-	show.input.classList.add("active");
+	if (show !== undefined)
+	{
+		show.button.classList.add("active");
+		show.table.classList.add("active");
+		show.input.classList.add("active");
+	}
 }
 
 //////////////////////////////////////////////////////
@@ -158,11 +183,12 @@ function	getHeaderStruct()
 	const buttons = document.querySelectorAll("header button");
 	const struct = {
 		wrapper: document.getElementsByTagName("header")[0],
-		gameSelectorButton: buttons[0],
-		chatButton: buttons[1],
-		friendButton: buttons[2],
-		optionButton: buttons[3],
-		logoutButton: buttons[4]
+		historyButton: buttons[0],
+		gameSelectorButton: buttons[1],
+		chatButton: buttons[2],
+		friendButton: buttons[3],
+		optionButton: buttons[4],
+		logoutButton: buttons[5]
 	};
 	return (struct);
 }
@@ -227,9 +253,18 @@ function	getTournamentStruct()
 	return (struct);
 }
 
+function	getHistoryStruct()
+{
+	const struct = {
+		wrapper: document.getElementsByClassName("wrapper-history")[0],
+		leaveButton: document.querySelector(".wrapper-history button")
+	};
+	return (struct);
+}
+
 function	getTabsStruct()
 {
-	const buttons = document.querySelectorAll(".wrapper-tabs-button button");
+	const buttons = document.querySelectorAll(".wrapper-tabs-buttons button");
 	const tables = document.querySelectorAll(".wrapper-tabs-tables table");
 	const inputs = document.querySelectorAll(".wrapper-inputs div");
 	const chatStruct = {
@@ -243,6 +278,8 @@ function	getTabsStruct()
 		input: inputs[1]
 	};
 	const struct = {
+		wrapperTabs: document.getElementsByClassName("wrapper-tabs")[0],
+		wrapperInputs: document.getElementsByClassName("wrapper-inputs")[0],
 		chat: chatStruct,
 		friend: friendStruct
 	};

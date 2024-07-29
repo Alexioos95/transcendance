@@ -6,11 +6,12 @@
 	<h1>ft_transcendance</h1>
 	<nav>
 		<ul>
-			<li class="nav-user">
-				<div class="nav-user-avatar">
+			<li class="nav-user" title="Voir mon historique">
+				<button>
 					<img src="/favicon.ico" alt="Avatar de l'utilisateur">
-				</div>
-				<span>Alexioos95</span>
+					<span>Alexioos95</span>
+					<i class="fa-solid fa-clock-rotate-left"></i>
+				</button>
 			</li>
 			<li class="for-phone">
 				<button>
@@ -139,7 +140,9 @@
 		<div class="wrapper-screen zindex">
 			<div class="wrapper-canvas card">
 				<form class="tournament-form hidden">
-					<i class="fa-solid fa-circle-arrow-left"></i>
+					<button type="button" class="tournament-form-back">
+						<i class="fa-solid fa-circle-arrow-left"></i>
+					</button>
 					<span>Sélectionnez vos pseudonymes</span>
 					<div class="tournament-wrapper-inputs">
 						<input type="text" name="p1" maxlength="30" placeholder="Joueur 1" aria-label="Pseudonyme du joueur 1">
@@ -194,8 +197,48 @@
 			</section>
 		</div>
 		<section class="wrapper-right-section zindex">
+			<div class="wrapper-history card hidden">
+				<button type="button">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+				<h3>User</h3>
+				<table class="tab-history">
+					<tbody>
+						<tr>
+							<td tabindex="0">
+								<div class="history-card history-card-win">
+									<div class="history-card-game history-card-pong">
+									</div>
+									<div class="history-card-text">
+										<span>User</span>
+										<span>11</span>
+										<div class="bar"></div>
+										<span>User2</span>
+										<span>5</span>
+									</div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td tabindex="0">
+								<div class="history-card history-card-lose">
+									<div class="history-card-game history-card-tetris">
+									</div>
+									<div class="history-card-text">
+										<span>User</span>
+										<span>11</span>
+										<div class="bar"></div>
+										<span>User2</span>
+										<span>5</span>
+									</div>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 			<div class="wrapper-tabs card">
-				<div class="wrapper-tabs-button">
+				<div class="wrapper-tabs-buttons">
 					<button type="button" class="active"><span class="h3">Chat</span></button>
 					<button type="button"><span class="h3">Amis</span></button>
 				</div>
@@ -259,8 +302,8 @@
 					</table>
 					<table class="tab-friends">
 						<tbody>
-							<tr tabindex="0">
-								<td>
+							<tr>
+								<td tabindex="0">
 									<div class="friend-card">
 										<div class="friend-user-avatar">
 											<img src="/favicon.ico" alt="Avatar de l'utilisateur">
@@ -268,7 +311,7 @@
 										<div class="friend-user">
 											<div>
 												<span>User</span>
-												<i class="fa-solid fa-circle-dot"></i>
+												<i class="fa-solid fa-circle-dot online" title="En ligne"></i>
 											</div>
 											<div class="friend-options">
 												<button type="button" class="hover-purple" title="Voir l'historique">
@@ -285,8 +328,8 @@
 									</div>
 								</td>
 							</tr>
-							<tr tabindex="0">
-								<td>
+							<tr>
+								<td tabindex="0">
 									<div class="friend-card">
 										<div class="friend-user-avatar">
 											<img src="/favicon.ico" alt="Avatar de l'utilisateur">
@@ -294,7 +337,7 @@
 										<div class="friend-user">
 											<div>
 												<span>User</span>
-												<i class="fa-solid fa-circle-dot"></i>
+												<i class="fa-solid fa-circle-dot offline" title="En ligne"></i>
 											</div>
 											<div class="friend-options">
 												<button type="button" class="hover-purple" title="Voir l'historique">
@@ -316,11 +359,12 @@
 				</div>
 			</div>
 			<div class="wrapper-inputs card">
-				<i class="fa-solid fa-caret-right" title="Ecrivez aux autres joueurs !"></i>
 				<div class="chat-input active">
+					<i class="fa-solid fa-caret-right" title="Ecrivez aux autres joueurs !"></i>
 					<textarea maxlength="200"></textarea>
 				</div>
 				<div class="friend-input">
+					<i class="fa-solid fa-plus"></i>
 					<textarea maxlength="30"></textarea>
 				</div>
 			</div>

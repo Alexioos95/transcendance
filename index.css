@@ -19,12 +19,6 @@ body {
 	font: 1rem "Inter", sans-serif;
 }
 
-@keyframes fade {
-	0% { opacity: 1; }
-	50% { opacity: 0; }
-	100% { opacity: 1; }
-}
-
 :root {
 	--mainColor: #2E2E2E;
 	--textColor: #F2F2F2;
@@ -55,6 +49,10 @@ body {
 	color: #32CD32;
 }
 
+.hover-purple:hover, .hover-purple:focus {
+	color: #BA55D3;
+}
+
 .hover-blue:hover, .hover-blue:focus {
 	color: #1E90FF;
 }
@@ -63,8 +61,10 @@ body {
 	color: #FF6347;
 }
 
-.hover-purple:hover, .hover-purple:focus {
-	color: #BA55D3;
+@keyframes fade {
+	0% { opacity: 1; }
+	50% { opacity: 0; }
+	100% { opacity: 1; }
 }
 
 /*////////////*/
@@ -385,24 +385,6 @@ header nav ul {
 	list-style-type: none;
 }
 
-header nav ul .nav-user {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	gap: 0.5rem;
-	height: 100%;
-}
-
-.nav-user-avatar {
-	aspect-ratio: 1 / 1;
-	height: 100%;
-}
-
-.nav-user-avatar img {
-	height: 100%;
-	object-fit: fill;
-}
-
 nav ul li button {
 	display: flex;
 	justify-content: center;
@@ -415,6 +397,10 @@ nav ul li button {
 	color: var(--textColor);
 	border: none;
 	cursor: pointer;
+}
+
+nav ul .nav-user img {
+	height: 100%;
 }
 
 nav span {
@@ -451,7 +437,7 @@ h2 {
 .wrapper-sections {
 	display: flex;
 	gap: 2%;
-	height: 95%;
+	height: 93%;
 	width: 100%;
 }
 
@@ -969,10 +955,19 @@ canvas:focus {
 	user-select: none;
 }
 
-.tournament-form i {
-	font-size: 2rem;
+.tournament-form .tournament-form-back {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 40px;
+	width: 40px;;
 	position: absolute;
+	top: 45%;
 	left: 0;
+	background-color: var(--mainColor);
+	color: var(--textColor);
+	font-size: 2rem;
+	border: none;
 	cursor: pointer;
 }
 
@@ -1134,7 +1129,7 @@ canvas:focus {
 	height: 81%;
 }
 
-.wrapper-tabs-button {
+.wrapper-tabs-buttons {
 	display: flex;
 	gap: 3px;
 	height: 10%;
@@ -1142,7 +1137,7 @@ canvas:focus {
 	width: 100%;
 }
 
-.wrapper-tabs-button button {
+.wrapper-tabs-buttons button {
 	width: 50%;
 	height: 100%;
 	background-color: rgb(115, 115, 115);
@@ -1152,17 +1147,17 @@ canvas:focus {
 	cursor: pointer;
 }
 
-.wrapper-tabs-button .h3 {
+.wrapper-tabs-buttons .h3 {
 	margin: 0;
 	font-weight: bold;
 	user-select: none;
 }
 
-.wrapper-tabs-button button:hover {
+.wrapper-tabs-buttons button:hover {
 	background-color: rgb(100, 100, 100);
 }
 
-.wrapper-tabs-button button.active {
+.wrapper-tabs-buttons button.active {
 	background-color: var(--mainColor);
 }
 
@@ -1189,6 +1184,8 @@ canvas:focus {
 }
 
 .wrapper-tabs-tables table tbody {
+	display: flex;
+	flex-direction: column;
 	width: 100%;
 }
 
@@ -1221,6 +1218,10 @@ canvas:focus {
 	text-wrap: wrap;
 	word-break: break-all;
 }
+
+/*///////////////////*/
+/* Game - Tab - Chat */
+/*///////////////////*/
 
 .tab-chat .chat-message {
 	display: flex;
@@ -1272,6 +1273,10 @@ canvas:focus {
 	display: flex;
 }
 
+/*//////////////////////*/
+/* Game - Tab - Friends */
+/*//////////////////////*/
+
 .tab-friends .friend-card {
 	display: flex;
 	align-items: center;
@@ -1303,8 +1308,15 @@ canvas:focus {
 }
 
 .tab-friends .friend-card .fa-circle-dot {
-	color: #32CD32;
 	font-size: 0.6rem;
+}
+
+.tab-friends .friend-card .online {
+	color: #32CD32;
+}
+
+.tab-friends .friend-card .offline {
+	color: #FF6347;
 }
 
 .tab-friends .friend-card .friend-options {
@@ -1312,6 +1324,123 @@ canvas:focus {
 	gap: 0.7rem;
 	margin-top: 0.5rem;
 	font-size: 0.8rem;
+}
+
+/*//////////////////////*/
+/* Game - Tab - History */
+/*//////////////////////*/
+
+.wrapper-history {
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+	position: relative;
+}
+
+.wrapper-history button {
+	position: absolute;
+	top: 1%;
+	right: 2%;
+	background-color: var(--mainColor);
+	color: #FF6347;
+	border: none;
+	cursor: pointer;
+}
+
+.wrapper-history h3 {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 10%;
+	height: 10%;
+	max-height: 10%;
+	margin: 0;
+}
+
+.tab-history {
+	display: flex;
+	height: 90%;
+	min-height: 90%;
+	max-height: 90%;
+	width: 100%;
+	padding: 3%;
+	overflow: auto;
+}
+
+.tab-history tbody {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	width: 100%;
+}
+
+.tab-history tr {
+	display: flex;
+	width: 100%;
+}
+
+.tab-history td {
+	display: flex;
+	height: auto;
+	width: 100%;
+	padding: 0;
+	margin-bottom: 0.625rem;
+	text-wrap: wrap;
+	word-break: break-all;
+}
+
+.history-card {
+	display: flex;
+	align-items: center;
+	height: auto;
+	width: 100%;
+	padding: 3%;
+}
+
+.history-card-win {
+	background-color: green;
+}
+
+.history-card-lose {
+	background-color: rgb(121, 25, 25);
+}
+
+.history-card-game {
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
+	min-height: 2.5rem;
+	height: auto;
+	width: 30%;
+}
+
+.history-card-pong {
+	background-image: url("/svg/pong.svg");
+}
+
+.history-card-tetris {
+	background-image: url("/svg/tetris.svg");
+}
+
+.history-card-text {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	flex-wrap: wrap;
+	height: 100%;
+	width: 70%;
+}
+
+.history-card-text span {
+	font-size: 1rem;
+	font-weight: 600;
+	width: 50%;
+	margin: 0.3rem 0;
+}
+
+.history-card-text .bar {
+	width: 95%;
 }
 
 /*///////////////*/
@@ -1362,6 +1491,18 @@ canvas:focus {
 	animation: fade 3s infinite;
 }
 
+.wrapper-inputs .fa-plus {
+	top: 1.1rem;
+	left: 0;
+	font-size: 0.8rem;
+	animation: none;
+}
+
+.wrapper-right-section:has(> .wrapper-history:not(.hidden)) .chat-input,
+.wrapper-right-section:has(> .wrapper-history:not(.hidden)) .friend-input {
+	display: none;
+}
+
 /*//////////////////////*/
 /* Media Queries - Game */
 /*//////////////////////*/
@@ -1399,9 +1540,9 @@ canvas:focus {
 	/*//////*/
 	/* Hide */
 	/*//////*/
-	header h1, .nav-user, nav span, h2,
+	header h1, nav span, .nav-user i, h2,
 	.wrapper-bottom-section,
-	.wrapper-tabs-button {
+	.wrapper-tabs-buttons, .wrapper-history button {
 		display: none;
 	}
 	/*///////////////*/
@@ -1427,14 +1568,15 @@ canvas:focus {
 		width: 100%;
 		height: 100%;
 	}
-	.nav-user-avatar {
-		width: 50%;
-		height: auto;
-	}
 	nav ul li button {
 		display: block;
 		height: 100%;
 		width: 100%;
+	}
+	nav ul .nav-user img {
+		aspect-ratio: 1 / 1;
+		height: auto;
+		width: 50%;
 	}
 	/*/////////////*/
 	/* Game - main */
@@ -1559,6 +1701,12 @@ canvas:focus {
 	.tab-chat td:hover .chat-options, .tab-chat td:focus .chat-options, .tab-chat td:focus-within .chat-options {
 		display: block;
 	}
+	.tab-friends .friend-card .friend-options {
+		margin-top: 0.2rem;
+	}
+	.wrapper-history {
+		padding: 2%;
+	}
 	/*///////////////*/
 	/* Game - Inputs */
 	/*///////////////*/
@@ -1577,6 +1725,13 @@ canvas:focus {
 		border-top: 1px solid rgb(131, 126, 126);
 	}
 	.wrapper-inputs i {
+		top: 0.5rem;
+		left: 0;
+		font-size: 1rem;
+		animation: fade 3s infinite;
+		z-index: 2;
+	}
+	.wrapper-inputs .fa-plus {
 		top: 0.5rem;
 		left: 0;
 		font-size: 1rem;

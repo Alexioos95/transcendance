@@ -9,7 +9,6 @@
 html {
 	width: 100%;
 	height: 100%;
-	font-size: 16px;
 }
 
 body {
@@ -71,20 +70,20 @@ body {
 /* Font sizes */
 /*////////////*/
 
-h1 { font-size: 2.25rem; }
+h1 { font-size: 2vw; }
 h2 { font-size: 1.6rem; }
-h3, .h3 { font-size: 1.5rem; }
+h3 { font-size: 1.5rem; }
 span { font-size: 1rem; }
 td { font-size: 0.9rem; }
 textarea { font-size: 0.9rem; }
 
-@media (min-width: 5660px) { html { font-size: 60px; } }
-@media (max-width: 5660px) { html { font-size: 40px; } }
-@media (max-width: 2880px) { html { font-size: 20px; } }
-@media (max-width: 1920px) { html { font-size: 16px; } }
-@media (max-width: 1200px) { html { font-size: 15px; } }
-@media (max-width: 768px) { html { font-size: 14px; } }
-@media (max-width: 480px) { html { font-size: 13px; } }
+@media (min-width: 5660px) { html { font-size: 375%; } }
+@media (max-width: 5660px) { html { font-size: 250%; } }
+@media (max-width: 2880px) { html { font-size: 125%; } }
+@media (max-width: 1920px) { html { font-size: 100%; } }
+@media (max-width: 1280px) { html { font-size: 90%; } }
+@media (max-width: 768px) { html { font-size: 85%; } }
+@media (max-width: 480px) { html { font-size: 60%; } }
 
 /*///////////////*/
 /* Please rotate */
@@ -448,15 +447,17 @@ h2 {
 .wrapper-left-section {
 	width: 20%;
 	padding: 1% 0.5%;
+	overflow: hidden;
 }
 
 .wrapper-left-section form {
 	display: flex;
 	flex-direction: column;
 	text-align: center;
-	justify-content: space-between;
 	width: 100%;
 	height: 100%;
+	gap: 5%;
+	overflow: auto;
 }
 
 .wrapper-left-section form h3 {
@@ -467,7 +468,9 @@ h2 {
 .wrapper-selectors {
 	display: flex;
 	flex-direction: column;
-	height: 82%;
+	height: 90%;
+	width: 100%;
+	overflow: auto;
 }
 
 .wrapper-game-selectors, .wrapper-game-selector {
@@ -571,13 +574,14 @@ label:has(> [type=radio]:focus) {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	height: 83%;
+	align-items: center;
+	height: 78%;
 }
 
 .mode-selector {
 	display: flex;
 	align-items: center;
-	width: 100%;
+	width: 98%;
 	height: 15%;
 	margin-top: 5px;
 	position: relative;
@@ -604,15 +608,18 @@ label:has(> [type=radio]:focus) {
 		rgba(255, 255, 255, 0.5) 0 12px 5px inset,
 		#B01F4F 0 -12px 5px inset,
 		rgba(0, 0, 0, 0.8) 0 4px 8px;
+	position: relative;
 }
 
 .wrapper-mode-selector .top-circle {
+	position: absolute;
+	top: 17.9%;
+	left: 17.9%;
 	display: inline-block;
 	aspect-ratio: 1 / 1;
 	height: 66%;
 	width: auto;
 	padding: 0;
-	margin-top: 15%;
 	background: #fc2c71;
 	box-shadow:
 		rgba(0, 0, 0, 0.8) 0 0 1px 1px,
@@ -712,7 +719,7 @@ label:has(> [type=radio]:focus) {
 .wrapper-submit-button .coin-text {
 	width: 100%;
 	text-align: center;
-	font-size: calc(0.6rem + 1vh);
+	font-size: calc(0.5rem + 1vh);
 	font-family: "Press Start 2P", sans-serif;
 	color: var(--textColor);
 	text-shadow:
@@ -943,10 +950,10 @@ canvas:focus {
 .tournament-form {
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
+	justify-content: space-around;
 	align-items: center;
 	gap: 3%;
-	width: 50%;
+	width: 100%;
 	height: 100%;
 	position: absolute;
 }
@@ -959,11 +966,11 @@ canvas:focus {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	height: 40px;
-	width: 40px;;
+	height: 2rem;
+	width: 2rem;
 	position: absolute;
 	top: 45%;
-	left: 0;
+	left: 15%;
 	background-color: var(--mainColor);
 	color: var(--textColor);
 	font-size: 2rem;
@@ -972,8 +979,7 @@ canvas:focus {
 }
 
 .tournament-form button {
-	height: 40px;
-	margin-top: 6px;
+	height: 2rem;
 	border-radius: 20px;
 	user-select: none;
 	cursor: pointer;
@@ -986,7 +992,6 @@ canvas:focus {
 	align-items: center;
 	gap: 5%;
 	height: 40%;
-	margin-top: 5%;
 }
 
 .tournament-wrapper-inputs input {
@@ -1147,7 +1152,8 @@ canvas:focus {
 	cursor: pointer;
 }
 
-.wrapper-tabs-buttons .h3 {
+.wrapper-tabs-buttons span {
+	font-size: 1.55vw;
 	margin: 0;
 	font-weight: bold;
 	user-select: none;
@@ -1507,6 +1513,14 @@ canvas:focus {
 /* Media Queries - Game */
 /*//////////////////////*/
 
+/* Small Laptops */
+@media only screen and (max-width: 1280px) {
+	h2 {
+		font-size: 1.3rem;
+	}
+}
+
+/* Tablets and Phones */
 @media only screen and (max-width: 1023px) and (orientation: portrait) {
 	.please-rotate {
 		display: flex;
@@ -1517,6 +1531,7 @@ canvas:focus {
 	}
 }
 
+/* Tablets and Phones */
 @media only screen and (max-width: 1023px) and (orientation: landscape) {
 	/*////////////////*/
 	/* Useful Classes */
@@ -1620,7 +1635,6 @@ canvas:focus {
 		justify-content: space-around;
 	}
 	.game-selector {
-		height: 25%;
 		justify-content: center;
 		align-items: center;
 	}
@@ -1741,11 +1755,30 @@ canvas:focus {
 }
 
 @media only screen and (max-height: 320px) and (orientation: landscape) {
-	/*////////////*/
-	/* Font sizes */
-	/*////////////*/
+	/*///////////////////////////*/
+	/* Game - Game selector Form */
+	/*///////////////////////////*/
 	.wrapper-left-section form h3 {
 		margin: 0 0 3px 0;
+	}
+	.wrapper-mode-selector .mode-text {
+		font-size: 6vh;
+	}
+	.wrapper-mode-selector .base-circle {
+		box-shadow:
+			#CA235A 0 4px 5px inset,
+			rgba(255, 255, 255, 0.5) 0 12px 5px inset,
+			#B01F4F 0 -12px 5px inset,
+			rgba(0, 0, 0, 0.8) 0 1px 2px;
+	}	
+	.wrapper-mode-selector .top-circle {
+		box-shadow:
+			rgba(0, 0, 0, 0.8) 0 0 1px 1px,
+			rgba(0, 0, 0, 0.8) 0 3px 3px inset,
+			#f5213d 0 8px 10px inset,
+			rgba(0, 0, 0, 0.3) 0 10px 2px inset,
+			rgba(255,255,255,.3) 0 -2px 3px inset,
+			#e9233e 0 -7px 20px inset;
 	}
 	.wrapper-submit-button span {
 		text-shadow:
@@ -1768,9 +1801,9 @@ canvas:focus {
 	.go-button {
 		font-size: 2.5vh;
 	}
-	/*/////////////////*/
-	/* Tournament form */
-	/*/////////////////*/
+	/*////////////////////////*/
+	/* Game - Tournament form */
+	/*////////////////////////*/
 	.tournament-form {
 		justify-content: space-between;
 		width: 80%;
@@ -1779,7 +1812,9 @@ canvas:focus {
 	.tournament-form span {
 		font-size: 100%;
 		text-align: center;
-		width: 80%;
+	}
+	.tournament-form .tournament-form-back {
+		left: 5%
 	}
 	.tournament-form i {
 		font-size: 1.5rem;

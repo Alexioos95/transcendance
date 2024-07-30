@@ -31,7 +31,7 @@ async function	run()
 }
 
 function	setupEventListeners(struct)
-{	
+{
 	// addEventListener abandonButton => stopper le jeu;
 	struct.header.historyButton.addEventListener("click", function() {
 		resetPhoneClasses(struct, struct.cards.chat);

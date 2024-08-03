@@ -44,6 +44,62 @@ body {
 	visibility: hidden !important;
 }
 
+.cross-button {
+	position: absolute;
+	top: 1%;
+	right: 2%;
+	background-color: var(--mainColor);
+	color: #FF6347;
+	border: none;
+	cursor: pointer;
+}
+
+.wrapper-tab-button {
+	display: flex;
+	gap: 3px;
+	height: 10%;
+	min-height: 10%;
+	width: 100%;
+}
+
+.tab-button {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 50%;
+	height: 100%;
+	background-color: rgb(115, 115, 115);
+	color: var(--textColor);
+	border: none;
+	padding: 0;
+	cursor: pointer;
+}
+
+.tab-button.active {
+	background-color: var(--mainColor);
+}
+
+.tab-button:hover {
+	background-color: rgb(100, 100, 100);
+}
+
+.tab-button.active:hover {
+	background-color: var(--mainColor);
+}
+
+.tab-tabs {
+	display: flex;
+	flex-direction: column;
+	height: 90%;
+	min-height: 90%;
+	width: 100%;
+	overflow: auto;
+}
+
+.tab-tabs > * {
+	padding: 3%;
+}
+
 .hover-green:hover, .hover-green:focus {
 	color: #32CD32;
 }
@@ -535,7 +591,7 @@ h2 {
 	height: 0;
 }
 
-label:has(> [type=radio]:focus) {
+label:has(> [type=radio]:focus-visible) {
 	outline: 1px black auto;
 }
 
@@ -898,7 +954,7 @@ label:has(> [type=radio]:focus) {
 	gap: 4%;
 }
 
-.wrapper-canvas {
+.wrapper-screen-all {
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -907,9 +963,17 @@ label:has(> [type=radio]:focus) {
 	position: relative;
 }
 
+.wrapper-canvas {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+}
+
 canvas {
 	display: block;
-	position: absolute;
 	width: 100%;
 	height: 100%;
 }
@@ -929,6 +993,7 @@ canvas:focus {
 	border-radius: 100%;
 	cursor: pointer;
 	z-index: 1;
+	position: absolute;
 }
 
 .canvas-user-1 {
@@ -943,6 +1008,87 @@ canvas:focus {
 	right: 1%;
 }
 
+/*////////////////*/
+/* Game - Options */
+/*////////////////*/
+
+.wrapper-options {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	width: 100%;
+}
+
+.wrapper-options .cross-button {
+	height: 10%;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.wrapper-options-buttons button {
+	width: 48.8%;
+}
+
+.wrapper-options-buttons span {
+	font-size: 1.55vw;
+	margin: 0;
+	font-weight: bold;
+	user-select: none;
+}
+
+.wrapper-options-tabs > * {
+	display: none;
+	height: 100%;
+	min-height: 100%;
+	width: 100%;
+	overflow: auto;
+}
+
+.wrapper-options-tabs *.active {
+	display: flex;
+}
+
+.wrapper-options-tabs tbody {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.wrapper-options-tabs tbody td {
+	display: flex;
+	height: auto;
+	width: 100%;
+	padding: 0;
+	margin-bottom: 0.625rem;
+	text-wrap: wrap;
+	word-break: break-all;
+}
+
+.blocked-card {
+	display: flex;
+	gap: 3%;
+	width: 100%;
+}
+
+.blocked-card .blocked-user-avatar {
+	height: 4rem;
+	width: 4rem;
+	display: flex;
+}
+
+.blocked-card .blocked-user {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.blocked-card .blocked-user > span {
+	word-break: break-all;
+	font-size: 1.3rem;
+	font-weight: 600;
+}
+
 /*////////////////////////*/
 /* Game - Tournament form */
 /*////////////////////////*/
@@ -955,7 +1101,6 @@ canvas:focus {
 	gap: 3%;
 	width: 100%;
 	height: 100%;
-	position: absolute;
 }
 
 .tournament-form span {
@@ -1134,24 +1279,6 @@ canvas:focus {
 	height: 81%;
 }
 
-.wrapper-tabs-buttons {
-	display: flex;
-	gap: 3px;
-	height: 10%;
-	min-height: 10%;
-	width: 100%;
-}
-
-.wrapper-tabs-buttons button {
-	width: 50%;
-	height: 100%;
-	background-color: rgb(115, 115, 115);
-	color: var(--textColor);
-	border: none;
-	padding: 0;
-	cursor: pointer;
-}
-
 .wrapper-tabs-buttons span {
 	font-size: 1.55vw;
 	margin: 0;
@@ -1159,29 +1286,11 @@ canvas:focus {
 	user-select: none;
 }
 
-.wrapper-tabs-buttons button:hover {
-	background-color: rgb(100, 100, 100);
-}
-
-.wrapper-tabs-buttons button.active {
-	background-color: var(--mainColor);
-}
-
-.wrapper-tabs-tables {
-	display: flex;
-	flex-direction: column;
-	height: 90%;
-	min-height: 90%;
-	width: 100%;
-	overflow: hidden;
-}
-
 .wrapper-tabs-tables table {
 	display: none;
 	height: 100%;
 	min-height: 100%;
 	width: 100%;
-	padding: 3%;
 	overflow: auto;
 }
 
@@ -1343,16 +1452,6 @@ canvas:focus {
 	position: relative;
 }
 
-.wrapper-history button {
-	position: absolute;
-	top: 1%;
-	right: 2%;
-	background-color: var(--mainColor);
-	color: #FF6347;
-	border: none;
-	cursor: pointer;
-}
-
 .wrapper-history h3 {
 	display: flex;
 	justify-content: center;
@@ -1361,16 +1460,6 @@ canvas:focus {
 	height: 10%;
 	max-height: 10%;
 	margin: 0;
-}
-
-.tab-history {
-	display: flex;
-	height: 90%;
-	min-height: 90%;
-	max-height: 90%;
-	width: 100%;
-	padding: 3%;
-	overflow: auto;
 }
 
 .tab-history tbody {
@@ -1552,12 +1641,18 @@ canvas:focus {
 	.zindex {
 		display: none;
 	}
+	.cross-button {
+		display: none;
+	}
 	/*//////*/
 	/* Hide */
 	/*//////*/
-	header h1, nav span, .nav-user i, h2,
+	header h1,
+	nav span,
+	.nav-user i,
+	h2,
 	.wrapper-bottom-section,
-	.wrapper-tabs-buttons, .wrapper-history button {
+	.wrapper-tabs-buttons {
 		display: none;
 	}
 	/*///////////////*/
@@ -1676,6 +1771,17 @@ canvas:focus {
 	}
 	.go-button {
 		font-size: 2.5vh;
+	}
+	/*////////////////*/
+	/* Game - Options */
+	/*////////////////*/
+	.wrapper-options {
+		width: 92%;
+		position: absolute;
+		left: 0;
+	}
+	.wrapper-options-buttons button {
+		width: 50%;
 	}
 	/*/////////////*/
 	/* Game - Tabs */

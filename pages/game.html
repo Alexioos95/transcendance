@@ -138,7 +138,9 @@
 			</div>
 		</section>
 		<div class="wrapper-screen zindex">
-			<div class="wrapper-canvas card">
+			<div class="wrapper-screen-all card">
+				<div class="wrapper-canvas">
+				</div>
 				<form class="tournament-form hidden">
 					<button type="button" class="tournament-form-back">
 						<i class="fa-solid fa-circle-arrow-left"></i>
@@ -152,6 +154,44 @@
 					</div>
 					<button type="button" aria-label="Valider" >Valider</button>
 				</form>
+				<div class="wrapper-options hidden">
+					<button type="button" class="cross-button">
+						<i class="fa-solid fa-xmark"></i>
+					</button>
+					<div class="wrapper-options-buttons wrapper-tab-button">
+						<button type="button" class="tab-button active">
+							<span>Compte</span>
+						</button>
+						<button type="button" class="tab-button">
+							<span>Bloqués</span>
+						</button>
+					</div>
+					<div class="wrapper-options-tabs tab-tabs">
+						<form class="options-form">
+
+						</form>
+						<table class="wrapper-blocked">
+							<tbody>
+								<tr>
+									<td tabindex="0">
+										<div class="blocked-card">
+											<div class="blocked-user-avatar">
+												<img src="/favicon.ico" alt="Avatar de l'utilisateur">
+											</div>
+											<div class="blocked-user">
+												<span>User</span>
+												<button type="button" title="Retirer de la liste des bloqués">
+													<i class="fa-solid fa-square-minus"></i>
+													<span>Débloquer</span>
+												</button>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
 			</div>
 			<section class="wrapper-bottom-section card">
 				<div class="wrapper-player-controls">
@@ -198,11 +238,11 @@
 		</div>
 		<section class="wrapper-right-section zindex">
 			<div class="wrapper-history card hidden">
-				<button type="button">
+				<button type="button" class="cross-button">
 					<i class="fa-solid fa-xmark"></i>
 				</button>
 				<h3>User</h3>
-				<table class="tab-history">
+				<table class="tab-history tab-tabs">
 					<tbody>
 						<tr>
 							<td tabindex="0">
@@ -238,11 +278,15 @@
 				</table>
 			</div>
 			<div class="wrapper-tabs card">
-				<div class="wrapper-tabs-buttons">
-					<button type="button" class="active"><span>Chat</span></button>
-					<button type="button"><span>Amis</span></button>
+				<div class="wrapper-tabs-buttons wrapper-tab-button">
+					<button type="button" class="tab-button active">
+						<span>Chat</span>
+					</button>
+					<button type="button" class="tab-button">
+						<span>Amis</span>
+					</button>
 				</div>
-				<div class="wrapper-tabs-tables">
+				<div class="wrapper-tabs-tables tab-tabs">
 					<table class="tab-chat active">
 						<tbody>
 							<tr>

@@ -10,12 +10,13 @@ async function	run()
 		gameForm: getGameFormStruct(),
 		screen: getScreenStruct(),
 		tournament: getTournamentStruct(),
+		options: getOptionsStruct(),
 		history: getHistoryStruct(),
 		tabs: getTabsStruct(),
 		run: 1
 	};
 	setupEventListeners(struct);
-	while (struct.run == 1)
+	while (struct.run === 1)
 	{
 		await waitCoin(struct.gameForm)
 			.then(() => coinAnimation(struct))
@@ -33,6 +34,8 @@ async function	run()
 function	setupEventListeners(struct)
 {
 	// addEventListener abandonButton => stopper le jeu;
+
+	// Header Buttons
 	struct.header.historyButton.addEventListener("click", function() {
 		resetPhoneClasses(struct, struct.cards.chat);
 		struct.tabs.wrapperTabs.classList.add("hidden");
@@ -52,28 +55,45 @@ function	setupEventListeners(struct)
 		showTab(struct.tabs.friend, struct.tabs.chat)
 	});
 	struct.header.optionButton.addEventListener("click", function() {
-		// Options
+		resetPhoneClasses(struct, struct.cards.screen);
+		showScreen(struct.screen, struct.screen.wrapperOptions)
 	});
 	struct.header.logoutButton.addEventListener("click", function() {
 		struct.run = 0;
 		navigate("login");
 	});
+	// Cross Buttons
+	struct.options.leaveButton.addEventListener("click", function() {
+		if (struct.tournament.on === true && struct.tournament.names.length === 0)
+			showScreen(struct.screen, struct.screen.wrapperTournamentForm);
+		else
+			showScreen(struct.screen, struct.screen.wrapperCanvas);
+	});
 	struct.history.leaveButton.addEventListener("click", function() {		
 		resetHistoryClasses(struct);
 	});
+	// Tabs Account/Blocked
+	struct.options.account.button.addEventListener("click", function() {
+		showTab(struct.options.account, struct.options.blocked)
+	});
+	struct.options.blocked.button.addEventListener("click", function() {
+		showTab(struct.options.blocked, struct.options.account)
+	});
+	// Tabs Chat/Friend
 	struct.tabs.chat.button.addEventListener("click", function() {
 		showTab(struct.tabs.chat, struct.tabs.friend)
 	});
 	struct.tabs.friend.button.addEventListener("click", function() {
 		showTab(struct.tabs.friend, struct.tabs.chat)
 	});
+	// Sticks
 	struct.screen.wrapperCanvas.addEventListener("keydown", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("keyup", function(event) { disableStickMove(event, struct); });
 }
 
 async function	launchGame(struct)
 {
-	if (struct.tournament.on == false)
+	if (struct.tournament.on === false)
 	{
 		await waitGoButton(struct)
 			.then(() => activateStick(struct));
@@ -82,7 +102,7 @@ async function	launchGame(struct)
 	else
 	{
 		await waitGoButton(struct)
-			.then(() => clearScreen(struct.screen.wrapperCanvas))
+			.then(() => clearCanvas(struct.screen.wrapperCanvas))
 			.then(() => activateStick(struct))
 			.then(() => updateTournamentMarkers(struct))
 			.then(() => struct.screen.game.run(struct));
@@ -91,7 +111,7 @@ async function	launchGame(struct)
 
 async function	endGame(struct)
 {
-	if (struct.tournament.on == false)
+	if (struct.tournament.on === false)
 	{
 		if (isOnPhone())
 			await sleep(2500);
@@ -101,7 +121,7 @@ async function	endGame(struct)
 		resetInsertCoinButton(struct.gameForm.insertCoinButton);
 	}
 	await deactivateStick(struct.screen.sticks);
-	if (struct.tournament.on == true)
+	if (struct.tournament.on === true)
 	{
 		struct.tournament.matches--;
 		updateTournamentWinners(struct);
@@ -145,10 +165,10 @@ function	resetHistoryClasses(struct)
 	struct.history.wrapper.classList.add("hidden");
 }
 
-function	clearScreen(wrapper)
+function	clearCanvas(wrapper)
 {
-	while (wrapper.lastChild.nodeName != "FORM")
-		wrapper.removeChild(wrapper.lastChild);
+	while (wrapper.firstChild)
+		wrapper.firstChild.remove();
 }
 
 function	shuffle(array)
@@ -166,13 +186,23 @@ function	showTab(show, hide)
 {
 	hide.button.classList.remove("active");
 	hide.table.classList.remove("active");
-	hide.input.classList.remove("active");
+	if (hide.input !== undefined)
+		hide.input.classList.remove("active");
 	if (show !== undefined)
 	{
 		show.button.classList.add("active");
 		show.table.classList.add("active");
-		show.input.classList.add("active");
+		if (show.input !== undefined)
+			show.input.classList.add("active");
 	}
+}
+
+function	showScreen(struct, show)
+{
+	struct.wrapperCanvas.classList.add("hidden");
+	struct.wrapperTournamentForm.classList.add("hidden");
+	struct.wrapperOptions.classList.add("hidden");
+	show.classList.remove("hidden");
 }
 
 //////////////////////////////////////////////////////
@@ -218,6 +248,8 @@ function	getScreenStruct()
 {
 	const struct = {
 		wrapperCanvas: document.getElementsByClassName("wrapper-canvas")[0],
+		wrapperOptions: document.getElementsByClassName("wrapper-options")[0],
+		wrapperTournamentForm: document.getElementsByClassName("tournament-form")[0],
 		sticks: getSticksStruct(),
 		playerOnControls: document.getElementsByClassName("playername"),
 		game: undefined
@@ -238,10 +270,11 @@ function	getSticksStruct()
 
 function	getTournamentStruct()
 {
+	const buttons = document.querySelectorAll(".tournament-form button");
 	const struct = {
 		on: false,
-		cancel: document.querySelector(".tournament-form .fa-circle-arrow-left"),
-		validate: document.querySelector(".tournament-form button"),
+		cancel: buttons[0],
+		validate: buttons[1],
 		overview: document.getElementsByClassName("tournament-overview")[0],
 		players: document.getElementsByClassName("tournament-player"),
 		winners: document.getElementsByClassName("tournament-winner"),
@@ -249,6 +282,26 @@ function	getTournamentStruct()
 		markerArray: [["EN COURS", "SUIVANT", "PROCHAINEMENT"], ["", "EN ATTENTE", "PROCHAINEMENT"], ["", "EN COURS", "PROCHAINEMENT"], ["", "", "EN ATTENTE"], ["", "", "EN COURS"], ["", "", ""]],
 		names: [],
 		matches: 3
+	};
+	return (struct);
+}
+
+function	getOptionsStruct()
+{
+	const buttons = document.querySelectorAll(".wrapper-options-buttons button");
+	const accountStruct = {
+		button: buttons[0],
+		table: document.getElementsByClassName("options-form")[0]
+	};
+	const blockedStruct = {
+		button: buttons[1],
+		table: document.getElementsByClassName("wrapper-blocked")[0]
+	};
+	const struct = {
+		wrapper: document.getElementsByClassName("wrapper-options")[0],
+		leaveButton: document.querySelector(".wrapper-options .cross-button"),
+		account: accountStruct,
+		blocked: blockedStruct
 	};
 	return (struct);
 }
@@ -307,7 +360,7 @@ function	getCoin(button)
 
 async function	coinAnimation(struct)
 {
-	if (struct.run == 0)
+	if (struct.run === 0)
 		return new Promise ((resolve, reject) => { reject(); });
 	if (document.getElementsByClassName("coin")[0] !== undefined)
 		return new Promise ((resolve, reject) => { reject(); });
@@ -338,20 +391,22 @@ async function	checkGameSelectorValidation(struct)
 
 		if (game === null || mode === null)
 			return (reject(0));
-		if (game == "pong")
+		if (game === "pong")
 			struct.screen.game = getPongStruct();
-		// else if (game == "tetris")
+		// else if (game === "tetris")
 			// struct.screen.game = getTetrisStruct();
-		if (mode == "tournament")
+		if (mode === "tournament")
 			struct.tournament.on = true;
 		title.style.opacity = 0;
 		sleep(450)
 			.then(() => title.style.opacity = 1)
 			.then(() => title.innerHTML = struct.screen.game.name)
-		clearScreen(struct.screen.wrapperCanvas);
+		clearCanvas(struct.screen.wrapperCanvas);
+		showScreen(struct.screen, struct.screen.wrapperCanvas)
 		resetPhoneClasses(struct)
-		struct.cards.screen.classList.remove("zindex");
 		struct.header.wrapper.classList.add("zindex");
+		struct.options.wrapper.classList.add("hidden");
+		struct.cards.screen.classList.remove("zindex");
 		resolve();
 	});
 }
@@ -370,12 +425,16 @@ async function	waitGoButton(struct)
 		span1.classList.add("canvas-user-1");
 		span2.classList.add("canvas-user-2");
 		const names = [span1, span2];
-		updateTournamentNames(struct, names);
+		if (struct.tournament.on === true)
+		{
+			updateTournamentNames(struct, names);
+			struct.screen.wrapperCanvas.appendChild(span1);
+			struct.screen.wrapperCanvas.appendChild(span2);
+		}
 		struct.screen.wrapperCanvas.appendChild(button);
-		struct.screen.wrapperCanvas.appendChild(span1);
-		struct.screen.wrapperCanvas.appendChild(span2);
 		controls.classList.add("wrapper-bottom-section-hover");
 		button.addEventListener("click", function() {
+			struct.options.wrapper.classList.add("hidden");
 			controls.classList.remove("wrapper-bottom-section-hover");
 			button.remove();
 			resolve();
@@ -429,36 +488,36 @@ async function	activateStick(struct)
 
 function	enableStickMove(event, struct)
 {
-	if (struct.screen.game.running == 0)
+	if (struct.screen.game === undefined || struct.screen.game.running === 0)
 		return ;
-	if (event.key == "w" || event.key == "W")
+	if (event.key === "w" || event.key === "W")
 	{
 		struct.screen.sticks.keys.w = 1;
-		if (struct.screen.sticks.keys.s == 0)
+		if (struct.screen.sticks.keys.s === 0)
 			struct.screen.sticks.left.src = "/svg/stick/up.svg";
 		else
 			struct.screen.sticks.left.src = "/svg/stick/state4.svg";
 	}
-	else if (event.key == "s" || event.key == "S")
+	else if (event.key === "s" || event.key === "S")
 	{
 		struct.screen.sticks.keys.s = 1;
-		if (struct.screen.sticks.keys.w == 0)
+		if (struct.screen.sticks.keys.w === 0)
 			struct.screen.sticks.left.src = "/svg/stick/down.svg";
 		else
 			struct.screen.sticks.left.src = "/svg/stick/state4.svg";
 	}
-	else if (event.key == "ArrowUp")
+	else if (event.key === "ArrowUp")
 	{
 		struct.screen.sticks.keys.up = 1;
-		if (struct.screen.sticks.keys.down == 0)
+		if (struct.screen.sticks.keys.down === 0)
 			struct.screen.sticks.right.src = "/svg/stick/up.svg";
 		else
 			struct.screen.sticks.right.src = "/svg/stick/state4.svg";
 	}
-	else if (event.key == "ArrowDown")
+	else if (event.key === "ArrowDown")
 	{
 		struct.screen.sticks.keys.down = 1;
-		if (struct.screen.sticks.keys.up == 0)
+		if (struct.screen.sticks.keys.up === 0)
 			struct.screen.sticks.right.src = "/svg/stick/down.svg";
 		else
 			struct.screen.sticks.right.src = "/svg/stick/state4.svg";
@@ -467,24 +526,24 @@ function	enableStickMove(event, struct)
 
 function	disableStickMove(event, struct)
 {
-	if (struct.screen.game.running == 0)
+	if (struct.screen.game === undefined || struct.screen.game.running === 0)
 		return ;
-	if (event.key == "w" || event.key == "W")
+	if (event.key === "w" || event.key === "W")
 	{
 		struct.screen.sticks.keys.w = 0;
 		struct.screen.sticks.left.src = "/svg/stick/state4.svg";
 	}
-	else if (event.key == "s" || event.key == "S")
+	else if (event.key === "s" || event.key === "S")
 	{
 		struct.screen.sticks.keys.s = 0;
 		struct.screen.sticks.left.src = "/svg/stick/state4.svg";
 	}
-	else if (event.key == "ArrowUp")
+	else if (event.key === "ArrowUp")
 	{
 		struct.screen.sticks.keys.up = 0;
 		struct.screen.sticks.right.src = "/svg/stick/state4.svg";
 	}
-	else if (event.key == "ArrowDown")
+	else if (event.key === "ArrowDown")
 	{
 		struct.screen.sticks.keys.down = 0;
 		struct.screen.sticks.right.src = "/svg/stick/state4.svg";
@@ -509,7 +568,7 @@ async function	deactivateStick(sticks)
 /////////////////////////
 async function	setupTournament(struct)
 {
-	if (struct.tournament.on == false)
+	if (struct.tournament.on === false)
 		return ;
 	await waitTournamentForm(struct)
 		.then(() => getTournamentNames(struct.tournament))
@@ -522,11 +581,10 @@ async function	setupTournament(struct)
 
 async function	waitTournamentForm(struct)
 {
-	const form = document.getElementsByClassName("tournament-form")[0];
-	form.classList.remove("hidden");
+	showScreen(struct.screen, struct.screen.wrapperTournamentForm);
 	return new Promise((resolve, reject) => {
 		function validate() {
-			form.classList.add("hidden");
+			showScreen(struct.screen, struct.screen.wrapperCanvas);
 			resolve();
 		};
 		function resetTournamentForm() {
@@ -534,8 +592,8 @@ async function	waitTournamentForm(struct)
 			struct.cards.gameSelector.classList.remove("zindex");
 			struct.cards.screen.classList.add("zindex");
 			struct.header.wrapper.classList.remove("zindex");
-			form.classList.add("hidden");
-			form.reset();
+			showScreen(struct.screen, struct.screen.wrapperCanvas);
+			struct.screen.wrapperTournamentForm.reset();
 			reject();
 		};
 		struct.tournament.validate.addEventListener("click", validate, { once: true });
@@ -585,9 +643,9 @@ function	updateTournamentNames(struct, elements)
 {
 	let i;
 
-	if (struct.tournament.matches == 3)
+	if (struct.tournament.matches === 3)
 		i = 0;
-	else if (struct.tournament.matches == 2)
+	else if (struct.tournament.matches === 2)
 		i = 2;
 	if (struct.tournament.matches != 1)
 	{
@@ -611,7 +669,7 @@ function	updateTournamentMarkers(struct)
 
 function	updateTournamentWinners(struct)
 {
-	if (struct.tournament.winners[0].dataset.decided == "tbd")
+	if (struct.tournament.winners[0].dataset.decided === "tbd")
 	{
 		if (struct.screen.game.scores[0] > struct.screen.game.scores[1])
 			struct.tournament.winners[0].innerHTML = struct.tournament.names[0];
@@ -620,7 +678,7 @@ function	updateTournamentWinners(struct)
 		struct.tournament.winners[0].style.opacity = 1;
 		struct.tournament.winners[0].setAttribute("data-decided", "yes");
 	}
-	else if (struct.tournament.winners[1].dataset.decided == "tbd")
+	else if (struct.tournament.winners[1].dataset.decided === "tbd")
 	{
 		if (struct.screen.game.scores[0] > struct.screen.game.scores[1])
 			struct.tournament.winners[1].innerHTML = struct.tournament.names[2];

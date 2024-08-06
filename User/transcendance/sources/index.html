@@ -1,0 +1,97 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <title>42 auth</title>
+</head>
+<body>
+    <form method="post" id="auth-form">
+        {% csrf_token %}
+        <label>Nom :<input type="text" class="nom" name="nom"/></label>
+        <label>Password :<input type="password" class="password" name="password"/></label>
+        <button type="button" class="boutton">Sauvegarder</button>      
+    </form>
+    <a><button type="button" class="boutton42" >>log with 42</button> </a> 
+</body>
+<script src="{% static 'listings/test.js' %}"></script>
+</html> -->
+<!-- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <title>42 auth</title>
+</head>
+<body>
+    <form method="post" id="auth-form">
+        {% csrf_token %}
+        <label>Nom :<input type="text" class="nom" name="nom"/></label>
+        <label>Password :<input type="password" class="password" name="password"/></label>
+        <button type="button" class="boutton">Sauvegarder</button>      
+    </form>
+    <a><button type="button" class="boutton42">>>log with 42</button></a>
+     -->
+    <!-- Bouton pour tester le cookie -->
+    <!-- <button type="button" id="testCookieButton">Test Cookie</button> -->
+<!-- 
+    <script src="{% static 'listings/test.js' %}"></script>
+    <script>
+        document.getElementById('testCookieButton').addEventListener('click', () => {
+            fetch('/test/', {
+                method: 'GET',
+                credentials: 'include' // Inclut les cookies dans la requête
+            })
+            .then(response => response.text())
+            .then(text => {
+                console.log('Réponse du serveur :', text);
+
+                // Vérifie la présence du cookie dans la réponse
+                if (document.cookie.includes('auth=')) {
+                    console.log('Le cookie "auth" était là.');
+                } else {
+                    console.log('Le cookie "auth" n\'était pas là.');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la requête :', error);
+            });
+        });
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>42 auth</title>
+    {% load static %}
+</head>
+<body>
+    <form method="post" id="auth-form">
+        {% csrf_token %}
+        <label>Nom :<input type="text" class="nom" name="nom"/></label>
+        <label>Password :<input type="password" class="password" name="password"/></label>
+        <button type="button" class="boutton">Sauvegarder</button>      
+    </form>
+    <a><button type="button" class="boutton42" >>log with 42</button> </a> 
+    
+    <button id="testCookieButton">Test Cookie</button>
+    <script>
+        document.getElementById('testCookieButton').addEventListener('click', () => {
+            console.log(document.cookie.includes('auth=') ? 'Cookie "auth" présent' : 'Cookie "auth" absent');
+            
+            fetch('/test/', { method: 'POST', credentials: 'include' })
+            .then(response => response.text())
+            .then(console.log)
+            .catch(console.error);
+        });
+        </script>
+</body>
+<script src="{% static 'user/test.js' %}"></script>
+</html>

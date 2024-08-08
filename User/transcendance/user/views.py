@@ -7,6 +7,9 @@ from django.http import JsonResponse
 import json
 import datetime
 import pytz
+import os
+import pyotp
+import qrcode
 
 def index(request):
     print('coucou')
@@ -165,16 +168,63 @@ def updateOnline(request):
 def twoFA(request):
     #requete gen cle chaque 00.01s 30.01s
     # attend un code et dit si valide ou non 
+
+
+	key = keyFromDb
+    totp = pyotp.TOTP(key)
+	#print(f'Code: {totp.now()}')
+
+    #ask generated key in front!
+	userInput = input("Enter generated code (6 digits): ")
+
+    # check user input ?!
+
+    if (totp.verify(userInput)):
+        print("Code OK")
+		#	send OK to front!
+    else:
+        print("NOT OK :(")
+		#	send KO to front!
+
     return
 
 def set2FA(request):
     #requete gen cle chaque 00.01s 30.01s
     #set 2fa a true en bdd code deja stocke si c'est mail si apk check le code en cache
+
+	if 2FA == key:
+		key = keyFromDb
+	    totp = pyotp.TOTP(key)
+		#print(f'Code: {totp.now()}')
+	
+	    #ask generated key in front!
+		userInput = input("Enter generated code (6 digits): ")
+	
+	    # check user input ?!
+	
+	    if (totp.verify(userInput)):
+	    #if true, save key to db + remove from cache
+	        print("Code OK")
+			#	send OK to front!
+	    else:
+	        print("NOT OK :(")
+			#	start over in front!
+	
+		#	delete image !
+		if os.path.exists('PATH TO QRCODE.png'):
+			os.remove('PATH TO QRCODE.png')
+
     return
-    
 
 def preSet2FA(request):
     # sert a teser la 2fa et enregistrer la cle user puis on effectue une 2fa
+
+	userName = User.objects.
+	key = pyotp.random_base32()
+	#	save key in cache
+
+    otpUri = pyotp.totp.TOTP(key).provisioning_uri(name= "GET USERNAME FROM DB", issuer_name="Transcendance")
+    qrcode.make(otpUri).save("FIND USEFULL NAME.png")
     return
 
 def resetPasswd(request):

@@ -129,6 +129,7 @@ body {
 h1 { font-size: 2vw; }
 h2 { font-size: 1.6rem; }
 h3 { font-size: 1.5rem; }
+h4 { font-size: 1.2rem; }
 span { font-size: 1rem; }
 td { font-size: 0.9rem; }
 textarea { font-size: 0.9rem; }
@@ -669,8 +670,8 @@ label:has(> [type=radio]:focus-visible) {
 
 .wrapper-mode-selector .top-circle {
 	position: absolute;
-	top: 17.9%;
-	left: 17.9%;
+	top: 17%;
+	left: 17%;
 	display: inline-block;
 	aspect-ratio: 1 / 1;
 	height: 66%;
@@ -1047,6 +1048,32 @@ canvas:focus {
 
 .wrapper-options-tabs *.active {
 	display: flex;
+}
+
+.wrapper-options-tabs form {
+	flex-direction: column;
+}
+
+.wrapper-options-tabs form div {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	margin-bottom: 1rem;
+}
+
+.wrapper-options-tabs form div label {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.wrapper-options-tabs form div label input {
+	width: 45%;
+	margin-bottom: 1rem;
+}
+
+.wrapper-options-tabs form div label p {
+	margin: 0.2rem 0;
 }
 
 .wrapper-options-tabs tbody {
@@ -1490,6 +1517,7 @@ canvas:focus {
 	height: auto;
 	width: 100%;
 	padding: 3%;
+	position: relative;
 }
 
 .history-card-win {
@@ -1536,6 +1564,13 @@ canvas:focus {
 
 .history-card-text .bar {
 	width: 95%;
+}
+
+.history-card-date {
+	position: absolute;
+	bottom: 1%;
+	left: 1%;
+	font-size: 0.7em;
 }
 
 /*///////////////*/

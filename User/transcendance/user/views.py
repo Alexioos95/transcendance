@@ -4,6 +4,7 @@ from user import userMiddleware as middleware
 from datetime import date
 from user.models import User
 from django.http import JsonResponse
+from django.core.cache import cache
 import json
 import datetime
 import pytz
@@ -193,17 +194,21 @@ def set2FA(request):
     #set 2fa a true en bdd code deja stocke si c'est mail si apk check le code en cache
 
 	if 2FA == key:
-		key = keyFromDb
+		key = cache.get('"USERNAME" + 2FA') # Get from JWT
 	    totp = pyotp.TOTP(key)
 		#print(f'Code: {totp.now()}')
 	
 	    #ask generated key in front!
-		userInput = input("Enter generated code (6 digits): ")
+		userInput = input("Enter generated code (6 digits): ")	# Get from request ?
 	
 	    # check user input ?!
 	
 	    if (totp.verify(userInput)):
 	    #if true, save key to db + remove from cache
+			keyToDb = User.objects.get(Username = 'USERNAME')
+			keyToDb.twoFA = APK
+			keyToDb.key2FA = key
+			keyToDb.save()
 	        print("Code OK")
 			#	send OK to front!
 	    else:
@@ -213,17 +218,19 @@ def set2FA(request):
 		#	delete image !
 		if os.path.exists('PATH TO QRCODE.png'):
 			os.remove('PATH TO QRCODE.png')
-
+		cache.clear('"USERNAME" + 2FA')
+	else:
+		pass #for now
     return
 
 def preSet2FA(request):
     # sert a teser la 2fa et enregistrer la cle user puis on effectue une 2fa
 
-	userName = User.objects.
 	key = pyotp.random_base32()
 	#	save key in cache
+	cache.set('"USERNAME" + 2FA', key, 30)	# Get Username or ID from JWT
 
-    otpUri = pyotp.totp.TOTP(key).provisioning_uri(name= "GET USERNAME FROM DB", issuer_name="Transcendance")
+    otpUri = pyotp.totp.TOTP(key).provisioning_uri(name= "GET USERNAME OR ID FROM JWT", issuer_name="Transcendance")
     qrcode.make(otpUri).save("FIND USEFULL NAME.png")
     return
 

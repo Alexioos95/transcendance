@@ -2,7 +2,7 @@
 /////////////////////////
 // Script
 /////////////////////////
-navigate("game");
+navigate("login");
 
 async function navigate(page)
 {
@@ -10,6 +10,7 @@ async function navigate(page)
 	await fetch("/pages/" + page + ".html")
 	.then(response => response.text())
 		.then(html => { container.innerHTML = html; })
+		.catch(() => console.error("couldn't fetch pages for SPA"))
 	if (page == "game")
 		run();
 	else if (page == "login")

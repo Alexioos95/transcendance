@@ -14,7 +14,7 @@ html {
 body {
 	width: 100%;
 	height: 100%;
-	background-color: var(--mainColor);
+	background-color: black;
 	font: 1rem "Inter", sans-serif;
 }
 
@@ -27,7 +27,7 @@ body {
 /* Useful Classes */
 /*////////////////*/
 
-.card {
+.my-card {
 	background-color: var(--mainColor);
 	border-radius: 0.688rem;
 	box-shadow: 0 0.188rem 0.688rem 0.188rem rgb(131, 126, 126);
@@ -126,7 +126,7 @@ body {
 /* Font sizes */
 /*////////////*/
 
-h1 { font-size: 2vw; }
+header h1 { font-size: 2vw; }
 h2 { font-size: 1.6rem; }
 h3 { font-size: 1.5rem; }
 h4 { font-size: 1.2rem; }
@@ -185,167 +185,64 @@ textarea { font-size: 0.9rem; }
 /* Login Page */
 /*////////////*/
 
-.login-form {
-	color: var(--textColor);
+main.login-page {
 	background-color: black;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 100%;
-	width: 100%;
-	padding: 15px;
-	position: absolute;
-	top: 0;
-	left: 0;
+	color: var(--textColor);
 }
 
-.wrapper-login {
-	display: flex;
-	flex-direction: column;
-	width: 100%;
-	height: 100%;
-	padding: 20px;
-	max-width: 340px;
-	max-height: 565px;
-}
-
-.wrapper-title {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 25%;
-}
-
-.wrapper-title h1 {
-	margin: 0;
-	padding-bottom: 5%;
-	cursor: default;
-	user-select: none;
-}
-
-.wrapper-connection {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	height: 75%;
-}
-
-/*//////////////*/
-/* Login - Form */
-/*//////////////*/
-
-.login-form form {
-	display: flex;
-	flex-direction: column;
-	gap: 5px;
-}
-
-.login-form form input {
-	height: 40px;
-	padding: 5px;
+main.login-page form input, main.login-page form input:focus {
 	color: var(--textColor);
 	background: var(--mainColor);
 	border: none;
-	border-bottom: 1px solid var(--textColor);
-	margin-bottom: 15px;
+	border-radius: 0;
 	transition: all 0.5s ease-out, background 0s;
 	opacity: 1;
+	box-shadow: none;
 }
 
-.login-form form input.hideButton {
+main.login-page form input.hideInput {
 	visibility: hidden;
 	opacity: 0;
 }
 
-.login-form form button {
-	height: 40px;
-	margin-top: 6px;
+main.login-page form button {
 	border-radius: 20px;
-	user-select: none;
 	transition: margin 0.7s ease-out, background 0s;
 	z-index: 1;
-	cursor: pointer;
 }
 
-.login-form form button.notransition {
+main.login-form form button.notransition {
 	transition: none;
 }
 
-.login-form form button:hover {
-	background: rgb(220, 220, 220);
+main.login-page button.forgot-password {
+	border-radius: 20px;
+	background-color: var(--mainColor);
+	color: var(--textColor);
+	border: none;
 }
 
-.login-form form button:active {
-	margin-top: 8px;
-	margin-bottom: -2px;
+main.login-page form button.recovery {
+	margin-top: -3.350rem;
 }
 
-.login-form form button.recovery {
-	margin-top: -50px;
-}
-
-.login-form form button.recovery:active {
-	margin-top: -48px;
-	margin-bottom: -2px;
-}
-
-.login-form form p {
-	align-self: center;
-	font-size: 85%;
-	margin: 1% 0%;
-	cursor: pointer;
-	user-select: none;
-}
-
-/*/////////////////////////*/
-/* Login - Special sign-in */
-/*/////////////////////////*/
-
-.wrapper-sp-login {
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-end;
-	height: 30%;
-	gap: 10px;
-	user-select: none;
-}
-
-.sp-login {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	gap: 2%;
-	height: 50%;
-	padding: 1% 5%;
-	margin: 2px 0px;
-	border-radius: 0.375rem;
-}
-
-.sp-login:focus {
-	outline: 5px auto;
-}
-
-.sp-login:active {
-	margin: 4px 0px 0px 0px;
-}
-
-.login-42 {
-	display: flex;
+main.login-page .special-login button {
 	border: 1px solid #E5E5E5;
+	border-radius: 3px;
 }
 
-.svg {
-	height: 30px;
-	width: 50px;
+main.login-page .svg {
+	height: 2rem;
+	width: 3.125rem;
 	fill: black;
 }
 
-.login-42:hover {
+main.login-page .login-42:hover {
 	background-color: rgba(0, 0, 0, 0.5);
 	color: var(--textColor);
 }
 
-.login-42:hover .svg {
+main.login-page .login-42:hover .svg {
 	fill: var(--textColor);
 }
 
@@ -356,6 +253,13 @@ textarea { font-size: 0.9rem; }
 @media only screen and (max-width: 700px) and (orientation: portrait) {
 	main {
 		padding: 0;
+	}
+	/* main.login-page h1 {
+		font-size: 2.5rem;
+	} */
+	main.login-page > div {
+		width: 100% !important;
+		height: 100% !important;
 	}
 	.wrapper-login {
 		width: 100%;
@@ -470,7 +374,7 @@ nav span {
 /* Game - main */
 /*/////////////*/
 
-main {
+main.game {
 	display: flex;
 	flex-direction: column;
 	height: 94%;
@@ -632,7 +536,7 @@ label:has(> [type=radio]:focus-visible) {
 	flex-direction: column;
 	justify-content: space-between;
 	align-items: center;
-	height: 78%;
+	height: 75%;
 }
 
 .mode-selector {
@@ -1911,7 +1815,7 @@ canvas:focus {
 			rgba(255, 255, 255, 0.5) 0 12px 5px inset,
 			#B01F4F 0 -12px 5px inset,
 			rgba(0, 0, 0, 0.8) 0 1px 2px;
-	}	
+	}
 	.wrapper-mode-selector .top-circle {
 		box-shadow:
 			rgba(0, 0, 0, 0.8) 0 0 1px 1px,

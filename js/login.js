@@ -4,12 +4,12 @@
 /////////////////////////
 function	forgottenPassword()
 {
-	const link = document.getElementsByTagName("p")[0];
-	const pwd = document.getElementsByTagName("input")[1];
-	const button = document.getElementsByTagName("button")[0];
+	const link = document.getElementsByClassName("forgot-password")[0];
+	const pwd = document.getElementsByClassName("password")[0];
+	const button = document.getElementsByClassName("submit")[0];
 
 	link.addEventListener("click", function() {
-		if (pwd.classList.contains("hideButton"))
+		if (pwd.classList.contains("hideInput"))
 			restore(link, pwd, button);
 		else
 			move(link, pwd, button);
@@ -23,7 +23,7 @@ function	forgottenPassword()
 
 function	move(link, pwd, button)
 {
-	pwd.classList.add("hideButton");
+	pwd.classList.add("hideInput");
 	button.classList.remove("notransition");
 	button.classList.add("recovery");
 	button.innerText = "Envoyer un mail de recuperation";
@@ -33,10 +33,10 @@ function	move(link, pwd, button)
 
 function restore(link, pwd, button)
 {
-	pwd.classList.remove("hideButton");
-	button.classList.remove("notransition");
+	pwd.classList.remove("hideInput");
+	button.classList.add("notransition");
 	button.classList.remove("recovery");
-	button.innerText = "Connexion/Inscription";
+	button.innerText = "Connexion";
 	link.innerText = "Mot de passe oublie";
 	link.setAttribute("aria-label", "Mot de passe oublie");
 }

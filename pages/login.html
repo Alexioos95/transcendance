@@ -1,31 +1,27 @@
-<main class="login-form">
-	<div class="wrapper-login card">
-		<div class="wrapper-title">
-			<h1>ft_transcendance</h1>
-		</div>
-		<div class="wrapper-connection">
-			<form autocomplete="on">
-				<input name="email" type="email" placeholder="Email" aria-label="Email" tabindex="1"/>
-				<input name="password" type="password" minlength="10" placeholder="Mot de passe" aria-label="Mot de passe" tabindex="2"/>
-				<button class="notransition" tabindex="3">Connexion/Inscription</button>
-				<p aria-label="Mot de passe oublie" tabindex="4">Mot de passe oublié</p>
-			</form>
-			<div class="wrapper-sp-login">
-				<button class="sp-login login-42" aria-label="Connexion avec 42" tabindex="5">
-					<svg version="1.1" sodipodi:docname="42_logo.svg" inkscape:version="0.48.2 r9819" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 -200 960 960" enable-background="new 0 -200 960 960" xml:space="preserve" class="svg">
-						<polygon points="32,412.6 362.1,412.6 362.1,578 526.8,578 526.8,279.1 197.3,279.1 526.8,-51.1 362.1,-51.1
-						32,279.1 "/>
-						<polygon points="597.9,114.2 762.7,-51.1 597.9,-51.1 "/>
-						<polygon points="762.7,114.2 597.9,279.1 597.9,443.9 762.7,443.9 762.7,279.1 928,114.2 928,-51.1 762.7,-51.1 "/>
-						<polygon points="928,279.1 762.7,443.9 928,443.9 "/>
-					</svg>
-					Connexion avec 42
-				</button>
-				<button class="sp-login login-guest" aria-label="Jouer sans se connecter" tabindex="6">
-					<img src="/svg/incognito.svg" height="30" width="50"/>
-					Continuer en tant qu'Invite
-				</button>
-			</div>
+<main class="login-page d-flex justify-content-center align-items-center h-100">
+	<div class="container-fluid w-25 h-75 px-3 py-5 d-flex flex-column justify-content-between align-items-center my-card">
+		<form class="w-100 text-center d-flex flex-column" autocomplete="on">
+			<h1 class="text-center mb-5 font-weight-bolder text-break">ft_transcendance</h1>
+			<input name="email" type="email" class="form-control border-bottom border-light form-group" placeholder="Email" aria-label="Email" aria-describedby="emailHelp">
+			<input name="password" type="password" minlength="10" class="form-control border-bottom border-light form-group password" placeholder="Mot de passe" aria-label="Mot de passe">
+			<button type="submit" class="w-100 py-2 mb-1 text-break submit notransition">Connexion</button>
+			<button type="button" class="mx-auto forgot-password" aria-label="Mot de passe oublie">Mot de passe oublié</button>
+		</form>
+		<div class="w-100 text-center special-login">
+			<button class="w-100 py-2 my-1 text-break login-42" aria-label="Connexion avec 42">
+				<svg version="1.1" sodipodi:docname="42_logo.svg" inkscape:version="0.48.2 r9819" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 -200 960 960" enable-background="new 0 -200 960 960" xml:space="preserve" class="svg">
+					<polygon points="32,412.6 362.1,412.6 362.1,578 526.8,578 526.8,279.1 197.3,279.1 526.8,-51.1 362.1,-51.1
+					32,279.1 "/>
+					<polygon points="597.9,114.2 762.7,-51.1 597.9,-51.1 "/>
+					<polygon points="762.7,114.2 597.9,279.1 597.9,443.9 762.7,443.9 762.7,279.1 928,114.2 928,-51.1 762.7,-51.1 "/>
+					<polygon points="928,279.1 762.7,443.9 928,443.9 "/>
+				</svg>
+				Connexion avec 42
+			</button>
+			<button class="w-100 py-2 my-1 text-break" aria-label="Jouer sans se connecter">
+				<img src="/svg/incognito.svg" class="svg"/>
+				Continuer en tant qu'Invite
+			</button>
 		</div>
 	</div>
 </main>

@@ -4,39 +4,78 @@
 /////////////////////////
 function	forgottenPassword()
 {
-	const link = document.getElementsByClassName("forgot-password")[0];
-	const pwd = document.getElementsByClassName("password")[0];
-	const button = document.getElementsByClassName("submit")[0];
+	const struct = getLoginStruct();
 
-	link.addEventListener("click", function() {
-		if (pwd.classList.contains("hideInput"))
-			restore(link, pwd, button);
+	struct.forgotPassword.addEventListener("click", function() {
+		if (struct.password.classList.contains("hideInFade"))
+			restore(struct);
 		else
-			move(link, pwd, button);
+			move(struct);
 	});
-	pwd.addEventListener("transitionend", function() {
-		if (button.classList.contains("recovery"))
-			pwd.value = "";
+	struct.password.addEventListener("transitionend", function() {
+		if (struct.connection.classList.contains("recovery"))
+			struct.password.value = "";
 	});
-	button.addEventListener("transitionend", function() { button.classList.add("notransition"); });
+	struct.signUp.addEventListener("click", function() {
+		signUpForm(struct);
+	});
+	struct.cancelSignUp.addEventListener("click", function() {
+		cancelSignUp(struct);
+	});
 }
 
-function	move(link, pwd, button)
+function	getLoginStruct()
 {
-	pwd.classList.add("hideInput");
-	button.classList.remove("notransition");
-	button.classList.add("recovery");
-	button.innerText = "Envoyer un mail de recuperation";
-	link.innerText = "Je me souviens !";
-	link.setAttribute("aria-label", "Je me souviens");
+	const struct = {
+		password: document.getElementsByClassName("password")[0],
+		username: document.getElementsByClassName("username")[0],
+		connection: document.getElementsByClassName("submit")[0],
+		forgotPassword: document.getElementsByClassName("forgot-password")[0],
+		signUp: document.getElementsByClassName("signup")[0],
+		cancelSignUp: document.getElementsByClassName("cancel-signup")[0],
+		wrapperSpecialLogin: document.getElementsByClassName("special-login")[0]
+	};
+	return (struct);
 }
 
-function restore(link, pwd, button)
+function	move(struct)
 {
-	pwd.classList.remove("hideInput");
-	button.classList.add("notransition");
-	button.classList.remove("recovery");
-	button.innerText = "Connexion";
-	link.innerText = "Mot de passe oublie";
-	link.setAttribute("aria-label", "Mot de passe oublie");
+	struct.signUp.disabled = true;
+	struct.password.classList.add("hideInFade");
+	struct.connection.classList.add("recovery");
+	struct.connection.innerText = "Envoyer un mail de recuperation";
+	struct.forgotPassword.innerText = "Je me souviens !";
+	struct.forgotPassword.setAttribute("aria-label", "Je me souviens");
+	struct.signUp.classList.add("hideInFade");
+}
+
+function	restore(struct)
+{
+	struct.password.classList.remove("hideInFade");
+	struct.connection.classList.remove("recovery");
+	struct.connection.innerText = "Connexion";
+	struct.forgotPassword.innerText = "Mot de passe oublie";
+	struct.forgotPassword.setAttribute("aria-label", "Mot de passe oublie");
+	struct.signUp.classList.remove("hideInFade");
+	struct.signUp.disabled = false;
+}
+
+function	signUpForm(struct)
+{
+	struct.username.classList.remove("hidden");
+	struct.connection.classList.add("hidden");
+	struct.forgotPassword.classList.add("hidden");
+	struct.wrapperSpecialLogin.classList.add("hideInFade");
+	struct.signUp.classList.add("primary");
+	struct.cancelSignUp.classList.remove("hideInFade");
+}
+
+function	cancelSignUp(struct)
+{
+	struct.username.classList.add("hidden");
+	struct.connection.classList.remove("hidden");
+	struct.forgotPassword.classList.remove("hidden");
+	struct.wrapperSpecialLogin.classList.remove("hideInFade");
+	struct.signUp.classList.remove("primary");
+	struct.cancelSignUp.classList.add("hideInFade");
 }

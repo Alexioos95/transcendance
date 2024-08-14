@@ -1,11 +1,14 @@
 <main class="login-page d-flex justify-content-center align-items-center h-100">
 	<div class="container-fluid w-25 h-75 px-3 py-5 d-flex flex-column justify-content-between align-items-center my-card">
-		<form class="w-100 text-center d-flex flex-column" autocomplete="on">
+		<form class="w-100 form-group text-center d-flex flex-column" autocomplete="on">
 			<h1 class="text-center mb-5 font-weight-bolder text-break">ft_transcendance</h1>
-			<input name="email" type="email" class="form-control border-bottom border-light form-group" placeholder="Email" aria-label="Email" aria-describedby="emailHelp">
-			<input name="password" type="password" minlength="10" class="form-control border-bottom border-light form-group password" placeholder="Mot de passe" aria-label="Mot de passe">
-			<button type="submit" class="w-100 py-2 mb-1 text-break submit notransition">Connexion</button>
-			<button type="button" class="mx-auto forgot-password" aria-label="Mot de passe oublie">Mot de passe oublié</button>
+			<input name="email" type="email" class="form-control border-top-0 border-left-0 border-right-0 border-bottom border-light rounded-0 form-group" placeholder="Email" aria-label="Email" aria-describedby="emailHelp">
+			<input name="password" type="password" minlength="10" class="form-control border-top-0 border-left-0 border-right-0 border-bottom border-light rounded-0 form-group password" placeholder="Mot de passe" aria-label="Mot de passe">
+			<input name="username" type="text" minlength="1" maxlength="30" class="form-control border-top-0 border-left-0 border-right-0 border-bottom border-light rounded-0 form-group username hidden" placeholder="Nom d'utilisateur" aria-label="Nom d'utilisateur">
+			<button type="submit" class="w-100 py-2 mb-1 text-break submit">Connexion</button>
+			<button type="button" class="mx-auto border-0 forgot-password" aria-label="Mot de passe oublie">Mot de passe oublié</button>
+			<button type="button" class="mx-auto mt-2 signup" aria-label="Inscription">Inscription</button>
+			<button type="button" class="mx-auto mt-2 cancel-signup hideInFade" aria-label="Annuler">Annuler</button>
 		</form>
 		<div class="w-100 text-center special-login">
 			<button class="w-100 py-2 my-1 text-break login-42" aria-label="Connexion avec 42">

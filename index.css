@@ -18,6 +18,14 @@ body {
 	font: 1rem "Inter", sans-serif;
 }
 
+button:focus {
+	outline: none;
+}
+
+button:focus-visible {
+	outline: 5px auto -webkit-focus-ring-color;
+}
+
 :root {
 	--mainColor: #2E2E2E;
 	--textColor: #F2F2F2;
@@ -36,6 +44,11 @@ body {
 
 .for-phone {
 	display: none;
+}
+
+.hideInFade {
+	visibility: hidden;
+	opacity: 0;
 }
 
 .hidden {
@@ -185,125 +198,76 @@ textarea { font-size: 0.9rem; }
 /* Login Page */
 /*////////////*/
 
-main.login-page {
+.login-page {
 	background-color: black;
 	color: var(--textColor);
 }
 
-main.login-page form input, main.login-page form input:focus {
+.login-page form input, .login-page form input:focus {
 	color: var(--textColor);
 	background: var(--mainColor);
-	border: none;
-	border-radius: 0;
 	transition: all 0.5s ease-out, background 0s;
-	opacity: 1;
 	box-shadow: none;
 }
 
-main.login-page form input.hideInput {
-	visibility: hidden;
-	opacity: 0;
-}
-
-main.login-page form button {
+.login-page form button {
 	border-radius: 20px;
 	transition: margin 0.7s ease-out, background 0s;
 	z-index: 1;
 }
 
-main.login-form form button.notransition {
-	transition: none;
-}
-
-main.login-page button.forgot-password {
+.login-page form button.forgot-password {
 	border-radius: 20px;
 	background-color: var(--mainColor);
 	color: var(--textColor);
-	border: none;
 }
 
-main.login-page form button.recovery {
+.login-page form button.recovery {
 	margin-top: -3.350rem;
 }
 
-main.login-page .special-login button {
+.login-page form button.signup, .login-page form button.cancel-signup  {
+	background-color: var(--mainColor);
+	color: var(--textColor);
+	border: 1px solid var(--textColor);
+	transition: all 0.3s ease-out, background 0s;
+}
+
+.login-page form button.signup.primary {
+	background-color: var(--textColor);
+	color: var(--mainColor);
+	transition: all 0.3s ease-out, background 0s;
+}
+
+.login-page .special-login {
+	transition: all 0.2s ease-out, background 0s;
+}
+
+.login-page .special-login button {
 	border: 1px solid #E5E5E5;
 	border-radius: 3px;
 }
 
-main.login-page .svg {
+.login-page .svg {
 	height: 2rem;
 	width: 3.125rem;
 	fill: black;
 }
 
-main.login-page .login-42:hover {
+.login-page .login-42:hover {
 	background-color: rgba(0, 0, 0, 0.5);
 	color: var(--textColor);
 }
 
-main.login-page .login-42:hover .svg {
+.login-page .login-42:hover .svg {
 	fill: var(--textColor);
 }
 
-/*///////////////////////*/
-/* Media queries - Login */
-/*///////////////////////*/
-
 @media only screen and (max-width: 700px) and (orientation: portrait) {
-	main {
-		padding: 0;
-	}
-	/* main.login-page h1 {
-		font-size: 2.5rem;
-	} */
 	main.login-page > div {
+		padding: 0;
 		width: 100% !important;
 		height: 100% !important;
-	}
-	.wrapper-login {
-		width: 100%;
-		height: 100%;
-		max-width: none;
-		max-height: none;
-	}
-	.wrapper-sp-login {
-		height: auto;
-	}
-	.sp-login {
-		margin-bottom: 10px;
-		height: 45px;
-	}
-}
-
-@media only screen and (max-height: 500px) and (orientation: landscape) {
-	.wrapper-login {
-		width: 100%;
-		height: 100%;
-		max-width: none;
-		max-height: none;
-	}
-
-	.wrapper-title {
-		margin-bottom: 30px;
-	}
-
-	.wrapper-connection {
-		height: auto;
-		gap: 50px;
-	}
-
-	.wrapper-sp-login {
-		height: auto;
-	}
-
-	.sp-login {
-		margin-bottom: 10px;
-		height: 45px;
-	}
-
-	.sp-login:active {
-		margin: 4px 0px 8px 0px;
 	}
 }
 
@@ -1564,10 +1528,11 @@ canvas:focus {
 	/*////////////////*/
 	/* Useful Classes */
 	/*////////////////*/
-	.card {
+	.my-card {
 		border-radius: 0;
 		box-shadow: none;
 		min-width: 100%;
+		min-height: 100%;
 		width: 100%;
 		height: 100%;
 		position: absolute;
@@ -1630,7 +1595,7 @@ canvas:focus {
 	/*/////////////*/
 	/* Game - main */
 	/*/////////////*/
-	main {
+	main.game {
 		height: 100%;
 		width: 100%;
 		padding: 0;

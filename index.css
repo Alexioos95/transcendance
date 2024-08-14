@@ -210,6 +210,13 @@ textarea { font-size: 0.9rem; }
 	box-shadow: none;
 }
 
+.login-page form button.position-absolute {
+	background-color: var(--mainColor);
+	color: var(--textColor);
+	right: 3%;
+	top: 15%;
+}
+
 .login-page form button {
 	border-radius: 20px;
 	transition: margin 0.7s ease-out, background 0s;

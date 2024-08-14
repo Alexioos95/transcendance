@@ -10,9 +10,14 @@ async function navigate(page)
 	await fetch("/pages/" + page + ".html")
 	.then(response => response.text())
 		.then(html => { container.innerHTML = html; })
-		.catch(() => console.error("couldn't fetch pages for SPA"))
+		.then(() => launchPageScript(page))
+		.catch(() => console.error("couldn't fetch page for SPA"))
+}
+
+async function	launchPageScript(page)
+{
 	if (page == "game")
 		run();
 	else if (page == "login")
-		forgottenPassword();
+		login();
 }

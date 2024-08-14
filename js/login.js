@@ -2,7 +2,7 @@
 /////////////////////////
 // Script
 /////////////////////////
-function	forgottenPassword()
+function	login()
 {
 	const struct = getLoginStruct();
 
@@ -16,8 +16,25 @@ function	forgottenPassword()
 		if (struct.connection.classList.contains("recovery"))
 			struct.password.value = "";
 	});
+	struct.showPassword.addEventListener("click", function() {
+		if (struct.password.type == "password")
+		{
+			struct.password.type = "text";
+			struct.showPasswordIcon.classList.remove("fa-eye-slash");
+			struct.showPasswordIcon.classList.add("fa-eye");
+		}
+		else
+		{
+			struct.password.type = "password";
+			struct.showPasswordIcon.classList.remove("fa-eye");
+			struct.showPasswordIcon.classList.add("fa-eye-slash");
+		}
+	});
 	struct.signUp.addEventListener("click", function() {
-		signUpForm(struct);
+		if (struct.signUp.classList.contains("primary"))
+			struct.signUp.type = "submit";
+		else
+			signUpForm(struct);
 	});
 	struct.cancelSignUp.addEventListener("click", function() {
 		cancelSignUp(struct);
@@ -28,6 +45,8 @@ function	getLoginStruct()
 {
 	const struct = {
 		password: document.getElementsByClassName("password")[0],
+		showPassword: document.getElementsByClassName("show-password")[0],
+		showPasswordIcon: document.querySelector(".show-password i"),
 		username: document.getElementsByClassName("username")[0],
 		connection: document.getElementsByClassName("submit")[0],
 		forgotPassword: document.getElementsByClassName("forgot-password")[0],

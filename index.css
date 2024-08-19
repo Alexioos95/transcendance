@@ -107,6 +107,7 @@ button:focus-visible {
 	min-height: 90%;
 	width: 100%;
 	overflow: auto;
+	position: relative;
 }
 
 .tab-tabs > * {
@@ -1239,6 +1240,16 @@ canvas:focus {
 /*///////////////////*/
 /* Game - Tab - Chat */
 /*///////////////////*/
+
+.tab-tabs .fa-lock {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	width: 100%;
+	font-size: 10vw;
+	z-index: 1;
+}
 
 .tab-chat .chat-message {
 	display: flex;

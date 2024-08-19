@@ -30,6 +30,11 @@ function	login()
 			struct.showPasswordIcon.classList.add("fa-eye-slash");
 		}
 	});
+	struct.connection.addEventListener("click", function(event) {
+		event.preventDefault();
+		navigate("game")
+			.then(() => launchPageScript("game", false));
+	});
 	struct.signUp.addEventListener("click", function() {
 		if (struct.signUp.classList.contains("primary"))
 			struct.signUp.type = "submit";
@@ -38,6 +43,10 @@ function	login()
 	});
 	struct.cancelSignUp.addEventListener("click", function() {
 		cancelSignUp(struct);
+	});
+	struct.guestConnection.addEventListener("click", function() {
+		navigate("game")
+			.then(() => launchPageScript("game", true));
 	});
 }
 
@@ -52,7 +61,8 @@ function	getLoginStruct()
 		forgotPassword: document.getElementsByClassName("forgot-password")[0],
 		signUp: document.getElementsByClassName("signup")[0],
 		cancelSignUp: document.getElementsByClassName("cancel-signup")[0],
-		wrapperSpecialLogin: document.getElementsByClassName("special-login")[0]
+		wrapperSpecialLogin: document.getElementsByClassName("special-login")[0],
+		guestConnection: document.getElementsByClassName("special-login-guest")[0]
 	};
 	return (struct);
 }

@@ -2,7 +2,7 @@
 /////////////////////////
 // Script
 /////////////////////////
-async function	run()
+async function	run(guestMode)
 {
 	const struct = {
 		header: getHeaderStruct(),
@@ -16,6 +16,8 @@ async function	run()
 		run: 1
 	};
 	setupEventListeners(struct);
+	if (guestMode === true)
+		setGuestRestrictions(struct);
 	while (struct.run === 1)
 	{
 		await waitCoin(struct.gameForm)
@@ -60,7 +62,8 @@ function	setupEventListeners(struct)
 	});
 	struct.header.logoutButton.addEventListener("click", function() {
 		struct.run = 0;
-		navigate("login");
+		navigate("login")
+			.then(() => launchPageScript("login"));
 	});
 	// Cross Buttons
 	struct.options.leaveButton.addEventListener("click", function() {
@@ -89,6 +92,26 @@ function	setupEventListeners(struct)
 	// Sticks
 	struct.screen.wrapperCanvas.addEventListener("keydown", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("keyup", function(event) { disableStickMove(event, struct); });
+}
+
+async function	setGuestRestrictions(struct)
+{
+	const historyIcon = document.querySelectorAll("header .fa-clock-rotate-left")[0];
+	const lockIcon = document.querySelectorAll(".tab-tabs .fa-lock")[0];
+	const hideForGuest = document.getElementsByClassName("hide-for-guest");
+
+	historyIcon.classList.add("hidden");
+	hideForGuest[0].classList.add("hidden");
+	hideForGuest[1].classList.add("hidden");
+	hideForGuest[2].classList.add("hidden");
+	lockIcon.classList.remove("hidden");
+	struct.header.historyButton.title = "";
+	struct.header.historyButton.disabled = true;
+	struct.header.historyButton.style.cursor = "default";
+	struct.tabs.chat.input.classList.add("hidden");
+	struct.tabs.friend.input.classList.add("hidden");
+	struct.tabs.chat.table.classList.add("hidden");
+	struct.tabs.friend.table.classList.add("hidden");
 }
 
 async function	launchGame(struct)

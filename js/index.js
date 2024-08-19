@@ -2,7 +2,7 @@
 /////////////////////////
 // Script
 /////////////////////////
-navigate("login");
+navigate("login").then(() => launchPageScript("login", false));
 
 async function navigate(page)
 {
@@ -10,14 +10,13 @@ async function navigate(page)
 	await fetch("/pages/" + page + ".html")
 	.then(response => response.text())
 		.then(html => { container.innerHTML = html; })
-		.then(() => launchPageScript(page))
 		.catch(() => console.error("couldn't fetch page for SPA"))
 }
 
-async function	launchPageScript(page)
+async function	launchPageScript(page, restriction)
 {
-	if (page == "game")
-		run();
-	else if (page == "login")
+	if (page === "game")
+		run(restriction);
+	else if (page === "login")
 		login();
 }

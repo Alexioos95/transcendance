@@ -11,6 +11,7 @@ import pytz
 import os
 import pyotp
 import qrcode
+import pyjwt
 
 def index(request):
     print('coucou')
@@ -22,10 +23,10 @@ def index(request):
 def checkCookie(request, str):
     if str in request.COOKIES:
         print('Le cookie "auth" est présent.')
-        return null
+        return request.COOKIES[str]
     else:
         print('Le cookie "auth" n\'est pas présent.')
-        return request.COOKIES[str]
+        return null
 
 @csrf_exempt
 def register(request):
@@ -62,14 +63,39 @@ def register(request):
 @csrf_exempt
 def login(request):
     if request.method == 'POST':
-        cookie = checkCookie(request, 'auth')
-        if cookie == null:
+        auth = checkCookie(request, 'auth')	#jwt?
+        if auth == null:
             return JsonResponse({'error': 'not connected'}, status=204)
+
+		# Check if JWT present
+		#  Check JWT validity
+		#  Check JWT expiracy date
+
+		decodedJwt = ""
+
+		try:
+			decodedJwt = jwt.decode(auth, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
+
+		except Exception as error
+			print(error)
+			return JsonResponse({'error': 'Forbidden'}, status=403)
+
+		decodedJwt = json.loads(decodedJwt)
+		if decodedJwt["expirationDate"] < time.time():
+			return JsonResponse({'error': 'Token expired'}, status=401)
+
+		# check si user existe toujours en db
+        user = User.objects.all().filter(Username=decodedJwt["userName"]).value_list()
+
+
         #si 2fa si mail genere code stoker en cache et envoyer le mail via route mail
-        #recuperer info user en bdd et construirel la response et set le coockie
+        #recuperer info user en bdd et construirel la response et set le cookie
         # data = json.loads(request.body)
         # nom = data['nom']
         # password = data['password']
+
+		#generate user jwt encode/decode secret and save it in db
+		encoded_jwt = jwt.encode({"userName": "", "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")	#	Export to .env file		#	Add env_example file
         response_data #= {nom: password}
         # userIp = request.META.get('REMOTE_ADDR')
         # print(f"voici l'ip user{userIp}")

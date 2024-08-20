@@ -60,9 +60,8 @@ def register(request):
         return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
     return 
 
-@csrf_exempt
-def login(request):
-    if request.method == 'POST':
+def checkJwt(request):
+    if request.method == 'GET':
         auth = checkCookie(request, 'auth')	#jwt?
         if auth == null:
             return JsonResponse({'error': 'not connected'}, status=204)
@@ -86,7 +85,13 @@ def login(request):
 
 		# check si user existe toujours en db
         user = User.objects.all().filter(Username=decodedJwt["userName"]).value_list()
+		if not user:
+			return JsonResponse({'error': 'User does not exist'}, status=401)
+        return JsonResponse({'success': 'User connected'}, status=200)
 
+@csrf_exempt
+def login(request):
+    if request.method == 'POST':
 
         #si 2fa si mail genere code stoker en cache et envoyer le mail via route mail
         #recuperer info user en bdd et construirel la response et set le cookie

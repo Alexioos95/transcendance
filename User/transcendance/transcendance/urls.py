@@ -22,6 +22,7 @@ urlpatterns = [
     path('', views.index),#faire une route static via nginx a enlever d'ici
     path('register/', views.register),
     path('login/', views.login),
+    path('checkJwt/', views.checkJwt),
     path('auth42/', views.auth42),
     path('2fa/', views.twoFA),
     path('set2FA/', views.set2FA),

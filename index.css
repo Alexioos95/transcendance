@@ -1067,7 +1067,7 @@ canvas:focus {
 	justify-content: center;
 	align-items: center;
 	position: relative;
-	width: 12%;
+	width: 11%;
 }
 
 .wrapper-player-controls {
@@ -1099,7 +1099,7 @@ canvas:focus {
 
 .stick {
 	height: 100%;
-	width: 100%;
+	width: 151%;
 }
 
 .rotate {
@@ -1119,7 +1119,12 @@ canvas:focus {
 	bottom: 10%;
 	height: 100%;
 	width: 50%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	background-color: var(--textColor);
+	color: var(--mainColor);
+	font-weight: 800;
 	border-radius: 0.3em;
 	box-shadow: 0 0.2em 0 0.05em #9b9595;
 	display: none;
@@ -1160,7 +1165,7 @@ canvas:focus {
 
 .wrapper-bottom-section:hover .key, .wrapper-bottom-section:hover .wrapper-controls-keys,
 .wrapper-bottom-section-hover .key, .wrapper-bottom-section-hover .wrapper-controls-keys {
-	display: block;
+	display: flex;
 	opacity: 1;
 }
 

@@ -31,7 +31,7 @@ function	initPongStruct(game, wrapperCanvas)
 	game.ctx = game.canvas.getContext("2d");
 	game.paddles = getPaddles(game.canvas);
 	game.ball = getBall(game.canvas);
-	game.scores = [9, 9];
+	game.scores = [0, 0];
 	game.running = 1;
 }
 
@@ -41,10 +41,10 @@ function	setupPongEventListeners(screen)
 	screen.game.canvas.addEventListener("keydown", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
 	screen.game.canvas.addEventListener("keyup", function(event) { disableMove(event, screen.game.canvas, screen.game.paddles); });
 	// Mouse
-	// ! TODO
-	// screen.game.canvas.addEventListener("mousedown", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
-	// screen.game.canvas.addEventListener("mousemove", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
-	// screen.game.canvas.addEventListener("mouseup", function(event) { disableMove(event, screen.game.canvas, screen.game.paddles); });
+	screen.game.canvas.addEventListener("mousedown", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
+	screen.game.canvas.addEventListener("mousemove", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
+	screen.game.canvas.addEventListener("mouseup", function(event) { disableMove(event, screen.game.canvas, screen.game.paddles); });
+	document.body.addEventListener("mouseup", mouseUpEvent(screen.game));
 	// Touchscreen
 	// ! TODO
 	// screen.game.canvas.addEventListener("touchstart", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
@@ -70,6 +70,7 @@ async function	loop(struct, game)
 		game.running = 0;
 		renderFinalScore(game);
 		await endGame(struct);
+		document.body.removeEventListener("mouseup", mouseUpEvent(screen.game));
 	}
 }
 
@@ -145,7 +146,7 @@ function	resizePaddles(oldValues, canvas, paddles)
 {
 	const percentOldLeft = paddles.left.y / oldValues.height * 100;
 	const percentOldRight = paddles.right.y / oldValues.height * 100;
-	
+
 	paddles.height = canvas.height / 5;
 	paddles.width = canvas.width / 50;
 	paddles.left.x = canvas.width / 20;
@@ -173,38 +174,36 @@ function	resizeBall(oldValues, canvas, ball)
 function	enableMove(event, canvas, paddles)
 {
 	// ! TODO
-// 	if (event.type == "mousedown")
-// 	{
-// 		paddles.left.mouse = 1;
-// 		paddles.right.mouse = 1;
-// 		if (event.offsetY < canvas.height / 2)
-// 		{
-// 			paddles.left.move_top = 1;
-// 			paddles.right.move_top = 1;
-// 		}
-// 		else
-// 		{
-// 			paddles.left.move_bot = 1;
-// 			paddles.right.move_bot = 1;
-// 		}
-// 	}
-// 	else if (event.type == "mousemove")
-// 	{
-// 		paddles.left.move_top = 0;
-// 		paddles.left.move_bot = 0;
-// 		paddles.right.move_top = 0;
-// 		paddles.right.move_bot = 0;
-// 		if (paddles.left.mouse == 1 && event.movementY < 0)
-// 		{
-// 			paddles.left.move_top = 1;
-// 			paddles.right.move_top = 1;
-// 		}
-// 		else if (paddles.left.mouse == 1 && event.movementY > 0)
-// 		{
-// 			paddles.left.move_bot = 1;
-// 			paddles.right.move_bot = 1;
-// 		}
-// 	}
+	if (event.type == "mousedown")
+	{
+		if (event.offsetX < canvas.width / 2)
+			paddles.left.mouse = 1;
+		else
+			paddles.right.mouse = 1;
+	}
+	else if (event.type == "mousemove")
+	{
+		if (paddles.left.mouse == 1)
+		{
+			paddles.left.event = event;
+			paddles.left.move_top = 0;
+			paddles.left.move_bot = 0;
+			if (event.movementY < 0 && event.layerY < (paddles.left.y + paddles.height / 2))
+				paddles.left.move_top = 1;
+			else if (event.movementY > 0 && event.layerY > (paddles.left.y + paddles.height / 2))
+				paddles.left.move_bot = 1;
+		}
+		else if (paddles.right.mouse == 1)
+		{
+			paddles.right.event = event;
+			paddles.right.move_top = 0;
+			paddles.right.move_bot = 0;
+			if (event.movementY < 0 && event.layerY < (paddles.right.y + paddles.height / 2))
+				paddles.right.move_top = 1;
+			else if (event.movementY > 0 && event.layerY > (paddles.right.y + paddles.height / 2))
+				paddles.right.move_bot = 1;
+		}
+	}
 	if (event.key == "w" || event.key == "W")
 		paddles.left.move_top = 1;
 	else if (event.key == "s" || event.key == "S")
@@ -215,24 +214,24 @@ function	enableMove(event, canvas, paddles)
 		paddles.right.move_bot = 1;
 }
 
+function	mouseUpEvent(paddles)
+{
+	console.log("CALL");
+	if (paddles !== undefined && paddles.left !== undefined)
+		paddles.left.mouse = 0;
+	if (paddles !== undefined && paddles.right !== undefined)
+		paddles.right.mouse = 0;
+}
+
 function	disableMove(event, canvas, paddles)
 {
-	if (event.type == "touchend")
-	{
-		paddles.left.mouse = 0;
-		paddles.right.mouse = 0;
-		paddles.left.move_top = 0;
-		paddles.right.move_top = 0;
-		paddles.left.move_bot = 0;
-		paddles.right.move_bot = 0;
-	}
 	if (event.type == "mouseup")
 	{
 		paddles.left.mouse = 0;
-		paddles.right.mouse = 0;
 		paddles.left.move_top = 0;
-		paddles.right.move_top = 0;
 		paddles.left.move_bot = 0;
+		paddles.right.mouse = 0;
+		paddles.right.move_top = 0;
 		paddles.right.move_bot = 0;
 	}
 	if (event.key == "w" || event.key == "W")
@@ -255,6 +254,20 @@ function	movePaddles(canvas, paddles)
 		paddles.right.y -= paddles.speed;
 	if (paddles.right.move_bot == 1 && paddles.right.y < (canvas.height - paddles.height))
 		paddles.right.y += paddles.speed;
+	if (paddles.left.mouse == 1 && paddles.left.event != undefined)
+	{
+		if (paddles.left.move_top == 1 && paddles.left.y + (paddles.height / 2) < paddles.left.event.layerY)
+			paddles.left.move_top = 0;
+		else if (paddles.left.move_bot == 1 && paddles.left.y + (paddles.height / 2) > paddles.left.event.layerY)
+			paddles.left.move_bot = 0;
+	}
+	if (paddles.right.mouse == 1 && paddles.right.event != undefined)
+	{
+		if (paddles.right.move_top == 1 && paddles.right.y + (paddles.height / 2) < paddles.right.event.layerY)
+			paddles.right.move_top = 0;
+		else if (paddles.right.move_bot == 1 && paddles.right.y + (paddles.height / 2) > paddles.right.event.layerY)
+			paddles.right.move_bot = 0;
+	}
 }
 
 function	moveBall(game)
@@ -480,9 +493,10 @@ function	createPaddle(canvas, height, width, position)
 		y: 0,
 		move_top: 0,
 		move_bot: 0,
-		mouse: 0
+		mouse: 0,
+		event: undefined
 	};
-	
+
 	if (position == "l")
 	{
 		paddle.x = canvas.width / 20;
@@ -560,7 +574,7 @@ function	getDimensions(game, pictures)
 		leftWidth: [0, 0],
 		rightWidth: [0, 0]
 	};
-	
+
 	if (game.scores[1] > game.scores[0])
 	{
 		dimensions.leftDimensions = pictures[1].height;

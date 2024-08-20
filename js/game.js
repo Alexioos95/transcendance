@@ -72,7 +72,7 @@ function	setupEventListeners(struct)
 		else
 			showScreen(struct.screen, struct.screen.wrapperCanvas);
 	});
-	struct.history.leaveButton.addEventListener("click", function() {		
+	struct.history.leaveButton.addEventListener("click", function() {
 		resetHistoryClasses(struct);
 	});
 	// Tabs Account/Blocked
@@ -274,6 +274,7 @@ function	getScreenStruct()
 		wrapperOptions: document.getElementsByClassName("wrapper-options")[0],
 		wrapperTournamentForm: document.getElementsByClassName("tournament-form")[0],
 		sticks: getSticksStruct(),
+		keys: document.getElementsByClassName("key"),
 		playerOnControls: document.getElementsByClassName("playername"),
 		game: undefined
 	};
@@ -415,9 +416,15 @@ async function	checkGameSelectorValidation(struct)
 		if (game === null || mode === null)
 			return (reject(0));
 		if (game === "pong")
+		{
 			struct.screen.game = getPongStruct();
+			setupGameControls(struct, "pong");
+		}
 		// else if (game === "tetris")
-			// struct.screen.game = getTetrisStruct();
+		// {
+		// 	struct.screen.game = getTetrisStruct();
+		// 	setupGameControls(struct, "tetris");
+		// }
 		if (mode === "tournament")
 			struct.tournament.on = true;
 		title.style.opacity = 0;
@@ -490,6 +497,43 @@ function	resetInsertCoinButton(button)
 
 	text.classList.remove("active")
 	button.removeChild(coin);
+}
+
+/////////////////////////
+// Controls
+/////////////////////////
+function	setupGameControls(struct, game)
+{
+	if (game === "pong")
+	{
+		struct.screen.keys[0].innerHTML = "";
+		struct.screen.keys[1].innerHTML = "";
+		struct.screen.keys[2].innerHTML = "W";
+		struct.screen.keys[3].innerHTML = "";
+		struct.screen.keys[4].innerHTML = "";
+		struct.screen.keys[5].innerHTML = "S";
+		struct.screen.keys[6].innerHTML = "";
+		struct.screen.keys[7].innerHTML = "";
+		struct.screen.keys[8].innerHTML = "<i class=\"fa-solid fa-arrow-up\"></i>";
+		struct.screen.keys[9].innerHTML = "";
+		struct.screen.keys[10].innerHTML = "";
+		struct.screen.keys[11].innerHTML = "<i class=\"fa-solid fa-arrow-down\"></i>";
+	}
+	// else if (game === "tetris")
+	// {
+	// 	struct.screen.keys[0].innerHTML = "";
+	// 	struct.screen.keys[1].innerHTML = "";
+	// 	struct.screen.keys[2].innerHTML = "";
+	// 	struct.screen.keys[3].innerHTML = "";
+	// 	struct.screen.keys[4].innerHTML = "";
+	// 	struct.screen.keys[5].innerHTML = "";
+	// 	struct.screen.keys[6].innerHTML = "";
+	// 	struct.screen.keys[7].innerHTML = "";
+	// 	struct.screen.keys[8].innerHTML = "";
+	// 	struct.screen.keys[9].innerHTML = "";
+	// 	struct.screen.keys[10].innerHTML = "";
+	// 	struct.screen.keys[11].innerHTML = "";
+	// }
 }
 
 /////////////////////////

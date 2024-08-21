@@ -93,18 +93,47 @@ def checkJwt(request):
 def login(request):
     if request.method == 'POST':
 
+        data = json.loads(request.body)
+        requestUserName = data['nom']
+        password = data['password']	#hash for comparison with db
+
+		#	Guard against injection/xss here?
+		#	Check if empty name or password?
+		#	Check for minimum lengths?
+
+        dbUser = User.objects.all().filter(Username=requestUserName).value_list()
+		if not dbUser:
+			return JsonResponse({'error': 'User does not exist'}, status=401)
+		if dbUser.password != hash_function(requestPassword)
+			return JsonResponse({'error': 'Wrong password'}, status=401)
+
         #si 2fa si mail genere code stoker en cache et envoyer le mail via route mail
+		# if 2FA active
+		if User.objects.all().filter(Username=requestUserName).value_list().twoFA != 'NONE':
+			if User.objects.all().filter(Username=requestUserName).value_list().twoFA == 'MAIL':
+			#	Gen random code
+			#	Save code to cache
+			#	Send code to user's mail
+			#	Ask for user's code
+			#	Compare with code in cache
+			#	If code OK, user is logged in, send JWT
+			#	Else, ask code again
+			elif User.objects.all().filter(Username=requestUserName).value_list().twoFA == 'APK':
+			#	Ask user authenticator app's code
+			#	Compare with generated code
+			#	If code OK, user is logged in, send JWT
+			#	Else, ask code again
+
         #recuperer info user en bdd et construirel la response et set le cookie
-        # data = json.loads(request.body)
-        # nom = data['nom']
-        # password = data['password']
 
 		#generate user jwt encode/decode secret and save it in db
-		encoded_jwt = jwt.encode({"userName": "", "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")	#	Export to .env file		#	Add env_example file
-        response_data #= {nom: password}
+		encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")	#	Export to .env file		#	Add env_example file
+		response_data = JsonResponse({'success': 'User logged in'}, status=200);
+#= {nom: password}
         # userIp = request.META.get('REMOTE_ADDR')
         # print(f"voici l'ip user{userIp}")
-        return JsonResponse(response_data, status=200)
+		response_data.set_cookie(key='auth', value=encoded_jwt, max_age=300)
+        return response_data
     else:
         return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
 

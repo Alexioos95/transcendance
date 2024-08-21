@@ -39,17 +39,25 @@ function	setupPongEventListeners(screen)
 {
 	// Keyboard
 	screen.game.canvas.addEventListener("keydown", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
-	screen.game.canvas.addEventListener("keyup", function(event) { disableMove(event, screen.game.canvas, screen.game.paddles); });
+	screen.game.canvas.addEventListener("keyup", function(event) { disableMove(event, screen.game.paddles); });
 	// Mouse
 	screen.game.canvas.addEventListener("mousedown", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
 	screen.game.canvas.addEventListener("mousemove", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
-	screen.game.canvas.addEventListener("mouseup", function(event) { disableMove(event, screen.game.canvas, screen.game.paddles); });
-	document.body.addEventListener("mouseup", mouseUpEvent(screen.game));
+	screen.game.canvas.addEventListener("mouseup", function(event) { disableMove(event, screen.game.paddles); });
+	window.addEventListener("mouseup", function() { mouseUpEvent(screen.game) });
 	// Touchscreen
-	// ! TODO
-	// screen.game.canvas.addEventListener("touchstart", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
-	// screen.game.canvas.addEventListener("touchmove", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
-	// screen.game.canvas.addEventListener("touchend", function(event) { disableMove(event, screen.game.canvas, screen.game.paddles); });
+	screen.game.canvas.addEventListener("touchstart", function(event) {
+		event.type == "mousedown";
+		enableMove(event, screen.game.canvas, screen.game.paddles);
+	});
+	screen.game.canvas.addEventListener("touchmove", function(event) {
+		event.type == "mousemove";
+		enableMove(event, screen.game.canvas, screen.game.paddles);
+	});
+	screen.game.canvas.addEventListener("touchend", function(event) {
+		event.type == "mouseup";
+		disableMove(event, screen.game.canvas, screen.game.paddles);
+	});
 	// Resizing
 	document.defaultView.addEventListener("resize", function() { resize(screen.game, screen.wrapperCanvas); });
 }
@@ -69,8 +77,8 @@ async function	loop(struct, game)
 	{
 		game.running = 0;
 		renderFinalScore(game);
+		document.getElementsByClassName("game")[0].removeEventListener("mouseup", mouseUpEvent(struct.screen.game.paddles));
 		await endGame(struct);
-		document.body.removeEventListener("mouseup", mouseUpEvent(screen.game));
 	}
 }
 
@@ -173,17 +181,27 @@ function	resizeBall(oldValues, canvas, ball)
 /////////////////////////
 function	enableMove(event, canvas, paddles)
 {
-	// ! TODO
-	if (event.type == "mousedown")
+	if (event.type === "keydown")
+	{
+		if (event.key === "w" || event.key === "W")
+			paddles.left.move_top = 1;
+		else if (event.key === "s" || event.key === "S")
+			paddles.left.move_bot = 1;
+		else if (event.key === "ArrowUp")
+			paddles.right.move_top = 1;
+		else if (event.key === "ArrowDown")
+			paddles.right.move_bot = 1;
+	}
+	else if (event.type === "mousedown")
 	{
 		if (event.offsetX < canvas.width / 2)
 			paddles.left.mouse = 1;
 		else
 			paddles.right.mouse = 1;
 	}
-	else if (event.type == "mousemove")
+	else if (event.type === "mousemove")
 	{
-		if (paddles.left.mouse == 1)
+		if (paddles.left.mouse === 1)
 		{
 			paddles.left.event = event;
 			paddles.left.move_top = 0;
@@ -193,7 +211,7 @@ function	enableMove(event, canvas, paddles)
 			else if (event.movementY > 0 && event.layerY > (paddles.left.y + paddles.height / 2))
 				paddles.left.move_bot = 1;
 		}
-		else if (paddles.right.mouse == 1)
+		else if (paddles.right.mouse === 1)
 		{
 			paddles.right.event = event;
 			paddles.right.move_top = 0;
@@ -204,28 +222,41 @@ function	enableMove(event, canvas, paddles)
 				paddles.right.move_bot = 1;
 		}
 	}
-	if (event.key == "w" || event.key == "W")
-		paddles.left.move_top = 1;
-	else if (event.key == "s" || event.key == "S")
-		paddles.left.move_bot = 1;
-	else if (event.key == "ArrowUp")
-		paddles.right.move_top = 1;
-	else if (event.key == "ArrowDown")
-		paddles.right.move_bot = 1;
 }
 
-function	mouseUpEvent(paddles)
+function	mouseUpEvent(game)
 {
-	console.log("CALL");
-	if (paddles !== undefined && paddles.left !== undefined)
-		paddles.left.mouse = 0;
-	if (paddles !== undefined && paddles.right !== undefined)
-		paddles.right.mouse = 0;
+	if (game !== undefined && game.name === "PONG" && game.paddles !== undefined)
+	{
+		if (game.paddles.left !== undefined && game.paddles.left.mouse === 1)
+		{
+			game.paddles.left.mouse = 0;
+			game.paddles.left.move_top = 0;
+			game.paddles.left.move_bot = 0;
+		}
+		if (game.paddles.right !== undefined && game.paddles.right.mouse === 1)
+		{
+			game.paddles.right.mouse = 0;
+			game.paddles.right.move_top = 0;
+			game.paddles.right.move_bot = 0;
+		}
+	}
 }
 
-function	disableMove(event, canvas, paddles)
+function	disableMove(event, paddles)
 {
-	if (event.type == "mouseup")
+	if (event.type === "keyup")
+	{
+		if (event.key === "w" || event.key === "W")
+			paddles.left.move_top = 0;
+		else if (event.key === "s" || event.key === "S")
+			paddles.left.move_bot = 0;
+		else if (event.key === "ArrowUp")
+			paddles.right.move_top = 0;
+		else if (event.key === "ArrowDown")
+			paddles.right.move_bot = 0;
+	}
+	else if (event.type === "mouseup")
 	{
 		paddles.left.mouse = 0;
 		paddles.left.move_top = 0;
@@ -234,38 +265,30 @@ function	disableMove(event, canvas, paddles)
 		paddles.right.move_top = 0;
 		paddles.right.move_bot = 0;
 	}
-	if (event.key == "w" || event.key == "W")
-		paddles.left.move_top = 0;
-	else if (event.key == "s" || event.key == "S")
-		paddles.left.move_bot = 0;
-	else if (event.key == "ArrowUp")
-		paddles.right.move_top = 0;
-	else if (event.key == "ArrowDown")
-		paddles.right.move_bot = 0;
 }
 
 function	movePaddles(canvas, paddles)
 {
-	if (paddles.left.move_top == 1 && paddles.left.y > 0)
+	if (paddles.left.move_top === 1 && paddles.left.y > 0)
 		paddles.left.y -= paddles.speed;
-	if (paddles.left.move_bot == 1 && paddles.left.y < (canvas.height - paddles.height))
+	if (paddles.left.move_bot === 1 && paddles.left.y < (canvas.height - paddles.height))
 		paddles.left.y += paddles.speed;
-	if (paddles.right.move_top == 1 && paddles.right.y > 0)
+	if (paddles.right.move_top === 1 && paddles.right.y > 0)
 		paddles.right.y -= paddles.speed;
-	if (paddles.right.move_bot == 1 && paddles.right.y < (canvas.height - paddles.height))
+	if (paddles.right.move_bot === 1 && paddles.right.y < (canvas.height - paddles.height))
 		paddles.right.y += paddles.speed;
-	if (paddles.left.mouse == 1 && paddles.left.event != undefined)
+	if (paddles.left.mouse === 1 && paddles.left.event != undefined)
 	{
-		if (paddles.left.move_top == 1 && paddles.left.y + (paddles.height / 2) < paddles.left.event.layerY)
+		if (paddles.left.move_top === 1 && paddles.left.y + (paddles.height / 2) < paddles.left.event.layerY)
 			paddles.left.move_top = 0;
-		else if (paddles.left.move_bot == 1 && paddles.left.y + (paddles.height / 2) > paddles.left.event.layerY)
+		else if (paddles.left.move_bot === 1 && paddles.left.y + (paddles.height / 2) > paddles.left.event.layerY)
 			paddles.left.move_bot = 0;
 	}
-	if (paddles.right.mouse == 1 && paddles.right.event != undefined)
+	if (paddles.right.mouse === 1 && paddles.right.event != undefined)
 	{
-		if (paddles.right.move_top == 1 && paddles.right.y + (paddles.height / 2) < paddles.right.event.layerY)
+		if (paddles.right.move_top === 1 && paddles.right.y + (paddles.height / 2) < paddles.right.event.layerY)
 			paddles.right.move_top = 0;
-		else if (paddles.right.move_bot == 1 && paddles.right.y + (paddles.height / 2) > paddles.right.event.layerY)
+		else if (paddles.right.move_bot === 1 && paddles.right.y + (paddles.height / 2) > paddles.right.event.layerY)
 			paddles.right.move_bot = 0;
 	}
 }
@@ -497,12 +520,12 @@ function	createPaddle(canvas, height, width, position)
 		event: undefined
 	};
 
-	if (position == "l")
+	if (position === "l")
 	{
 		paddle.x = canvas.width / 20;
 		paddle.y = (canvas.height / 2) - (height / 2);
 	}
-	else if (position == "r")
+	else if (position === "r")
 	{
 		paddle.x = canvas.width - (canvas.width / 20) - width;
 		paddle.y = (canvas.height / 2) - (height / 2);

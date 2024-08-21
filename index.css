@@ -649,6 +649,10 @@ label:has(> [type=radio]:focus-visible) {
 	user-select: none;
 }
 
+.wrapper-submit-button button:focus-visible {
+	outline: 5px auto var(--textColor);
+}
+
 .wrapper-submit-button .coin-text {
 	width: 100%;
 	text-align: center;
@@ -849,6 +853,10 @@ label:has(> [type=radio]:focus-visible) {
 	overflow: hidden;
 }
 
+.wrapper-screen-all:has(.wrapper-canvas canvas:focus) {
+	box-shadow: 0 0.188rem 0.688rem 0.188rem rgb(210, 210, 210);
+}
+
 canvas {
 	display: block;
 	width: 100%;
@@ -856,7 +864,7 @@ canvas {
 }
 
 canvas:focus {
-	outline: none;
+	outline: 5px solid white;
 }
 
 .go-button {

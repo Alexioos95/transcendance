@@ -33,7 +33,8 @@ function	login()
 	struct.connection.addEventListener("click", function(event) {
 		event.preventDefault();
 		navigate("game")
-			.then(() => launchPageScript("game", false));
+			.then(() => launchPageScript("game", false))
+			.catch((e) => console.log(e));
 	});
 	struct.signUp.addEventListener("click", function() {
 		if (struct.signUp.classList.contains("primary"))
@@ -46,7 +47,8 @@ function	login()
 	});
 	struct.guestConnection.addEventListener("click", function() {
 		navigate("game")
-			.then(() => launchPageScript("game", true));
+			.then(() => launchPageScript("game", true))
+			.catch((e) => console.log(e));
 	});
 }
 

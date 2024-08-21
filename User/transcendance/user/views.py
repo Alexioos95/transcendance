@@ -4,9 +4,13 @@ from user import userMiddleware as middleware
 from datetime import date
 from user.models import User
 from django.http import JsonResponse
+from django.http import HttpResponse
 import json
 import datetime
 import pytz
+from django.core.cache import cache
+import requests
+from datetime import datetime, timedelta
 
 def index(request):
     print('coucou')
@@ -37,8 +41,8 @@ def register(request):
         tz = pytz.timezone('EST')
         tzTime = tz.localize(time)
         timebdd2 = tzTime.replace()
-        print(timebdd)
-        print(timebdd2)
+        # print(timebdd)
+        # print(timebdd2)
         # print(datetime.datetime.now())
         # print(datetime.datetime.now().timestamp())
         # print(datetime.datetime.total_seconds())
@@ -46,9 +50,12 @@ def register(request):
         new_user = User(Username = nom, Password = password, lastTimeOnline = timebdd2, pongLvl = 0, tetrisLvl = 0)
         new_user.save()
         all_entries = User.objects.all()
-        print(all_entries.values_list())
-        user = User.objects.all().filter(Username='madaguen')
+        # print(all_entries.values_list())
+        user = User.objects.all().filter(Username='testdulundi')
+        print(user)
+        print("\n\n")
         print(user.values_list())
+        print(f"res == {User.objects.get(Username='testdulundi')}")
         #check si dans bdd si oui return erreur sinon creer et return 201 et data user connecte set le coockie
         return JsonResponse(response_data, status=201)
     else:
@@ -73,6 +80,7 @@ def login(request):
     else:
         return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
 
+@csrf_exempt
 def auth42(request):
     if request.method != 'GET':
         return JsonResponse({'error': 'Invalid request method'}, status=405)
@@ -80,9 +88,9 @@ def auth42(request):
     data = {
         'grant_type': 'authorization_code',
         'client_id': 'u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9',
-        'client_secret': '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',
+        'client_secret': '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',
         'code': authorization_code,
-        'redirect_uri': 'http://paul-f4Ar5s3:8000/auth42'
+        'redirect_uri': 'http://made-f0Br7s18:8000/auth42'
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', json=data)
     if response.status_code != 200:
@@ -106,18 +114,20 @@ def auth42(request):
         authDataJson = json.dumps(auth_data)
         userIp = request.META.get('REMOTE_ADDR')
         cache.set(userIp, authDataJson, 300)
+        print("////////////////////////////////////////////////////////////")
         # check si user est en data base sinon l'ajouter creer un jwt permettant de l'identifier
         # first_name = user_data.get('first_name', '')
         # last_name = user_data.get('last_name', '')
         # html_response = f'<html><body><h1>Bonjour {first_name} {last_name}</h1></body></html>'
-        return JsonResponse(user_response.json(), status=user_response.status_code)
+        # return JsonResponse(user_response.json(), status=user_response.status_code)
         # //response = HttpResponse("Cookie Set")
         # //response.set_cookie('java-tutorial', 'javatpoint.com')
         # response.set_cookie('coucou', 'coucou')
-        # return render(request , 'html/index.html')
+        return render(request , 'index.html')
     else:
         return JsonResponse({'error': 'Failed to fetch user data'}, status=user_response.status_code)
 
+@csrf_exempt
 def checkAuth42(request):
     response = HttpResponse()
     userIp = request.META.get('REMOTE_ADDR')

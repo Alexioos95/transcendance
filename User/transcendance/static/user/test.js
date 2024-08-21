@@ -36,7 +36,7 @@ async function main() {
     console.log('CSRF Token:', csrftoken);
     console.log('Data to send:', info);
 
-    fetch('http://127.0.0.1:8000/register/', {
+    fetch('http://made-f0Br7s18:8000/register/', {
         credentials: 'include',
         method: 'POST',
         headers: {
@@ -73,7 +73,7 @@ main();
 function fetchUntilSuccess() {
     const intervalId = setInterval(async () => {
         try {
-            const response = await fetch('http://paul-f4Ar5s3:8000/checkAuth/', {
+            const response = await fetch('http://made-f0Br7s18:8000/checkAuth42/', {
                 method: 'POST'
             });
             
@@ -98,7 +98,7 @@ function fetchUntilSuccess() {
 function openOAuthPopup()
 {
     const strWindowFeatures ='toolbar=no, menubar=no, width=400, height=500, top=500, left=100';
-    const authUrl = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9&redirect_uri=http%3A%2F%2Fpaul-f4Ar5s3%3A8000%2Fauth42&response_type=code";
+    const authUrl = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9&redirect_uri=http%3A%2F%2Fmade-f0Br7s18%3A8000%2Fauth42&response_type=code";
     //const authUrl = 'http://127.0.0.1:8000/';
     //const popupWindow = window.open(authUrl, 'Intra OAuth', 'popup=true');
     windowObjectReference = window.open(authUrl, "oauth", strWindowFeatures);

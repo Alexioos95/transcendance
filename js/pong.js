@@ -31,7 +31,7 @@ function	initPongStruct(game, wrapperCanvas)
 	game.ctx = game.canvas.getContext("2d");
 	game.paddles = getPaddles(game.canvas);
 	game.ball = getBall(game.canvas);
-	game.scores = [10, 10];
+	game.scores = [0, 0];
 	game.running = 1;
 }
 
@@ -46,20 +46,27 @@ function	setupPongEventListeners(screen)
 	screen.game.canvas.addEventListener("mouseup", function(event) { disableMove(event, screen.game.paddles); });
 	window.addEventListener("mouseup", function() { mouseUpEvent(screen.game) });
 	// Touchscreen
-	screen.game.canvas.addEventListener("touchstart", function(event) {
-		event.type = "mousedown";
-		enableMove(event, screen.game.canvas, screen.game.paddles);
-	});
-	screen.game.canvas.addEventListener("touchmove", function(event) {
-		event.type = "mousemove";
-		enableMove(event, screen.game.canvas, screen.game.paddles);
-	});
-	screen.game.canvas.addEventListener("touchend", function(event) {
-		event.type = "mouseup";
-		disableMove(event, screen.game.canvas, screen.game.paddles);
-	});
+	screen.game.canvas.addEventListener("touchstart", convertTouchToMouse);
+	screen.game.canvas.addEventListener("touchmove", convertTouchToMouse);
+	screen.game.canvas.addEventListener("touchend", convertTouchToMouse);
 	// Resizing
 	document.defaultView.addEventListener("resize", function() { resize(screen.game, screen.wrapperCanvas); });
+}
+
+function	convertTouchToMouse(e)
+{
+	const touch = e.changedTouches[0];
+	let mouseType;
+
+	if (e.type == "touchstart")
+		mouseType = "mousedown";
+	else if (e.type == "touchmove")
+		mouseType = "mousemove";
+	else if (e.type == "touchend")
+		mouseType = "mouseup";
+
+	const mouseEvent = document.createEvent("MouseEvent");
+	mouseEvent.initMouseEvent(mouseType, true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
 }
 
 async function	loop(struct, game)

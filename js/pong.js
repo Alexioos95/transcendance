@@ -67,6 +67,8 @@ function	convertTouchToMouse(e)
 
 	const mouseEvent = document.createEvent("MouseEvent");
 	mouseEvent.initMouseEvent(mouseType, true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
+	touch.target.dispatchEvent(mouseEvent);
+	e.preventDefault();
 }
 
 async function	loop(struct, game)

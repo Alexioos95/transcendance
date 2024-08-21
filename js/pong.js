@@ -55,19 +55,17 @@ function	setupPongEventListeners(screen)
 
 function	convertTouchToMouse(e)
 {
-	const touch = e.changedTouches[0];
-	let mouseType;
-
-	if (e.type == "touchstart")
-		mouseType = "mousedown";
-	else if (e.type == "touchmove")
-		mouseType = "mousemove";
-	else if (e.type == "touchend")
-		mouseType = "mouseup";
-
-	const mouseEvent = document.createEvent("MouseEvent");
-	mouseEvent.initMouseEvent(mouseType, true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
-	touch.target.dispatchEvent(mouseEvent);
+	var touch = e.changedTouches[0];
+	var simulatedEvent = new MouseEvent({
+		touchstart: "mousedown",
+		touchmove: "mousemove",
+		touchend: "mouseup"
+	}[e.type], {
+		bubbles: true, cancelable: true, view: window, detail: 1,
+		screenX: touch.screenX, screenY: touch.screenY, clientX: touch.clientX, clientY: touch.clientY,
+		ctrlKey: false, altKey: false, shiftKey: false, metaKey: false, button: 0, relatedTarget: null
+	});
+	touch.target.dispatchEvent(simulatedEvent);
 	e.preventDefault();
 }
 

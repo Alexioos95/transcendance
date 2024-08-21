@@ -31,7 +31,7 @@ function	initPongStruct(game, wrapperCanvas)
 	game.ctx = game.canvas.getContext("2d");
 	game.paddles = getPaddles(game.canvas);
 	game.ball = getBall(game.canvas);
-	game.scores = [0, 0];
+	game.scores = [10, 10];
 	game.running = 1;
 }
 
@@ -47,15 +47,15 @@ function	setupPongEventListeners(screen)
 	window.addEventListener("mouseup", function() { mouseUpEvent(screen.game) });
 	// Touchscreen
 	screen.game.canvas.addEventListener("touchstart", function(event) {
-		event.type == "mousedown";
+		event.type = "mousedown";
 		enableMove(event, screen.game.canvas, screen.game.paddles);
 	});
 	screen.game.canvas.addEventListener("touchmove", function(event) {
-		event.type == "mousemove";
+		event.type = "mousemove";
 		enableMove(event, screen.game.canvas, screen.game.paddles);
 	});
 	screen.game.canvas.addEventListener("touchend", function(event) {
-		event.type == "mouseup";
+		event.type = "mouseup";
 		disableMove(event, screen.game.canvas, screen.game.paddles);
 	});
 	// Resizing
@@ -124,11 +124,11 @@ function	renderScore(game)
 {
 	const pictures = getPictures(game.scores);
 	if (pictures[0] != 0)
-		game.ctx.drawImage(pictures[0], ((((game.canvas.width / 2) / 2) - pictures[1].width) - 5), 20);
-	game.ctx.drawImage(pictures[1], ((game.canvas.width / 2) / 2) + 3, (game.canvas.height - game.canvas.height + 20));
+		game.ctx.drawImage(pictures[0], ((game.canvas.width / 2) / 2) - pictures[1].width - 4, 20);
+	game.ctx.drawImage(pictures[1], ((game.canvas.width / 2) / 2) + 2, 20);
 	if (pictures[2] != 0)
-		game.ctx.drawImage(pictures[2], (game.canvas.width / 2) + ((((game.canvas.width / 2) / 2) - pictures[3].width) - 5), 20);
-	game.ctx.drawImage(pictures[3], (game.canvas.width / 2) + ((game.canvas.width / 2) / 2) - 3, 20);
+		game.ctx.drawImage(pictures[2], (game.canvas.width) - ((game.canvas.width / 2) / 2) - (pictures[3].width) - 2, 20);
+	game.ctx.drawImage(pictures[3], (game.canvas.width) - ((game.canvas.width / 2) / 2) + 4, 20);
 }
 
 function	resize(game, wrapper)
@@ -332,9 +332,9 @@ function	point(game)
 
 function	updateScore(game)
 {
-	if (game.ball.x <= -100 && game.scores[1] < 99)
+	if (game.ball.x <= -100 && game.scores[1] < 11)
 		game.scores[1]++;
-	else if (game.ball.x >= (canvas.width + 100) && game.scores[0] < 99)
+	else if (game.ball.x >= (canvas.width + 100) && game.scores[0] < 11)
 		game.scores[0]++;
 }
 

@@ -1,16 +1,18 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from user import userMiddleware as middleware
-from datetime import date
+from datetime import date, datetime, timedelta
 from user.models import User
 from django.http import JsonResponse
 from django.http import HttpResponse
-import json
-import datetime
-import pytz
 from django.core.cache import cache
+import json
+import pytz
 import requests
-from datetime import datetime, timedelta
+import os
+import pyotp
+import qrcode
+import pyjwt
 
 def index(request):
     print('coucou')
@@ -22,10 +24,10 @@ def index(request):
 def checkCookie(request, str):
     if str in request.COOKIES:
         print('Le cookie "auth" est présent.')
-        return null
+        return request.COOKIES[str]
     else:
         print('Le cookie "auth" n\'est pas présent.')
-        return request.COOKIES[str]
+        return null
 
 @csrf_exempt
 def register(request):
@@ -62,21 +64,80 @@ def register(request):
         return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
     return 
 
+def checkJwt(request):
+    if request.method == 'GET':
+        auth = checkCookie(request, 'auth')	#jwt?
+        if auth == null:
+            return JsonResponse({'error': 'not connected'}, status=204)
+
+		# Check if JWT present
+		#  Check JWT validity
+		#  Check JWT expiracy date
+
+		decodedJwt = ""
+
+		try:
+			decodedJwt = jwt.decode(auth, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
+
+		except Exception as error
+			print(error)
+			return JsonResponse({'error': 'Forbidden'}, status=403)
+
+		decodedJwt = json.loads(decodedJwt)
+		if decodedJwt["expirationDate"] < time.time():
+			return JsonResponse({'error': 'Token expired'}, status=401)
+
+		# check si user existe toujours en db
+        user = User.objects.all().filter(Username=decodedJwt["userName"]).value_list()
+		if not user:
+			return JsonResponse({'error': 'User does not exist'}, status=401)
+        return JsonResponse({'success': 'User connected'}, status=200)
+
 @csrf_exempt
 def login(request):
     if request.method == 'POST':
-        cookie = checkCookie(request, 'auth')
-        if cookie == null:
-            return JsonResponse({'error': 'not connected'}, status=204)
+
+        data = json.loads(request.body)
+        requestUserName = data['nom']
+        password = data['password']	#hash for comparison with db
+
+		#	Guard against injection/xss here?
+		#	Check if empty name or password?
+		#	Check for minimum lengths?
+
+        dbUser = User.objects.all().filter(Username=requestUserName).value_list()
+		if not dbUser:
+			return JsonResponse({'error': 'User does not exist'}, status=401)
+		if dbUser.password != hash_function(requestPassword)
+			return JsonResponse({'error': 'Wrong password'}, status=401)
+
         #si 2fa si mail genere code stoker en cache et envoyer le mail via route mail
-        #recuperer info user en bdd et construirel la response et set le coockie
-        # data = json.loads(request.body)
-        # nom = data['nom']
-        # password = data['password']
-        response_data #= {nom: password}
+		# if 2FA active
+		if User.objects.all().filter(Username=requestUserName).value_list().twoFA != 'NONE':
+			if User.objects.all().filter(Username=requestUserName).value_list().twoFA == 'MAIL':
+			#	Gen random code
+			#	Save code to cache
+			#	Send code to user's mail
+			#	Ask for user's code
+			#	Compare with code in cache
+			#	If code OK, user is logged in, send JWT
+			#	Else, ask code again
+			elif User.objects.all().filter(Username=requestUserName).value_list().twoFA == 'APK':
+			#	Ask user authenticator app's code
+			#	Compare with generated code
+			#	If code OK, user is logged in, send JWT
+			#	Else, ask code again
+
+        #recuperer info user en bdd et construirel la response et set le cookie
+
+		#generate user jwt encode/decode secret and save it in db
+		encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")	#	Export to .env file		#	Add env_example file
+		response_data = JsonResponse({'success': 'User logged in'}, status=200);
+#= {nom: password}
         # userIp = request.META.get('REMOTE_ADDR')
         # print(f"voici l'ip user{userIp}")
-        return JsonResponse(response_data, status=200)
+		response_data.set_cookie(key='auth', value=encoded_jwt, max_age=300)
+        return response_data
     else:
         return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
 
@@ -175,16 +236,69 @@ def updateOnline(request):
 def twoFA(request):
     #requete gen cle chaque 00.01s 30.01s
     # attend un code et dit si valide ou non 
+
+
+	key = keyFromDb
+    totp = pyotp.TOTP(key)
+	#print(f'Code: {totp.now()}')
+
+    #ask generated key in front!
+	userInput = input("Enter generated code (6 digits): ")
+
+    # check user input ?!
+
+    if (totp.verify(userInput)):
+        print("Code OK")
+		#	send OK to front!
+    else:
+        print("NOT OK :(")
+		#	send KO to front!
+
     return
 
 def set2FA(request):
     #requete gen cle chaque 00.01s 30.01s
     #set 2fa a true en bdd code deja stocke si c'est mail si apk check le code en cache
+
+	if 2FA == key:
+		key = cache.get('"USERNAME" + 2FA') # Get from JWT
+	    totp = pyotp.TOTP(key)
+		#print(f'Code: {totp.now()}')
+	
+	    #ask generated key in front!
+		userInput = input("Enter generated code (6 digits): ")	# Get from request ?
+	
+	    # check user input ?!
+	
+	    if (totp.verify(userInput)):
+	    #if true, save key to db + remove from cache
+			keyToDb = User.objects.get(Username = 'USERNAME')
+			keyToDb.twoFA = APK
+			keyToDb.key2FA = key
+			keyToDb.save()
+	        print("Code OK")
+			#	send OK to front!
+	    else:
+	        print("NOT OK :(")
+			#	start over in front!
+	
+		#	delete image !
+		if os.path.exists('PATH TO QRCODE.png'):
+			os.remove('PATH TO QRCODE.png')
+		cache.clear('"USERNAME" + 2FA')
+	else:
+		pass #for now
     return
-    
 
 def preSet2FA(request):
     # sert a teser la 2fa et enregistrer la cle user puis on effectue une 2fa
+
+	key = pyotp.random_base32()
+	#	save key in cache
+	cache.set('"USERNAME" + 2FA', key, 30)	# Get Username or ID from JWT
+
+    otpUri = pyotp.totp.TOTP(key).provisioning_uri(name= "GET USERNAME OR ID FROM JWT", issuer_name="Transcendance")
+    qrcode.make(otpUri).save("FIND USEFULL NAME.png")
     return
 
 def resetPasswd(request):

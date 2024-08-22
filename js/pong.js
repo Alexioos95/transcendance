@@ -20,7 +20,7 @@ function	getPongStruct()
 async function	startPong(struct)
 {
 	initPongStruct(struct.screen.game, struct.screen.wrapperCanvas);
-	setupPongEventListeners(struct.screen);
+	setupPongEventListeners(struct.screen.game, struct.wrapperCanvas);
 	struct.screen.game.canvas.focus();
 	loop(struct, struct.screen.game);
 }
@@ -35,38 +35,23 @@ function	initPongStruct(game, wrapperCanvas)
 	game.running = 1;
 }
 
-function	setupPongEventListeners(screen)
+function	setupPongEventListeners(game, wrapperCanvas)
 {
 	// Keyboard
-	screen.game.canvas.addEventListener("keydown", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
-	screen.game.canvas.addEventListener("keyup", function(event) { disableMove(event, screen.game.paddles); });
+	game.canvas.addEventListener("keydown", function(event) { enableMove(event, game.canvas, game.paddles); });
+	game.canvas.addEventListener("keyup", function(event) { disableMove(event, game.paddles); });
 	// Mouse
-	screen.game.canvas.addEventListener("mousedown", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
-	screen.game.canvas.addEventListener("mousemove", function(event) { enableMove(event, screen.game.canvas, screen.game.paddles); });
-	screen.game.canvas.addEventListener("mouseup", function(event) { disableMove(event, screen.game.paddles); });
-	window.addEventListener("mouseup", function() { mouseUpEvent(screen.game) });
+	game.canvas.addEventListener("mousedown", function(event) { enableMove(event, game.canvas, game.paddles); });
+	game.canvas.addEventListener("mousemove", function(event) { enableMove(event, game.canvas, game.paddles); });
+	game.canvas.addEventListener("mouseup", function(event) { disableMove(event, game.paddles); });
+	window.addEventListener("mouseup", function() { mouseUpEvent(game) });
 	// Touchscreen
-	screen.game.canvas.addEventListener("touchstart", convertTouchToMouse);
-	screen.game.canvas.addEventListener("touchmove", convertTouchToMouse);
-	screen.game.canvas.addEventListener("touchend", convertTouchToMouse);
+	game.canvas.addEventListener("touchstart", function(event) { enableMove(event, game.canvas, game.paddles); });
+	game.canvas.addEventListener("touchmove", function(event) { enableMove(event, game.canvas, game.paddles); });
+	game.canvas.addEventListener("touchend", function(event) { disableMove(event, game.paddles); });
+	game.canvas.addEventListener("touchcancel", function(event) { disableMove(event, game.paddles); });
 	// Resizing
-	document.defaultView.addEventListener("resize", function() { resize(screen.game, screen.wrapperCanvas); });
-}
-
-function	convertTouchToMouse(e)
-{
-	var touch = e.changedTouches[0];
-	var simulatedEvent = new MouseEvent({
-		touchstart: "mousedown",
-		touchmove: "mousemove",
-		touchend: "mouseup"
-	}[e.type], {
-		bubbles: true, cancelable: true, view: window, detail: 1,
-		screenX: touch.screenX, screenY: touch.screenY, clientX: touch.clientX, clientY: touch.clientY,
-		ctrlKey: false, altKey: false, shiftKey: false, metaKey: false, button: 0, relatedTarget: null
-	});
-	touch.target.dispatchEvent(simulatedEvent);
-	e.preventDefault();
+	document.defaultView.addEventListener("resize", function() { resize(game, wrapperCanvas); });
 }
 
 async function	loop(struct, game)
@@ -229,6 +214,37 @@ function	enableMove(event, canvas, paddles)
 				paddles.right.move_bot = 1;
 		}
 	}
+	else if (event.type === "touchstart")
+	{
+		if (event.clientX < canvas.width / 2 && paddles.left.touchID === -1)
+			paddles.left.touchID = event.changedTouches[0].identifier;
+		else if (event.clientX > canvas.width / 2 && paddles.right.touchID === -1)
+			paddles.right.touchID = event.changedTouches[0].identifier;
+	}
+	else if (event.type === "touchmove")
+	{
+		for (let i = 0; i < event.changedTouches.length; i++)
+		{
+			if (event.changedTouches[i].identifier === paddles.left.touchID)
+			{
+				paddles.left.move_top = 0;
+				paddles.left.move_bot = 0;
+				if (event.clientY < (paddles.left.y + paddles.height / 2))
+					paddles.left.move_top = 1;
+				else if (event.clientY > (paddles.left.y + paddles.height / 2))
+					paddles.left.move_bot = 1;
+			}
+			else if (event.changedTouches[i].identifier === paddles.right.touchID)
+			{
+				paddles.right.move_top = 0;
+				paddles.right.move_bot = 0;
+				if (event.clientY < (paddles.right.y + paddles.height / 2))
+					paddles.right.move_top = 1;
+				else if (event.clientY > (paddles.right.y + paddles.height / 2))
+					paddles.right.move_bot = 1;
+			}
+		}
+	}
 }
 
 function	mouseUpEvent(game)
@@ -271,6 +287,13 @@ function	disableMove(event, paddles)
 		paddles.right.mouse = 0;
 		paddles.right.move_top = 0;
 		paddles.right.move_bot = 0;
+	}
+	else if (event.type === "touchend" || event.type === "touchcancel")
+	{
+		if (event.changedTouches[0].identifier === paddles.left.touchID)
+			paddles.left.touchID = -1;
+		else if (event.changedTouches[0].identifier === paddles.right.touchID)
+			paddles.right.touchID = -1;
 	}
 }
 
@@ -524,7 +547,8 @@ function	createPaddle(canvas, height, width, position)
 		move_top: 0,
 		move_bot: 0,
 		mouse: 0,
-		event: undefined
+		event: undefined,
+		touchID: -1
 	};
 
 	if (position === "l")

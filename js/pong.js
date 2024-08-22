@@ -245,6 +245,8 @@ function	enableMove(event, canvas, paddles)
 			}
 		}
 	}
+	if (event.type !== "mousemove")
+		event.preventDefault();
 }
 
 function	mouseUpEvent(game)

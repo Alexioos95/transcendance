@@ -79,10 +79,10 @@ function	renderFinalScore(game)
 	const pictures = getPictures(game.scores);
 	const dim = getDimensions(game, pictures);
 
-	if (pictures[0] != 0)
+	if (pictures[0] !== 0)
 		game.ctx.drawImage(pictures[0], dim.leftWidth[0], dim.leftHeight, dim.leftDimensions, dim.leftDimensions);
 	game.ctx.drawImage(pictures[1], dim.leftWidth[1], dim.leftHeight, dim.leftDimensions, dim.leftDimensions);
-	if (pictures[2] != 0)
+	if (pictures[2] !== 0)
 		game.ctx.drawImage(pictures[2], dim.rightWidth[0], dim.rightHeight, dim.rightDimensions, dim.rightDimensions);
 	game.ctx.drawImage(pictures[3], dim.rightWidth[1], dim.rightHeight, dim.rightDimensions, dim.rightDimensions);
 }
@@ -115,10 +115,10 @@ function	renderBall(ctx, ball)
 function	renderScore(game)
 {
 	const pictures = getPictures(game.scores);
-	if (pictures[0] != 0)
+	if (pictures[0] !== 0)
 		game.ctx.drawImage(pictures[0], ((game.canvas.width / 2) / 2) - pictures[1].width - 4, 20);
 	game.ctx.drawImage(pictures[1], ((game.canvas.width / 2) / 2) + 2, 20);
-	if (pictures[2] != 0)
+	if (pictures[2] !== 0)
 		game.ctx.drawImage(pictures[2], (game.canvas.width) - ((game.canvas.width / 2) / 2) - (pictures[3].width) - 2, 20);
 	game.ctx.drawImage(pictures[3], (game.canvas.width) - ((game.canvas.width / 2) / 2) + 4, 20);
 }
@@ -173,6 +173,8 @@ function	resizeBall(oldValues, canvas, ball)
 /////////////////////////
 function	enableMove(event, canvas, paddles)
 {
+	if (event.type !== "mousemove")
+		event.preventDefault();
 	if (event.type === "keydown")
 	{
 		if (event.key === "w" || event.key === "W")
@@ -216,10 +218,16 @@ function	enableMove(event, canvas, paddles)
 	}
 	else if (event.type === "touchstart")
 	{
-		if (event.clientX < canvas.width / 2 && paddles.left.touchID === -1)
+		if (event.changedTouches[0].clientX < canvas.width / 2 && paddles.left.touchID === -1)
+		{
 			paddles.left.touchID = event.changedTouches[0].identifier;
-		else if (event.clientX > canvas.width / 2 && paddles.right.touchID === -1)
+			paddles.left.event = event.changedTouches[0];
+		}
+		else if (event.changedTouches[0].clientX > canvas.width / 2 && paddles.right.touchID === -1)
+		{
 			paddles.right.touchID = event.changedTouches[0].identifier;
+			paddles.right.event = event.changedTouches[0];
+		}
 	}
 	else if (event.type === "touchmove")
 	{
@@ -229,24 +237,24 @@ function	enableMove(event, canvas, paddles)
 			{
 				paddles.left.move_top = 0;
 				paddles.left.move_bot = 0;
-				if (event.clientY < (paddles.left.y + paddles.height / 2))
+				paddles.left.event = event.changedTouches[i];
+				if (event.changedTouches[i].clientY + paddles.speed < (paddles.left.y + paddles.height / 2))
 					paddles.left.move_top = 1;
-				else if (event.clientY > (paddles.left.y + paddles.height / 2))
+				else if (event.changedTouches[i].clientY - paddles.speed > (paddles.left.y + paddles.height / 2))
 					paddles.left.move_bot = 1;
 			}
 			else if (event.changedTouches[i].identifier === paddles.right.touchID)
 			{
 				paddles.right.move_top = 0;
 				paddles.right.move_bot = 0;
-				if (event.clientY < (paddles.right.y + paddles.height / 2))
+				paddles.right.event = event.changedTouches[i];
+				if (event.changedTouches[i].clientY + paddles.speed < (paddles.right.y + paddles.height / 2))
 					paddles.right.move_top = 1;
-				else if (event.clientY > (paddles.right.y + paddles.height / 2))
+				else if (event.changedTouches[i].clientY - paddles.speed > (paddles.right.y + paddles.height / 2))
 					paddles.right.move_bot = 1;
 			}
 		}
 	}
-	if (event.type !== "mousemove")
-		event.preventDefault();
 }
 
 function	mouseUpEvent(game)
@@ -293,14 +301,50 @@ function	disableMove(event, paddles)
 	else if (event.type === "touchend" || event.type === "touchcancel")
 	{
 		if (event.changedTouches[0].identifier === paddles.left.touchID)
+		{
 			paddles.left.touchID = -1;
+			paddles.left.move_top = 0;
+			paddles.left.move_bot = 0;
+		}
 		else if (event.changedTouches[0].identifier === paddles.right.touchID)
+		{
 			paddles.right.touchID = -1;
+			paddles.right.move_top = 0;
+			paddles.right.move_bot = 0;
+		}
 	}
 }
 
 function	movePaddles(canvas, paddles)
 {
+	if (paddles.left.mouse === 1 && paddles.left.event !== undefined)
+	{
+		if (paddles.left.move_top === 1 && paddles.left.y + (paddles.height / 2) < paddles.left.event.layerY)
+			paddles.left.move_top = 0;
+		else if (paddles.left.move_bot === 1 && paddles.left.y + (paddles.height / 2) > paddles.left.event.layerY)
+			paddles.left.move_bot = 0;
+	}
+	else if (paddles.left.touchID !== -1 && paddles.right.event !== undefined)
+	{
+		if (paddles.left.move_top === 1 && paddles.left.y + (paddles.height / 2) < paddles.left.event.clientY)
+			paddles.left.move_top = 0;
+		else if (paddles.left.move_bot === 1 && paddles.left.y + (paddles.height / 2) > paddles.left.event.clientY)
+			paddles.left.move_bot = 0;
+	}
+	if (paddles.right.mouse === 1 && paddles.right.event !== undefined)
+	{
+		if (paddles.right.move_top === 1 && paddles.right.y + (paddles.height / 2) < paddles.right.event.layerY)
+			paddles.right.move_top = 0;
+		else if (paddles.right.move_bot === 1 && paddles.right.y + (paddles.height / 2) > paddles.right.event.layerY)
+			paddles.right.move_bot = 0;
+	}
+	else if (paddles.right.touchID !== -1 && paddles.right.event !== undefined)
+	{
+		if (paddles.right.move_top === 1 && paddles.right.y + (paddles.height / 2) < paddles.right.event.clientY)
+			paddles.right.move_top = 0;
+		else if (paddles.right.move_bot === 1 && paddles.right.y + (paddles.height / 2) > paddles.right.event.clientY)
+			paddles.right.move_bot = 0;
+	}
 	if (paddles.left.move_top === 1 && paddles.left.y > 0)
 		paddles.left.y -= paddles.speed;
 	if (paddles.left.move_bot === 1 && paddles.left.y < (canvas.height - paddles.height))
@@ -309,20 +353,6 @@ function	movePaddles(canvas, paddles)
 		paddles.right.y -= paddles.speed;
 	if (paddles.right.move_bot === 1 && paddles.right.y < (canvas.height - paddles.height))
 		paddles.right.y += paddles.speed;
-	if (paddles.left.mouse === 1 && paddles.left.event != undefined)
-	{
-		if (paddles.left.move_top === 1 && paddles.left.y + (paddles.height / 2) < paddles.left.event.layerY)
-			paddles.left.move_top = 0;
-		else if (paddles.left.move_bot === 1 && paddles.left.y + (paddles.height / 2) > paddles.left.event.layerY)
-			paddles.left.move_bot = 0;
-	}
-	if (paddles.right.mouse === 1 && paddles.right.event != undefined)
-	{
-		if (paddles.right.move_top === 1 && paddles.right.y + (paddles.height / 2) < paddles.right.event.layerY)
-			paddles.right.move_top = 0;
-		else if (paddles.right.move_bot === 1 && paddles.right.y + (paddles.height / 2) > paddles.right.event.layerY)
-			paddles.right.move_bot = 0;
-	}
 }
 
 function	moveBall(game)
@@ -382,7 +412,7 @@ function	resetBall(game)
 		game.ball.x = 0 - game.ball.radius;
 		game.ball.y = 0 - game.ball.radius;
 	}
-	game.ball.dir_x = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
+	game.ball.dir_x = (Math.round(Math.random() * 100) % 2 !== 1) ? -1 : 1;
 	game.ball.dir_y = generateDirY();
 }
 
@@ -572,7 +602,7 @@ function	getBall(canvas)
 		radius: canvas.width / 66,
 		x: canvas.width / 2,
 		y: canvas.height / 2,
-		dir_x: (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1,
+		dir_x: (Math.round(Math.random() * 100) % 2 !== 1) ? -1 : 1,
 		dir_y: generateDirY(),
 		speed: canvas.width / 100
 	}
@@ -581,7 +611,7 @@ function	getBall(canvas)
 
 function	generateDirY()
 {
-	const sign = (Math.round(Math.random() * 100) % 2 != 1) ? -1 : 1;
+	const sign = (Math.round(Math.random() * 100) % 2 !== 1) ? -1 : 1;
 	return (Math.random() * sign);
 }
 
@@ -592,14 +622,14 @@ function	getPictures(score)
 	const path = "/svg/number/";
 	const extension = ".svg";
 
-	if (numbers[0] != 0)
+	if (numbers[0] !== 0)
 	{
 		pictures[0] = new Image();
 		pictures[0].src = path + numbers[0] + extension;
 	}
 	pictures[1] = new Image();
 	pictures[1].src = path + numbers[1] + extension;
-	if (numbers[2] != 0)
+	if (numbers[2] !== 0)
 	{
 		pictures[2] = new Image();
 		pictures[2].src = path + numbers[2] + extension;

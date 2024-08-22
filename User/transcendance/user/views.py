@@ -6,13 +6,14 @@ from user.models import User
 from django.http import JsonResponse
 from django.http import HttpResponse
 from django.core.cache import cache
+import time
 import json
 import pytz
 import requests
 import os
 import pyotp
 import qrcode
-# import pyjwt
+import jwt
 import bcrypt
 
 def index(request):
@@ -59,7 +60,7 @@ def checkCookie(request, str):
 #         new_user.save()
 #         all_entries = User.objects.all()
 #         # print(all_entries.values_list())
-#         user = User.objects.all().filter(Username='ntestdumercredi')
+#         user = User.objects.all().filter(Username__exact='ntestdumercredi')
 #         print(user)
 #         print("\n\n")
 #         print(user.values_list())
@@ -71,8 +72,7 @@ def checkCookie(request, str):
 #         return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
 
 @csrf_exempt
-def register(request):
-    print('register')
+def register(request):#check si user est unique sinon refuser try except get?
     if request.method == 'POST':
         # Génération du sel pour bcrypt
         salt = bcrypt.gensalt()
@@ -98,7 +98,7 @@ def register(request):
         )
         new_user.save()
         # Vérification du mot de passe juste après son insertion
-        user = User.objects.filter(Username='h').first()
+        user = User.objects.filter(Username__exact='h').first()
         if user:
             print(f'user={user}')
             print(f'user.password={user.Password}')
@@ -107,9 +107,19 @@ def register(request):
             else:
                 print("Le mot de passe est invalide.")
         # Réponse JSON
-        response_data = {"message": "User successfully registered"}
-        return JsonResponse(response_data, status=201)
-    
+        mailData = {'title':'transcendance registration','body':f'welcome {nom}, successfully registered', 'destinataire':'ftTranscendanceAMFEA@gmail.com'}
+        response = requests.post('http://localhost:8001/sendMail/', json=mailData)#mettre la route dans l'env ou set la route definitive dans le build final?
+        print(response.status_code)
+        response_data = JsonResponse({"message": "User successfully registered"})
+        response_data.status = 201
+        response_data.set_cookie(
+        'auth',
+        f'test{nom}',#
+        httponly=True,   # Empêche l'accès JavaScript au cookie
+        # secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
+        samesite='None',
+        expires=datetime.utcnow() + timedelta(hours=1))
+        return (response_data)
     else:
         return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
 
@@ -122,12 +132,10 @@ def checkJwt(request):
         # Check if JWT present
         #  Check JWT validity
         #  Check JWT expiracy date
-
         decodedJwt = ""
 
         try:
             decodedJwt = jwt.decode(auth, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
-
         except Exception as error:
             print(error)
             return JsonResponse({'error': 'Forbidden'}, status=403)
@@ -137,58 +145,78 @@ def checkJwt(request):
             return JsonResponse({'error': 'Token expired'}, status=401)
 
         # check si user existe toujours en db
-        user = User.objects.all().filter(Username=decodedJwt["userName"]).value_list()
+        user = User.objects.all().filter(Username__exact=decodedJwt["userName"]).value_list()
         if not user:
             return JsonResponse({'error': 'User does not exist'}, status=401)
         return JsonResponse({'success': 'User connected'}, status=200)
 
 @csrf_exempt
 def login(request):
-    if request.method == 'POST':
-
-        data = json.loads(request.body)
-        requestUserName = data['nom']
-        password = data['password']    #hash for comparison with db
-
-        #    Guard against injection/xss here?
-        #    Check if empty name or password?
-        #    Check for minimum lengths?
-
-        dbUser = User.objects.all().filter(Username=requestUserName).value_list()
-        if not dbUser:
-            return JsonResponse({'error': 'User does not exist'}, status=401)
-        if dbUser.password != hash_function(requestPassword):
-            return JsonResponse({'error': 'Wrong password'}, status=401)
-
-        #si 2fa si mail genere code stoker en cache et envoyer le mail via route mail
-        # if 2FA active
-        # if User.objects.all().filter(Username=requestUserName).value_list().twoFA != 'NONE':
-        #     if User.objects.all().filter(Username=requestUserName).value_list().twoFA == 'MAIL':
-        #     #    Gen random code
-        #     #    Save code to cache
-        #     #    Send code to user's mail
-        #     #    Ask for user's code
-        #     #    Compare with code in cache
-        #     #    If code OK, user is logged in, send JWT
-        #     #    Else, ask code again
-        #     elif User.objects.all().filter(Username=requestUserName).value_list().twoFA == 'APK':
-            #    Ask user authenticator app's code
-            #    Compare with generated code
-            #    If code OK, user is logged in, send JWT
-            #    Else, ask code again
-
-        #recuperer info user en bdd et construirel la response et set le cookie
-
-        #generate user jwt encode/decode secret and save it in db
-        encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
-        response_data = JsonResponse({'success': 'User logged in'}, status=200);
-#= {nom: password}
-        # userIp = request.META.get('REMOTE_ADDR')
-        # print(f"voici l'ip user{userIp}")
-        response_data.set_cookie(key='auth', value=encoded_jwt, max_age=300)
-        return response_data
-    else:
+    print('on estp asse par ici')
+    if request.method != 'POST':
         return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
+    data = json.loads(request.body)
+    requestUserName = data['nom']
+    password = data['password']    #hash for comparison with db
+    #    Guard against injection/xss here?
+    #    Check if empty name or password?
+    #    Check for minimum lengths?
+    dbUser = User.objects.filter(Username__exact=requestUserName)
+    print('on estp asse par la')
+    encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")    #    Export to .env file        #    Add env_example file
+    print(f'var == {os.environ.get("SERVER_JWT_KEY")} et encoded jwt == {encoded_jwt}')
+    try:
+        dbUser = User.objects.filter(Username__exact=requestUserName).get()
+    except:
+        print('user not found')
+        return JsonResponse({'error': 'invalid credentials'}, status=401)
+    if bcrypt.checkpw(password.encode('utf-8'), dbUser.Password.encode('utf-8')):
+        print("Le mot de passe est valide.")
+        response_data = JsonResponse({'data': 'pein de data user'})
+        response_data.status = 200
+        response_data.set_cookie(
+        'auth',
+        encoded_jwt,
+        httponly=True,   # Empêche l'accès JavaScript au cookie
+        secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
+        samesite='None',
+        expires=datetime.utcnow() + timedelta(hours=1))
+        return (response_data)
+        response_data.set_cookie(key='auth', value=encoded_jwt, max_age=300)
+        # return JsonResponse({'data': 'pein de data user'}, status=200)
+    else:
+        print("Le mot de passe est invalide.")
+        return JsonResponse({'error': 'invalid credentials'}, status=401)
+    # if not dbUser:
+        # return JsonResponse({'error': 'User does not exist'}, status=401)
+    # if dbUser.password != hash_function(requestPassword):
+        # return JsonResponse({'error': 'Wrong password'}, status=401)
+    #si 2fa si mail genere code stoker en cache et envoyer le mail via route mail
+    # if 2FA active
+    # if User.objects.all().filter(Username=requestUserName).value_list().twoFA != 'NONE':
+    #     if User.objects.all().filter(Username=requestUserName).value_list().twoFA == 'MAIL':
+    #     #    Gen random code
+    #     #    Save code to cache
+    #     #    Send code to user's mail
+    #     #    Ask for user's code
+    #     #    Compare with code in cache
+    #     #    If code OK, user is logged in, send JWT
+    #     #    Else, ask code again
+    #     elif User.objects.all().filter(Username=requestUserName).value_list().twoFA == 'APK':
+        #    Ask user authenticator app's code
+        #    Compare with generated code
+        #    If code OK, user is logged in, send JWT
+        #    Else, ask code again
+    #recuperer info user en bdd et construirel la response et set le cookie
+    #generate user jwt encode/decode secret and save it in db
+    # user = User.objects.filter(Username='h').first()
+    encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
+    response_data = JsonResponse({'success': 'User logged in'}, status=200);
+#= {nom: password}
+    # userIp = request.META.get('REMOTE_ADDR')
+    # print(f"voici l'ip user{userIp}")
+    response_data.set_cookie(key='auth', value=encoded_jwt, max_age=300)
+    return response_data
 
 @csrf_exempt
 def auth42(request):
@@ -200,7 +228,7 @@ def auth42(request):
         'client_id': 'u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9',
         'client_secret': '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',
         'code': authorization_code,
-        'redirect_uri': 'http://made-f0Br7s18:8000/auth42'
+        'redirect_uri': 'http://localhost:8000/auth42'
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', json=data)
     if response.status_code != 200:
@@ -224,7 +252,6 @@ def auth42(request):
         authDataJson = json.dumps(auth_data)
         userIp = request.META.get('REMOTE_ADDR')
         cache.set(userIp, authDataJson, 300)
-        print("////////////////////////////////////////////////////////////")
         # check si user est en data base sinon l'ajouter creer un jwt permettant de l'identifier
         # first_name = user_data.get('first_name', '')
         # last_name = user_data.get('last_name', '')
@@ -248,12 +275,12 @@ def checkAuth42(request):
             response.content = cachedValue
             cache.delete(userIp)
             response.status_code = 200
-            response.set_cookie(#ajouter le token
-            'oauth42',
-            'test',
+            response.set_cookie(
+            'auth', #vallue finale : auth
+            'test', #ici token jwt
             httponly=True,   # Empêche l'accès JavaScript au cookie
             # secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
-            samesite='Strict',
+            # samesite='Strict',
             expires=datetime.utcnow() + timedelta(hours=1)
             )
         else:

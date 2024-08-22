@@ -29,8 +29,10 @@ urlpatterns = [
     path('disconnect/', views.disconnect),
     path('checkAuth42/', views.checkAuth42),
     path('updateUserInfos/', views.updateUserInfos),
+    # path('addFriend/', views.addFriend),
+    # path('blockUser/', views.blockUser),
     path('updateOnline/', views.updateOnline),
     path('resetPaswd/', views.resetPasswd),
 ]
 
-# route matchmaking et peut elle rediriger vers une channel la requete
+# route matchmaking servie a part ou service user

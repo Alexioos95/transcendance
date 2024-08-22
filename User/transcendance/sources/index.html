@@ -77,7 +77,14 @@
         {% csrf_token %}
         <label>Nom :<input type="text" class="nom" name="nom"/></label>
         <label>Password :<input type="password" class="password" name="password"/></label>
-        <button type="button" class="boutton">Sauvegarder</button>      
+        <button type="button" class="login">login</button>      
+    </form>
+    <form method="post" id="register-form">
+        {% csrf_token %}
+        <label>Nom :<input type="text" class="registernom" name="registernom"/></label>
+        <label>Password :<input type="registerpassword" class="registerpassword" name="registerpassword"/></label>
+        <label>Email :<input type="email" class="email" name="email"/></label>
+        <button type="button" class="register">register</button>      
     </form>
     <a><button type="button" class="boutton42" >>log with 42</button> </a> 
     

@@ -28,21 +28,24 @@ async function main() {
         });
     }
 
-    const buttons = document.getElementsByClassName('boutton');
-    const button = buttons[0];
-    const info = await getInfo(button);
+
+//login
+
+    const loginbuttons = document.getElementsByClassName('login');
+    const loginbutton = loginbuttons[0];
+    const info = await getInfo(loginbutton);
 
     const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
     console.log('CSRF Token:', csrftoken);
     console.log('Data to send:', info);
 
-    fetch('http://made-f0Br7s18:8000/register/', {
+    fetch('http://localhost:8000/login/', {
         credentials: 'include',
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            // 'X-CSRFToken': csrftoken,
-        },
+        // headers: {
+        //     'Content-Type': 'application/json',
+        //     // 'X-CSRFToken': csrftoken,
+        // },
         body: JSON.stringify(info)
     })
     .then(response => {
@@ -57,7 +60,7 @@ async function main() {
             let messageKey = Object.keys(data)[0]; 
             let messageValue = data[messageKey];
            // sessionStorage.setItem(messageKey, messageValue);
-            localStorage.setItem(messageKey, messageValue);
+            // localStorage.setItem(messageKey, messageValue);
             // cookies.set(data);
             console.log("message key", messageKey, "val ", messageValue);
             console.log('Success:', data);
@@ -66,14 +69,14 @@ async function main() {
     .catch(error => {
         console.error('There was a problem with your fetch operation:', error);
     });
-}
 
+}
 main();
 
 function fetchUntilSuccess() {
     const intervalId = setInterval(async () => {
         try {
-            const response = await fetch('http://made-f0Br7s18:8000/checkAuth42/', {
+            const response = await fetch('http://localhost:8000/checkAuth42/', {
                 method: 'POST'
             });
             
@@ -98,7 +101,7 @@ function fetchUntilSuccess() {
 function openOAuthPopup()
 {
     const strWindowFeatures ='toolbar=no, menubar=no, width=400, height=500, top=500, left=100';
-    const authUrl = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9&redirect_uri=http%3A%2F%2Fmade-f0Br7s18%3A8000%2Fauth42&response_type=code";
+    const authUrl = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Fauth42&response_type=code";
     //const authUrl = 'http://127.0.0.1:8000/';
     //const popupWindow = window.open(authUrl, 'Intra OAuth', 'popup=true');
     windowObjectReference = window.open(authUrl, "oauth", strWindowFeatures);
@@ -114,7 +117,7 @@ function openOAuthPopup()
         //popupWindow.close();
     }
     
-    
+
     
     const button = document.querySelectorAll('.boutton42')[0];
     button.addEventListener('click', function() {
@@ -122,3 +125,65 @@ function openOAuthPopup()
         fetchUntilSuccess();
     })
         
+
+
+async function mainregister() {
+
+    async function getInforegister(button) {
+        return new Promise((resolve, reject) => {
+            button.addEventListener("click", function(event) {
+                const nom = document.querySelector('.registernom').value;
+                const password = document.querySelector('.registerpassword').value;
+                const email = document.querySelector('.email').value;
+
+                data = {
+                    nom: nom,
+                    password: password
+                };
+
+                resolve(data);
+            });
+        });
+    }
+//register
+
+    const registerbuttons = document.getElementsByClassName('register');
+    const registerbutton = registerbuttons[0];
+    const info = await getInforegister(registerbutton);
+
+    const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+    console.log('CSRF Token:', csrftoken);
+    console.log('Data to send:', info);
+
+    fetch('http://localhost:8000/register/', {
+        credentials: 'include',
+        method: 'POST',
+        // headers: {
+        //     'Content-Type': 'application/json',
+        //     // 'X-CSRFToken': csrftoken,
+        // },
+        body: JSON.stringify(info)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        console.log("Response headers:", response.headers);
+        return response.json().then(data => ({ data, headers: response.headers }));
+    })
+    .then(({ data, headers }) => {
+        {
+            let messageKey = Object.keys(data)[0]; 
+            let messageValue = data[messageKey];
+           // sessionStorage.setItem(messageKey, messageValue);
+            localStorage.setItem(messageKey, messageValue);
+            // cookies.set(data);
+            console.log("message key", messageKey, "val ", messageValue);
+            console.log('Success:', data);
+        }
+    })
+    .catch(error => {
+        console.error('There was a problem with your fetch operation:', error);
+    });
+}
+mainregister();

@@ -2,7 +2,7 @@
 /////////////////////////
 // Script
 /////////////////////////
-function	login()
+function	login(signUpMode)
 {
 	const struct = getLoginStruct();
 
@@ -33,23 +33,32 @@ function	login()
 	struct.connection.addEventListener("click", function(event) {
 		event.preventDefault();
 		navigate("game")
-			.then(() => launchPageScript("game", false))
+			.then(() => launchPageScript("game", false, false))
 			.catch((e) => console.log(e));
 	});
 	struct.signUp.addEventListener("click", function() {
 		if (struct.signUp.classList.contains("primary"))
 			struct.signUp.type = "submit";
 		else
+		{
 			signUpForm(struct);
+			window.history.pushState({ login: true, signUp: true, game: false }, null, "");
+		}
 	});
 	struct.cancelSignUp.addEventListener("click", function() {
-		cancelSignUp(struct);
+		window.history.back();
 	});
 	struct.guestConnection.addEventListener("click", function() {
 		navigate("game")
-			.then(() => launchPageScript("game", true))
+			.then(() => launchPageScript("game", true, false))
+			.then(() => window.history.pushState({ login: false, signUp: false, game: true }, null, ""))
 			.catch((e) => console.log(e));
 	});
+	if (signUpMode !== undefined && signUpMode === true)
+	{
+		document.title = "ft_transcendance [Inscription]";
+		signUpForm(struct);
+	}
 }
 
 function	getLoginStruct()
@@ -99,14 +108,5 @@ function	signUpForm(struct)
 	struct.wrapperSpecialLogin.classList.add("hideInFade");
 	struct.signUp.classList.add("primary");
 	struct.cancelSignUp.classList.remove("hideInFade");
-}
-
-function	cancelSignUp(struct)
-{
-	struct.username.classList.add("hidden");
-	struct.connection.classList.remove("hidden");
-	struct.forgotPassword.classList.remove("hidden");
-	struct.wrapperSpecialLogin.classList.remove("hideInFade");
-	struct.signUp.classList.remove("primary");
-	struct.cancelSignUp.classList.add("hideInFade");
+	document.title = "ft_transcendance [Inscription]";
 }

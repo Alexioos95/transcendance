@@ -15,9 +15,12 @@ async function	run(guestMode)
 		tabs: getTabsStruct(),
 		run: 1
 	};
-	setupEventListeners(struct);
+	setupEventListeners(struct, guestMode);
 	if (guestMode === true)
+	{
+		document.title = "ft_transcendance [Invite]";
 		setGuestRestrictions(struct);
+	}
 	while (struct.run === 1)
 	{
 		await waitCoin(struct.gameForm)
@@ -33,7 +36,7 @@ async function	run(guestMode)
 	}
 }
 
-function	setupEventListeners(struct)
+function	setupEventListeners(struct, guestMode)
 {
 	// addEventListener abandonButton => stopper le jeu;
 
@@ -63,7 +66,11 @@ function	setupEventListeners(struct)
 	struct.header.logoutButton.addEventListener("click", function() {
 		struct.run = 0;
 		navigate("login")
-			.then(() => launchPageScript("login"))
+			.then(() => launchPageScript("login", false, false))
+			.then(() => {
+				if (guestMode === true)
+					window.history.pushState({ login: true, signUp: false, game: false }, null, "")
+				})
 			.catch((e) => console.log(e));
 	});
 	// Cross Buttons

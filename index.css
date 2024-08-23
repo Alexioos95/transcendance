@@ -1556,6 +1556,12 @@ canvas:focus {
 
 /* Tablets and Phones */
 @media only screen and (max-width: 1023px) and (orientation: landscape) {
+	/*/////////*/
+	/* General */
+	/*/////////*/
+	body {
+		position: fixed;
+	}
 	/*////////////////*/
 	/* Useful Classes */
 	/*////////////////*/

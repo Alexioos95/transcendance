@@ -863,10 +863,6 @@ canvas {
 	height: 100%;
 }
 
-canvas:focus {
-	outline: 5px solid white;
-}
-
 .go-button {
 	display: flex;
 	justify-content: center;

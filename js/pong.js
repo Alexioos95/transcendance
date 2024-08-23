@@ -173,7 +173,7 @@ function	resizeBall(oldValues, canvas, ball)
 /////////////////////////
 function	enableMove(event, canvas, paddles)
 {
-	if (event.type !== "mousemove")
+	if (event.type !== "mousedown" && event.type !== "mousemove")
 		event.preventDefault();
 	if (event.type === "keydown")
 	{

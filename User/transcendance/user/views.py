@@ -119,6 +119,8 @@ def register(request):#check si user est unique sinon refuser try except get?
         # secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
         samesite='None',
         expires=datetime.utcnow() + timedelta(hours=1))
+        encoded_jwt = jwt.encode({"userName": nom, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
+        response_data.set_cookie(key='auth', value=encoded_jwt, max_age=300)
         return (response_data)
     else:
         return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
@@ -210,7 +212,7 @@ def login(request):
     #recuperer info user en bdd et construirel la response et set le cookie
     #generate user jwt encode/decode secret and save it in db
     # user = User.objects.filter(Username='h').first()
-    encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
+    encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file	#	Already above...
     response_data = JsonResponse({'success': 'User logged in'}, status=200);
 #= {nom: password}
     # userIp = request.META.get('REMOTE_ADDR')
@@ -260,7 +262,30 @@ def auth42(request):
         # //response = HttpResponse("Cookie Set")
         # //response.set_cookie('java-tutorial', 'javatpoint.com')
         # response.set_cookie('coucou', 'coucou')
-        return render(request , 'index.html')
+
+        try:
+            User.objects.filter(Username__exact=login).get()
+            encoded_jwt = jwt.encode({"userName": login, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
+            response_data = JsonResponse({'success': 'User logged in'}, status=200);	### Update for this function
+            return render(request , 'index.html')
+        except:
+    # Nouvel utilisateur
+            # Gestion du temps
+            time = datetime.now()
+            tz = pytz.timezone('CET')
+            tzTime = tz.localize(time)
+            # Création du nouvel utilisateur
+            new_user = User(
+                Username=login,
+                lastTimeOnline=tzTime,
+                pongLvl=0,
+                tetrisLvl=0
+            )
+            # Try excpet for uniqueness
+            new_user.save()
+            encoded_jwt = jwt.encode({"userName": login, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
+            response_data = JsonResponse({'success': 'User logged in'}, status=200);	### Update for this function
+            return render(request , 'index.html')
     else:
         return JsonResponse({'error': 'Failed to fetch user data'}, status=user_response.status_code)
 

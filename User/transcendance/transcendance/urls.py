@@ -20,19 +20,20 @@ from user import views
 
 urlpatterns = [
     path('', views.index),#faire une route static via nginx a enlever d'ici
-    path('register/', views.register),
-    path('login/', views.login),
-    path('checkJwt/', views.checkJwt),
-    path('auth42/', views.auth42),
-    path('2fa/', views.twoFA),
-    path('set2FA/', views.set2FA),
-    path('disconnect/', views.disconnect),
-    path('checkAuth42/', views.checkAuth42),
-    path('updateUserInfos/', views.updateUserInfos),
-    # path('addFriend/', views.addFriend),
-    # path('blockUser/', views.blockUser),
-    path('updateOnline/', views.updateOnline),
-    path('resetPaswd/', views.resetPasswd),
+    path('User/register/', views.register),
+    path('User/login/', views.login),
+    path('User/checkJwt/', views.checkJwt),
+    path('User/auth42/', views.auth42),
+    path('User/2fa/', views.twoFA),
+    path('User/set2FA/', views.set2FA),
+    path('User/disconnect/', views.disconnect),
+    path('User/checkAuth42/', views.checkAuth42),
+    path('User/updateUserInfos/', views.updateUserInfos),
+    # path('User/addFriend/', views.addFriend),en attene de postgres
+    # path('User/blockUser/', views.blockUser),en attene de postgres
+    path('User/updateInfo/', views.updateInfo),
+    path('User/resetPaswd/', views.resetPasswd),
+    path('User/matchMaking/', views.matchMaking),
 ]
 
 # route matchmaking servie a part ou service user

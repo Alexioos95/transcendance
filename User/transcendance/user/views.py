@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from user import userMiddleware as middleware
+import time
 from datetime import date, datetime, timedelta
 from user.models import User
 from django.http import JsonResponse
 from django.http import HttpResponse
 from django.core.cache import cache
-import time
 import json
 import pytz
 import requests
@@ -23,13 +23,23 @@ def index(request):
         print('data =', form_data)
     return render(request , 'index.html')
 
+def print_all_cookies(request):
+    cookies = request.COOKIES
+    if cookies:
+        print("Cookies présents dans la requête :")
+        for cookie_name, cookie_value in cookies.items():
+            print(f'{cookie_name}: {cookie_value}')
+    else:
+        print("Aucun cookie n'est présent dans la requête.")
+
 def checkCookie(request, str):
+    print_all_cookies(request)
     if str in request.COOKIES:
         print('Le cookie "auth" est présent.')
         return request.COOKIES[str]
     else:
         print('Le cookie "auth" n\'est pas présent.')
-        return null
+        return 'null'
 
 # @csrf_exempt
 # def register(request):
@@ -107,9 +117,9 @@ def register(request):#check si user est unique sinon refuser try except get?
             else:
                 print("Le mot de passe est invalide.")
         # Réponse JSON
-        mailData = {'title':'transcendance registration','body':f'welcome {nom}, successfully registered', 'destinataire':'ftTranscendanceAMFEA@gmail.com'}
-        response = requests.post('http://localhost:8001/sendMail/', json=mailData)#mettre la route dans l'env ou set la route definitive dans le build final?
-        print(response.status_code)
+        # mailData = {'title':'transcendance registration','body':f'welcome {nom}, successfully registered', 'destinataire':'ftTranscendanceAMFEA@gmail.com'}
+        # response = requests.post('http://localhost:8001/sendMail/', json=mailData)#mettre la route dans l'env ou set la route definitive dans le build final?
+        # print(response.status_code)
         response_data = JsonResponse({"message": "User successfully registered"})
         response_data.status = 201
         response_data.set_cookie(
@@ -119,7 +129,8 @@ def register(request):#check si user est unique sinon refuser try except get?
         # secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
         samesite='None',
         expires=datetime.utcnow() + timedelta(hours=1))
-        encoded_jwt = jwt.encode({"userName": nom, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
+        expiration_time = (datetime.now() + timedelta(seconds=300)).timestamp()  # 300 secondes = 5 minutes
+        encoded_jwt = jwt.encode({"userName": nom, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
         response_data.set_cookie(key='auth', value=encoded_jwt, max_age=300)
         return (response_data)
     else:
@@ -128,7 +139,7 @@ def register(request):#check si user est unique sinon refuser try except get?
 def checkJwt(request):
     if request.method == 'GET':
         auth = checkCookie(request, 'auth')	#jwt?
-        if auth == null:
+        if auth == 'null':
             return JsonResponse({'error': 'not connected'}, status=204)
 
         # Check if JWT present
@@ -137,7 +148,7 @@ def checkJwt(request):
         decodedJwt = ""
 
         try:
-            decodedJwt = jwt.decode(auth, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
+            decodedJwt = jwt.decode(auth, os.environ['SERVER_JWT_KEY'], algorithms="HS256")
         except Exception as error:
             print(error)
             return JsonResponse({'error': 'Forbidden'}, status=403)
@@ -164,7 +175,6 @@ def login(request):
     #    Check if empty name or password?
     #    Check for minimum lengths?
     dbUser = User.objects.filter(Username__exact=requestUserName)
-    print('on estp asse par la')
     encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")    #    Export to .env file        #    Add env_example file
     print(f'var == {os.environ.get("SERVER_JWT_KEY")} et encoded jwt == {encoded_jwt}')
     try:
@@ -213,7 +223,7 @@ def login(request):
     #generate user jwt encode/decode secret and save it in db
     # user = User.objects.filter(Username='h').first()
     encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file	#	Already above...
-    response_data = JsonResponse({'success': 'User logged in'}, status=200);
+    response_data = JsonResponse({'success': 'User logged in'}, status=200)
 #= {nom: password}
     # userIp = request.META.get('REMOTE_ADDR')
     # print(f"voici l'ip user{userIp}")
@@ -321,7 +331,7 @@ def updateUserInfos(request):
 def disconnect(request):
     return
 
-def updateOnline(request):
+def updateInfo(request):
     # recevoir en post avoir via le coockie qui est co retourner la liste de ses amis avec l'update last co
     return
 
@@ -404,3 +414,57 @@ def preSet2FA(request):
 
 def resetPasswd(request):
     return
+
+@csrf_exempt
+def matchMaking(request):
+    # decode jwt
+    # recperer la ligne user en bdd
+    # check si le joueur est dans le cache , l'enlever et set la marge lvladveraire
+    # check dans le cache si on lui trouve un avdversaire
+    # sinon ajouter le joueur dans le cache
+    response = HttpResponse()
+    auth = checkCookie(request, 'auth')
+    
+    
+    if auth == 'null':
+        response.status_code = 403
+        return response
+    
+    print(f'le cookie est {auth}')
+    username = ""
+    try:
+        decoded_token = jwt.decode(auth, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
+        username = decoded_token.get('userName')  # Extract the username from the token
+    except jwt.ExpiredSignatureError:
+        response.status_code = 403
+        return response
+    except jwt.InvalidTokenError:
+        response.status_code = 403
+        return response
+    
+    user = User.objects.filter(Username__exact=username).first()
+    
+    if not user:
+        response.status_code = 403
+        return response
+    print(f'le username est {username}')
+    matchmakingDict = cache.get('matchmaking', {})
+    print(f"cache == {matchmakingDict}")
+    userMatchmaking = {'time': datetime.now(), 'difLevel': 5, 'game': "pong" ,'levelPong': user.pongLvl, 'levelTetris':tetrisLvl, 'matched':False}#si marchd a true return 200
+    # if username == 'fguarrac':
+    #     userMatchmaking = {'time': datetime.now(), 'difLevel': 5, 'game': "pong" ,'levelPong': 20, 'levelTetris':tetrisLvl}
+
+    if username in matchmakingDict.keys():
+        userMatchmaking = matchmakingDict.pop(username)
+        current_time = datetime.now()
+        time_difference = current_time - userMatchmaking['time']
+        if time_difference > timedelta(seconds=30):
+            userMatchmaking['difLevel'] *= 2
+            userMatchmaking['time'] = current_time
+    print(userMatchmaking)
+    for username, data in matchmakingDict.items():
+        print(f"Username: {username}, Time: {data['time'].timestamp()}, difference Level: {data['difLevel']}")
+    matchmakingDict[username] = userMatchmaking
+    cache.set('matchmaking', matchmakingDict, timeout=3600)#si pas trouve sinon inscrire en bdd game
+    response.status_code = 200 #100 si pas trouve
+    return response

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        .start-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .start-button:hover {
+            background-color: #0056b3;
+        }
+        canvas {
+            border: 1px solid #000;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="start-button">Démarrer</button>
+    </div>
+    <script>
+        let tetrisObj = {};
+
+        function drawCanevas(canvas, elements) {
+            let map = elements;
+            console.log('cici '+typeof(elements.map));
+            // console.log(map.length);
+            for (let y = 0; y < map.length; y++) {
+                console.log(map[y].length);
+                for (let x = 0; x < map[y].length; x++) {
+                    canvas.fillStyle = map[y][x];
+                    canvas.fillRect(x * 40, y * 40, 40, 40);
+                    canvas.strokeStyle = "#F0F0F2";
+                    canvas.strokeRect(x * 40, y * 40, 40, 40);
+                }
+            }
+        }
+
+        function drawPiece(canvas, element) {
+            let piece = JSON.parse(element);
+            for (let y = 0; y < piece.positions.length; y++) {
+                for (let x = 0; x < piece.positions[y].length; x++) {
+                    let color = piece.positions[y][x];
+                    canvas.fillStyle = color;
+                    if (color !== "#FFFFFF") {
+                        canvas.fillRect((piece.start.x + x) * 40, (piece.start.y + y) * 40, 40, 40);
+                    }
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const startButton = document.querySelector('.start-button');
+
+            startButton.onclick = () => {
+                startButton.style.display = 'none';
+                tetrisObj.canevas1 = createCanvas('gameCanvas1');
+                tetrisObj.canevas2 = createCanvas('gameCanvas2');
+                openSocket();
+                initGame();
+            };
+
+            function createCanvas(id) {
+                const canvas = document.createElement('canvas');
+                canvas.id = id;
+                canvas.width = 10 * 40;
+                canvas.height = 20 * 40;
+                document.body.appendChild(canvas);
+
+                return canvas.getContext('2d');
+            }
+
+            function openSocket() {
+                let socket = null;
+
+                try {
+                    socket = new WebSocket('ws://localhost:8001/ws/tetris/');
+                    socket.onopen = () => console.log('WebSocket est ouvert.');
+                    socket.onmessage = (event) => {
+                        console.log('Message reçu du serveur:', event.data);
+                        let data = JSON.parse(event.data);
+                        if (data.game1) {
+                            console.log(data.game1);
+                            console.log(data.game1.map);
+                            console.log(typeof(data.game1.map));
+                            drawCanevas(tetrisObj.canevas1, data.game1.map);
+                            drawPiece(tetrisObj.canevas1, data.game1.current);
+                        }
+                        if (data.game2) {
+                            console.log(data.game2);
+                            console.log(data.game2.map2);
+                            console.log(typeof(data.game2.map2));
+                            drawCanevas(tetrisObj.canevas2, data.game2.map2);
+                            drawPiece(tetrisObj.canevas2, data.game2.current2);
+                        }
+                    };
+                    socket.onerror = (error) => console.error('Erreur WebSocket:', error);
+                    socket.onclose = () => console.log('WebSocket fermé.');
+                } catch (error) {
+                    console.error('Erreur lors de l\'ouverture de la connexion WebSocket:', error);
+                }
+
+                listenForKeyEvents(socket);
+            }
+
+            function listenForKeyEvents(socket) {
+                window.addEventListener('keydown', (event) => {
+                    if (socket && socket.readyState === WebSocket.OPEN) {
+                        socket.send(JSON.stringify({ message: 'Press'+event.code }));
+                    }
+                });
+                document.addEventListener('keyup', function(event) {
+                    if (socket && socket.readyState === WebSocket.OPEN) {
+                        socket.send(JSON.stringify({ message: 'Release' + event.code }));
+                    }
+                });
+            }
+
+            function initGame() {
+                const canvas1 = document.getElementById('gameCanvas1').getContext('2d');
+                const canvas2 = document.getElementById('gameCanvas2').getContext('2d');
+                canvas1.clearRect(0, 0, canvas1.canvas.width, canvas1.canvas.height);
+                canvas2.clearRect(0, 0, canvas2.canvas.width, canvas2.canvas.height);
+            }
+        });
+    </script>
+</body>
+</html>

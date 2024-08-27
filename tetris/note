@@ -1,0 +1,5 @@
+daphne -b 0.0.0.0 -p 8000 tetris.asgi:application
+docker run -d --name redis -p 6379:6379 redis
+docker run -d --rm -p 6997:6379 redis:7
+
+docker rm $(docker ps -a -q)

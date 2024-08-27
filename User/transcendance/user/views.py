@@ -33,12 +33,12 @@ def print_all_cookies(request):
         print("Aucun cookie n'est présent dans la requête.")
 
 def checkCookie(request, str):
-    print_all_cookies(request)
+    # print_all_cookies(request)
     if str in request.COOKIES:
-        print('Le cookie "auth" est présent.')
+        # print('Le cookie "auth" est présent.')
         return request.COOKIES[str]
     else:
-        print('Le cookie "auth" n\'est pas présent.')
+        # print('Le cookie "auth" n\'est pas présent.')
         return 'null'
 
 # @csrf_exempt
@@ -122,16 +122,31 @@ def register(request):#check si user est unique sinon refuser try except get?
         # print(response.status_code)
         response_data = JsonResponse({"message": "User successfully registered"})
         response_data.status = 201
-        response_data.set_cookie(
-        'auth',
-        f'test{nom}',#
-        httponly=True,   # Empêche l'accès JavaScript au cookie
-        # secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
-        samesite='None',
-        expires=datetime.utcnow() + timedelta(hours=1))
+        # response_data.set_cookie(
+        # 'auth',
+        # f'test{nom}',#
+        # httponly=True,   # Empêche l'accès JavaScript au cookie
+        # # secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
+        # # samesite='None',
+        # expires=datetime.utcnow() + timedelta(hours=1))
         expiration_time = (datetime.now() + timedelta(seconds=300)).timestamp()  # 300 secondes = 5 minutes
         encoded_jwt = jwt.encode({"userName": nom, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
-        response_data.set_cookie(key='auth', value=encoded_jwt, max_age=300)
+        # response_data.set_cookie(
+        # 'auth',
+        # encoded_jwt,
+        # httponly=True,   # Empêche l'accès JavaScript au cookie
+        # # secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
+        # samesite='None',
+        # expires=datetime.utcnow() + timedelta(hours=1))
+        response_data.set_cookie(
+            'auth',
+            encoded_jwt,
+            httponly=True,  # Empêche l'accès JavaScript au cookie
+            secure=False,   # Désactivé pour HTTP local
+            samesite='Lax', # 'Lax' est souvent suffisant pour les tests locaux
+            expires=datetime.utcnow() + timedelta(hours=1)  # Date d'expiration future
+        )
+        # response_data.set_cookie(key='auth', value=encoded_jwt, max_age=3000)
         return (response_data)
     else:
         return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
@@ -190,11 +205,11 @@ def login(request):
         'auth',
         encoded_jwt,
         httponly=True,   # Empêche l'accès JavaScript au cookie
-        secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
+        # secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
         samesite='None',
-        expires=datetime.utcnow() + timedelta(hours=1))
+        expires=datetime.utcnow() + timedelta(hours=100))
         return (response_data)
-        response_data.set_cookie(key='auth', value=encoded_jwt, max_age=300)
+        response_data.set_cookie(key='auth', value=encoded_jwt, max_age=3000)
         # return JsonResponse({'data': 'pein de data user'}, status=200)
     else:
         print("Le mot de passe est invalide.")
@@ -222,12 +237,13 @@ def login(request):
     #recuperer info user en bdd et construirel la response et set le cookie
     #generate user jwt encode/decode secret and save it in db
     # user = User.objects.filter(Username='h').first()
+    print('on pass apr la????')
     encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file	#	Already above...
     response_data = JsonResponse({'success': 'User logged in'}, status=200)
+    response_data.set_cookie(key='auth', value=encoded_jwt, max_age=300)
 #= {nom: password}
     # userIp = request.META.get('REMOTE_ADDR')
     # print(f"voici l'ip user{userIp}")
-    response_data.set_cookie(key='auth', value=encoded_jwt, max_age=300)
     return response_data
 
 @csrf_exempt
@@ -422,11 +438,13 @@ def matchMaking(request):
     # check si le joueur est dans le cache , l'enlever et set la marge lvladveraire
     # check dans le cache si on lui trouve un avdversaire
     # sinon ajouter le joueur dans le cache
+    print('ici on matchmake!?')
     response = HttpResponse()
     auth = checkCookie(request, 'auth')
     
     
     if auth == 'null':
+        print('403?')
         response.status_code = 403
         return response
     
@@ -436,24 +454,26 @@ def matchMaking(request):
         decoded_token = jwt.decode(auth, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
         username = decoded_token.get('userName')  # Extract the username from the token
     except jwt.ExpiredSignatureError:
+        print('403??')
         response.status_code = 403
         return response
     except jwt.InvalidTokenError:
+        print('403???')
         response.status_code = 403
         return response
     
     user = User.objects.filter(Username__exact=username).first()
     
     if not user:
+        print('403????')
         response.status_code = 403
         return response
     print(f'le username est {username}')
     matchmakingDict = cache.get('matchmaking', {})
     print(f"cache == {matchmakingDict}")
-    userMatchmaking = {'time': datetime.now(), 'difLevel': 5, 'game': "pong" ,'levelPong': user.pongLvl, 'levelTetris':tetrisLvl, 'matched':False}#si marchd a true return 200
+    userMatchmaking = {'time': datetime.now(), 'difLevel': 5, 'game': "pong" ,'levelPong': user.pongLvl, 'levelTetris':user.tetrisLvl, 'matched':False}#si marchd a true return 200
     # if username == 'fguarrac':
-    #     userMatchmaking = {'time': datetime.now(), 'difLevel': 5, 'game': "pong" ,'levelPong': 20, 'levelTetris':tetrisLvl}
-
+    #     userMatchmaking = {'time': datetime.now(), 'difLevel': 5, 'game': "pong" ,'levelPong': 20, 'levelTetris':user.tetrisLvl}
     if username in matchmakingDict.keys():
         userMatchmaking = matchmakingDict.pop(username)
         current_time = datetime.now()
@@ -461,9 +481,24 @@ def matchMaking(request):
         if time_difference > timedelta(seconds=30):
             userMatchmaking['difLevel'] *= 2
             userMatchmaking['time'] = current_time
+    print(username)
     print(userMatchmaking)
-    for username, data in matchmakingDict.items():
-        print(f"Username: {username}, Time: {data['time'].timestamp()}, difference Level: {data['difLevel']}")
+    # maxLevel = userMatchmaking['game'] == "pong"?userMatchmaking['levelPong']:userMatchmaking['levelTetris']
+
+    maxLevel = userMatchmaking['levelPong'] if userMatchmaking['game'] == "pong" else userMatchmaking['levelTetris']
+    maxLevel+=userMatchmaking['difLevel']
+    
+    minLevel = userMatchmaking['levelPong'] if userMatchmaking['game'] == "pong" else userMatchmaking['levelTetris']
+    minLevel-=userMatchmaking['difLevel']
+    for userName, data in matchmakingDict.items():
+        if data['levelPong'] <= maxLevel and data['levelPong'] >= minLevel:
+            print('ca matchmake la')
+        else:
+            print('ca matchamake pas la')
+        print(f"Username: {userName}, Time: {data['time'].timestamp()}, difference Level: {data['difLevel']}")
+    gameData = {'player1': "fguarrac", 'player2': "madaguen"}
+    gameResponse = requests.post('http://localhost:8001/initGame/', json=gameData)
+    print(gameResponse.status_code)
     matchmakingDict[username] = userMatchmaking
     cache.set('matchmaking', matchmakingDict, timeout=3600)#si pas trouve sinon inscrire en bdd game
     response.status_code = 200 #100 si pas trouve

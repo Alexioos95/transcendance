@@ -1,0 +1,31 @@
+name: transcendance
+
+services:
+  webserver:
+    depends_on:
+      - "home"
+    container_name: webserver
+    build: ./services/webserver/
+    networks:
+      - "transcendance"
+    ports:
+      - "80:80"
+  home:
+    hostname: home
+    build: ./services/home/
+    networks:
+      - "transcendance"
+    expose:
+      - "8000"
+  cat:
+    depends_on:
+      - "home"
+    hostname: cat
+    build: ./services/cat/
+    networks:
+      - "transcendance"
+    expose:
+      - "8001"
+
+networks:
+  transcendance:

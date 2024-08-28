@@ -1,0 +1,13 @@
+#	pong
+#		db
+#		redis
+#		ws
+#	tetris
+#		db
+#		redis
+#		ws
+#	user
+#		db
+#	chat
+#		redis
+#		ws

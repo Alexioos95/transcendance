@@ -39,7 +39,7 @@ async function main() {
     console.log('CSRF Token:', csrftoken);
     console.log('Data to send:', info);
 
-    fetch('http://localhost:8000/login/', {
+    fetch('http://made-f0Br6s19:8000/User/login/', {
         credentials: 'include',
         method: 'POST',
         // headers: {
@@ -76,7 +76,7 @@ main();
 function fetchUntilSuccess() {
     const intervalId = setInterval(async () => {
         try {
-            const response = await fetch('http://localhost:8000/checkAuth42/', {
+            const response = await fetch('http://made-f0Br6s19:8000/User/checkAuth42/', {
                 method: 'POST'
             });
             
@@ -155,7 +155,7 @@ async function mainregister() {
     console.log('CSRF Token:', csrftoken);
     console.log('Data to send:', info);
 
-    fetch('http://localhost:8000/register/', {
+    fetch('http://made-f0Br6s19:8000/User/register/', {
         credentials: 'include',
         method: 'POST',
         // headers: {

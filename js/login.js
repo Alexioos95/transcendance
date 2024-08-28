@@ -55,10 +55,7 @@ function	login(signUpMode)
 			.catch((e) => console.log(e));
 	});
 	if (signUpMode !== undefined && signUpMode === true)
-	{
-		document.title = "ft_transcendance [Inscription]";
 		signUpForm(struct);
-	}
 }
 
 function	getLoginStruct()
@@ -108,5 +105,4 @@ function	signUpForm(struct)
 	struct.wrapperSpecialLogin.classList.add("hideInFade");
 	struct.signUp.classList.add("primary");
 	struct.cancelSignUp.classList.remove("hideInFade");
-	document.title = "ft_transcendance [Inscription]";
 }

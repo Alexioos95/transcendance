@@ -920,6 +920,7 @@ canvas {
 
 .wrapper-options-tabs > * {
 	display: none;
+	flex-direction: column;
 	height: 100%;
 	min-height: 100%;
 	width: 100%;
@@ -931,29 +932,98 @@ canvas {
 }
 
 .wrapper-options-tabs form {
-	flex-direction: column;
-}
-
-.wrapper-options-tabs form div {
-	display: flex;
-	flex-direction: column;
-	width: 100%;
-	margin-bottom: 1rem;
-}
-
-.wrapper-options-tabs form div label {
 	display: flex;
 	flex-direction: column;
 	width: 100%;
 }
 
-.wrapper-options-tabs form div label input {
-	width: 45%;
+.wrapper-options-forms .options-section {
 	margin-bottom: 1rem;
 }
 
-.wrapper-options-tabs form div label p {
-	margin: 0.2rem 0;
+.wrapper-options-forms .options-section p {
+	font-size: 0.8rem;
+	margin-left: 1.8rem;
+}
+
+.wrapper-options-forms .options-form .options-div label {
+	display: flex;
+	flex-direction: column;
+	width: 50%;
+	padding-left: 1.4rem;
+}
+
+.wrapper-options-forms .options-form .options-div label span {
+	width: 35%;
+}
+
+.wrapper-options-forms .options-form .options-div label span.txt {
+	margin-bottom: 0.2rem;
+	width: 100%;
+}
+
+.wrapper-options-forms .options-form .options-div label input {
+	margin-left: 1.4rem;
+}
+
+.wrapper-options-forms .options-form button {
+	margin-bottom: 2rem;
+}
+
+.wrapper-options-forms .options-wrapper-lang,
+.wrapper-options-forms .options-wrapper-2fa {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	margin-bottom: 0;
+	padding-left: 1rem;
+}
+
+.wrapper-options-forms .lang-label {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.2rem 0.4rem;
+	border: 2px solid var(--mainColor);
+	border-radius: 23px;
+	cursor: pointer;
+}
+
+.wrapper-options-forms .lang-label:has([type=radio]:checked) {
+	border: 2px solid var(--textColor);
+}
+
+.wrapper-options-forms form .flag-vlaaderen {
+	height: 1rem;
+	width: 1.4rem;
+}
+
+.wrapper-options-forms .options-wrapper-connection {
+	display: flex;
+	flex-direction: column;
+}
+
+.wrapper-options-forms .options-wrapper-connection label {
+	margin-bottom: 1rem;
+}
+
+.wrapper-options-forms .options-wrapper-password span.txt {
+	margin-left: 1.4rem;
+	margin-bottom: 0.2rem;
+}
+
+.wrapper-options-forms .options-wrapper-2fa [type=radio] {
+	position: unset;
+	width: auto;
+	height: auto;
+	opacity: 1;
+}	
+
+.wrapper-options-forms button {
+	align-self: center;
+	width: 75%;
+	padding: 0.3rem 0;
+	border-radius: 20px;
 }
 
 .wrapper-options-tabs tbody {

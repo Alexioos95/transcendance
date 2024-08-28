@@ -13,14 +13,12 @@ async function	run(guestMode)
 		options: getOptionsStruct(),
 		history: getHistoryStruct(),
 		tabs: getTabsStruct(),
+		txt: document.getElementsByClassName("txt"),
 		run: 1
 	};
 	setupEventListeners(struct, guestMode);
 	if (guestMode === true)
-	{
-		document.title = "ft_transcendance [Invite]";
 		setGuestRestrictions(struct);
-	}
 	while (struct.run === 1)
 	{
 		await waitCoin(struct.gameForm)
@@ -83,6 +81,27 @@ function	setupEventListeners(struct, guestMode)
 	struct.history.leaveButton.addEventListener("click", function() {
 		resetHistoryClasses(struct);
 	});
+	// Lang
+	struct.options.lang.fr.addEventListener("click", function() {
+		if (struct.options.lang.prev !== "fr")
+		{
+			fetch("/lang/fr.json")
+				.then(response => response.json())
+				.then(result => { translatePage(struct.txt, result); })
+				.then(() => { struct.options.lang.prev = "fr"; })
+				.catch(() => { console.error("Error: couldn't translate the page"); });
+		}
+	});
+	struct.options.lang.en.addEventListener("click", function() {
+		if (struct.options.lang.prev !== "en")
+		{
+			fetch("/lang/en.json")
+				.then(response => response.json())
+				.then(result => { translatePage(struct.txt, result); })
+				.then(() => { struct.options.lang.prev = "en"; })
+				.catch(() => { console.error("Error: couldn't translate the page"); });
+		}
+	});
 	// Tabs Account/Blocked
 	struct.options.account.button.addEventListener("click", function() {
 		showTab(struct.options.account, struct.options.blocked)
@@ -102,6 +121,18 @@ function	setupEventListeners(struct, guestMode)
 	struct.screen.wrapperCanvas.addEventListener("keyup", function(event) { disableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mousemove", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mouseup", function(event) { disableStickMove(event, struct); });
+}
+
+async function	translatePage(txt, obj)
+{
+	let i = 0;
+	let values = Object.values(obj);
+
+	for (let value of values)
+	{
+		txt[i].innerHTML = value;
+		i++;
+	}
 }
 
 async function	setGuestRestrictions(struct)
@@ -323,19 +354,28 @@ function	getTournamentStruct()
 function	getOptionsStruct()
 {
 	const buttons = document.querySelectorAll(".wrapper-options-buttons button");
+	const labels = document.getElementsByClassName("lang-label");
+
 	const accountStruct = {
 		button: buttons[0],
-		table: document.getElementsByClassName("options-form")[0]
+		table: document.getElementsByClassName("wrapper-options-forms")[0]
 	};
 	const blockedStruct = {
 		button: buttons[1],
 		table: document.getElementsByClassName("wrapper-blocked")[0]
 	};
+	const langStruct = {
+		prev: null,
+		fr: labels[0],
+		en: labels[1],
+		vl: labels[2]
+	};
 	const struct = {
 		wrapper: document.getElementsByClassName("wrapper-options")[0],
 		leaveButton: document.querySelector(".wrapper-options .cross-button"),
 		account: accountStruct,
-		blocked: blockedStruct
+		blocked: blockedStruct,
+		lang: langStruct
 	};
 	return (struct);
 }
@@ -724,6 +764,7 @@ async function	waitTournamentForm(struct)
 			showScreen(struct.screen, struct.screen.wrapperCanvas);
 			resolve();
 		};
+
 		function resetTournamentForm() {
 			struct.tournament.on = false;
 			struct.cards.gameSelector.classList.remove("zindex");

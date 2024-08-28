@@ -38,13 +38,7 @@ async function navigate(page)
 async function	launchPageScript(page, guestMode, signUpMode)
 {
 	if (page === "game")
-	{
-		document.title = "ft_transcendance";
 		run(guestMode);
-	}
 	else if (page === "login")
-	{
-		document.title = "ft_transcendance [Connection]";
 		login(signUpMode);
-	}
 }

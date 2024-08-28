@@ -237,8 +237,8 @@ def auth42(request):
     authorization_code = request.GET.get('code')
     data = {
         'grant_type': 'authorization_code',
-        'client_id': 'u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9',
-        'client_secret': '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',
+        'client_id': os.environ.get('CLIENT_ID'),
+        'client_secret': os.environ.get('CLIENT_SECRET'),
         'code': authorization_code,
         'redirect_uri': 'http://localhost:8000/auth42'
     }

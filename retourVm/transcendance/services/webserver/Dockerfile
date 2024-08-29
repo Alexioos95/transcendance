@@ -5,7 +5,9 @@ COPY default.conf /etc/nginx/conf.d/
 COPY index.html /
 COPY test.js /
 EXPOSE 80
+EXPOSE 8080
 EXPOSE 443
+EXPOSE 4433
 RUN ["openssl", "req", "-x509", "-newkey", "rsa:2048", "-noenc", "-subj", "/=/=/=", "-days", "3650", "-keyout", "/root/key.pem", "-out", "/root/crt.pem"]
 HEALTHCHECK     --interval=10s --timeout=1s --retries=3 --start-period=30s \
         CMD wget -q --tries=1 --spider --no-check-certificate https://localhost:443/health; if [ $? -eq 0 ]; then exit 0; else exit 1; fi

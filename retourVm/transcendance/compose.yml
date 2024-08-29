@@ -1,31 +1,108 @@
 name: transcendance
 
 services:
+
+  chat_cache:
+    hostname: redis
+    image: redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - transcendance
+    #??volume:??
+
+#  pong_cache:
+#    image: redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
+#
+#  tetris_cache:
+#    image: redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
+#
+#  pong_db:
+#    volume:
+#
+#  tetris_db:
+#    volume:
+#
+#  user_db:
+#    volume:
+
+  chat:
+    hostname: chat
+    container_name: chat
+    depends_on:
+      chat_cache:
+        condition: service_healthy
+        restart: true
+    pull_policy: build
+    build:
+      context: services/Chat
+      dockerfile: Dockerfile
+    networks:
+      - transcendance
+    restart: unless-stopped
+
+#  pong:
+#    pull_policy: build
+#    build:
+#      context: services
+#      dockerfile: Pong/Dockerfile
+#
+#  tetris:
+#    pull_policy: build
+#    build:
+#      context: services
+#      dockerfile: Tetris/Dockerfile
+#
+#  user:
+#    pull_policy: build
+#    build:
+#      context: services
+#      dockerfile: User/Dockerfile
+
   webserver:
+    hostname: webserver
+    container_name: nginx
     depends_on:
-      - "home"
-    container_name: webserver
-    build: ./services/webserver/
-    networks:
-      - "transcendance"
+      chat:
+        condition: service_healthy
+        restart: true
+    pull_policy: build
+    build:
+      context: services/webserver/
+      dockerfile: Dockerfile
     ports:
-      - "80:80"
-  home:
-    hostname: home
-    build: ./services/home/
+      - 80:80
+      - 8080:8080
+      - 443:443
+      - 4433:4433
     networks:
-      - "transcendance"
-    expose:
-      - "8000"
-  cat:
-    depends_on:
-      - "home"
-    hostname: cat
-    build: ./services/cat/
-    networks:
-      - "transcendance"
-    expose:
-      - "8001"
+      - transcendance
+    ##volume:
+    restart: unless-stopped
 
 networks:
   transcendance:
+
+
+#	pong
+#		db
+#		redis
+#		ws
+#	tetris
+#		db
+#		redis
+#		ws
+#	user
+#		db
+#	chat
+#		redis
+#		ws
+
+#       chat
+#               daphne 8000
+

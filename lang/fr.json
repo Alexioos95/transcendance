@@ -79,7 +79,7 @@
 	},
 	"ariaLabel": {
 		"chooseGame": "Choisissez le jeu: Pong ou Tetris",
-		"mode": "Mode",
+		"mode": "Choisissez le mode de jeu: ",
 		"1vAI": "Joueur contre Ordinateur",
 		"1v1": "Joueur contre Joueur en local",
 		"tournament": "Tournoi a 4 joueurs en local",

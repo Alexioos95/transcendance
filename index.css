@@ -1336,6 +1336,7 @@ canvas.pong {
 	height: 1.5rem;
 	width: 1.5rem;
 	display: flex;
+	align-self: flex-start;
 }
 
 .tab-chat .chat-message p {

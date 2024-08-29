@@ -13,6 +13,7 @@ async function	run(guestMode)
 		options: getOptionsStruct(),
 		history: getHistoryStruct(),
 		tabs: getTabsStruct(),
+		chat: getChatStruct(),
 		translation: getTranslationStruct(),
 		run: 1
 	};
@@ -63,6 +64,8 @@ function	setupEventListeners(struct, guestMode)
 	});
 	struct.header.logoutButton.addEventListener("click", function() {
 		struct.run = 0;
+		if (struct.chat.socket !== undefined)
+			struct.chat.socket.close(1000);
 		navigate("login")
 			.then(() => launchPageScript("login", false, false))
 			.then(() => {
@@ -121,6 +124,90 @@ function	setupEventListeners(struct, guestMode)
 	struct.screen.wrapperCanvas.addEventListener("keyup", function(event) { disableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mousemove", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mouseup", function(event) { disableStickMove(event, struct); });
+	// Chat
+	liveChat(struct);
+}
+
+async function	liveChat(struct)
+{
+	struct.chat.socket = new WebSocket("ws://made-f0ar12s1:8000/ws/chat/");
+
+	struct.chat.socket.addEventListener("message", function(event) {
+		const tr = document.createElement("tr");
+		const td = document.createElement("td");
+		const chatMessage = document.createElement("div");
+		const chatUserAvatar = document.createElement("div");
+		const avatar = document.createElement("img");
+		const p = document.createElement("p");
+		const span = document.createElement("span");
+		const text = document.createTextNode(": " + JSON.parse(event.data).message);
+		const chatOptions = document.createElement("div");
+		const button1 = document.createElement("button");
+		const button2 = document.createElement("button");
+		const button3 = document.createElement("button");
+		const button4 = document.createElement("button");
+		const i1 = document.createElement("i");
+		const i2 = document.createElement("i");
+		const i3 = document.createElement("i");
+		const i4 = document.createElement("i");
+		let isScrolled = false;
+
+		avatar.src = "/favicon.ico";
+		avatar.alt = "Avatar de l'utilisateur";
+		span.innerHTML = "USERNAME";
+		p.appendChild(span);
+		p.appendChild(text);
+		chatUserAvatar.classList.add("chat-user-avatar");
+		chatUserAvatar.appendChild(avatar);
+		chatMessage.classList.add("chat-message");
+		chatMessage.appendChild(chatUserAvatar);
+		chatMessage.appendChild(p);
+		i1.classList.add("fa-solid", "fa-user-plus");
+		i2.classList.add("fa-solid", "fa-clock-rotate-left");
+		i3.classList.add("fa-solid", "fa-table-tennis-paddle-ball");
+		i4.classList.add("fa-solid", "fa-circle-xmark");
+		button1.type = "button";
+		button2.type = "button";
+		button3.type = "button";
+		button4.type = "button";
+		button1.title = "Ajouter en ami";
+		button2.title = "Voir l'historique";
+		button3.title = "Inviter pour un Pong";
+		button4.title = "Bloquer l'utilisateur";
+		button1.classList.add("hover-green");
+		button2.classList.add("hover-purple");
+		button3.classList.add("hover-blue");
+		button4.classList.add("hover-red");
+		button1.appendChild(i1);
+		button2.appendChild(i2);
+		button3.appendChild(i3);
+		button4.appendChild(i4);
+		chatOptions.appendChild(button1);
+		chatOptions.appendChild(button2);
+		chatOptions.appendChild(button3);
+		chatOptions.appendChild(button4);
+		chatOptions.classList.add("chat-options");
+		td.appendChild(chatMessage);
+		td.appendChild(chatOptions);
+		td.tabIndex = "0";
+		if (struct.tabs.chat.table.scrollTop === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
+			isScrolled = true;
+		tr.appendChild(td);
+		struct.chat.output.appendChild(tr);
+		if (struct.tabs.chat.table.classList.contains("active") && isScrolled === true)
+			struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
+	});
+	struct.chat.input.addEventListener("keydown", function(event) {
+		if (event.key === "Enter")
+		{
+			event.preventDefault();
+			if (struct.chat.input.value !== "")
+			{
+				struct.chat.socket.send(JSON.stringify({ "message": struct.chat.input.value }));
+				struct.chat.input.value = "";
+			}
+		}
+	});
 }
 
 async function	translateGamePage(struct, obj)
@@ -415,21 +502,35 @@ function	getTabsStruct()
 	const buttons = document.querySelectorAll(".wrapper-tabs-buttons button");
 	const tables = document.querySelectorAll(".wrapper-tabs-tables table");
 	const inputs = document.querySelectorAll(".wrapper-inputs div");
+
 	const chatStruct = {
 		button: buttons[0],
 		table: tables[0],
-		input: inputs[0]
+		input: inputs[0],
 	};
 	const friendStruct = {
 		button: buttons[1],
 		table: tables[1],
-		input: inputs[1]
+		input: inputs[1],
 	};
 	const struct = {
 		wrapperTabs: document.getElementsByClassName("wrapper-tabs")[0],
 		wrapperInputs: document.getElementsByClassName("wrapper-inputs")[0],
 		chat: chatStruct,
 		friend: friendStruct
+	};
+	return (struct);
+}
+
+function	getChatStruct()
+{
+	const textareas = document.querySelectorAll(".wrapper-inputs textarea");
+	const chatOutput = document.querySelector(".tab-chat tbody")
+
+	const struct = {
+		output: chatOutput,
+		input: textareas[0],
+		socket: undefined
 	};
 	return (struct);
 }

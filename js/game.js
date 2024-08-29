@@ -13,7 +13,7 @@ async function	run(guestMode)
 		options: getOptionsStruct(),
 		history: getHistoryStruct(),
 		tabs: getTabsStruct(),
-		txt: document.getElementsByClassName("txt"),
+		translation: getTranslationStruct(),
 		run: 1
 	};
 	setupEventListeners(struct, guestMode);
@@ -87,7 +87,7 @@ function	setupEventListeners(struct, guestMode)
 		{
 			fetch("/lang/fr.json")
 				.then(response => response.json())
-				.then(result => { translatePage(struct.txt, result); })
+				.then(result => { translatePage(struct.translation, result); })
 				.then(() => { struct.options.lang.prev = "fr"; })
 				.catch(() => { console.error("Error: couldn't translate the page"); });
 		}
@@ -97,7 +97,7 @@ function	setupEventListeners(struct, guestMode)
 		{
 			fetch("/lang/en.json")
 				.then(response => response.json())
-				.then(result => { translatePage(struct.txt, result); })
+				.then(result => { translatePage(struct.translation, result); })
 				.then(() => { struct.options.lang.prev = "en"; })
 				.catch(() => { console.error("Error: couldn't translate the page"); });
 		}
@@ -123,14 +123,28 @@ function	setupEventListeners(struct, guestMode)
 	struct.screen.wrapperCanvas.addEventListener("mouseup", function(event) { disableStickMove(event, struct); });
 }
 
-async function	translatePage(txt, obj)
+async function	translatePage(struct, obj)
 {
-	let i = 0;
-	let values = Object.values(obj);
+	let plainTexts = Object.values(obj.plainText);
+	let placeHolders = Object.values(obj.placeholder);
+	let titles = Object.values(obj.title);
 
-	for (let value of values)
+	let i = 0;
+	for (let text of plainTexts)
 	{
-		txt[i].innerHTML = value;
+		struct.txt[i].innerHTML = text;
+		i++;
+	}
+	i = 0;
+	for (let placeholder of placeHolders)
+	{
+		struct.pholder[i].placeholder = placeholder;
+		i++;
+	}
+	i = 0;
+	for (let title of titles)
+	{
+		struct.title[i].title = title;
 		i++;
 	}
 }
@@ -413,6 +427,16 @@ function	getTabsStruct()
 	return (struct);
 }
 
+function	getTranslationStruct()
+{
+	const struct = {
+		txt: document.getElementsByClassName("translate-txt"),
+		pholder: document.getElementsByClassName("translate-pholder"),
+		title: document.getElementsByClassName("translate-title")
+	};
+	return (struct);
+}
+
 //////////////////////////////////////////////////////
 // Menu (Game selector's form; Tournament Overview)
 //////////////////////////////////////////////////////
@@ -470,11 +494,11 @@ async function	checkGameSelectorValidation(struct)
 			struct.screen.game = getPongStruct();
 			setupGameControls(struct, "pong");
 		}
-		// else if (game === "tetris")
-		// {
-		// 	struct.screen.game = getTetrisStruct();
-		// 	setupGameControls(struct, "tetris");
-		// }
+		else if (game === "tetris")
+		{
+			struct.screen.game = getTetrisStruct();
+			setupGameControls(struct, "tetris");
+		}
 		if (mode === "tournament")
 			struct.tournament.on = true;
 		title.style.opacity = 0;
@@ -569,21 +593,21 @@ function	setupGameControls(struct, game)
 		struct.screen.keys[10].innerHTML = "";
 		struct.screen.keys[11].innerHTML = "<i class=\"fa-solid fa-arrow-down\"></i>";
 	}
-	// else if (game === "tetris")
-	// {
-	// 	struct.screen.keys[0].innerHTML = "";
-	// 	struct.screen.keys[1].innerHTML = "";
-	// 	struct.screen.keys[2].innerHTML = "";
-	// 	struct.screen.keys[3].innerHTML = "";
-	// 	struct.screen.keys[4].innerHTML = "";
-	// 	struct.screen.keys[5].innerHTML = "";
-	// 	struct.screen.keys[6].innerHTML = "";
-	// 	struct.screen.keys[7].innerHTML = "";
-	// 	struct.screen.keys[8].innerHTML = "";
-	// 	struct.screen.keys[9].innerHTML = "";
-	// 	struct.screen.keys[10].innerHTML = "";
-	// 	struct.screen.keys[11].innerHTML = "";
-	// }
+	else if (game === "tetris")
+	{
+		struct.screen.keys[0].innerHTML = "";
+		struct.screen.keys[1].innerHTML = "";
+		struct.screen.keys[2].innerHTML = "";
+		struct.screen.keys[3].innerHTML = "";
+		struct.screen.keys[4].innerHTML = "";
+		struct.screen.keys[5].innerHTML = "";
+		struct.screen.keys[6].innerHTML = "";
+		struct.screen.keys[7].innerHTML = "";
+		struct.screen.keys[8].innerHTML = "";
+		struct.screen.keys[9].innerHTML = "";
+		struct.screen.keys[10].innerHTML = "";
+		struct.screen.keys[11].innerHTML = "";
+	}
 }
 
 /////////////////////////

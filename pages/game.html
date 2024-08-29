@@ -1,12 +1,12 @@
 <div class="please-rotate">
 	<div></div>
-	<p class="txt">Veuillez tourner votre appareil sur le côté</p>
+	<p class="translate-txt">Veuillez tourner votre appareil sur le côté</p>
 </div>
 <header>
 	<h1>ft_transcendance</h1>
 	<nav>
 		<ul>
-			<li class="nav-user" title="Voir mon historique">
+			<li class="nav-user translate-title" title="Voir mon historique">
 				<button>
 					<img src="/favicon.ico" alt="Avatar de l'utilisateur">
 					<span>Alexioos95</span>
@@ -15,42 +15,42 @@
 			</li>
 			<li class="for-phone">
 				<button>
-					<i class="fa-solid fa-gamepad" title="Jouer à un jeu"></i>
+					<i class="fa-solid fa-gamepad translate-title" title="Jouer à un jeu"></i>
 				</button>
 			</li>
 			<li class="hide-for-guest for-phone">
 				<button>
-					<i class="fa-solid fa-message" title="Parler aux autres joueurs"></i>
+					<i class="fa-solid fa-message translate-title" title="Parler aux autres joueurs"></i>
 				</button>
 			</li>
 			<li class="hide-for-guest for-phone">
 				<button>
-					<i class="fa-solid fa-address-book" title="Liste d'amis"></i>
+					<i class="fa-solid fa-address-book translate-title" title="Liste d'amis"></i>
 				</button>
 			</li>
 			<li class="hide-for-guest">
 				<button>
-					<i class="fa-solid fa-gear" title="Options"></i>
-					<span class="txt">Options</span>
+					<i class="fa-solid fa-gear translate-title" title="Options"></i>
+					<span class="translate-txt">Options</span>
 				</button>
 			</li>
 			<li>
 				<button>
-					<i class="fa-solid fa-arrow-right-to-bracket" title="Se déconnecter"></i>
-					<span class="txt">Se deconnecter</span>
+					<i class="fa-solid fa-arrow-right-to-bracket translate-title" title="Se déconnecter"></i>
+					<span class="translate-txt">Se deconnecter</span>
 				</button>
 			</li>
 		</ul>
 	</nav>
 </header>
 <main class="game">
-	<h2 class="txt">CHARGEMENT</h2>
+	<h2 class="translate-txt">CHARGEMENT</h2>
 	<div class="wrapper-sections">
 		<section class="wrapper-left-section my-card">
 			<form>
 				<div class="wrapper-selectors">
 					<div class="wrapper-game-selectors">
-						<h3 class="txt" aria-label="Choisissez le jeu: Pong ou Tetris">Jeu</h3>
+						<h3 class="translate-txt translate-aria-label" aria-label="Choisissez le jeu: Pong ou Tetris">Jeu</h3>
 						<div class="wrapper-game-selector">
 							<label class="game-selector">
 								<input type="radio" name="game" value="pong" aria-label="Pong">
@@ -67,7 +67,7 @@
 						</div>
 					</div>
 					<div class="wrapper-mode-selectors">
-						<h3 class="txt" aria-label="Choisissez le mode de jeu: ">Mode</h3>
+						<h3 class="translate-txt" aria-label="Choisissez le mode de jeu: ">Mode</h3>
 						<div class="wrapper-mode-selector">
 							<label class="mode-selector">
 								<input disabled type="radio" name="mode" value="1vAI" aria-label="Joueur contre Ordinateur">
@@ -76,41 +76,41 @@
 										<span class="top-circle"></span>
 									</span>
 								</span>
-								<span class="mode-text txt">1vIA</span>
+								<span class="mode-text translate-txt">1vIA</span>
 							</label>
-							<label class="mode-selector" title="Ce mode est désactivé sur téléphone et tablette">
+							<label class="mode-selector translate-title" title="Ce mode est désactivé sur téléphone et tablette">
 								<input type="radio" name="mode" value="1v1" aria-label="Joueur contre Joueur en local">
 								<span class="wrapper-circle">
 									<span class="base-circle">
 										<span class="top-circle"></span>
 									</span>
 								</span>
-								<span class="mode-text txt">1v1 local</span>
+								<span class="mode-text translate-txt">1v1 local</span>
 							</label>
-							<label class="mode-selector" title="Ce mode est désactivé sur téléphone et tablette">
+							<label class="mode-selector translate-title" title="Ce mode est désactivé sur téléphone et tablette">
 								<input type="radio" name="mode" value="tournament" aria-label="Tournoi a 4 joueurs en local">
 								<span class="wrapper-circle">
 									<span class="base-circle">
 										<span class="top-circle"></span>
 									</span>
 								</span>
-								<span class="mode-text txt">Tournoi local a 4</span>
+								<span class="mode-text translate-txt">Tournoi local a 4</span>
 							</label>
-							<label class="mode-selector" title="Ce mode est désactivé si vous n'êtes pas connecté">
+							<label class="mode-selector translate-title" title="Ce mode est désactivé si vous n'êtes pas connecté">
 								<input disabled type="radio" name="mode" value="online" aria-label="Joueur contre Joueur en ligne">
 								<span class="wrapper-circle">
 									<span class="base-circle">
 										<span class="top-circle"></span>
 									</span>
 								</span>
-								<span class="mode-text txt">1v1 en ligne</span>
+								<span class="mode-text translate-txt">1v1 en ligne</span>
 							</label>
 						</div>
 					</div>
 				</div>
 				<div class="wrapper-submit-button">
 					<button id="selector" type="button" aria-label="Jouer !">
-						<span class="coin-text txt">Insérer une pièce</span>
+						<span class="coin-text translate-txt">Insérer une pièce</span>
 						<span class="wrapper-slot">
 							<span class="slot"></span>
 						</span>
@@ -145,14 +145,14 @@
 					<button type="button" class="tournament-form-back">
 						<i class="fa-solid fa-circle-arrow-left"></i>
 					</button>
-					<span class="txt">Sélectionnez vos pseudonymes</span>
+					<span class="translate-txt">Sélectionnez vos pseudonymes</span>
 					<div class="tournament-wrapper-inputs">
-						<input type="text" name="p1" maxlength="30" placeholder="Joueur 1" aria-label="Pseudonyme du joueur 1">
-						<input type="text" name="p2" maxlength="30" placeholder="Joueur 2" aria-label="Pseudonyme du joueur 2">
-						<input type="text" name="p3" maxlength="30" placeholder="Joueur 3" aria-label="Pseudonyme du joueur 3">
-						<input type="text" name="p4" maxlength="30" placeholder="Joueur 4" aria-label="Pseudonyme du joueur 4">
+						<input class="translate-pholder" type="text" name="p1" maxlength="30" placeholder="Joueur 1" aria-label="Pseudonyme du joueur 1">
+						<input class="translate-pholder" type="text" name="p2" maxlength="30" placeholder="Joueur 2" aria-label="Pseudonyme du joueur 2">
+						<input class="translate-pholder" type="text" name="p3" maxlength="30" placeholder="Joueur 3" aria-label="Pseudonyme du joueur 3">
+						<input class="translate-pholder" type="text" name="p4" maxlength="30" placeholder="Joueur 4" aria-label="Pseudonyme du joueur 4">
 					</div>
-					<button class="txt" type="button" aria-label="Valider">Valider</button>
+					<button class="translate-txt" type="button" aria-label="Valider">Valider</button>
 				</form>
 				<div class="wrapper-options hidden">
 					<button type="button" class="cross-button">
@@ -160,17 +160,17 @@
 					</button>
 					<div class="wrapper-options-buttons wrapper-tab-button">
 						<button type="button" class="tab-button active">
-							<span class="txt">Compte</span>
+							<span class="translate-txt">Compte</span>
 						</button>
 						<button type="button" class="tab-button">
-							<span class="txt">Bloqués</span>
+							<span class="translate-txt">Bloqués</span>
 						</button>
 					</div>
 					<div class="wrapper-options-tabs tab-tabs">
 						<div class="wrapper-options-forms active">
 							<form class="options-form">
 								<div class="options-section">
-									<h4 class="txt">Langue</h4>
+									<h4 class="translate-txt">Langue</h4>
 									<div class="options-wrapper-lang">
 										<label class="lang-label">
 											<span class="fi fi-fr"></span>
@@ -188,55 +188,55 @@
 											<input type="radio" name="lang" value="vl">
 										</label>
 									</div>
-									<p class="txt">N'oubliez pas de sauvegarder pour appliquer votre choix à la prochaine connexion</p>
+									<p class="translate-txt">N'oubliez pas de sauvegarder pour appliquer votre choix à la prochaine connexion</p>
 								</div>
 								<div class="options-section options-div">
-									<h4 class="txt">Avatar</h4>
+									<h4 class="translate-txt">Avatar</h4>
 									<label>
-										<span class="txt">Changer mon avatar:</span>
+										<span class="translate-txt">Changer mon avatar:</span>
 										<input type="file">
 									</label>
 								</div>
 								<div class="options-section options-div">
-									<h4 class="txt">Connexion</h4>
+									<h4 class="translate-txt">Connexion</h4>
 									<div class="options-wrapper-connection">
 										<label>
-											<span class="txt">Nom d'utilisateur:</span>
+											<span class="translate-txt">Nom d'utilisateur:</span>
 											<input type="text" name="options-username">
 										</label>
 										<label>
-											<span class="txt">Email:</span>
+											<span class="translate-txt">Email:</span>
 											<input type="email" name="options-email">
 										</label>
 										<div class="options-wrapper-password">
-											<span class="txt">Mot de passe:</span>
+											<span class="translate-txt">Mot de passe:</span>
 											<label>
-												<input type="password" name="options-password-actual" placeholder="Actuel">
+												<input class="translate-pholder" type="password" name="options-password-actual" placeholder="Actuel">
 											</label>
 											<label>
-												<input type="password" name="options-password-new" placeholder="Nouveau">
+												<input class="translate-pholder" type="password" name="options-password-new" placeholder="Nouveau">
 											</label>
 											<label>
-												<input type="password" name="options-password-confirmation" placeholder="Confirmation">
+												<input class="translate-pholder" type="password" name="options-password-confirmation" placeholder="Confirmation">
 											</label>
 										</div>
 									</div>
 								</div>
-								<button class="txt" type="submit">Sauvegarder</button>
+								<button class="translate-txt" type="submit">Sauvegarder</button>
 								<div class="options-section">
-									<h4 class="txt">Authentification à deux facteurs</h4>
+									<h4 class="translate-txt">Authentification à deux facteurs</h4>
 									<div class="options-wrapper-2fa">
 										<label class="2fa-label">
 											<input type="radio" name="2fa" value="off" checked>
-											<span class="txt">Désactiver</span>
+											<span class="translate-txt">Désactiver</span>
 										</label>
 										<label class="2fa-label">
-											<input type="radio" name="2fa" value="sms">
-											<span class="txt">SMS</span>
+											<input type="radio" name="2fa" value="email">
+											<span class="translate-txt">Email</span>
 										</label>
 										<label class="2fa-label">
 											<input type="radio" name="2fa" value="app">
-											<span class="txt">Application Google</span>
+											<span class="translate-txt">Application Google</span>
 										</label>
 									</div>
 								</div>
@@ -254,7 +254,7 @@
 												<span>User</span>
 												<button type="button" title="Retirer de la liste des bloqués">
 													<i class="fa-solid fa-square-minus"></i>
-													<span class="txt">Débloquer</span>
+													<span class="translate-txt">Débloquer</span>
 												</button>
 											</div>
 										</div>
@@ -354,10 +354,10 @@
 			<div class="wrapper-tabs my-card">
 				<div class="wrapper-tabs-buttons wrapper-tab-button">
 					<button type="button" class="tab-button active">
-						<span class="txt">Chat</span>
+						<span class="translate-txt">Chat</span>
 					</button>
 					<button type="button" class="tab-button">
-						<span class="txt">Amis</span>
+						<span class="translate-txt">Amis</span>
 					</button>
 				</div>
 				<div class="wrapper-tabs-tables tab-tabs">

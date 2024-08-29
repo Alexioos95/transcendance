@@ -87,7 +87,7 @@ function	setupEventListeners(struct, guestMode)
 		{
 			fetch("/lang/fr.json")
 				.then(response => response.json())
-				.then(result => { translatePage(struct.translation, result); })
+				.then(result => { translateGamePage(struct.translation, result); })
 				.then(() => { struct.options.lang.prev = "fr"; })
 				.catch(() => { console.error("Error: couldn't translate the page"); });
 		}
@@ -97,7 +97,7 @@ function	setupEventListeners(struct, guestMode)
 		{
 			fetch("/lang/en.json")
 				.then(response => response.json())
-				.then(result => { translatePage(struct.translation, result); })
+				.then(result => { translateGamePage(struct.translation, result); })
 				.then(() => { struct.options.lang.prev = "en"; })
 				.catch(() => { console.error("Error: couldn't translate the page"); });
 		}
@@ -123,11 +123,12 @@ function	setupEventListeners(struct, guestMode)
 	struct.screen.wrapperCanvas.addEventListener("mouseup", function(event) { disableStickMove(event, struct); });
 }
 
-async function	translatePage(struct, obj)
+async function	translateGamePage(struct, obj)
 {
 	let plainTexts = Object.values(obj.plainText);
 	let placeHolders = Object.values(obj.placeholder);
 	let titles = Object.values(obj.title);
+	let ariaLabels = Object.values(obj.ariaLabel);
 
 	let i = 0;
 	for (let text of plainTexts)
@@ -145,6 +146,12 @@ async function	translatePage(struct, obj)
 	for (let title of titles)
 	{
 		struct.title[i].title = title;
+		i++;
+	}
+	i = 0;
+	for (let ariaLabel of ariaLabels)
+	{
+		struct.ariaLabel[i].ariaLabel = ariaLabel;
 		i++;
 	}
 }
@@ -432,7 +439,8 @@ function	getTranslationStruct()
 	const struct = {
 		txt: document.getElementsByClassName("translate-txt"),
 		pholder: document.getElementsByClassName("translate-pholder"),
-		title: document.getElementsByClassName("translate-title")
+		title: document.getElementsByClassName("translate-title"),
+		ariaLabel: document.getElementsByClassName("translate-aria-label")
 	};
 	return (struct);
 }

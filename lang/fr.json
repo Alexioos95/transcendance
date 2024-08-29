@@ -1,4 +1,14 @@
 {
+	"login": {
+		"plainText": {
+			"signin": "Connexion",
+			"forgotten": "Mot de passe oublié",
+			"signup": "Inscription",
+			"cancel": "Annuler",
+			"continue-42": "Continuer avec 42",
+			"continue-guest": "Continuer en tant qu'Invite"
+		}
+	},
 	"plainText": {
 		"landscape": "Veuillez tourner votre appareil sur le côté",
 		"options": "Options",
@@ -51,5 +61,19 @@
 		"notOnPhone1": "Ce mode est désactivé sur téléphone et tablette",
 		"notOnPhone2": "Ce mode est désactivé sur téléphone et tablette",
 		"notOffline": "Ce mode est désactivé si vous n'êtes pas connecté"
+	},
+	"ariaLabel": {
+		"chooseGame": "Choisissez le jeu: Pong ou Tetris",
+		"mode": "Mode",
+		"1vAI": "Joueur contre Ordinateur",
+		"1v1": "Joueur contre Joueur en local",
+		"tournament": "Tournoi a 4 joueurs en local",
+		"online": "Joueur contre Joueur en ligne",
+		"play": "Jouer !",
+		"pseudo1": "Pseudonyme du joueur 1",
+		"pseudo2": "Pseudonyme du joueur 2",
+		"pseudo3": "Pseudonyme du joueur 3",
+		"pseudo4": "Pseudonyme du joueur 4",
+		"validate": "Valider"
 	}
 }

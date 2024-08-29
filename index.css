@@ -857,7 +857,7 @@ label:has(> [type=radio]:focus-visible) {
 	overflow: hidden;
 }
 
-canvas {
+canvas.pong {
 	display: block;
 	width: 100%;
 	height: 100%;
@@ -957,7 +957,7 @@ canvas {
 	width: 35%;
 }
 
-.wrapper-options-forms .options-form .options-div label span.txt {
+.wrapper-options-forms .options-form .options-div label span.translate-txt {
 	margin-bottom: 0.2rem;
 	width: 100%;
 }
@@ -1007,7 +1007,7 @@ canvas {
 	margin-bottom: 1rem;
 }
 
-.wrapper-options-forms .options-wrapper-password span.txt {
+.wrapper-options-forms .options-wrapper-password span.translate-txt {
 	margin-left: 1.4rem;
 	margin-bottom: 0.2rem;
 }
@@ -1017,7 +1017,7 @@ canvas {
 	width: auto;
 	height: auto;
 	opacity: 1;
-}	
+}
 
 .wrapper-options-forms button {
 	align-self: center;

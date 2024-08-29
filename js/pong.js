@@ -540,6 +540,7 @@ function	getCanvas(wrapper)
 {
 	const canvas = document.createElement("canvas");
 
+	canvas.classList.add("pong");
 	canvas.setAttribute("id", "canvas");
 	canvas.setAttribute("tabindex", "0");
 	setCanvasDimensions(canvas, wrapper);

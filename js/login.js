@@ -54,6 +54,20 @@ function	login(signUpMode)
 			.then(() => window.history.pushState({ login: false, signUp: false, game: true }, null, ""))
 			.catch((e) => console.log(e));
 	});
+	struct.langSelect.addEventListener("change", function(event) {
+		if (event.target.value === "fr")
+		{
+			fetch("/lang/fr.json")
+				.then(response => response.json())
+				.then(result => { translateLoginPage(struct, result); })
+		}
+		else if (event.target.value === "en")
+		{
+			fetch("/lang/en.json")
+				.then(response => response.json())
+				.then(result => { translateLoginPage(struct, result); })
+		}
+	});
 	if (signUpMode !== undefined && signUpMode === true)
 		signUpForm(struct);
 }
@@ -70,7 +84,9 @@ function	getLoginStruct()
 		signUp: document.getElementsByClassName("signup")[0],
 		cancelSignUp: document.getElementsByClassName("cancel-signup")[0],
 		wrapperSpecialLogin: document.getElementsByClassName("special-login")[0],
-		guestConnection: document.getElementsByClassName("special-login-guest")[0]
+		guestConnection: document.getElementsByClassName("special-login-guest")[0],
+		langSelect: document.getElementsByTagName("select")[0],
+		translateText: document.getElementsByClassName("translate-text"),
 	};
 	return (struct);
 }
@@ -80,9 +96,12 @@ function	move(struct)
 	struct.signUp.disabled = true;
 	struct.password.classList.add("hideInFade");
 	struct.connection.classList.add("recovery");
-	struct.connection.innerText = "Envoyer un mail de recuperation";
-	struct.forgotPassword.innerText = "Je me souviens !";
-	struct.forgotPassword.setAttribute("aria-label", "Je me souviens");
+	if (struct.langSelect.value === "fr")
+	{
+		struct.connection.innerText = "Envoyer un mail de recuperation";
+		struct.forgotPassword.innerText = "Je me souviens !";
+		struct.forgotPassword.setAttribute("aria-label", "Je me souviens");
+	}
 	struct.signUp.classList.add("hideInFade");
 }
 
@@ -90,9 +109,12 @@ function	restore(struct)
 {
 	struct.password.classList.remove("hideInFade");
 	struct.connection.classList.remove("recovery");
-	struct.connection.innerText = "Connexion";
-	struct.forgotPassword.innerText = "Mot de passe oublie";
-	struct.forgotPassword.setAttribute("aria-label", "Mot de passe oublie");
+	if (struct.langSelect.value === "fr")
+	{
+		struct.connection.innerText = "Connexion";
+		struct.forgotPassword.innerText = "Mot de passe oublie";
+		struct.forgotPassword.setAttribute("aria-label", "Mot de passe oublie");
+	}
 	struct.signUp.classList.remove("hideInFade");
 	struct.signUp.disabled = false;
 }
@@ -105,4 +127,19 @@ function	signUpForm(struct)
 	struct.wrapperSpecialLogin.classList.add("hideInFade");
 	struct.signUp.classList.add("primary");
 	struct.cancelSignUp.classList.remove("hideInFade");
+}
+
+function	translateLoginPage(struct, obj)
+{
+	let plainTexts = Object.values(obj.login.plainText);
+	let placeHolders = Object.values(obj.placeholder);
+	let titles = Object.values(obj.title);
+	let ariaLabels = Object.values(obj.ariaLabel);
+
+	let i = 0;
+	for (let text of plainTexts)
+	{
+		struct.txt[i].innerHTML = text;
+		i++;
+	}
 }

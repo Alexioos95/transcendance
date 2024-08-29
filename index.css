@@ -18,12 +18,8 @@ body {
 	font: 1rem "Inter", sans-serif;
 }
 
-button:focus {
+button:focus:not(:focus-visible) {
 	outline: none;
-}
-
-button:focus-visible {
-	outline: 5px auto -webkit-focus-ring-color;
 }
 
 :root {
@@ -1569,7 +1565,7 @@ canvas.pong {
 .wrapper-inputs textarea {
 	height: 100%;
 	width: 100%;
-	padding: 1rem;
+	padding: 0.9rem 1rem;
 	background: var(--mainColor);
 	color: var(--textColor);
 	word-break: break-all;

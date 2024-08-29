@@ -8,7 +8,6 @@ navigate("login")
 	.catch((e) => console.log(e));
 
 window.onpopstate = function(event) {
-	console.log(event.state);
 	if (event.state)
 	{
 		if (event.state.login === true)

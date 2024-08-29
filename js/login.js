@@ -87,6 +87,8 @@ function	getLoginStruct()
 		guestConnection: document.getElementsByClassName("special-login-guest")[0],
 		langSelect: document.getElementsByTagName("select")[0],
 		translateText: document.getElementsByClassName("translate-text"),
+		translatePlaceholder: document.getElementsByClassName("translate-pholder"),
+		translateAriaLabel: document.getElementsByClassName("translate-aria-label"),
 	};
 	return (struct);
 }
@@ -94,7 +96,9 @@ function	getLoginStruct()
 function	move(struct)
 {
 	struct.signUp.disabled = true;
+	struct.password.ariaHidden = "false";
 	struct.password.classList.add("hideInFade");
+	struct.showPassword.classList.add("hideInFade");
 	struct.connection.classList.add("recovery");
 	if (struct.langSelect.value === "fr")
 	{
@@ -102,18 +106,32 @@ function	move(struct)
 		struct.forgotPassword.innerText = "Je me souviens !";
 		struct.forgotPassword.setAttribute("aria-label", "Je me souviens");
 	}
+	if (struct.langSelect.value === "en")
+	{
+		struct.connection.innerText = "Send a recovery email";
+		struct.forgotPassword.innerText = "I remember!";
+		struct.forgotPassword.setAttribute("aria-label", "I remember");
+	}
 	struct.signUp.classList.add("hideInFade");
 }
 
 function	restore(struct)
 {
+	struct.password.ariaHidden = "false";
 	struct.password.classList.remove("hideInFade");
+	struct.showPassword.classList.remove("hideInFade");
 	struct.connection.classList.remove("recovery");
 	if (struct.langSelect.value === "fr")
 	{
 		struct.connection.innerText = "Connexion";
 		struct.forgotPassword.innerText = "Mot de passe oublie";
 		struct.forgotPassword.setAttribute("aria-label", "Mot de passe oublie");
+	}
+	else if (struct.langSelect.value === "en")
+	{
+		struct.connection.innerText = "Sign in";
+		struct.forgotPassword.innerText = "Forgotten password";
+		struct.forgotPassword.setAttribute("aria-label", "Forgotten password");
 	}
 	struct.signUp.classList.remove("hideInFade");
 	struct.signUp.disabled = false;
@@ -132,14 +150,25 @@ function	signUpForm(struct)
 function	translateLoginPage(struct, obj)
 {
 	let plainTexts = Object.values(obj.login.plainText);
-	let placeHolders = Object.values(obj.placeholder);
-	let titles = Object.values(obj.title);
-	let ariaLabels = Object.values(obj.ariaLabel);
+	let placeHolders = Object.values(obj.login.placeholder);
+	let ariaLabels = Object.values(obj.login.ariaLabel);
 
 	let i = 0;
 	for (let text of plainTexts)
 	{
-		struct.txt[i].innerHTML = text;
+		struct.translateText[i].innerHTML = text;
+		i++;
+	}
+	i = 0;
+	for (let placeholder of placeHolders)
+	{
+		struct.translatePlaceholder[i].placeholder = placeholder;
+		i++;
+	}
+	i = 0;
+	for (let ariaLabel of ariaLabels)
+	{
+		struct.translateAriaLabel[i].ariaLabel = ariaLabel;
 		i++;
 	}
 }

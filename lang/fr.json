@@ -7,6 +7,21 @@
 			"cancel": "Annuler",
 			"continue-42": "Continuer avec 42",
 			"continue-guest": "Continuer en tant qu'Invite"
+		},
+		"placeholder": {
+			"email": "Email",
+			"password": "Mot de passe",
+			"username": "Nom d'utilisateur"
+		},
+		"ariaLabel": {
+			"email": "Email",
+			"password": "Mot de passe",
+			"username": "Nom d'utilisateur",
+			"forgottenPassword": "Mot de passe oublié",
+			"signup": "Inscription",
+			"cancel": "Annuler",
+			"continue-42": "Connexion avec 42",
+			"continue-guest": "Jouer sans se connecter"
 		}
 	},
 	"plainText": {

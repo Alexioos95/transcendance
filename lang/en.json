@@ -7,6 +7,21 @@
 			"cancel": "Cancel",
 			"continue-42": "Continue with 42",
 			"continue-guest": "Continue as Guest"
+		},
+		"placeholder": {
+			"email": "Email",
+			"password": "Password",
+			"username": "Username"
+		},
+		"ariaLabel": {
+			"email": "Email",
+			"password": "Password",
+			"username": "Username",
+			"forgottenPassword": "Forgotten password",
+			"signup": "Sign up",
+			"cancel": "Cancel",
+			"continue-42": "Sign in avec 42",
+			"continue-guest": "Playing without signing in"
 		}
 	},
 	"plainText": {

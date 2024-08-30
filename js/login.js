@@ -67,6 +67,12 @@ function	login(signUpMode)
 				.then(response => response.json())
 				.then(result => { translateLoginPage(struct, result); })
 		}
+		else if (event.target.value === "nl")
+		{
+			fetch("/lang/nl.json")
+				.then(response => response.json())
+				.then(result => { translateLoginPage(struct, result); })
+		}
 	});
 	if (signUpMode !== undefined && signUpMode === true)
 		signUpForm(struct);
@@ -112,6 +118,12 @@ function	move(struct)
 		struct.forgotPassword.innerText = "I remember!";
 		struct.forgotPassword.setAttribute("aria-label", "I remember");
 	}
+	if (struct.langSelect.value === "nl")
+	{
+		struct.connection.innerText = "Zend een recuperatie email";
+		struct.forgotPassword.innerText = "Ik herinner mijn paswoord!";
+		struct.forgotPassword.setAttribute("aria-label", "IK herinner mijn passwoord");
+	}
 	struct.signUp.classList.add("hideInFade");
 }
 
@@ -132,6 +144,12 @@ function	restore(struct)
 		struct.connection.innerText = "Sign in";
 		struct.forgotPassword.innerText = "Forgotten password";
 		struct.forgotPassword.setAttribute("aria-label", "Forgotten password");
+	}
+	else if (struct.langSelect.value === "nl")
+	{
+		struct.connection.innerText = "Log in";
+		struct.forgotPassword.innerText = "Passwoord vergeten";
+		struct.forgotPassword.setAttribute("aria-label", "Passwoord vergeten");
 	}
 	struct.signUp.classList.remove("hideInFade");
 	struct.signUp.disabled = false;

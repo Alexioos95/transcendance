@@ -31,6 +31,17 @@ services:
 #  user_db:
 #    volume:
 
+  user:
+    hostname: user
+    container_name: user
+    pull_policy: build
+    build:
+      context: services/User
+      dockerfile: Dockerfile
+    networks:
+      - transcendance
+    restart: unless-stopped
+
   chat:
     hostname: chat
     container_name: chat
@@ -57,17 +68,14 @@ services:
 #    build:
 #      context: services
 #      dockerfile: Tetris/Dockerfile
-#
-#  user:
-#    pull_policy: build
-#    build:
-#      context: services
-#      dockerfile: User/Dockerfile
 
   webserver:
     hostname: webserver
     container_name: nginx
     depends_on:
+      user:
+        condition: service_healthy
+        restart: true
       chat:
         condition: service_healthy
         restart: true
@@ -104,5 +112,8 @@ networks:
 #		ws
 
 #       chat
-#               daphne 8000
+#               daphne  8000
+#               redis   6379
+#       user
+#               daphne 8001
 

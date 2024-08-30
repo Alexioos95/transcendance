@@ -503,3 +503,6 @@ def matchMaking(request):
     cache.set('matchmaking', matchmakingDict, timeout=3600)#si pas trouve sinon inscrire en bdd game
     response.status_code = 200 #100 si pas trouve
     return response
+
+def ping(request):
+    return HttpResponse(status=204)

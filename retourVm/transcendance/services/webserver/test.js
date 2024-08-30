@@ -35,11 +35,11 @@ async function main() {
     const loginbutton = loginbuttons[0];
     const info = await getInfo(loginbutton);
 
-    const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-    console.log('CSRF Token:', csrftoken);
-    console.log('Data to send:', info);
+    //const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+    //console.log('CSRF Token:', csrftoken);
+    //console.log('Data to send:', info);
 
-    fetch('http://made-f0Br6s19:8000/User/login/', {
+    fetch('/user/login/', {
         credentials: 'include',
         method: 'POST',
         // headers: {
@@ -76,7 +76,7 @@ main();
 function fetchUntilSuccess() {
     const intervalId = setInterval(async () => {
         try {
-            const response = await fetch('http://made-f0Br6s19:8000/User/checkAuth42/', {
+            const response = await fetch('http://made-f0Br6s19:8000/user/checkAuth42/', {
                 method: 'POST'
             });
             
@@ -155,7 +155,7 @@ async function mainregister() {
     console.log('CSRF Token:', csrftoken);
     console.log('Data to send:', info);
 
-    fetch('http://made-f0Br6s19:8000/User/register/', {
+    fetch('/user/register/', {
         credentials: 'include',
         method: 'POST',
         // headers: {

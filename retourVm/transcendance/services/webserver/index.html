@@ -109,7 +109,7 @@
     
         // Requête de matchmaking
         document.getElementById('matchmaking').addEventListener('click', () => {
-            fetch('/User/matchMaking/', { method: 'POST', credentials: 'include' })
+            fetch('/user/matchMaking/', { method: 'POST', credentials: 'include' })
                 .then(response => console.log(response.status))
                 .catch(console.error);
         });
@@ -118,7 +118,7 @@
         (function() {
             // Connexion au WebSocket
             //const socket = new WebSocket('ws://localhost:8080/ws/chat/');
-            const socket = new WebSocket('wss://made-f0Ar13s3:4433/ws/chat/');
+            const socket = new WebSocket('wss://made-f0Br7s18:4433/ws/chat/');
     
             // Lorsque la connexion est ouverte
             socket.onopen = function(event) {

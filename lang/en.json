@@ -74,15 +74,15 @@
 		"logout": "Logout",
 		"notOnPhone1": "This mode is disabled on phone and tablet",
 		"notOnPhone2": "This mode is disabled on phone and tablet",
-		"notOffline": "This mode is disabled for not logged in user"
+		"notOffline": "This mode is disabled for guest users"
 	},
 	"ariaLabel": {
 		"chooseGame": "Choose the game: Pong or Tetris",
-		"mode": "Choost the game mode: ",
-		"1vAI": "Player agaist computer",
+		"mode": "Choose the gamemode: ",
+		"1vAI": "Player against computer",
 		"1v1": "Local player against player",
 		"tournament": "Local 4-player tournament",
-		"online": "Online player gainst player",
+		"online": "Online player against player",
 		"play": "Play!",
 		"pseudo1": "Pseudo of player 1",
 		"pseudo2": "Pseudo of player 2",

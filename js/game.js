@@ -78,51 +78,17 @@ function	setupEventListeners(struct, guestMode)
 		else
 			showScreen(struct.screen, struct.screen.wrapperCanvas);
 	});
-	struct.history.leaveButton.addEventListener("click", function() {
-		resetHistoryClasses(struct);
-	});
+	struct.history.leaveButton.addEventListener("click", function() { resetHistoryClasses(struct); });
 	// Lang
-	struct.options.lang.fr.addEventListener("click", function() {
-		if (struct.options.lang.curr !== "fr")
-		{
-			fetch("/lang/fr.json")
-				.then(response => response.json())
-				.then(result => { translateGamePage(struct, result, "fr"); })
-				.catch(() => { console.error("Error: couldn't translate the page"); });
-		}
-	});
-	struct.options.lang.en.addEventListener("click", function() {
-		if (struct.options.lang.curr !== "en")
-		{
-			fetch("/lang/en.json")
-				.then(response => response.json())
-				.then(result => { translateGamePage(struct, result, "en"); })
-				.catch(() => { console.error("Error: couldn't translate the page"); });
-		}
-	});
-	struct.options.lang.nl.addEventListener("click", function() {
-		if (struct.options.lang.curr !== "nl")
-		{
-			fetch("/lang/nl.json")
-				.then(response => response.json())
-				.then(result => { translateGamePage(struct, result, "nl"); })
-				.catch(() => { console.error("Error: couldn't translate the page"); });
-		}
-	});
+	struct.options.lang.fr.addEventListener("click", function() { fetchTranslation(struct, "fr") });
+	struct.options.lang.en.addEventListener("click", function() { fetchTranslation(struct, "en") });
+	struct.options.lang.nl.addEventListener("click", function() { fetchTranslation(struct, "nl") });
 	// Tabs Account/Blocked
-	struct.options.account.button.addEventListener("click", function() {
-		showTab(struct.options.account, struct.options.blocked)
-	});
-	struct.options.blocked.button.addEventListener("click", function() {
-		showTab(struct.options.blocked, struct.options.account)
-	});
+	struct.options.account.button.addEventListener("click", function() { showTab(struct.options.account, struct.options.blocked) });
+	struct.options.blocked.button.addEventListener("click", function() { showTab(struct.options.blocked, struct.options.account) });
 	// Tabs Chat/Friend
-	struct.tabs.chat.button.addEventListener("click", function() {
-		showTab(struct.tabs.chat, struct.tabs.friend)
-	});
-	struct.tabs.friend.button.addEventListener("click", function() {
-		showTab(struct.tabs.friend, struct.tabs.chat)
-	});
+	struct.tabs.chat.button.addEventListener("click", function() { showTab(struct.tabs.chat, struct.tabs.friend) });
+	struct.tabs.friend.button.addEventListener("click", function() { showTab(struct.tabs.friend, struct.tabs.chat) });
 	// Sticks
 	struct.screen.wrapperCanvas.addEventListener("keydown", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("keyup", function(event) { disableStickMove(event, struct); });
@@ -132,7 +98,18 @@ function	setupEventListeners(struct, guestMode)
 	liveChat(struct);
 }
 
-async function	liveChat(struct)
+function	fetchTranslation(struct, lang)
+{
+	if (struct.options.lang.curr !== lang)
+	{
+		fetch("/lang/" + lang + ".json")
+			.then(response => response.json())
+			.then(result => { translateGamePage(struct, result, lang); })
+			.catch(() => { console.error("Error: couldn't translate the page"); });
+	}
+}
+
+function	liveChat(struct)
 {
 	struct.chat.socket = new WebSocket("ws://made-f0ar12s1:8000/ws/chat/");
 	struct.chat.socket.addEventListener("error", (event) => {

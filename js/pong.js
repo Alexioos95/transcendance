@@ -31,7 +31,7 @@ function	initPongStruct(game, wrapperCanvas)
 	game.ctx = game.canvas.getContext("2d");
 	game.paddles = getPaddles(game.canvas);
 	game.ball = getBall(game.canvas);
-	game.scores = [0, 0];
+	game.scores = [10, 10];
 	game.running = 1;
 }
 
@@ -550,6 +550,8 @@ function	getCanvas(wrapper)
 
 function	setCanvasDimensions(canvas, wrapper)
 {
+	if (wrapper === undefined)
+		return ;
 	const width = wrapper.clientWidth;
 	const height = wrapper.clientHeight;
 

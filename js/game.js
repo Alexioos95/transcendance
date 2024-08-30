@@ -31,14 +31,11 @@ async function	run(guestMode)
 				if (e === 0)
 					rejectCoin(struct.gameForm);
 			});
-		// Faire un await pour le chat (?);
 	}
 }
 
 function	setupEventListeners(struct, guestMode)
 {
-	// addEventListener abandonButton => stopper le jeu;
-
 	// Header Buttons
 	struct.header.historyButton.addEventListener("click", function() {
 		resetPhoneClasses(struct, struct.cards.chat);
@@ -86,22 +83,20 @@ function	setupEventListeners(struct, guestMode)
 	});
 	// Lang
 	struct.options.lang.fr.addEventListener("click", function() {
-		if (struct.options.lang.prev !== "fr")
+		if (struct.options.lang.curr !== "fr")
 		{
 			fetch("/lang/fr.json")
 				.then(response => response.json())
-				.then(result => { translateGamePage(struct.translation, result); })
-				.then(() => { struct.options.lang.prev = "fr"; })
+				.then(result => { translateGamePage(struct, result, "fr"); })
 				.catch(() => { console.error("Error: couldn't translate the page"); });
 		}
 	});
 	struct.options.lang.en.addEventListener("click", function() {
-		if (struct.options.lang.prev !== "en")
+		if (struct.options.lang.curr !== "en")
 		{
 			fetch("/lang/en.json")
 				.then(response => response.json())
-				.then(result => { translateGamePage(struct.translation, result); })
-				.then(() => { struct.options.lang.prev = "en"; })
+				.then(result => { translateGamePage(struct, result, "en"); })
 				.catch(() => { console.error("Error: couldn't translate the page"); });
 		}
 	});
@@ -131,7 +126,10 @@ function	setupEventListeners(struct, guestMode)
 async function	liveChat(struct)
 {
 	struct.chat.socket = new WebSocket("ws://made-f0ar12s1:8000/ws/chat/");
-
+	struct.chat.socket.addEventListener("error", (event) => {
+		console.error("Critical error on WebSocket. Closed Live Chat.")
+		return ;
+	});
 	struct.chat.socket.addEventListener("message", function(event) {
 		const tr = document.createElement("tr");
 		const td = document.createElement("td");
@@ -210,37 +208,45 @@ async function	liveChat(struct)
 	});
 }
 
-async function	translateGamePage(struct, obj)
+async function	translateGamePage(struct, obj, currLang)
 {
+	struct.options.lang.curr = currLang;
 	let plainTexts = Object.values(obj.plainText);
 	let placeHolders = Object.values(obj.placeholder);
 	let titles = Object.values(obj.title);
 	let ariaLabels = Object.values(obj.ariaLabel);
-
 	let i = 0;
+	let array;
+
 	for (let text of plainTexts)
 	{
-		struct.txt[i].innerHTML = text;
+		struct.translation.txt[i].innerHTML = text;
 		i++;
 	}
 	i = 0;
 	for (let placeholder of placeHolders)
 	{
-		struct.pholder[i].placeholder = placeholder;
+		struct.translation.pholder[i].placeholder = placeholder;
 		i++;
 	}
 	i = 0;
 	for (let title of titles)
 	{
-		struct.title[i].title = title;
+		struct.translation.title[i].title = title;
 		i++;
 	}
 	i = 0;
 	for (let ariaLabel of ariaLabels)
 	{
-		struct.ariaLabel[i].ariaLabel = ariaLabel;
+		struct.translation.ariaLabel[i].ariaLabel = ariaLabel;
 		i++;
 	}
+	if (struct.options.lang.curr === "fr")
+		array = struct.tournament.markerArrayStringFR;
+	if (struct.options.lang.curr === "en")
+		array = struct.tournament.markerArrayStringEN;
+	for (let i = 0; i < 3; i++)
+		struct.tournament.markers[i].innerHTML = array[struct.tournament.markerArrayToken[0][i]];
 }
 
 async function	setGuestRestrictions(struct)
@@ -452,7 +458,12 @@ function	getTournamentStruct()
 		players: document.getElementsByClassName("tournament-player"),
 		winners: document.getElementsByClassName("tournament-winner"),
 		markers: document.getElementsByClassName("tournament-marker"),
-		markerArray: [["EN COURS", "SUIVANT", "PROCHAINEMENT"], ["", "EN ATTENTE", "PROCHAINEMENT"], ["", "EN COURS", "PROCHAINEMENT"], ["", "", "EN ATTENTE"], ["", "", "EN COURS"], ["", "", ""]],
+		markerArray: undefined,
+		markerArrayToken: [[0, 2, 3], [1, 2, 3], [4, 0, 3], [4, 1, 3], [4, 4, 0], [4, 4, 1], [4, 4, 4]], // 0 = WAITING, 1 = ONGOING, 2 = NEXT, 3 = SOON, 4 = Finished;
+		markerArrayStringFR: ["EN ATTENTE", "EN COURS", "SUIVANT", "PROCHAINEMENT", ""],
+		markerArrayStringEN: ["WAITING", "ONGOING", "NEXT", "SOON", ""],
+		markerArrayFR: [["EN COURS", "SUIVANT", "PROCHAINEMENT"], ["", "EN ATTENTE", "PROCHAINEMENT"], ["", "EN COURS", "PROCHAINEMENT"], ["", "", "EN ATTENTE"], ["", "", "EN COURS"], ["", "", ""]],
+		markerArrayEN: [["ONGOING", "NEXT", "SOON"], ["", "WAITING", "SOON"], ["", "ONGOING", "SOON"], ["", "", "WAITING"], ["", "", "ONGOING"], ["", "", ""]],
 		names: [],
 		matches: 3
 	};
@@ -473,7 +484,7 @@ function	getOptionsStruct()
 		table: document.getElementsByClassName("wrapper-blocked")[0]
 	};
 	const langStruct = {
-		prev: null,
+		curr: "fr",
 		fr: labels[0],
 		en: labels[1],
 		vl: labels[2]
@@ -943,9 +954,18 @@ function	showTournamentOverview(struct)
 	struct.tournament.winners[0].style.opacity = 0;
 	struct.tournament.winners[1].innerHTML = "-";
 	struct.tournament.winners[1].style.opacity = 0;
-	struct.tournament.markers[0].innerHTML = "EN ATTENTE";
-	struct.tournament.markers[1].innerHTML = "SUIVANT";
-	struct.tournament.markers[2].innerHTML = "PROCHAINEMENT";
+	if (struct.options.lang.curr === "fr")
+	{
+		struct.tournament.markers[0].innerHTML = "EN ATTENTE";
+		struct.tournament.markers[1].innerHTML = "SUIVANT";
+		struct.tournament.markers[2].innerHTML = "PROCHAINEMENT";
+	}
+	else if (struct.options.lang.curr === "en")
+	{
+		struct.tournament.markers[0].innerHTML = "WAITING";
+		struct.tournament.markers[1].innerHTML = "NEXT";
+		struct.tournament.markers[2].innerHTML = "SOON";
+	}
 	struct.gameForm.form.classList.add("hidden");
 	struct.tournament.overview.classList.remove("hidden");
 }
@@ -958,7 +978,7 @@ function	updateTournamentNames(struct, elements)
 		i = 0;
 	else if (struct.tournament.matches === 2)
 		i = 2;
-	if (struct.tournament.matches != 1)
+	if (struct.tournament.matches !== 1)
 	{
 		elements[0].innerHTML = struct.tournament.names[i];
 		elements[1].innerHTML = struct.tournament.names[i + 1];
@@ -972,10 +992,16 @@ function	updateTournamentNames(struct, elements)
 
 function	updateTournamentMarkers(struct)
 {
+	if (struct.options.lang.curr === "fr")
+		struct.tournament.markerArray = struct.tournament.markerArrayFR;
+	else if (struct.options.lang.curr === "en")
+		struct.tournament.markerArray = struct.tournament.markerArrayEN;
 	struct.tournament.markers[0].innerHTML = struct.tournament.markerArray[0][0];
 	struct.tournament.markers[1].innerHTML = struct.tournament.markerArray[0][1];
 	struct.tournament.markers[2].innerHTML = struct.tournament.markerArray[0][2];
-	struct.tournament.markerArray.shift();
+	struct.tournament.markerArrayFR.shift();
+	struct.tournament.markerArrayEN.shift();
+	struct.tournament.markerArrayToken.shift();
 }
 
 function	updateTournamentWinners(struct)

@@ -122,7 +122,7 @@ function	move(struct)
 	{
 		struct.connection.innerText = "Zend een recuperatie email";
 		struct.forgotPassword.innerText = "Ik herinner mijn paswoord!";
-		struct.forgotPassword.setAttribute("aria-label", "IK herinner mijn passwoord");
+		struct.forgotPassword.setAttribute("aria-label", "Ik herinner mijn paswoord");
 	}
 	struct.signUp.classList.add("hideInFade");
 }
@@ -147,9 +147,9 @@ function	restore(struct)
 	}
 	else if (struct.langSelect.value === "nl")
 	{
-		struct.connection.innerText = "Log in";
-		struct.forgotPassword.innerText = "Passwoord vergeten";
-		struct.forgotPassword.setAttribute("aria-label", "Passwoord vergeten");
+		struct.connection.innerText = "Aanmelden";
+		struct.forgotPassword.innerText = "Paswoord vergeten";
+		struct.forgotPassword.setAttribute("aria-label", "Paswoord vergeten");
 	}
 	struct.signUp.classList.remove("hideInFade");
 	struct.signUp.disabled = false;

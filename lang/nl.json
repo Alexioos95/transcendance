@@ -1,0 +1,93 @@
+{
+	"login": {
+		"plainText": {
+			"signin": "Sign in",
+			"forgotten": "Forgotten password",
+			"signup": "Sign up",
+			"cancel": "Cancel",
+			"continue-42": "Continue with 42",
+			"continue-guest": "Continue as Guest"
+		},
+		"placeholder": {
+			"email": "Email",
+			"password": "Password",
+			"username": "Username"
+		},
+		"ariaLabel": {
+			"email": "Email",
+			"password": "Password",
+			"username": "Username",
+			"forgottenPassword": "Forgotten password",
+			"signup": "Sign up",
+			"cancel": "Cancel",
+			"continue-42": "Sign in avec 42",
+			"continue-guest": "Playing without signing in"
+		}
+	},
+	"plainText": {
+		"landscape": "Please turn your device sideways",
+		"options": "Options",
+		"logout": "Logout",
+		"game": "Game",
+		"mode": "Mode",
+		"ai": "1vAI",
+		"local": "Local 1v1",
+		"tournament": "Local 4-player tournament",
+		"online": "Online 1v1",
+		"coin": "Insert coin",
+		"tournamentNames": "Select your nicknames",
+		"validate": "Validate",
+		"account": "Account",
+		"blocked": "Blocked",
+		"lang": "Language",
+		"langNote": "Do not forget to save to apply your choice to your next connection",
+		"avatar": "Avatar",
+		"changeAvatar": "Change my avatar:",
+		"connection": "Connection",
+		"changeUsername": "Username:",
+		"changeEmail": "Email:",
+		"changePassword": "Password:",
+		"save": "Save",
+		"2fa": "2-factor Authentication",
+		"2fa-off": "Disabled",
+		"2fa-email": "Email",
+		"2fa-app": "Google Application",
+		"unblock": "Unblock",
+		"chat": "Chat",
+		"friend": "Friends"
+	},
+	"placeholder": {
+		"p1": "Player 1",
+		"p2": "Player 2",
+		"p3": "Player 3",
+		"p4": "Player 4",
+		"passwordActual": "Current",
+		"passwordNew": "New",
+		"passwordConfirmation": "Confirmation"
+	},
+	"title": {
+		"me": "See my history",
+		"gamezone": "Play a game",
+		"chat": "Speak to other players",
+		"friendlist": "Friendlist",
+		"options": "Options",
+		"logout": "Logout",
+		"notOnPhone1": "This mode is disabled on phone and tablet",
+		"notOnPhone2": "This mode is disabled on phone and tablet",
+		"notOffline": "This mode is disabled for not logged in user"
+	},
+	"ariaLabel": {
+		"chooseGame": "Choose the game: Pong or Tetris",
+		"mode": "Choost the game mode: ",
+		"1vAI": "Player agaist computer",
+		"1v1": "Local player against player",
+		"tournament": "Local 4-player tournament",
+		"online": "Online player gainst player",
+		"play": "Play!",
+		"pseudo1": "Pseudo of player 1",
+		"pseudo2": "Pseudo of player 2",
+		"pseudo3": "Pseudo of player 3",
+		"pseudo4": "Pseudo of player 4",
+		"validate": "Validate"
+	}
+}

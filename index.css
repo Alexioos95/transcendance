@@ -989,11 +989,6 @@ canvas.pong {
 	border: 2px solid var(--textColor);
 }
 
-.wrapper-options-forms form .flag-Netherlands {
-	height: 1rem;
-	width: 1.4rem;
-}
-
 .wrapper-options-forms .options-wrapper-connection {
 	display: flex;
 	flex-direction: column;

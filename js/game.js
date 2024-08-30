@@ -227,14 +227,7 @@ async function	translateGamePage(struct, obj, currLang)
 		struct.translation.ariaLabel[i].ariaLabel = ariaLabel;
 		i++;
 	}
-	if (struct.options.lang.curr === "fr")
-		array = struct.tournament.markerArrayStringFR;
-	if (struct.options.lang.curr === "en")
-		array = struct.tournament.markerArrayStringEN;
-	if (struct.options.lang.curr === "nl")
-		array = struct.tournament.markerArrayStringNL;
-	for (let i = 0; i < 3; i++)
-		struct.tournament.markers[i].innerHTML = array[struct.tournament.markerArrayToken[0][i]];
+	updateTournamentMarkers(struct, false);
 }
 
 async function	setGuestRestrictions(struct)
@@ -270,7 +263,7 @@ async function	launchGame(struct)
 		await waitGoButton(struct)
 			.then(() => clearCanvas(struct.screen.wrapperCanvas))
 			.then(() => activateStick(struct))
-			.then(() => updateTournamentMarkers(struct))
+			.then(() => updateTournamentMarkers(struct, true))
 			.then(() => struct.screen.game.run(struct));
 	}
 }
@@ -291,7 +284,7 @@ async function	endGame(struct)
 	{
 		struct.tournament.matches--;
 		updateTournamentWinners(struct);
-		updateTournamentMarkers(struct);
+		updateTournamentMarkers(struct, true);
 		updateTournamentNames(struct, struct.screen.playerOnControls);
 		if (struct.tournament.matches != 0)
 			launchGame(struct);
@@ -446,14 +439,10 @@ function	getTournamentStruct()
 		players: document.getElementsByClassName("tournament-player"),
 		winners: document.getElementsByClassName("tournament-winner"),
 		markers: document.getElementsByClassName("tournament-marker"),
-		markerArray: undefined,
-		markerArrayToken: [[0, 2, 3], [1, 2, 3], [4, 0, 3], [4, 1, 3], [4, 4, 0], [4, 4, 1], [4, 4, 4]], // 0 = WAITING, 1 = ONGOING, 2 = NEXT, 3 = SOON, 4 = Finished;
-		markerArrayStringFR: ["EN ATTENTE", "EN COURS", "SUIVANT", "PROCHAINEMENT", ""],
-		markerArrayStringEN: ["WAITING", "ONGOING", "NEXT", "SOON", ""],
-		markerArrayStringNL: ["WACHTEND", "DOORLOPEND", "VOLGENDE", "BINNENKORT", ""],
-		markerArrayFR: [["EN COURS", "SUIVANT", "PROCHAINEMENT"], ["", "EN ATTENTE", "PROCHAINEMENT"], ["", "EN COURS", "PROCHAINEMENT"], ["", "", "EN ATTENTE"], ["", "", "EN COURS"], ["", "", ""]],
-		markerArrayEN: [["ONGOING", "NEXT", "SOON"], ["", "WAITING", "SOON"], ["", "ONGOING", "SOON"], ["", "", "WAITING"], ["", "", "ONGOING"], ["", "", ""]],
-		markerArrayNL: [["DOORLOPEND", "VOLGENDE", "BINNENKORT"], ["", "WACHTEND", "BINNENKORT"], ["", "DOORLOPEND", "BINNENKORT"], ["", "", "WACHTEND"], ["", "", "DOORLOPEND"], ["", "", ""]],
+		markerArray: [[0, 2, 3], [1, 2, 3], [4, 0, 3], [4, 1, 3], [4, 4, 0], [4, 4, 1], [4, 4, 4]], // 0 = WAITING, 1 = ONGOING, 2 = NEXT, 3 = SOON, 4 = "" (Finished);
+		markerArrayStringsFR: ["EN ATTENTE", "EN COURS", "SUIVANT", "PROCHAINEMENT", ""],
+		markerArrayStringsEN: ["WAITING", "ONGOING", "NEXT", "SOON", ""],
+		markerArrayStringsNL: ["WACHTEND", "DOORLOPEND", "VOLGENDE", "BINNENKORT", ""],
 		names: [],
 		matches: 3
 	};
@@ -944,26 +933,9 @@ function	showTournamentOverview(struct)
 	struct.tournament.winners[0].style.opacity = 0;
 	struct.tournament.winners[1].innerHTML = "-";
 	struct.tournament.winners[1].style.opacity = 0;
-	if (struct.options.lang.curr === "fr")
-	{
-		struct.tournament.markers[0].innerHTML = "EN ATTENTE";
-		struct.tournament.markers[1].innerHTML = "SUIVANT";
-		struct.tournament.markers[2].innerHTML = "PROCHAINEMENT";
-	}
-	else if (struct.options.lang.curr === "en")
-	{
-		struct.tournament.markers[0].innerHTML = "WAITING";
-		struct.tournament.markers[1].innerHTML = "NEXT";
-		struct.tournament.markers[2].innerHTML = "SOON";
-	}
-	else if (struct.options.lang.curr === "nl")
-	{
-		struct.tournament.markers[0].innerHTML = "WACHTEND";
-		struct.tournament.markers[1].innerHTML = "VOLGENDE";
-		struct.tournament.markers[2].innerHTML = "BINNENKORT";
-	}
 	struct.gameForm.form.classList.add("hidden");
 	struct.tournament.overview.classList.remove("hidden");
+	updateTournamentMarkers(struct, true);
 }
 
 function	updateTournamentNames(struct, elements)
@@ -986,21 +958,20 @@ function	updateTournamentNames(struct, elements)
 	}
 }
 
-function	updateTournamentMarkers(struct)
+function	updateTournamentMarkers(struct, shift)
 {
+	let array;
+
 	if (struct.options.lang.curr === "fr")
-		struct.tournament.markerArray = struct.tournament.markerArrayFR;
-	else if (struct.options.lang.curr === "en")
-		struct.tournament.markerArray = struct.tournament.markerArrayEN;
-	else if (struct.options.lang.curr === "nl")
-		struct.tournament.markerArray = struct.tournament.markerArrayNL;
-	struct.tournament.markers[0].innerHTML = struct.tournament.markerArray[0][0];
-	struct.tournament.markers[1].innerHTML = struct.tournament.markerArray[0][1];
-	struct.tournament.markers[2].innerHTML = struct.tournament.markerArray[0][2];
-	struct.tournament.markerArrayFR.shift();
-	struct.tournament.markerArrayEN.shift();
-	struct.tournament.markerArrayNL.shift();
-	struct.tournament.markerArrayToken.shift();
+		array = struct.tournament.markerArrayStringsFR;
+	if (struct.options.lang.curr === "en")
+		array = struct.tournament.markerArrayStringsEN;
+	if (struct.options.lang.curr === "nl")
+		array = struct.tournament.markerArrayStringsNL;
+	for (let i = 0; i < 3; i++)
+		struct.tournament.markers[i].innerHTML = array[struct.tournament.markerArray[0][i]];
+	if (shift === true)
+		struct.tournament.markerArray.shift();
 }
 
 function	updateTournamentWinners(struct)

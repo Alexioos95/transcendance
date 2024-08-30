@@ -208,7 +208,7 @@ async function	liveChat(struct)
 		if (event.key === "Enter")
 		{
 			event.preventDefault();
-			if (struct.chat.input.value !== "")
+			if (struct.chat.input.value.trim() !== "")
 			{
 				struct.chat.socket.send(JSON.stringify({ "message": struct.chat.input.value }));
 				struct.chat.input.value = "";

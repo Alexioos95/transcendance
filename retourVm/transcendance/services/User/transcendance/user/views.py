@@ -16,6 +16,15 @@ import qrcode
 import jwt
 import bcrypt
 
+
+def index(request):#a degager
+    print('coucou')
+    if request.method == 'POST':
+        form_data = request.POST
+        print('data =', form_data)
+    return render(request , 'index.html')
+
+
 def print_all_cookies(request):#a ddegsge avant la fin sertsa verifier les coockies
     cookies = request.COOKIES
     if cookies:
@@ -51,8 +60,11 @@ def register(request):#check si user est unique sinon refuser try except get?
             Password=password.decode('utf-8'),
             lastTimeOnline=tzTime,
             pongLvl=0,
-            tetrisLvl=0
+            Language='NL',
+            tetrisLvl=0,
+            twoFA=True
         )
+        # new_user.Language = 'FR'
         # user = User.objects.all().filter(Username__exact=decodedJwt["userName"]).value_list()
         # if not user:
         #     print(username pas trouve)
@@ -65,8 +77,8 @@ def register(request):#check si user est unique sinon refuser try except get?
         #     print(email trouve)
         try:
             new_user.save()
-            print("ca marche")
         except Exception as error:
+            print('ca  echouer a ecrie en bdd')
             response_data = JsonResponse({"error": "erreur in database"}, status=409)
             #response_data.status = 409
             print(error)
@@ -164,15 +176,36 @@ def login(request):
     # Guard against injection/xss here?
     # Check if empty name or password?
     # Check for minimum lengths?
+    dbUser = ''
     try:
-        user = User.objects.all().filter(Username__exact="userName").value_list()
+        mydata = User.objects.all().values()
+        print(mydata)
+        print(list(mydata))
+
+        dbUser = User.objects.filter(Username__exact=requestUserName)
+        dbUserList = list(dbUser)
+
+        for user in dbUserList:
+            print(f'dbUser == {dbUserList} Username {user.Username} password == {user.Password}')
+            print(f'Language: {user.get_Language_display()}')
+            print(f'TwoFA: {user.get_twoFA_display()}')
+        # mydata = User.objects.all().values()
+        # print(mydata)
+        # print(list(mydata))
+        # print(f'username == {requestUserName}')
+        # dbUser = User.objects.filter(Username__exact=requestUserName)
+        # dbUserList = list(dbUser)
+        # print(f'dbUser == {dbUserList} Username {dbUserList[0].Username} password == {dbUserList[0].Password}')
+        # print(f'dbUser == {dbUserList} Username {dbUserList[0].Username} password == {dbUserList[0].Password}')
     except Exception as e:
-        print(e)
+        print(f'database esceptiom == {e}')
         return JsonResponse({'error': 'invalid credentials'}, status=401)
     encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")    #    Export to .env file        #    Add env_example file
-    if bcrypt.checkpw(password.encode('utf-8'), dbUser.Password.encode('utf-8')):
+    if bcrypt.checkpw(password.encode('utf-8'), dbUserList[0].Password.encode('utf-8')):
         print("Le mot de passe est valide.")
-        response_data = JsonResponse({"username":user.Username, "Avatar":user.Avatar, "Language": user.Language})
+        if dbUserList[0].twoFA != 'NONE':
+            return JsonResponse({"2fa": 'True'}, status=200)#code a verifier code 2fa attendu
+        response_data = JsonResponse({"2fa": 'False', "username":dbUserList[0].Username, "Avatar":dbUserList[0].Avatar, "Language": dbUserList[0].Language})
         response_data.status = 200
         response_data.set_cookie(
         'auth',

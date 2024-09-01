@@ -35,11 +35,9 @@ async function main() {
     const loginbutton = loginbuttons[0];
     const info = await getInfo(loginbutton);
 
-    const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-    console.log('CSRF Token:', csrftoken);
     console.log('Data to send:', info);
 
-    fetch('http://made-f0Br6s19:8000/User/login/', {
+    fetch('/user/login/', {
         credentials: 'include',
         method: 'POST',
         // headers: {
@@ -57,6 +55,7 @@ async function main() {
     })
     .then(({ data, headers }) => {
         {
+            console.log(data);
             let messageKey = Object.keys(data)[0]; 
             let messageValue = data[messageKey];
            // sessionStorage.setItem(messageKey, messageValue);
@@ -76,7 +75,7 @@ main();
 function fetchUntilSuccess() {
     const intervalId = setInterval(async () => {
         try {
-            const response = await fetch('http://made-f0Br6s19:8000/User/checkAuth42/', {
+            const response = await fetch('/user/checkAuth42/', {
                 method: 'POST'
             });
             
@@ -137,8 +136,9 @@ async function mainregister() {
                 const email = document.querySelector('.email').value;
 
                 data = {
-                    nom: nom,
-                    password: password
+                    'nom': nom,
+                    'password': password,
+                    'email':email
                 };
 
                 resolve(data);
@@ -150,12 +150,9 @@ async function mainregister() {
     const registerbuttons = document.getElementsByClassName('register');
     const registerbutton = registerbuttons[0];
     const info = await getInforegister(registerbutton);
-
-    const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-    console.log('CSRF Token:', csrftoken);
     console.log('Data to send:', info);
 
-    fetch('http://made-f0Br6s19:8000/User/register/', {
+    fetch('/user/register/', {
         credentials: 'include',
         method: 'POST',
         // headers: {

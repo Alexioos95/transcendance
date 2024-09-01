@@ -46,6 +46,7 @@ def register(request):#check si user est unique sinon refuser try except get?
         tz = pytz.timezone('CET')
         tzTime = tz.localize(time)
         new_user = User(
+            Email=email,
             Username=nom,
             Password=password.decode('utf-8'),
             lastTimeOnline=tzTime,
@@ -66,8 +67,8 @@ def register(request):#check si user est unique sinon refuser try except get?
             new_user.save()
             print("ca marche")
         except Exception as error:
-            response_data = JsonResponse({"error": "erreur in database"})
-            response_data.status = 409
+            response_data = JsonResponse({"error": "erreur in database"}, status=409)
+            #response_data.status = 409
             print(error)
             return(response_data)
         # user = User.objects.filter(Username__exact='h').first()
@@ -163,8 +164,10 @@ def login(request):
     # Guard against injection/xss here?
     # Check if empty name or password?
     # Check for minimum lengths?
-    user = User.objects.all().filter(Username__exact="userName").value_list()
-    if not user:
+    try:
+        user = User.objects.all().filter(Username__exact="userName").value_list()
+    except Exception as e:
+        print(e)
         return JsonResponse({'error': 'invalid credentials'}, status=401)
     encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")    #    Export to .env file        #    Add env_example file
     if bcrypt.checkpw(password.encode('utf-8'), dbUser.Password.encode('utf-8')):

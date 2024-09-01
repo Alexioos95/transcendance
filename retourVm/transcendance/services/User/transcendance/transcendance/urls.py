@@ -19,7 +19,6 @@ from django.urls import path
 from user import views
 
 urlpatterns = [
-    path('', views.index),#faire une route static via nginx a enlever d'ici
     path('user/register/', views.register),
     path('user/login/', views.login),
     path('user/checkJwt/', views.checkJwt),

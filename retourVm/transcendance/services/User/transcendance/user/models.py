@@ -3,6 +3,7 @@ from django.db import models
 
 # Create your models here.
 class User(models.Model):
+    Email = models.CharField(max_length=1000, blank=False, unique=True)
     Username = models.CharField(max_length=30, blank=False, unique=True)
     Password = models.CharField(max_length=1000, blank=True) #hash
     Avatar = models.CharField(max_length=1000)

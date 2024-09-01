@@ -13,14 +13,14 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'made-f0Ar13s2', '*', 'made-f0Br7s18'
 
 # Application definition
 INSTALLED_APPS = [
+    'corsheaders',
+    'user',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
-    'user'
 ]
 
 MIDDLEWARE = [

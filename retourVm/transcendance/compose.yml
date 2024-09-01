@@ -4,6 +4,7 @@ services:
 
   chat_cache:
     hostname: redis
+    container_name: redis_chat
     image: redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
@@ -41,6 +42,8 @@ services:
     networks:
       - transcendance
     restart: unless-stopped
+    environment:
+      - SERVER_JWT_KEY=SuperSecret
 
   chat:
     hostname: chat
@@ -56,6 +59,8 @@ services:
     networks:
       - transcendance
     restart: unless-stopped
+    environment:
+      - SERVER_JWT_KEY=SuperSecret
 
 #  pong:
 #    pull_policy: build

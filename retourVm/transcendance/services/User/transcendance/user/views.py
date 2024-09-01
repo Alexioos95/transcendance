@@ -64,7 +64,8 @@ def register(request):#check si user est unique sinon refuser try except get?
         #     print(email trouve)
         try:
             new_user.save()
-        except Exception as error
+            print("ca marche")
+        except Exception as error:
             response_data = JsonResponse({"error": "erreur in database"})
             response_data.status = 409
             print(error)
@@ -81,7 +82,7 @@ def register(request):#check si user est unique sinon refuser try except get?
         # mailData = {'title':'transcendance registration','body':f'welcome {nom}, successfully registered', 'destinataire':'ftTranscendanceAMFEA@gmail.com'}
         # response = requests.post('http://localhost:8001/sendMail/', json=mailData)#mettre la route dans l'env ou set la route definitive dans le build final?
         # print(response.status_code)
-        response_data = JsonResponse({"message": "User successfully registered"})
+        response_data = JsonResponse({"message": "User successfully registered"}, status=201)
         response_data.status = 201
         # response_data.set_cookie(
         # 'auth',
@@ -108,8 +109,10 @@ def register(request):#check si user est unique sinon refuser try except get?
             expires=datetime.utcnow() + timedelta(hours=25)  # Date d'expiration future
         )
         # response_data.set_cookie(key='auth', value=encoded_jwt, max_age=3000)
+        print("erreur 1")
         return (response_data)
     else:
+        print("erreur 2")
         return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
 
 def decodeJwt(auth_coockie):
@@ -123,7 +126,7 @@ def decodeJwt(auth_coockie):
     #     response_data.status_code = 401
     #     raise response_data
     except jwt.InvalidTokenError:
-        response_data = JsonResponse("error":"Forbidden")
+        response_data = JsonResponse({'error': 'Forbidden'})
         response_data.status_code = 403
         raise response_data
     if decodedJwt["expirationDate"] < time.time():
@@ -136,7 +139,7 @@ def decodeJwt(auth_coockie):
     return user
 
 def checkJwt(request):
-    if request.method != 'GET'
+    if request.method != 'GET':
         return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
     auth = checkCookie(request, 'auth')
     if auth == 'null':
@@ -160,9 +163,8 @@ def login(request):
     # Guard against injection/xss here?
     # Check if empty name or password?
     # Check for minimum lengths?
-    user = User.objects.all().filter(Username__exact=decodedJwt["userName"]).value_list()
+    user = User.objects.all().filter(Username__exact="userName").value_list()
     if not user:
-        return JsonResponse({'error': 'User does not exist'}, status=403)
         return JsonResponse({'error': 'invalid credentials'}, status=401)
     encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")    #    Export to .env file        #    Add env_example file
     if bcrypt.checkpw(password.encode('utf-8'), dbUser.Password.encode('utf-8')):

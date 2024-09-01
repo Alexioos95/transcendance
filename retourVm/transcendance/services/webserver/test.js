@@ -137,8 +137,9 @@ async function mainregister() {
                 const email = document.querySelector('.email').value;
 
                 data = {
-                    nom: nom,
-                    password: password
+                    'nom': nom,
+                    'password': password,
+		    'email': email
                 };
 
                 resolve(data);
@@ -151,9 +152,9 @@ async function mainregister() {
     const registerbutton = registerbuttons[0];
     const info = await getInforegister(registerbutton);
 
-    const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-    console.log('CSRF Token:', csrftoken);
-    console.log('Data to send:', info);
+//    const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+//    console.log('CSRF Token:', csrftoken);
+//    console.log('Data to send:', info);
 
     fetch('/user/register/', {
         credentials: 'include',

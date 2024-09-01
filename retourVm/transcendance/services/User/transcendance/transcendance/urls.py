@@ -20,6 +20,7 @@ from user import views
 
 #data user
 # {"2fa": 'False', "username":dbUserList[0].Username, "Avatar":dbUserList[0].Avatar, "Language": dbUserList[0].Language}
+#ajouter le type de methode sur chaqaue route
 
 urlpatterns = [
     path('', views.index),#faire une route static via nginx a enlever d'ici

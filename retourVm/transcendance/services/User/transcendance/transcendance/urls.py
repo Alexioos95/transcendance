@@ -18,15 +18,18 @@ from django.contrib import admin
 from django.urls import path
 from user import views
 
+#data user
+# {"2fa": 'False', "username":dbUserList[0].Username, "Avatar":dbUserList[0].Avatar, "Language": dbUserList[0].Language}
+
 urlpatterns = [
     path('', views.index),#faire une route static via nginx a enlever d'ici
-    path('user/register/', views.register),
-    path('user/login/', views.login),
-    path('user/checkJwt/', views.checkJwt),
+    path('user/register/', views.register),#prend du json en entree attend les champ username password et email, return 201 ainsi qu'un json contenant les infos user  si l'user a ete cree et set un coockie auth jwt sinon un code adapte ainsi qu'un json contenant error
+    path('user/login/', views.login),#prend du json en entree attend les champ username et password retourn 200 si ok ainsi qu'un json contenant les infos user  et set un coockie auth contant un jwt sinon  un code adapte ainsi qu'un json contenant error
+    path('user/checkJwt/', views.checkJwt),#route servant a verifier si un user est deja connecte via un coockie auth return 200 ainsi qu'un json contenant les infos user sinon un autre code est retourne
     path('user/auth42/', views.auth42),
     path('user/2fa/', views.twoFA),
     path('user/set2FA/', views.set2FA),
-    path('user/disconnect/', views.disconnect),
+    path('user/disconnect/', views.disconnect),#supprime le coockie auth
     path('user/checkAuth42/', views.checkAuth42),
     path('user/updateUserInfos/', views.updateUserInfos),
     # path('user/addFriend/', views.addFriend),en attene de postgres

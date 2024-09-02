@@ -418,7 +418,6 @@ def matchMaking(request):
     
     
     if auth == 'null':
-        print('403?')
         response.status_code = 403
         return response
     

@@ -19,7 +19,7 @@ from django.urls import path
 from user import views
 
 #data user
-# {"2fa": 'False', "username":"username", "Avatar":PATH, "Language": "FR"}
+# {"2fa": 'False', "username":"username", "Avatar":PATH, "Language": "FR"}//ajouter les amis et bloques
 #ajouter le type de methode sur chaqaue route
 #code 2fa valide 10 minutes?
 
@@ -46,13 +46,12 @@ urlpatterns = [
     #POST envoi un username a jouter a une des liste ami bloque
     # path('user/addFriend/', views.addFriend),en attene de postgres
     # path('user/blockUser/', views.blockUser),en attene de postgres
-    path('user/updateInfo/', views.updateInfo),
     #POST
     path('user/resetPaswd/', views.resetPasswd),#envoi un username auquel sera envoye un mail de reset de son password via un lien fourni
     #GET
     path('user/matchMaking/', views.matchMaking),#a ping regulierement renverra 403 si token invalide une 100 si la recherche et en cours une 200 si un adveraire a ete trouve il faudra ensuite se connecter a la socket du jeu
     #GET
-    path('user/ping/', views.ping),#requete a effetuer regulierement (1s?) afin de recevoir les defis/acceptation de defi liste d'ami avec leur date de connection liste de bloque a jour {defi:"nom du jeu si defi accepte ping la route du jeu sinon vide", friendList:[], blockedList:[]}
+    path('user/updateInfo/', views.updateInfo),#requete a effetuer regulierement (1s?) afin de recevoir les defis/acceptation de defi liste d'ami avec leur date de connection liste de bloque a jour {defi:"nom du jeu si defi accepte ping la route du jeu sinon vide", friendList:[], blockedList:[]}
 ]
 
 # route matchmaking servie a part ou service user

@@ -39,7 +39,7 @@ def checkCookie(request, str):
     if str in request.COOKIES:
         return request.COOKIES[str]
     else:
-        return 'null'
+        return None
 
 @csrf_exempt
 def register(request):#check si user est unique sinon refuser try except get?
@@ -155,7 +155,7 @@ def checkJwt(request):
     if request.method != 'GET':
         return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
     auth = checkCookie(request, 'auth')
-    if auth == 'null':
+    if auth is None:
         response = HttpResponse()
         response.status_code = 403
         return response
@@ -302,29 +302,69 @@ def checkAuth42(request):
             cache.delete(userIp)
             response.status_code = 200
             response.set_cookie(
-            'auth', #vallue finale : auth
+            'auth',
             'test', #ici token jwt
             httponly=True,   # Empêche l'accès JavaScript au cookie
-            # secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
-            # samesite='Strict',
+            secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
+            samesite='Strict',
             expires=datetime.utcnow() + timedelta(hours=1)
             )
         else:
-            # response.content = "Cache is empty."
-            response.status_code = 204
+            return HttpResponse(status=204)
     else:
-        response.status_code = 405
-    return (response)
+        return HttpResponse(status=405)
+    return (response, status=200)
 
+@require_http_methods(["POST"])
 def updateUserInfos(request):
-    return
+    data = {}
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return HttpResponseBadRequest('error': 'Invalid JSON', status=403)
+    auth = checkCookie(request, 'auth')
+    if auth is None:
+        return HttpResponse(status=403) 
+    userName = decodeJwt(auth)
+    try:
+        user = User.objects.filter(Username__exact=userName)
+        dbUserList = list(dbUser)
+        for user in dbUserList:
+            print(f'dbUser == {dbUserList} Username {user.Username} password == {user.Password}')
+            print(f'Language: {user.get_Language_display()}')
+            print(f'TwoFA: {user.get_twoFA_display()}')
+    except Exception as e:
+        return JsonResponse({'error': 'user do not exist'}, status=403)
+    if 'username' in data:
+        user.username = data['username']    
+    if 'password' in data:
+        user.password = data['password'] 
+    if 'avatar' in data:
+        user.avatar = data['avatar']
+    if 'language' in data:
+        if data['language'] in dict(User.Language.choices):
+            user.language = data['language']  
+    user.save()
+    return JsonResponse({"message": "User information updated successfully"})
 
 def disconnect(request):
-    return
+    response = HttpResponse()
+    response.set_cookie('auth', '', expires='Thu, 01 Jan 1970 00:00:00 GMT')
+    return response
 
 def updateInfo(request):
-    # recevoir en post avoir via le coockie qui est co retourner la liste de ses amis avec l'update last co
-    return
+    auth = checkCookie(request, 'auth')
+    user = ''
+    if auth is None:
+        return JsonResponse({'error': 'Unauthorized request'}, status=403)
+    userName = decodeJwt(auth)
+    try:
+        user = User.objects.get(username=userName)
+    except User.DoesNotExist:
+        print('User does not exist')
+        return JsonResponse({'error': 'User does not exist'}, status=404)
+    response = JsonResponse({"username":user.Username, "Avatar":user.Avatar, "Language": user.Language})#ajouter plus tard friends et bloques + get dans le cache les defis lances ou acceptes
+    return response(status=200)
 
 # def checkCode2faAPK(user, code):
 #     return
@@ -403,8 +443,81 @@ def preSet2FA(request):
     qrcode.make(otpUri).save("FIND USEFULL NAME.png")
     return
 
+def generate_code():#a mettre dans les middleware
+    code = []
+    for _ in range(30):
+        value = random.randint(0, 61)
+        if value < 26:
+            code.append(chr(97 + value))
+        elif value < 52:
+            code.append(chr(65 + value - 26))
+        else:
+            code.append(chr(48 + value - 52))
+    return ''.join(code)
+
+
+def checkCodeModifyPassword(request):
+    code = request.GET.get('code')
+    if code:
+        print({"message": f"Code received: {code}"})
+    if not code:
+        return JsonResponse({"error": "No code provided"}, status=400)
+    userName = cache.get(code)
+    if userName is None:
+        return JsonResponse({"error": "Invalid or expired code"}, status=400)
+    cache.delete(code)
+    try:
+        user = User.objects.get(username=userName)
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return HttpResponseBadRequest('error': 'Invalid JSON', status=403)
+        if 'password' in data:
+            user.Password = data['password']
+            user.save()
+            return JsonResponse({"message":"password successfully updated", status=200})
+    except User.DoesNotExist:
+        print('User does not exist')
+        return JsonResponse({'error': 'User does not exist'}, status=404)
+
+
+@require_http_methods(["POST"])
 def resetPasswd(request):
-    return
+    auth = checkCookie(request, 'auth')
+    if auth is None:
+        return JsonResponse({'error': 'Unauthorized request'}, status=403)
+    userName = decodeJwt(auth)
+    print(userName)
+    validationCode = generate_code()
+    try:
+        user = User.objects.get(username=userName)
+        email = user.Email
+        cache.set(validationCode, user.Username,timeout=600)
+    except User.DoesNotExist:
+        print('User does not exist')
+        return JsonResponse({'error': 'User does not exist'}, status=404)
+    except Exception as e:
+        print(f'Database exception: {e}')
+        return JsonResponse({'error': 'Database error'}, status=500)
+    mailData = {
+        'title': 'Transcendance Reset Password',
+        'body': (
+            f'Hey {user.username},\n\n'
+            'It looks like you requested to reset your password. No worries, we’ve got you covered!\n\n'
+            'Click the link below to set a new password:\n\n'
+            f'https://HOST/user/checkCodeModifyPassword/?code={validationCode}\n\n'
+            'This link will be good for 10 minutes, so make sure to use it before it expires. If you missed it, just request another one.\n\n'
+            'If you didn’t ask for a password reset, just ignore this email – your account is safe.\n\n'
+            'Got any questions? Feel free to reach out to us!\n\n'
+            'Cheers,\n'
+            'The Team'
+            ),
+            'destinataire': email}
+    response = requests.post('http://localhost:8001/sendMail/', json=mailData)
+    if response.status_code != 200:
+        print({'error': 'Failed to send email'})
+        return JsonResponse({'error': 'Failed to send email'}, status=500)
+    return JsonResponse({'message': 'Password reset email sent successfully'}, status=200)
 
 @csrf_exempt
 def matchMaking(request):
@@ -415,9 +528,7 @@ def matchMaking(request):
     # sinon ajouter le joueur dans le cache
     response = HttpResponse()
     auth = checkCookie(request, 'auth')
-    
-    
-    if auth == 'null':
+    if auth is None:
         response.status_code = 403
         return response
     
@@ -444,6 +555,10 @@ def matchMaking(request):
             userMatchmaking['time'] = current_time
     print(username)
     print(userMatchmaking)
+    if userMatchmaking['matched'] = True
+        cache.set('matchmaking', matchmakingDict, timeout=3600)
+        return HttpResponse(status=200)
+
     # maxLevel = userMatchmaking['game'] == "pong"?userMatchmaking['levelPong']:userMatchmaking['levelTetris']
 
     maxLevel = userMatchmaking['levelPong'] if userMatchmaking['game'] == "pong" else userMatchmaking['levelTetris']
@@ -454,16 +569,17 @@ def matchMaking(request):
     for userName, data in matchmakingDict.items():
         if data['levelPong'] <= maxLevel and data['levelPong'] >= minLevel:
             print('ca matchmake la')
+            data['matched'] = True
+            break
         else:
             print('ca matchamake pas la')
         print(f"Username: {userName}, Time: {data['time'].timestamp()}, difference Level: {data['difLevel']}")
     gameData = {'player1': "fguarrac", 'player2': "madaguen"}
-    gameResponse = requests.post('http://localhost:8001/initGame/', json=gameData)
+    gameResponse = requests.post('http://localhost:8001/initGame/', json=gameData)#inscrit la partie en bdd jeu
     print(gameResponse.status_code)
     matchmakingDict[username] = userMatchmaking
     cache.set('matchmaking', matchmakingDict, timeout=3600)#si pas trouve sinon inscrire en bdd game
-    response.status_code = 200 #100 si pas trouve
-    return response
+    return HttpResponse(status=100)
 
 def ping(request):
     return HttpResponse(status=204)

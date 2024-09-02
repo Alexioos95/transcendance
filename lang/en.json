@@ -51,10 +51,11 @@
 		"2fa": "2-factor Authentication",
 		"2fa-off": "Disabled",
 		"2fa-email": "Email",
-		"2fa-app": "Google Application",
+		"2fa-app": "QRCode Application",
 		"unblock": "Unblock",
 		"chat": "Chat",
-		"friend": "Friends"
+		"friend": "Friends",
+		"criticalChat": "A critical error impacted the online Chat"
 	},
 	"placeholder": {
 		"p1": "Player 1",

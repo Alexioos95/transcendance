@@ -67,9 +67,9 @@ function	setupEventListeners(struct, guestMode)
 			.then(() => launchPageScript("login", false, false))
 			.then(() => {
 				if (guestMode === true)
-					window.history.pushState({ login: true, signUp: false, game: false }, null, "")
-				})
-			.catch((e) => console.log(e));
+					window.history.pushState({ login: true, signUp: false, game: false }, null, "");
+			})
+			.catch((e) => console.error(e));
 	});
 	// Cross Buttons
 	struct.options.leaveButton.addEventListener("click", function() {
@@ -112,9 +112,17 @@ function	fetchTranslation(struct, lang)
 function	liveChat(struct)
 {
 	struct.chat.socket = new WebSocket("ws://made-f0ar12s1:8000/ws/chat/");
-	struct.chat.socket.addEventListener("error", (event) => {
-		console.error("Critical error on WebSocket. Closed Live Chat.")
-		return ;
+	struct.chat.socket.addEventListener("error", function(event) {
+		const tr = document.querySelectorAll(".tab-chat tr");
+		const buttons = document.querySelector(".tab-chat button");
+		const lock = document.getElementsByClassName("tab-chat-lock")[0];
+
+		lock.classList.remove("hidden");
+		struct.tabs.chat.input.classList.add("hidden");
+		for (let i = 1; i < tr.length; i++)
+			tr[i].style.opacity = 0.5;
+		for (let i = 0; i < buttons.length; i++)
+			buttons[i].disabled = true;
 	});
 	struct.chat.socket.addEventListener("message", function(event) {
 		const tr = document.createElement("tr");
@@ -574,7 +582,7 @@ async function	addInsertCoinAnimations(coin, text)
 {
 	text.classList.add("active");
 	coin.classList.add("active");
-	await sleep(3100);
+	await sleep(2500);
 }
 
 async function	checkGameSelectorValidation(struct)
@@ -595,15 +603,17 @@ async function	checkGameSelectorValidation(struct)
 		}
 		else if (game === "tetris")
 		{
-			struct.screen.game = getTetrisStruct();
-			setupGameControls(struct, "tetris");
+				struct.screen.game = getTetrisStruct();
+				setupGameControls(struct, "tetris");
 		}
-		if (mode === "tournament")
-			struct.tournament.on = true;
 		title.style.opacity = 0;
-		sleep(450)
+		sleep(400)
 			.then(() => title.style.opacity = 1)
 			.then(() => title.innerHTML = struct.screen.game.name)
+		if (mode === "tournament")
+			struct.tournament.on = true;
+		else if (mode === "online")
+			struct.screen.game.online = true;
 		clearCanvas(struct.screen.wrapperCanvas);
 		showScreen(struct.screen, struct.screen.wrapperCanvas)
 		resetPhoneClasses(struct)
@@ -650,13 +660,6 @@ async function	rejectCoin(struct)
 	const title = document.getElementsByTagName("h2")[0];
 	const coin = document.getElementsByClassName("coin")[0];
 
-	if (title.innerHTML !== "LOADING")
-	{
-		title.style.opacity = 0;
-		await sleep(450)
-			.then(() => title.style.opacity = 1)
-			.then(() => title.innerHTML = "LOADING")
-	}
 	coin.classList.add("fall");
 	coin.classList.remove("active");
 	await sleep(1000);
@@ -925,14 +928,13 @@ function	getTournamentNames(struct)
 
 function	showTournamentOverview(struct)
 {
-	struct.tournament.players[0].innerHTML = struct.tournament.names[0];
-	struct.tournament.players[1].innerHTML = struct.tournament.names[1];
-	struct.tournament.players[2].innerHTML = struct.tournament.names[2];
-	struct.tournament.players[3].innerHTML = struct.tournament.names[3];
-	struct.tournament.winners[0].innerHTML = "-";
-	struct.tournament.winners[0].style.opacity = 0;
-	struct.tournament.winners[1].innerHTML = "-";
-	struct.tournament.winners[1].style.opacity = 0;
+	for (let i = 0; i < 4; i++)
+		struct.tournament.players[i].innerHTML = struct.tournament.names[i];
+	for (let i = 0; i < 2; i++)
+	{
+		struct.tournament.winners[i].innerHTML = "-";
+		struct.tournament.winners[i].style.opacity = 0;
+	}
 	struct.gameForm.form.classList.add("hidden");
 	struct.tournament.overview.classList.remove("hidden");
 	updateTournamentMarkers(struct, true);
@@ -964,9 +966,9 @@ function	updateTournamentMarkers(struct, shift)
 
 	if (struct.options.lang.curr === "fr")
 		array = struct.tournament.markerArrayStringsFR;
-	if (struct.options.lang.curr === "en")
+	else if (struct.options.lang.curr === "en")
 		array = struct.tournament.markerArrayStringsEN;
-	if (struct.options.lang.curr === "nl")
+	else if (struct.options.lang.curr === "nl")
 		array = struct.tournament.markerArrayStringsNL;
 	for (let i = 0; i < 3; i++)
 		struct.tournament.markers[i].innerHTML = array[struct.tournament.markerArray[0][i]];

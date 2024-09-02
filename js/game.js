@@ -41,8 +41,7 @@ function	setupEventListeners(struct, guestMode)
 		resetPhoneClasses(struct, struct.cards.chat);
 		struct.tabs.wrapperTabs.classList.add("hidden");
 		struct.tabs.wrapperInputs.classList.add("zindex");
-		struct.history.wrapper.classList.remove("zindex");
-		struct.history.wrapper.classList.remove("hidden");
+		struct.history.wrapper.classList.remove("zindex", "hidden");
 	});
 	struct.header.gameSelectorButton.addEventListener("click", function() { resetPhoneClasses(struct, struct.cards.gameSelector); });
 	struct.header.chatButton.addEventListener("click", function() {
@@ -98,31 +97,20 @@ function	setupEventListeners(struct, guestMode)
 	liveChat(struct);
 }
 
-function	fetchTranslation(struct, lang)
-{
-	if (struct.options.lang.curr !== lang)
-	{
-		fetch("/lang/" + lang + ".json")
-			.then(response => response.json())
-			.then(result => { translateGamePage(struct, result, lang); })
-			.catch(() => { console.error("Error: couldn't translate the page"); });
-	}
-}
-
 function	liveChat(struct)
 {
 	struct.chat.socket = new WebSocket("ws://made-f0ar12s1:8000/ws/chat/");
-	struct.chat.socket.addEventListener("error", function(event) {
+	struct.chat.socket.addEventListener("error", function() {
 		const tr = document.querySelectorAll(".tab-chat tr");
 		const buttons = document.querySelector(".tab-chat button");
 		const lock = document.getElementsByClassName("tab-chat-lock")[0];
 
-		lock.classList.remove("hidden");
 		struct.tabs.chat.input.classList.add("hidden");
 		for (let i = 1; i < tr.length; i++)
 			tr[i].style.opacity = 0.5;
 		for (let i = 0; i < buttons.length; i++)
 			buttons[i].disabled = true;
+		lock.classList.remove("hidden");
 	});
 	struct.chat.socket.addEventListener("message", function(event) {
 		const tr = document.createElement("tr");
@@ -202,69 +190,13 @@ function	liveChat(struct)
 	});
 }
 
-async function	translateGamePage(struct, obj, currLang)
-{
-	struct.options.lang.curr = currLang;
-	let plainTexts = Object.values(obj.plainText);
-	let placeHolders = Object.values(obj.placeholder);
-	let titles = Object.values(obj.title);
-	let ariaLabels = Object.values(obj.ariaLabel);
-	let i = 0;
-	let array;
-
-	for (let text of plainTexts)
-	{
-		struct.translation.txt[i].innerHTML = text;
-		i++;
-	}
-	i = 0;
-	for (let placeholder of placeHolders)
-	{
-		struct.translation.pholder[i].placeholder = placeholder;
-		i++;
-	}
-	i = 0;
-	for (let title of titles)
-	{
-		struct.translation.title[i].title = title;
-		i++;
-	}
-	i = 0;
-	for (let ariaLabel of ariaLabels)
-	{
-		struct.translation.ariaLabel[i].ariaLabel = ariaLabel;
-		i++;
-	}
-	updateTournamentMarkers(struct, false);
-}
-
-async function	setGuestRestrictions(struct)
-{
-	const historyIcon = document.querySelectorAll("header .fa-clock-rotate-left")[0];
-	const lockIcon = document.querySelectorAll(".tab-tabs .fa-lock")[0];
-	const hideForGuest = document.getElementsByClassName("hide-for-guest");
-
-	historyIcon.classList.add("hidden");
-	hideForGuest[0].classList.add("hidden");
-	hideForGuest[1].classList.add("hidden");
-	hideForGuest[2].classList.add("hidden");
-	lockIcon.classList.remove("hidden");
-	struct.header.historyButton.title = "";
-	struct.header.historyButton.disabled = true;
-	struct.header.historyButton.style.cursor = "default";
-	struct.tabs.chat.input.classList.add("hidden");
-	struct.tabs.friend.input.classList.add("hidden");
-	struct.tabs.chat.table.classList.add("hidden");
-	struct.tabs.friend.table.classList.add("hidden");
-}
-
 async function	launchGame(struct)
 {
 	if (struct.tournament.on === false)
 	{
 		await waitGoButton(struct)
-			.then(() => activateStick(struct));
-		struct.screen.game.run(struct)
+			.then(() => activateStick(struct))
+			.then(() => struct.screen.game.run(struct));
 	}
 	else
 	{
@@ -370,6 +302,71 @@ function	showScreen(struct, show)
 	struct.wrapperTournamentForm.classList.add("hidden");
 	struct.wrapperOptions.classList.add("hidden");
 	show.classList.remove("hidden");
+}
+
+function	fetchTranslation(struct, lang)
+{
+	if (struct.options.lang.curr !== lang)
+	{
+		fetch("/lang/" + lang + ".json")
+			.then(response => response.json())
+			.then(result => { translateGamePage(struct, result, lang); })
+			.catch(() => { console.error("Error: couldn't translate the page"); });
+	}
+}
+
+async function	translateGamePage(struct, obj, currLang)
+{
+	struct.options.lang.curr = currLang;
+	let plainTexts = Object.values(obj.plainText);
+	let placeHolders = Object.values(obj.placeholder);
+	let titles = Object.values(obj.title);
+	let ariaLabels = Object.values(obj.ariaLabel);
+	let i = 0;
+
+	for (let text of plainTexts)
+	{
+		struct.translation.txt[i].innerHTML = text;
+		i++;
+	}
+	i = 0;
+	for (let placeholder of placeHolders)
+	{
+		struct.translation.pholder[i].placeholder = placeholder;
+		i++;
+	}
+	i = 0;
+	for (let title of titles)
+	{
+		struct.translation.title[i].title = title;
+		i++;
+	}
+	i = 0;
+	for (let ariaLabel of ariaLabels)
+	{
+		struct.translation.ariaLabel[i].ariaLabel = ariaLabel;
+		i++;
+	}
+	updateTournamentMarkers(struct, false);
+}
+
+async function	setGuestRestrictions(struct)
+{
+	const historyIcon = document.querySelectorAll("header .fa-clock-rotate-left")[0];
+	const lockIcon = document.querySelectorAll(".tab-tabs .fa-lock")[0];
+	const hideForGuest = document.getElementsByClassName("hide-for-guest");
+
+	historyIcon.classList.add("hidden");
+	for (let i = 0; i < 3; i++)
+		hideForGuest[i].classList.add("hidden");
+	lockIcon.classList.remove("hidden");
+	struct.header.historyButton.title = "";
+	struct.header.historyButton.disabled = true;
+	struct.header.historyButton.style.cursor = "default";
+	struct.tabs.chat.input.classList.add("hidden");
+	struct.tabs.chat.table.classList.add("hidden");
+	struct.tabs.friend.input.classList.add("hidden");
+	struct.tabs.friend.table.classList.add("hidden");
 }
 
 //////////////////////////////////////////////////////
@@ -603,8 +600,8 @@ async function	checkGameSelectorValidation(struct)
 		}
 		else if (game === "tetris")
 		{
-				struct.screen.game = getTetrisStruct();
-				setupGameControls(struct, "tetris");
+			struct.screen.game = getTetrisStruct();
+			setupGameControls(struct, "tetris");
 		}
 		title.style.opacity = 0;
 		sleep(400)

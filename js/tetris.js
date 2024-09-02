@@ -758,6 +758,7 @@ function	getTetrisStruct()
 		canvas: undefined,
 		ctx: undefined,
 		run: startTetris,
+		online: false,
 		running: 0
 	};
 	return (struct);

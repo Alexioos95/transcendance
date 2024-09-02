@@ -97,7 +97,7 @@
 								<span class="mode-text translate-txt">Tournoi local a 4</span>
 							</label>
 							<label class="mode-selector translate-title" title="Ce mode est désactivé si vous n'êtes pas connecté">
-								<input class="translate-aria-label" disabled type="radio" name="mode" value="online" aria-label="Joueur contre Joueur en ligne">
+								<input class="translate-aria-label" type="radio" name="mode" value="online" aria-label="Joueur contre Joueur en ligne">
 								<span class="wrapper-circle">
 									<span class="base-circle">
 										<span class="top-circle"></span>
@@ -236,7 +236,7 @@
 										</label>
 										<label class="2fa-label">
 											<input type="radio" name="2fa" value="app">
-											<span class="translate-txt">Application Google</span>
+											<span class="translate-txt">Application à QRCode</span>
 										</label>
 									</div>
 								</div>
@@ -361,9 +361,14 @@
 					</button>
 				</div>
 				<div class="wrapper-tabs-tables tab-tabs">
-					<i class="fa-solid fa-lock hidden"></i>
 					<table class="tab-chat active">
 						<tbody>
+							<tr class="tab-chat-lock hidden">
+								<td>
+									<i class="fa-solid fa-lock"></i>
+									<p class="translate-txt">Une erreur critique a impacté le Chat en ligne</p>
+								</td>
+							</tr>
 							<tr>
 								<td>
 									<p class="chat-announcement">User est en ligne.</p>

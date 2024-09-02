@@ -51,10 +51,11 @@
 		"2fa": "2-factor-authenticatie",
 		"2fa-off": "Uitgeschakeld",
 		"2fa-email": "Email",
-		"2fa-app": "Google App",
+		"2fa-app": "QRCode-applicatie",
 		"unblock": "Deblokkeren",
 		"chat": "Chat",
-		"friend": "Vrienden"
+		"friend": "Vrienden",
+		"criticalChat": "A critical error impacted the online Chat"
 	},
 	"placeholder": {
 		"p1": "Speler 1",

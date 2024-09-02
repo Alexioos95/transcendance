@@ -1,42 +1,44 @@
 <main class="login-page d-flex justify-content-center align-items-center h-100">
-	<div class="container-fluid position-relative w-25 h-75 px-3 py-5 d-flex flex-column justify-content-between align-items-center my-card">
-		<form class="w-100 form-group text-center d-flex flex-column" autocomplete="on">
-			<h1 class="text-center mb-5 font-weight-bolder text-break">ft_transcendance</h1>
-			<input name="email" type="email" class="form-control border-top-0 border-left-0 border-right-0 border-bottom border-light rounded-0 form-group translate-pholder translate-aria-label" placeholder="Email" aria-label="Email">
-			<div class="position-relative">
-				<input name="password" type="password" minlength="10" class="form-control pr-5 border-top-0 border-left-0 border-right-0 border-bottom border-light rounded-0 form-group password translate-pholder translate-aria-label" placeholder="Mot de passe" aria-label="Mot de passe">
-				<button type="button" class="position-absolute border-0 show-password">
-					<i class="fa-solid fa-eye-slash"></i>
-				</button>
+	<div class="container-fluid position-relative w-25 h-75 px-0 overflow-hidden my-card">
+		<div class="w-100 h-100 px-3 py-5 d-flex flex-column justify-content-between align-items-center overflow-auto">
+			<form class="w-100 form-group text-center d-flex flex-column" autocomplete="on">
+				<h1 class="text-center mb-5 font-weight-bolder text-break">ft_transcendance</h1>
+				<input name="email" type="email" class="form-control border-top-0 border-left-0 border-right-0 border-bottom border-light rounded-0 form-group translate-pholder translate-aria-label" placeholder="Email" aria-label="Email">
+				<div class="position-relative">
+					<input name="password" type="password" minlength="10" class="form-control pr-5 border-top-0 border-left-0 border-right-0 border-bottom border-light rounded-0 form-group password translate-pholder translate-aria-label" placeholder="Mot de passe" aria-label="Mot de passe">
+					<button type="button" class="position-absolute border-0 show-password">
+						<i class="fa-solid fa-eye-slash"></i>
+					</button>
+				</div>
+				<input name="username" type="text" minlength="1" maxlength="30" class="form-control border-top-0 border-left-0 border-right-0 border-bottom border-light rounded-0 form-group username hidden translate-pholder translate-aria-label" placeholder="Nom d'utilisateur" aria-label="Nom d'utilisateur">
+				<button type="submit" class="w-100 py-2 mb-1 text-break submit translate-text">Connexion</button>
+				<button type="button" class="mx-auto border-0 forgot-password translate-text translate-aria-label" aria-label="Mot de passe oublie">Mot de passe oublié</button>
+				<button type="button" class="mx-auto mt-2 signup translate-text translate-aria-label" aria-label="Inscription">Inscription</button>
+				<button type="button" class="mx-auto mt-2 cancel-signup hideInFade translate-text translate-aria-label" aria-label="Annuler">Annuler</button>
+			</form>
+			<div class="w-100 text-center">
+				<div class="w-100 text-center special-login">
+					<button class="w-100 py-2 my-1 text-break login-42 translate-aria-label" aria-label="Connexion avec 42">
+						<svg version="1.1" x="0px" y="0px" viewBox="0 -200 960 960" enable-background="new 0 -200 960 960" xml:space="preserve" class="svg">
+							<polygon points="32,412.6 362.1,412.6 362.1,578 526.8,578 526.8,279.1 197.3,279.1 526.8,-51.1 362.1,-51.1
+							32,279.1 "/>
+							<polygon points="597.9,114.2 762.7,-51.1 597.9,-51.1 "/>
+							<polygon points="762.7,114.2 597.9,279.1 597.9,443.9 762.7,443.9 762.7,279.1 928,114.2 928,-51.1 762.7,-51.1 "/>
+							<polygon points="928,279.1 762.7,443.9 928,443.9 "/>
+						</svg>
+						<span class="translate-text">Continuer avec 42</span>
+					</button>
+					<button class="w-100 py-2 my-1 text-break special-login-guest translate-aria-label" aria-label="Jouer sans se connecter">
+						<img class="svg" src="/svg/incognito.svg" alt="Incognito logo">
+						<span class="translate-text">Continuer en tant qu'Invite</span>
+					</button>
+				</div>
+				<select class="mt-2">
+					<option value="fr">Français</option>
+					<option value="en">English</option>
+					<option value="vl">Nederlands</option>
+				</select>
 			</div>
-			<input name="username" type="text" minlength="1" maxlength="30" class="form-control border-top-0 border-left-0 border-right-0 border-bottom border-light rounded-0 form-group username hidden translate-pholder translate-aria-label" placeholder="Nom d'utilisateur" aria-label="Nom d'utilisateur">
-			<button type="submit" class="w-100 py-2 mb-1 text-break submit translate-text">Connexion</button>
-			<button type="button" class="mx-auto border-0 forgot-password translate-text translate-aria-label" aria-label="Mot de passe oublie">Mot de passe oublié</button>
-			<button type="button" class="mx-auto mt-2 signup translate-text translate-aria-label" aria-label="Inscription">Inscription</button>
-			<button type="button" class="mx-auto mt-2 cancel-signup hideInFade translate-text translate-aria-label" aria-label="Annuler">Annuler</button>
-		</form>
-		<div class="w-100 text-center">
-			<div class="w-100 text-center special-login">
-				<button class="w-100 py-2 my-1 text-break login-42 translate-aria-label" aria-label="Connexion avec 42">
-					<svg version="1.1" x="0px" y="0px" viewBox="0 -200 960 960" enable-background="new 0 -200 960 960" xml:space="preserve" class="svg">
-						<polygon points="32,412.6 362.1,412.6 362.1,578 526.8,578 526.8,279.1 197.3,279.1 526.8,-51.1 362.1,-51.1
-						32,279.1 "/>
-						<polygon points="597.9,114.2 762.7,-51.1 597.9,-51.1 "/>
-						<polygon points="762.7,114.2 597.9,279.1 597.9,443.9 762.7,443.9 762.7,279.1 928,114.2 928,-51.1 762.7,-51.1 "/>
-						<polygon points="928,279.1 762.7,443.9 928,443.9 "/>
-					</svg>
-					<span class="translate-text">Continuer avec 42</span>
-				</button>
-				<button class="w-100 py-2 my-1 text-break special-login-guest translate-aria-label" aria-label="Jouer sans se connecter">
-					<img class="svg" src="/svg/incognito.svg" alt="Incognito logo">
-					<span class="translate-text">Continuer en tant qu'Invite</span>
-				</button>
-			</div>
-			<select class="mt-2">
-				<option value="fr">Français</option>
-				<option value="en">English</option>
-				<option value="vl">Nederlands</option>
-			</select>
 		</div>
 	</div>
 </main>

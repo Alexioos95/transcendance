@@ -12,6 +12,7 @@ function	getPongStruct()
 		scores: undefined,
 		ball: undefined,
 		run: startPong,
+		online: false,
 		running: 0
 	};
 	return (struct);

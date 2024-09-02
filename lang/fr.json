@@ -51,10 +51,11 @@
 		"2fa": "Authentification à deux facteurs",
 		"2fa-off": "Désactivé",
 		"2fa-email": "Email",
-		"2fa-app": "Application Google",
+		"2fa-app": "Application à QRCode",
 		"unblock": "Débloquer",
 		"chat": "Chat",
-		"friend": "Amis"
+		"friend": "Amis",
+		"criticalChat": "Une erreur critique a impacté le Chat en ligne"
 	},
 	"placeholder": {
 		"p1": "Joueur 1",

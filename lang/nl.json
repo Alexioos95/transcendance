@@ -72,10 +72,7 @@
 		"chat": "Spreek met andere spelers",
 		"friendlist": "Vriendenlijst",
 		"options": "Opties",
-		"logout": "Afmelden",
-		"notOnPhone1": "Deze mode is uitgeschakeld op telefoon en tablet",
-		"notOnPhone2": "Deze mode is uitgeschakeld op telefoon en tablet",
-		"notOffline": "Deze mode is uitgeschakeld voor niet aangemelde gebruikers"
+		"logout": "Afmelden"
 	},
 	"ariaLabel": {
 		"chooseGame": "Kies het spel: Pong of Tetris",

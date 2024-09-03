@@ -101,16 +101,16 @@ function	liveChat(struct)
 {
 	struct.chat.socket = new WebSocket("ws://made-f0ar12s1:8000/ws/chat/");
 	struct.chat.socket.addEventListener("error", function() {
-		// const tr = document.querySelectorAll(".tab-chat tr");
-		// const buttons = document.querySelector(".tab-chat button");
-		// const lock = document.getElementsByClassName("tab-chat-lock")[0];
+		const tr = document.querySelectorAll(".tab-chat tr");
+		const buttons = document.querySelector(".tab-chat button");
+		const lock = document.getElementsByClassName("tab-chat-lock")[0];
 
-		// struct.tabs.chat.input.classList.add("hidden");
-		// for (let i = 1; i < tr.length; i++)
-		// 	tr[i].style.opacity = 0.5;
-		// for (let i = 0; i < buttons.length; i++)
-		// 	buttons[i].disabled = true;
-		// lock.classList.remove("hidden");
+		struct.tabs.chat.input.classList.add("hidden");
+		for (let i = 1; i < tr.length; i++)
+			tr[i].style.opacity = 0.5;
+		for (let i = 0; i < buttons.length; i++)
+			buttons[i].disabled = true;
+		lock.classList.remove("hidden");
 	});
 	struct.chat.socket.addEventListener("message", function(event) {
 		const tr = document.createElement("tr");
@@ -122,10 +122,6 @@ function	liveChat(struct)
 		const span = document.createElement("span");
 		const text = document.createTextNode(": " + JSON.parse(event.data).message);
 		const chatOptions = document.createElement("div");
-		const button1 = document.createElement("button");
-		const button2 = document.createElement("button");
-		const button3 = document.createElement("button");
-		const button4 = document.createElement("button");
 		const i1 = document.createElement("i");
 		const i2 = document.createElement("i");
 		const i3 = document.createElement("i");
@@ -133,7 +129,7 @@ function	liveChat(struct)
 		let isScrolled = false;
 
 		avatar.src = "/favicon.ico";
-		avatar.alt = "Avatar de l'utilisateur";
+		avatar.alt = "Avatar";
 		span.innerHTML = "USERNAME";
 		p.appendChild(span);
 		p.appendChild(text);
@@ -146,26 +142,10 @@ function	liveChat(struct)
 		i2.classList.add("fa-solid", "fa-clock-rotate-left");
 		i3.classList.add("fa-solid", "fa-table-tennis-paddle-ball");
 		i4.classList.add("fa-solid", "fa-circle-xmark");
-		button1.type = "button";
-		button2.type = "button";
-		button3.type = "button";
-		button4.type = "button";
-		button1.title = "Ajouter en ami";
-		button2.title = "Voir l'historique";
-		button3.title = "Inviter pour un Pong";
-		button4.title = "Bloquer l'utilisateur";
-		button1.classList.add("hover-green");
-		button2.classList.add("hover-purple");
-		button3.classList.add("hover-blue");
-		button4.classList.add("hover-red");
-		button1.appendChild(i1);
-		button2.appendChild(i2);
-		button3.appendChild(i3);
-		button4.appendChild(i4);
-		chatOptions.appendChild(button1);
-		chatOptions.appendChild(button2);
-		chatOptions.appendChild(button3);
-		chatOptions.appendChild(button4);
+		chatOptions.appendChild(createChatButton("Ajouter en ami", "hover-green", i1));
+		chatOptions.appendChild(createChatButton("Voir l'historique", "hover-purple", i2));
+		chatOptions.appendChild(createChatButton("Inviter pour un Pong", "hover-blue", i3));
+		chatOptions.appendChild(createChatButton("Bloquer l'utilisateur", "hover-red", i4));
 		chatOptions.classList.add("chat-options");
 		td.appendChild(chatMessage);
 		td.appendChild(chatOptions);
@@ -174,7 +154,7 @@ function	liveChat(struct)
 			isScrolled = true;
 		tr.appendChild(td);
 		struct.chat.output.appendChild(tr);
-		if (struct.tabs.chat.table.classList.contains("active") && isScrolled === true)
+		if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
 			struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
 	});
 	struct.chat.input.addEventListener("keydown", function(event) {
@@ -260,8 +240,7 @@ function	resetHistoryClasses(struct)
 {
 	struct.tabs.wrapperTabs.classList.remove("hidden");
 	struct.tabs.wrapperInputs.classList.remove("zindex");
-	struct.history.wrapper.classList.add("zindex");
-	struct.history.wrapper.classList.add("hidden");
+	struct.history.wrapper.classList.add("zindex", "hidden");
 }
 
 function	clearCanvas(wrapper)
@@ -273,6 +252,7 @@ function	clearCanvas(wrapper)
 function	shuffle(array)
 {
 	let i = array.length;
+
 	while (i != 0)
 	{
 	  let j = Math.floor(Math.random() * i);
@@ -287,13 +267,10 @@ function	showTab(show, hide)
 	hide.table.classList.remove("active");
 	if (hide.input !== undefined)
 		hide.input.classList.remove("active");
-	if (show !== undefined)
-	{
-		show.button.classList.add("active");
-		show.table.classList.add("active");
-		if (show.input !== undefined)
-			show.input.classList.add("active");
-	}
+	show.button.classList.add("active");
+	show.table.classList.add("active");
+	if (show.input !== undefined)
+		show.input.classList.add("active");
 }
 
 function	showScreen(struct, show)
@@ -366,6 +343,17 @@ async function	setGuestRestrictions(struct)
 	struct.tabs.chat.table.classList.add("hidden");
 	struct.tabs.friend.input.classList.add("hidden");
 	struct.tabs.friend.table.classList.add("hidden");
+}
+
+function	createChatButton(title, addClass, child)
+{
+	const button = document.createElement("button");
+
+	button.type = "button";
+	button.title = title;
+	button.classList.add(addClass);
+	button.appendChild(child);
+	return (button);
 }
 
 //////////////////////////////////////////////////////
@@ -593,17 +581,12 @@ async function	checkGameSelectorValidation(struct)
 		if (game === null || mode === null)
 			return (reject(0));
 		if (game === "pong")
-		{
 			struct.screen.game = getPongStruct();
-			setupGameControls(struct, "pong");
-		}
 		else if (game === "tetris")
-		{
 			struct.screen.game = getTetrisStruct();
-			setupGameControls(struct, "tetris");
-		}
+		setupGameControls(struct, game);
 		title.style.opacity = 0;
-		sleep(400)
+		sleep(350)
 			.then(() => title.style.opacity = 1)
 			.then(() => title.innerHTML = struct.screen.game.name)
 		if (mode === "tournament")
@@ -653,7 +636,6 @@ async function	waitGoButton(struct)
 
 async function	rejectCoin(struct)
 {
-	const title = document.getElementsByTagName("h2")[0];
 	const coin = document.getElementsByClassName("coin")[0];
 
 	coin.classList.add("fall");
@@ -938,14 +920,14 @@ function	showTournamentOverview(struct)
 
 function	updateTournamentNames(struct, elements)
 {
-	let i;
-
-	if (struct.tournament.matches === 3)
-		i = 0;
-	else if (struct.tournament.matches === 2)
-		i = 2;
 	if (struct.tournament.matches !== 1)
 	{
+		let i;
+
+		if (struct.tournament.matches === 3)
+			i = 0;
+		else if (struct.tournament.matches === 2)
+			i = 2;
 		elements[0].innerHTML = struct.tournament.names[i];
 		elements[1].innerHTML = struct.tournament.names[i + 1];
 	}

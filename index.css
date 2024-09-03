@@ -110,19 +110,19 @@ button:focus:not(:focus-visible) {
 	padding: 3%;
 }
 
-.hover-green:hover, .hover-green:focus {
+.hover-green:hover, .hover-green:focus-visible {
 	color: #32CD32;
 }
 
-.hover-purple:hover, .hover-purple:focus {
+.hover-purple:hover, .hover-purple:focus-visible {
 	color: #BA55D3;
 }
 
-.hover-blue:hover, .hover-blue:focus {
+.hover-blue:hover, .hover-blue:focus-visible {
 	color: #1E90FF;
 }
 
-.hover-red:hover, .hover-red:focus {
+.hover-red:hover, .hover-red:focus-visible {
 	color: #FF6347;
 }
 
@@ -504,7 +504,7 @@ label:has(> [type=radio]:focus-visible) {
 	flex-direction: column;
 	justify-content: space-between;
 	align-items: center;
-	height: 75%;
+	height: 70%;
 }
 
 .mode-selector {
@@ -1372,7 +1372,6 @@ canvas.pong {
 	text-align: center;
 	gap: 1rem;
 	margin-top: 0.3rem;
-	word-break: auto-phrase;
 }
 
 .tab-chat .chat-options button span, .tab-chat .chat-options button i {

@@ -72,10 +72,7 @@
 		"chat": "Parler aux autres joueurs",
 		"friendlist": "Liste d'amis",
 		"options": "Options",
-		"logout": "Se déconnecter",
-		"notOnPhone1": "Ce mode est désactivé sur téléphone et tablette",
-		"notOnPhone2": "Ce mode est désactivé sur téléphone et tablette",
-		"notOffline": "Ce mode est désactivé si vous n'êtes pas connecté"
+		"logout": "Se déconnecter"
 	},
 	"ariaLabel": {
 		"chooseGame": "Choisissez le jeu: Pong ou Tetris",

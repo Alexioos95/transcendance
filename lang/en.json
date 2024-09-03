@@ -72,10 +72,7 @@
 		"chat": "Speak to other players",
 		"friendlist": "Friendlist",
 		"options": "Options",
-		"logout": "Logout",
-		"notOnPhone1": "This mode is disabled on phone and tablet",
-		"notOnPhone2": "This mode is disabled on phone and tablet",
-		"notOffline": "This mode is disabled for guest users"
+		"logout": "Logout"
 	},
 	"ariaLabel": {
 		"chooseGame": "Choose the game: Pong or Tetris",

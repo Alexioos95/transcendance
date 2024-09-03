@@ -94,7 +94,8 @@ function	setupEventListeners(struct, guestMode)
 	struct.screen.wrapperCanvas.addEventListener("mousemove", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mouseup", function(event) { disableStickMove(event, struct); });
 	// Chat
-	liveChat(struct);
+	if (guestMode === false)
+		liveChat(struct);
 }
 
 function	liveChat(struct)

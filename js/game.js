@@ -101,16 +101,16 @@ function	liveChat(struct)
 {
 	struct.chat.socket = new WebSocket("ws://made-f0ar12s1:8000/ws/chat/");
 	struct.chat.socket.addEventListener("error", function() {
-		const tr = document.querySelectorAll(".tab-chat tr");
-		const buttons = document.querySelector(".tab-chat button");
-		const lock = document.getElementsByClassName("tab-chat-lock")[0];
+		// const tr = document.querySelectorAll(".tab-chat tr");
+		// const buttons = document.querySelector(".tab-chat button");
+		// const lock = document.getElementsByClassName("tab-chat-lock")[0];
 
-		struct.tabs.chat.input.classList.add("hidden");
-		for (let i = 1; i < tr.length; i++)
-			tr[i].style.opacity = 0.5;
-		for (let i = 0; i < buttons.length; i++)
-			buttons[i].disabled = true;
-		lock.classList.remove("hidden");
+		// struct.tabs.chat.input.classList.add("hidden");
+		// for (let i = 1; i < tr.length; i++)
+		// 	tr[i].style.opacity = 0.5;
+		// for (let i = 0; i < buttons.length; i++)
+		// 	buttons[i].disabled = true;
+		// lock.classList.remove("hidden");
 	});
 	struct.chat.socket.addEventListener("message", function(event) {
 		const tr = document.createElement("tr");
@@ -314,7 +314,6 @@ function	fetchTranslation(struct, lang)
 			.catch(() => { console.error("Error: couldn't translate the page"); });
 	}
 }
-
 async function	translateGamePage(struct, obj, currLang)
 {
 	struct.options.lang.curr = currLang;

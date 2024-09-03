@@ -55,24 +55,9 @@ function	login(signUpMode)
 			.catch((e) => console.log(e));
 	});
 	struct.langSelect.addEventListener("change", function(event) {
-		if (event.target.value === "fr")
-		{
-			fetch("/lang/fr.json")
-				.then(response => response.json())
-				.then(result => { translateLoginPage(struct, result); })
-		}
-		else if (event.target.value === "en")
-		{
-			fetch("/lang/en.json")
-				.then(response => response.json())
-				.then(result => { translateLoginPage(struct, result); })
-		}
-		else if (event.target.value === "nl")
-		{
-			fetch("/lang/nl.json")
-				.then(response => response.json())
-				.then(result => { translateLoginPage(struct, result); })
-		}
+		fetch("/lang/" + event.target.value + ".json")
+			.then(response => response.json())
+			.then(result => { translateLoginPage(struct, result); })
 	});
 	if (signUpMode !== undefined && signUpMode === true)
 		signUpForm(struct);

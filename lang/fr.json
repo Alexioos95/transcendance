@@ -90,5 +90,12 @@
 		"pseudo3": "Pseudonyme du joueur 3",
 		"pseudo4": "Pseudonyme du joueur 4",
 		"validate": "Valider"
+	},
+	"tabOptions": {
+		"addFriend": "Ajouter en ami",
+		"removeFriend": "Retirer de la liste d'amis",
+		"seeHistory": "Voir l'historique",
+		"invitePong": "Inviter pour un Pong",
+		"blockUser": "Bloquer l'utilisateur"
 	}
 }

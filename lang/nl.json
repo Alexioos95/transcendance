@@ -90,5 +90,12 @@
 		"pseudo3": "Bijnaam of speler 3",
 		"pseudo4": "Bijnaam of speler 4",
 		"validate": "Bevestigen"
+	},
+	"tabOptions": {
+		"addFriend": "",
+		"removeFriend": "",
+		"seeHistory": "",
+		"invitePong": "",
+		"blockUser": ""
 	}
 }

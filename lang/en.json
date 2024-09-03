@@ -90,5 +90,12 @@
 		"pseudo3": "Pseudo of player 3",
 		"pseudo4": "Pseudo of player 4",
 		"validate": "Validate"
+	},
+	"tabOptions": {
+		"addFriend": "Add to friendlist",
+		"removeFriend": "Remove from friendlist",
+		"seeHistory": "See history",
+		"invitePong": "Invite for a Pong",
+		"blockUser": "Block the user"
 	}
 }

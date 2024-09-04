@@ -17,10 +17,6 @@ import pyotp
 import qrcode
 import jwt
 import bcrypt
-from flask import Flask, request
-
-app = Flask(__name__)
-
 
 # mailData = {'title':'transcendance registration','body':f'welcome {username}, successfully registered', 'destinataire':'ftTranscendanceAMFEA@gmail.com'}
 # response = requests.post('http://localhost:8001/sendMail/', json=mailData)#mettre la route dans l'env ou set la route definitive dans le build final?
@@ -54,7 +50,7 @@ def get_user_in_db(field_name: str, value: str):#middleware //a utliser pour che
     try:
         user = User.objects.get(**{field_name: value})
         return user
-    except ObjectDoesNotExist:
+    except ObjectDoesNotExist:  #Not defined
         return None
 
 def register_user_in_database(user_info:dict):
@@ -81,7 +77,6 @@ def compare_bcrypt_hash(username:str, password: str) -> bool:#middleware
 @csrf_exempt
 @require_http_methods(["POST"])
 def register(request):#check si user est unique sinon refuser try except get?	#Set Language par default ou la récupérer du front ?
-    print(request.get_host())
     data = json.loads(request.body)
     username = data['username']#penser a is chaques parametres
     password = data['password']

@@ -16,7 +16,7 @@
 			- Code erreur adapte.
 
 
-- **GET `/user/checkJwt`**
+- **GET `/user/checkJwt/`**
 	- **Parametre(s)**:
 		- Aucun.
 	- **Comportement**:
@@ -45,7 +45,7 @@
 			- Code erreur adapte.
 
 
-- **POST `/user/set2FA`**
+- **POST `/user/set2FA/`**
 	- **Parametre(s)**:
 		- JSON contenant un champ `email`.
 	- **Comportement**:
@@ -71,7 +71,7 @@
 			- Code erreur adapte.
 
 
-- **POST `/user/resetPaswd`**
+- **POST `/user/resetPaswd/`**
 	- **Parametre(s)**:
 		- JSON contenant un champ `email`.
 	- **Comportement**:
@@ -83,7 +83,7 @@
 			- ?
 
 
-- **GET `/user/disconnect`**
+- **GET `/user/disconnect/`**
 	- **Parametre(s)**:
 		- JSON contenant un champ `email`.
 	- **Comportement**:
@@ -96,7 +96,7 @@
 
 ## Ping regulierement
 
-- **GET `/user/updateInfo`**
+- **GET `/user/updateInfo/`**
 	- **Parametre(s)**:
 		- ?
 	- **Comportement**:
@@ -111,11 +111,11 @@
 			- Code 403 (Forbidden).
 
 
-- **GET `/user/matchMaking`**
+- **GET `/user/matchMaking/`**
 	- **Parametre(s)**:
 		- ?
 	- **Comportement**:
-		-
+		- ?
 	- **Retour(s)**:
 		- Succes:
 			- ?
@@ -124,7 +124,7 @@
 
 ## TBD
 
-- **POST `/user/addFriend`**
+- **POST `/user/addFriend/`**
 	- **Parametre(s)**:
 		- ?
 	- **Comportement**:
@@ -136,7 +136,7 @@
 			- ?
 
 
-- **POST `/user/blockUser`**
+- **POST `/user/blockUser/`**
 	- **Parametre(s)**:
 		- ?
 	- **Comportement**:

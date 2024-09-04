@@ -77,7 +77,7 @@ def compare_bcrypt_hash(username:str, password: str) -> bool:#middleware
 
 @csrf_exempt
 @require_http_methods(["POST"])
-def register(request):#check si user est unique sinon refuser try except get?
+def register(request):#check si user est unique sinon refuser try except get?	#Set Language par default ou la récupérer du front ?
     data = json.loads(request.body)
     nom = data['nom']
     password = data['password']
@@ -91,9 +91,9 @@ def register(request):#check si user est unique sinon refuser try except get?
         Password=generate_bcrypt_hash(password),
         lastTimeOnline=tzTime,
         pongLvl=0,
-        Language='NL',
+        Language='NL',	##
         tetrisLvl=0,
-        twoFA=True
+        twoFA=True	##	False par default ?
     )
     # new_user.Language = 'FR'
     # user = User.objects.all().filter(Username__exact=decodedJwt["userName"]).value_list()
@@ -109,7 +109,7 @@ def register(request):#check si user est unique sinon refuser try except get?
     try:
         new_user.save()
     except Exception as error:
-        print('ca  echouer a ecrie en bdd')
+        print('ca a echouer a ecrie en bdd')
         response_data = JsonResponse({"error": "erreur in database"}, status=409)
         #response_data.status = 409
         print(error)
@@ -124,7 +124,7 @@ def register(request):#check si user est unique sinon refuser try except get?
     #         print("Le mot de passe est invalide.")
     # Réponse JSON
     response_data = JsonResponse({"message": "User successfully registered"}, status=201)
-    response_data.status = 201
+	#response_data.status = 201
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes
     encoded_jwt = jwt.encode({"userName": nom, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
     response_data.set_cookie(
@@ -133,23 +133,23 @@ def register(request):#check si user est unique sinon refuser try except get?
         httponly=True,
         secure=True,
         samesite='Strict',
-        expires=datetime.utcnow() + timedelta(hours=25)
+        expires=datetime.utcnow() + timedelta(hours=25)	# Expire avant le JWT...
     )
     return (response_data)
 
-def decodeJwt(auth_coockie):
+def decodeJwt(auth_coockie):	#Middleware
     decodedJwt = ""
     try:
         decoded_token = jwt.decode(auth, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
-        username = decoded_token.get('userName')  # Extract the username from the token
+        username = decoded_token.get('userName')  # Extract the username from the token	#	Quelle utilité ?
         decodedJwt = json.loads(decoded_token)
     # except jwt.ExpiredSignatureError:
     #     response_data = JsonResponse("error":"Connection expired")
     #     response_data.status_code = 401
     #     raise response_data
     except jwt.InvalidTokenError:
-        response_data = JsonResponse({'error': 'Forbidden'})
-        response_data.status_code = 403
+        response_data = JsonResponse({'error': 'Forbidden'}, status=403)
+		#response_data.status_code = 403
         raise response_data
     if decodedJwt["expirationDate"] < time.time():
         raise JsonResponse({'error': 'Token expired'}, status=401)
@@ -160,13 +160,14 @@ def decodeJwt(auth_coockie):
     # return JsonResponse({'success': 'User connected'}, status=200)
     return user
 
+@require_http_methods(["GET"])
 def checkJwt(request):
-    if request.method != 'GET':
-        return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
+	#if request.method != 'GET':
+		#return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
     auth = checkCookie(request, 'auth')
     if auth is None:
         response = HttpResponse()
-        response.status_code = 403
+        response.status_code = 403	## Pq 403 ? 401 Plutôt
         return response
     print(f'le cookie est {auth}')
     user = decodeJwt(auth)
@@ -206,7 +207,7 @@ def login(request):
         # print(f'dbUser == {dbUserList} Username {dbUserList[0].Username} password == {dbUserList[0].Password}')
         # print(f'dbUser == {dbUserList} Username {dbUserList[0].Username} password == {dbUserList[0].Password}')
     except Exception as e:
-        print(f'database esceptiom == {e}')
+        print(f'database exception == {e}')
         return JsonResponse({'error': 'invalid credentials'}, status=401)
     if bcrypt.checkpw(password.encode('utf-8'), dbUserList[0].Password.encode('utf-8')):
         print("Le mot de passe est valide.")

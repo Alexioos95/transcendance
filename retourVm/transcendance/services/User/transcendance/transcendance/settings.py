@@ -107,6 +107,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://bess-f2r1s14:8000',
     'http://made-f0Br7s18:8000',
     'http://made-f0Br6s19:8000/',
+    'http://made-f0Br7s19:5500/',
 ]
 
 # Static files (CSS, JavaScript, Images)

@@ -17,9 +17,12 @@ import pyotp
 import qrcode
 import jwt
 import bcrypt
+from flask import Flask, request
+
+app = Flask(__name__)
 
 
-# mailData = {'title':'transcendance registration','body':f'welcome {nom}, successfully registered', 'destinataire':'ftTranscendanceAMFEA@gmail.com'}
+# mailData = {'title':'transcendance registration','body':f'welcome {username}, successfully registered', 'destinataire':'ftTranscendanceAMFEA@gmail.com'}
 # response = requests.post('http://localhost:8001/sendMail/', json=mailData)#mettre la route dans l'env ou set la route definitive dans le build final?
 # print(response.status_code)
 
@@ -63,7 +66,7 @@ def register_user_in_database(user_info:dict):
 def generate_bcrypt_hash(password: str) -> str:#middleware
     salt = bcrypt.gensalt()
     passwordEncoded = bcrypt.hashpw(password.encode('utf-8'), salt)
-    return password.decode('utf-8')
+    return password
 
 def compare_bcrypt_hash(username:str, password: str) -> bool:#middleware
     dbUser = get_user_in_db(Username, username)
@@ -71,15 +74,16 @@ def compare_bcrypt_hash(username:str, password: str) -> bool:#middleware
         return False
     if bcrypt.checkpw(password.encode('utf-8'), dbUserList[0].Password.encode('utf-8')):
         return True
-    else
+    else:
         return False
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def register(request):#check si user est unique sinon refuser try except get?	#Set Language par default ou la récupérer du front ?
+    print(request.get_host())
     data = json.loads(request.body)
-    nom = data['nom']
+    username = data['username']#penser a is chaques parametres
     password = data['password']
     email = data['email']
     time = datetime.now()
@@ -87,7 +91,7 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
     tzTime = tz.localize(time)
     new_user = User(
         Email=email,
-        Username=nom,
+        Username=username,
         Password=generate_bcrypt_hash(password),
         lastTimeOnline=tzTime,
         pongLvl=0,
@@ -123,26 +127,28 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
     #     else:
     #         print("Le mot de passe est invalide.")
     # Réponse JSON
-    response_data = JsonResponse({"message": "User successfully registered"}, status=201)
 	#response_data.status = 201
+    response_data = JsonResponse({"message": "User successfully registered"}, status=201)
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes
-    encoded_jwt = jwt.encode({"userName": nom, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
+    encoded_jwt = jwt.encode({"userName": username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
     response_data.set_cookie(
         'auth',
         encoded_jwt,
         httponly=True,
-        secure=True,
-        samesite='Strict',
-        expires=datetime.utcnow() + timedelta(hours=25)	# Expire avant le JWT...
+        secure=None,
+        samesite='Lax',
+        expires=datetime.utcnow() + timedelta(hours=25),	# Expire avant le JWT...
+        # domain="*"
     )
+    print("tout est ok")
     return (response_data)
 
 def decodeJwt(auth_coockie):	#Middleware
     decodedJwt = ""
     try:
-        decoded_token = jwt.decode(auth, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
+        decoded_token = jwt.decode(auth_coockie, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
         username = decoded_token.get('userName')  # Extract the username from the token	#	Quelle utilité ?
-        decodedJwt = json.loads(decoded_token)
+        # decodedJwt = json.loads(decoded_token)
     # except jwt.ExpiredSignatureError:
     #     response_data = JsonResponse("error":"Connection expired")
     #     response_data.status_code = 401
@@ -150,36 +156,40 @@ def decodeJwt(auth_coockie):	#Middleware
     except jwt.InvalidTokenError:
         response_data = JsonResponse({'error': 'Forbidden'}, status=403)
 		#response_data.status_code = 403
-        raise response_data
-    if decodedJwt["expirationDate"] < time.time():
-        raise JsonResponse({'error': 'Token expired'}, status=401)
+        raise response_data#throw custom exception
+    print(username)
+    print(decoded_token)
+    print(decoded_token.get("expirationDate"))
+    print(time.time())
+    if decoded_token.get("expirationDate") < time.time():
+        raise JsonResponse({'error': 'Token expired'}, status=401)#throw custom exception
     # check si user existe toujours en db
-    user = User.objects.all().filter(Username__exact=decodedJwt["userName"]).value_list()
+    user = get_user_in_db("Username", username)
     if not user:
-        raise JsonResponse({'error': 'User does not exist'}, status=403)
+        raise JsonResponse({'error': 'User does not exist'}, status=403)#custom esception
     # return JsonResponse({'success': 'User connected'}, status=200)
     return user
 
 @require_http_methods(["GET"])
 def checkJwt(request):
+    print('test')
 	#if request.method != 'GET':
 		#return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
     auth = checkCookie(request, 'auth')
     if auth is None:
-        response = HttpResponse()
-        response.status_code = 403	## Pq 403 ? 401 Plutôt
-        return response
+        print("couocu")
+        return JsonResponse({"error": "user not log"}, status=401)
     print(f'le cookie est {auth}')
     user = decodeJwt(auth)
     response_data = JsonResponse({"username":user.Username, "Avatar":user.Avatar, "Language": user.Language})
     response_data.status_code = 200
-    return(response)
+    return(response_data)
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def login(request):
     data = json.loads(request.body)
-    requestUserName = data['nom']
+    requestUserName = data['username']
     password = data['password']
     # hash for comparison with db
     # Guard against injection/xss here?
@@ -211,7 +221,7 @@ def login(request):
         return JsonResponse({'error': 'invalid credentials'}, status=401)
     if bcrypt.checkpw(password.encode('utf-8'), dbUserList[0].Password.encode('utf-8')):
         print("Le mot de passe est valide.")
-    encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")    #    Export to .env file        #    Add env_example file
+        encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")    #    Export to .env file        #    Add env_example file
         if dbUserList[0].twoFA != 'NONE':
             return JsonResponse({"2fa": 'True'}, status=200)#code a verifier code 2fa attendu
         response_data = JsonResponse({"2fa": 'False', "username":dbUserList[0].Username, "Avatar":dbUserList[0].Avatar, "Language": dbUserList[0].Language})
@@ -322,7 +332,7 @@ def checkAuth42(request):
             return HttpResponse(status=204)
     else:
         return HttpResponse(status=405)
-    return (response, status=200)
+    return response
 
 def save_file(uploaded_file):
     upload_dir = '/leSuperVolumeCommunAvecNginx'
@@ -358,7 +368,7 @@ def updateUserInfos(request):
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
-        return HttpResponseBadRequest('error': 'Invalid JSON', status=403)
+        return HttpResponseBadRequest({'error': 'Invalid JSON'}, status=403)
     auth = checkCookie(request, 'auth')
     if auth is None:
         return HttpResponse(status=403)
@@ -377,11 +387,11 @@ def updateUserInfos(request):
         # return JsonResponse({'error': 'user do not exist'}, status=403)
     if 'username' in data:
         if get_user_in_db(Username, data['username']) is not None:
-            return JsonResponse("errorUsername": "username already exists")
+            return JsonResponse({"errorUsername": "username already exists"}, status=403)
         user.Username = data['username']
     if 'email' in data:
         if get_user_in_db(Email, data['email']) is not None:
-            return JsonResponse("errorEmail": "email already exists")
+            return JsonResponse({"errorEmail": "email already exists"}, status=403)
         user.Email = data['email']
     if 'password' in data:
         user.Password = data['password']
@@ -392,15 +402,15 @@ def updateUserInfos(request):
             user.language = data['language']
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
     user.save()
-    encoded_jwt = jwt.encode({"userName": nom, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
+    encoded_jwt = jwt.encode({"userName": username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
     response_data.set_cookie(
-        'auth',
-        encoded_jwt,
-        httponly=True,
-        secure=True,
-        samesite='Strict',
-        expires=datetime.utcnow() + timedelta(hours=100))
-        return (response_data)
+    'auth',
+    encoded_jwt,
+    httponly=True,
+    secure=True,
+    samesite='Strict',
+    expires=datetime.utcnow() + timedelta(hours=100))
+    return (response_data)
     return JsonResponse({"message": "User information updated successfully"})
 
 def disconnect(request):
@@ -527,11 +537,11 @@ def checkCodeModifyPassword(request):
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
-            return HttpResponseBadRequest('error': 'Invalid JSON', status=403)
+            return HttpResponseBadRequest({'error': 'Invalid JSON'}, status=403)
         if 'password' in data:
             user.Password = data['password']
             user.save()
-            return JsonResponse({"message":"password successfully updated", status=200})
+            return JsonResponse({"message":"password successfully updated"}, status=200)
     except User.DoesNotExist:
         print('User does not exist')
         return JsonResponse({'error': 'User does not exist'}, status=404)
@@ -608,7 +618,7 @@ def matchMaking(request):
         if time_difference > timedelta(seconds=30):
             userMatchmaking['difLevel'] *= 2
             userMatchmaking['time'] = current_time
-    if userMatchmaking['matched'] = True
+    if userMatchmaking['matched'] == True:
         cache.set('matchmaking', matchmakingDict, timeout=3600)
         return HttpResponse(status=200)
     maxLevel = userMatchmaking['levelPong'] if userMatchmaking['game'] == "pong" else userMatchmaking['levelTetris']

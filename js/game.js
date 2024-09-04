@@ -129,7 +129,7 @@ function	liveChat(struct)
 		const i4 = document.createElement("i");
 		let isScrolled = false;
 
-		avatar.src = "/favicon.ico";
+		avatar.src = "/default_avatar.png";
 		avatar.alt = "Avatar";
 		span.innerHTML = "USERNAME";
 		p.appendChild(span);

@@ -2,10 +2,30 @@
 /////////////////////////
 // Script
 /////////////////////////
-navigate("login")
-	.then(() => window.history.replaceState( { login: true, signUp: false, game: false } , null, ""))
-	.then(() => launchPageScript("login", false, null))
-	.catch((e) => console.log(e));
+checkJWT();
+
+async function	checkJWT()
+{
+	// PING ALL MODULES
+	await fetch("http://made-f0br6s18:8000/user/checkJwt/")
+		.then(response => {
+			if (response.ok)
+			{
+				console.log(response.json());
+				navigate("game")
+					.then(() => launchPageScript("game", false, null)); // Envoy JSON
+			}
+			else
+			{
+				console.log(response.status);
+				console.log(response.text());
+				navigate("login")
+					.then(() => launchPageScript("login", false, null))
+					.catch((e) => console.log(e));
+			}
+		})
+		.catch(() => console.error("Error: failed to fetch the checkJwt route"))
+}
 
 window.onpopstate = function(event) {
 	if (event.state)

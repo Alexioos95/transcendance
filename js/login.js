@@ -32,13 +32,41 @@ function	login(signUpMode)
 	});
 	struct.connection.addEventListener("click", function(event) {
 		event.preventDefault();
+
+		// const form = document.getElementsByTagName("form")[0];
+		// const data = new FormData(form);
+		// const obj = {
+		// 	email: data.get("email"),
+		// 	password: data.get("password"),
+		// 	lang: struct.langSelect.value
+		// };
+		// fetch("http://made-f0br6s18:8000/user/login/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		// 	.then(response => function(response) {
+		// 		console.log(response.status);
+		// 		console.log(response.json());
+		// 	});
 		navigate("game")
 			.then(() => launchPageScript("game", false, false))
 			.catch((e) => console.log(e));
 	});
 	struct.signUp.addEventListener("click", function() {
 		if (struct.signUp.classList.contains("primary"))
-			struct.signUp.type = "submit";
+		{
+			const form = document.getElementsByTagName("form")[0];
+			const data = new FormData(form);
+			const obj = {
+				username: data.get("username"),
+				email: data.get("email"),
+				password: data.get("password"),
+				lang: struct.langSelect.value
+			};
+			fetch("http://made-f0br6s18:8000/user/register/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+				.then(response => function(response) {
+					console.log(response.status);
+					console.log(response.json());
+				});
+			// struct.signUp.type = "submit";
+		}
 		else
 		{
 			signUpForm(struct);
@@ -46,6 +74,7 @@ function	login(signUpMode)
 		}
 	});
 	struct.cancelSignUp.addEventListener("click", function() {
+		struct.connection.type = "button";
 		window.history.back();
 	});
 	struct.guestConnection.addEventListener("click", function() {
@@ -144,6 +173,7 @@ function	signUpForm(struct)
 {
 	struct.username.classList.remove("hidden");
 	struct.connection.classList.add("hidden");
+	struct.connection.type = "button";
 	struct.forgotPassword.classList.add("hidden");
 	struct.wrapperSpecialLogin.classList.add("hideInFade");
 	struct.signUp.classList.add("primary");

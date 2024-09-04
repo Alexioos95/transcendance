@@ -7,6 +7,8 @@ from user.models import User
 from django.http import JsonResponse
 from django.http import HttpResponse
 from django.core.cache import cache
+from django.views.decorators.http import require_http_methods
+from django.core.validators import validate_email
 import json
 import pytz
 import requests
@@ -16,6 +18,10 @@ import qrcode
 import jwt
 import bcrypt
 
+
+# mailData = {'title':'transcendance registration','body':f'welcome {nom}, successfully registered', 'destinataire':'ftTranscendanceAMFEA@gmail.com'}
+# response = requests.post('http://localhost:8001/sendMail/', json=mailData)#mettre la route dans l'env ou set la route definitive dans le build final?
+# print(response.status_code)
 
 def index(request):#a degager
     print('coucou')
@@ -34,99 +40,102 @@ def print_all_cookies(request):#a ddegsge avant la fin sertsa verifier les coock
     else:
         print("Aucun cookie n'est présent dans la requête.")
 
-def checkCookie(request, str):
+def checkCookie(request, str):#middleware
     # print_all_cookies(request)
     if str in request.COOKIES:
         return request.COOKIES[str]
     else:
         return None
 
+def get_user_in_db(field_name: str, value: str):#middleware //a utliser pour check si un champ unique est deja utilise dans update info
+    try:
+        user = User.objects.get(**{field_name: value})
+        return user
+    except ObjectDoesNotExist:
+        return None
+
+def register_user_in_database(user_info:dict):
+    try:
+        user_info.save()
+    except Exception as e:
+        raise HttpResponse(status=403)
+
+def generate_bcrypt_hash(password: str) -> str:#middleware
+    salt = bcrypt.gensalt()
+    passwordEncoded = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return password.decode('utf-8')
+
+def compare_bcrypt_hash(username:str, password: str) -> bool:#middleware
+    dbUser = get_user_in_db(Username, username)
+    if dbUser == False:
+        return False
+    if bcrypt.checkpw(password.encode('utf-8'), dbUserList[0].Password.encode('utf-8')):
+        return True
+    else
+        return False
+
+
 @csrf_exempt
+@require_http_methods(["POST"])
 def register(request):#check si user est unique sinon refuser try except get?
-    if request.method == 'POST':
-        salt = bcrypt.gensalt()
-        data = json.loads(request.body)
-        nom = data['nom']
-        password = data['password']
-        email = data['email']
-        password = bcrypt.hashpw(password.encode('utf-8'), salt)
-        print(f'ceci est un mdp hash {password}')
-        time = datetime.now()
-        tz = pytz.timezone('CET')
-        tzTime = tz.localize(time)
-        new_user = User(
-            Email=email,
-            Username=nom,
-            Password=password.decode('utf-8'),
-            lastTimeOnline=tzTime,
-            pongLvl=0,
-            Language='NL',
-            tetrisLvl=0,
-            twoFA=True
-        )
-        # new_user.Language = 'FR'
-        # user = User.objects.all().filter(Username__exact=decodedJwt["userName"]).value_list()
-        # if not user:
-        #     print(username pas trouve)
-        # else:
-        #     print(username trouve)
-        # user = User.objects.all().filter(Username__exact=decodedJwt["Email"]).value_list()
-        # if not user:
-        #     print(email pas trouve)
-        # else:
-        #     print(email trouve)
-        try:
-            new_user.save()
-        except Exception as error:
-            print('ca  echouer a ecrie en bdd')
-            response_data = JsonResponse({"error": "erreur in database"}, status=409)
-            #response_data.status = 409
-            print(error)
-            return(response_data)
-        # user = User.objects.filter(Username__exact='h').first()
-        # if user:
-        #     print(f'user={user}')
-        #     print(f'user.password={user.Password}')
-        #     if bcrypt.checkpw(prevpassword, user.Password.encode('utf-8')):
-        #         print("Le mot de passe est valide.")
-        #     else:
-        #         print("Le mot de passe est invalide.")
-        # Réponse JSON
-        # mailData = {'title':'transcendance registration','body':f'welcome {nom}, successfully registered', 'destinataire':'ftTranscendanceAMFEA@gmail.com'}
-        # response = requests.post('http://localhost:8001/sendMail/', json=mailData)#mettre la route dans l'env ou set la route definitive dans le build final?
-        # print(response.status_code)
-        response_data = JsonResponse({"message": "User successfully registered"}, status=201)
-        response_data.status = 201
-        # response_data.set_cookie(
-        # 'auth',
-        # f'test{nom}',#
-        # httponly=True,   # Empêche l'accès JavaScript au cookie
-        # # secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
-        # # samesite='None',
-        # expires=datetime.utcnow() + timedelta(hours=1))
-        expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes
-        encoded_jwt = jwt.encode({"userName": nom, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
-        # response_data.set_cookie(
-        # 'auth',
-        # encoded_jwt,
-        # httponly=True,   # Empêche l'accès JavaScript au cookie
-        # # secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
-        # samesite='None',
-        # expires=datetime.utcnow() + timedelta(hours=1))
-        response_data.set_cookie(
-            'auth',
-            encoded_jwt,
-            httponly=True,  # Empêche l'accès JavaScript au cookie
-            secure=True,   # Désactivé pour HTTP local
-            samesite='Strict', # 'Lax' est souvent suffisant pour les tests locaux
-            expires=datetime.utcnow() + timedelta(hours=25)  # Date d'expiration future
-        )
-        # response_data.set_cookie(key='auth', value=encoded_jwt, max_age=3000)
-        print("erreur 1")
-        return (response_data)
-    else:
-        print("erreur 2")
-        return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
+    data = json.loads(request.body)
+    nom = data['nom']
+    password = data['password']
+    email = data['email']
+    time = datetime.now()
+    tz = pytz.timezone('CET')
+    tzTime = tz.localize(time)
+    new_user = User(
+        Email=email,
+        Username=nom,
+        Password=generate_bcrypt_hash(password),
+        lastTimeOnline=tzTime,
+        pongLvl=0,
+        Language='NL',
+        tetrisLvl=0,
+        twoFA=True
+    )
+    # new_user.Language = 'FR'
+    # user = User.objects.all().filter(Username__exact=decodedJwt["userName"]).value_list()
+    # if not user:
+    #     print(username pas trouve)
+    # else:
+    #     print(username trouve)
+    # user = User.objects.all().filter(Username__exact=decodedJwt["Email"]).value_list()
+    # if not user:
+    #     print(email pas trouve)
+    # else:
+    #     print(email trouve)
+    try:
+        new_user.save()
+    except Exception as error:
+        print('ca  echouer a ecrie en bdd')
+        response_data = JsonResponse({"error": "erreur in database"}, status=409)
+        #response_data.status = 409
+        print(error)
+        return(response_data)
+    # user = User.objects.filter(Username__exact='h').first()
+    # if user:
+    #     print(f'user={user}')
+    #     print(f'user.password={user.Password}')
+    #     if bcrypt.checkpw(prevpassword, user.Password.encode('utf-8')):
+    #         print("Le mot de passe est valide.")
+    #     else:
+    #         print("Le mot de passe est invalide.")
+    # Réponse JSON
+    response_data = JsonResponse({"message": "User successfully registered"}, status=201)
+    response_data.status = 201
+    expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes
+    encoded_jwt = jwt.encode({"userName": nom, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
+    response_data.set_cookie(
+        'auth',
+        encoded_jwt,
+        httponly=True,
+        secure=True,
+        samesite='Strict',
+        expires=datetime.utcnow() + timedelta(hours=25)
+    )
+    return (response_data)
 
 def decodeJwt(auth_coockie):
     decodedJwt = ""
@@ -166,9 +175,8 @@ def checkJwt(request):
     return(response)
 
 @csrf_exempt
+@require_http_methods(["POST"])
 def login(request):
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
     data = json.loads(request.body)
     requestUserName = data['nom']
     password = data['password']
@@ -200,9 +208,9 @@ def login(request):
     except Exception as e:
         print(f'database esceptiom == {e}')
         return JsonResponse({'error': 'invalid credentials'}, status=401)
-    encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")    #    Export to .env file        #    Add env_example file
     if bcrypt.checkpw(password.encode('utf-8'), dbUserList[0].Password.encode('utf-8')):
         print("Le mot de passe est valide.")
+    encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")    #    Export to .env file        #    Add env_example file
         if dbUserList[0].twoFA != 'NONE':
             return JsonResponse({"2fa": 'True'}, status=200)#code a verifier code 2fa attendu
         response_data = JsonResponse({"2fa": 'False', "username":dbUserList[0].Username, "Avatar":dbUserList[0].Avatar, "Language": dbUserList[0].Language})
@@ -238,7 +246,7 @@ def auth42(request):
         return JsonResponse({'error': 'Failed to obtain access token'}, status=response.status_code)
     access_token = response.json().get('access_token')
     if not access_token:
-        return JsonResponse({'error': 'Access token not found in response'}, status=500)
+        return JsonResponse({'error': 'Access token not found in response'}, status=403)
     headers = {
         'Authorization': f'Bearer {access_token}'
     }
@@ -315,6 +323,34 @@ def checkAuth42(request):
         return HttpResponse(status=405)
     return (response, status=200)
 
+def save_file(uploaded_file):
+    upload_dir = '/leSuperVolumeCommunAvecNginx'
+    file_name = generate_code()
+    file_path = os.path.join(upload_dir, file_name)
+    with open(file_path, 'wb+') as destination:
+        for chunk in uploaded_file.chunks():
+            destination.write(chunk)
+    return file_path
+
+
+def image_validation():
+    if request.method == 'POST' and 'image' in request.FILES:
+        uploaded_file = request.FILES['image']
+        mime_type = uploaded_file.content_type
+        accepted_mime_types = [
+            'image/jpeg',   # JPEG
+            'image/png',    # PNG
+            'image/svg+xml', # SVG
+            'image/webp'    # WebP
+        ]
+    if mime_type in accepted_mime_types:
+        return save_file(uploaded_file)
+        
+    else:
+        raise JsonResponse({"errorImage": "invalide image format"}, status=403)
+
+
+
 @require_http_methods(["POST"])
 def updateUserInfos(request):
     data = {}
@@ -324,27 +360,46 @@ def updateUserInfos(request):
         return HttpResponseBadRequest('error': 'Invalid JSON', status=403)
     auth = checkCookie(request, 'auth')
     if auth is None:
-        return HttpResponse(status=403) 
+        return HttpResponse(status=403)
     userName = decodeJwt(auth)
-    try:
-        user = User.objects.filter(Username__exact=userName)
-        dbUserList = list(dbUser)
-        for user in dbUserList:
-            print(f'dbUser == {dbUserList} Username {user.Username} password == {user.Password}')
-            print(f'Language: {user.get_Language_display()}')
-            print(f'TwoFA: {user.get_twoFA_display()}')
-    except Exception as e:
-        return JsonResponse({'error': 'user do not exist'}, status=403)
+    user = get_user_in_db(Username, userName)
+    if user is None:
+        return HttpResponse(status=403)
+    # try:
+    #     user = User.objects.filter(Username__exact=userName)
+    #     dbUserList = list(dbUser)
+    #     for user in dbUserList:
+    #         print(f'dbUser == {dbUserList} Username {user.Username} password == {user.Password}')
+    #         print(f'Language: {user.get_Language_display()}')
+    #         print(f'TwoFA: {user.get_twoFA_display()}')
+    # except Exception as e:
+        # return JsonResponse({'error': 'user do not exist'}, status=403)
     if 'username' in data:
-        user.username = data['username']    
+        if get_user_in_db(Username, data['username']) is not None:
+            return JsonResponse("errorUsername": "username already exists")
+        user.Username = data['username']
+    if 'email' in data:
+        if get_user_in_db(Email, data['email']) is not None:
+            return JsonResponse("errorEmail": "email already exists")
+        user.Email = data['email']
     if 'password' in data:
-        user.password = data['password'] 
-    if 'avatar' in data:
-        user.avatar = data['avatar']
+        user.Password = data['password']
+    if 'avatar' in data:#on recoit une image je l'enregistre dans le volume et stock l'url
+        user.Avatar = data['avatar']
     if 'language' in data:
         if data['language'] in dict(User.Language.choices):
-            user.language = data['language']  
+            user.language = data['language']
+    expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
     user.save()
+    encoded_jwt = jwt.encode({"userName": nom, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
+    response_data.set_cookie(
+        'auth',
+        encoded_jwt,
+        httponly=True,
+        secure=True,
+        samesite='Strict',
+        expires=datetime.utcnow() + timedelta(hours=100))
+        return (response_data)
     return JsonResponse({"message": "User information updated successfully"})
 
 def disconnect(request):
@@ -362,7 +417,7 @@ def updateInfo(request):
         user = User.objects.get(username=userName)
     except User.DoesNotExist:
         print('User does not exist')
-        return JsonResponse({'error': 'User does not exist'}, status=404)
+        return JsonResponse({'error': 'User does not exist'}, status=403)
     response = JsonResponse({"username":user.Username, "Avatar":user.Avatar, "Language": user.Language})#ajouter plus tard friends et bloques + get dans le cache les defis lances ou acceptes
     return response(status=200)
 
@@ -505,7 +560,7 @@ def resetPasswd(request):
             f'Hey {user.username},\n\n'
             'It looks like you requested to reset your password. No worries, we’ve got you covered!\n\n'
             'Click the link below to set a new password:\n\n'
-            f'https://HOST/user/checkCodeModifyPassword/?code={validationCode}\n\n'
+            f'https://localhost:8000/resetmypassword/?code={validationCode}\n\n'
             'This link will be good for 10 minutes, so make sure to use it before it expires. If you missed it, just request another one.\n\n'
             'If you didn’t ask for a password reset, just ignore this email – your account is safe.\n\n'
             'Got any questions? Feel free to reach out to us!\n\n'
@@ -520,6 +575,7 @@ def resetPasswd(request):
     return JsonResponse({'message': 'Password reset email sent successfully'}, status=200)
 
 @csrf_exempt
+@require_http_methods(["GET"])
 def matchMaking(request):
     # decode jwt
     # recperer la ligne user en bdd
@@ -544,8 +600,6 @@ def matchMaking(request):
     matchmakingDict = cache.get('matchmaking', {})
     print(f"cache == {matchmakingDict}")
     userMatchmaking = {'time': datetime.now(), 'difLevel': 5, 'game': "pong" ,'levelPong': user.pongLvl, 'levelTetris':user.tetrisLvl, 'matched':False}#si marchd a true return 200
-    # if username == 'fguarrac':
-    #     userMatchmaking = {'time': datetime.now(), 'difLevel': 5, 'game': "pong" ,'levelPong': 20, 'levelTetris':user.tetrisLvl}
     if username in matchmakingDict.keys():
         userMatchmaking = matchmakingDict.pop(username)
         current_time = datetime.now()
@@ -553,14 +607,9 @@ def matchMaking(request):
         if time_difference > timedelta(seconds=30):
             userMatchmaking['difLevel'] *= 2
             userMatchmaking['time'] = current_time
-    print(username)
-    print(userMatchmaking)
     if userMatchmaking['matched'] = True
         cache.set('matchmaking', matchmakingDict, timeout=3600)
         return HttpResponse(status=200)
-
-    # maxLevel = userMatchmaking['game'] == "pong"?userMatchmaking['levelPong']:userMatchmaking['levelTetris']
-
     maxLevel = userMatchmaking['levelPong'] if userMatchmaking['game'] == "pong" else userMatchmaking['levelTetris']
     maxLevel+=userMatchmaking['difLevel']
     
@@ -570,16 +619,18 @@ def matchMaking(request):
         if data['levelPong'] <= maxLevel and data['levelPong'] >= minLevel:
             print('ca matchmake la')
             data['matched'] = True
-            break
+            cache.set('matchmaking', matchmakingDict, timeout=3600)
+            return HttpResponse(status=200)
         else:
             print('ca matchamake pas la')
         print(f"Username: {userName}, Time: {data['time'].timestamp()}, difference Level: {data['difLevel']}")
     gameData = {'player1': "fguarrac", 'player2': "madaguen"}
-    gameResponse = requests.post('http://localhost:8001/initGame/', json=gameData)#inscrit la partie en bdd jeu
+    gameResponse = requests.post('http://localhost:8001/Tetris/initGame/', json=gameData)#inscrit la partie en bdd jeu
     print(gameResponse.status_code)
     matchmakingDict[username] = userMatchmaking
     cache.set('matchmaking', matchmakingDict, timeout=3600)#si pas trouve sinon inscrire en bdd game
     return HttpResponse(status=100)
 
+@require_http_methods(["GET"])
 def ping(request):
     return HttpResponse(status=204)

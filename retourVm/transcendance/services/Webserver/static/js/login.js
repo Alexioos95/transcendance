@@ -76,7 +76,7 @@ function	login()
 				.catch(() => console.error("Error: failed to fetch the login route"));
 		}
 	});
-	struct.signUp.addEventListener("click", signUpFunction(struct));
+	struct.signUp.addEventListener("click", function() { signUpFunction(struct) });
 	struct.cancelSignUp.addEventListener("click", function() {
 		struct.signUp.classList.remove("primary");
 		// window.history.back();

@@ -61,13 +61,11 @@ function	setupEventListeners(struct, guestMode)
 		struct.run = 0;
 		if (struct.chat.socket !== undefined)
 			struct.chat.socket.close(1000);
-		navigate("login")
-			.then(() => launchPageScript("login", false, false))
-			.then(() => {
-				if (guestMode === true)
-					window.history.pushState({ login: true, signUp: false, game: false }, null, "");
-			})
-			.catch((e) => console.error(e));
+		navigate("login", undefined)
+			// .then(() => {
+			// 	if (guestMode === true)
+			// 		window.history.pushState({ login: true, signUp: false, game: false }, null, "");
+			// })
 	});
 	// Cross Buttons
 	struct.options.leaveButton.addEventListener("click", function() {
@@ -83,6 +81,38 @@ function	setupEventListeners(struct, guestMode)
 	struct.options.lang.nl.addEventListener("click", function() { fetchTranslation(struct, "nl") });
 	// Tabs Account/Blocked
 	struct.options.account.button.addEventListener("click", function() { showTab(struct.options.account, struct.options.blocked) });
+	struct.options.account.formSubmit.addEventListener("click", function() {
+		const data = new FormData(struct.options.account.form);
+		const obj = {
+			lang: data.get("lang"),
+			avatar: data.get("avatar"),
+			username: data.get("options-username"),
+			email: data.get("options-email"),
+			passwordCurr: data.get("options-password-actual"),
+			passwordNew: data.get("options-password-new"),
+			passwordConf: get("options-password-confirmation")
+		};
+
+		if (obj.passwordNew !== obj.passwordConf)
+		{
+			// Place error
+			console.log("Passwords do not match");
+			return ;
+		}
+		console.log("fetch /user/updateUserInfos");
+		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => function(response) {
+				if (response.ok)
+					console.log("response /user/updateUserInfos ok; do nothing // Need to place success");
+				else
+				{
+					console.log("response /user/updateUserInfos not good; do nothing // Need to place error");
+					console.log(response.status);
+					console.log(response.json());
+				}
+			})
+			.catch(() => console.error("Error: failed to fetch the updateUserInfos route"));
+	});
 	struct.options.blocked.button.addEventListener("click", function() { showTab(struct.options.blocked, struct.options.account) });
 	// Tabs Chat/Friend
 	struct.tabs.chat.button.addEventListener("click", function() { showTab(struct.tabs.chat, struct.tabs.friend) });
@@ -473,7 +503,9 @@ function	getOptionsStruct()
 
 	const accountStruct = {
 		button: buttons[0],
-		table: document.getElementsByClassName("wrapper-options-forms")[0]
+		table: document.getElementsByClassName("wrapper-options-forms")[0],
+		form: document.getElementsByClassName("options-form")[0],
+		formSubmit: document.getElementsByClassName("options-save")[0]
 	};
 	const blockedStruct = {
 		button: buttons[1],
@@ -614,16 +646,36 @@ async function	checkGameSelectorValidation(struct)
 		sleep(350)
 			.then(() => title.style.opacity = 1)
 			.then(() => title.innerHTML = struct.screen.game.name)
-		if (mode === "tournament")
-			struct.tournament.on = true;
-		else if (mode === "online")
-			struct.screen.game.online = true;
 		clearCanvas(struct.screen.wrapperCanvas);
 		showScreen(struct.screen, struct.screen.wrapperCanvas)
 		resetPhoneClasses(struct)
 		struct.header.wrapper.classList.add("zindex");
 		struct.options.wrapper.classList.add("hidden");
 		struct.cards.screen.classList.remove("zindex");
+		if (mode === "tournament")
+			struct.tournament.on = true;
+		else if (mode === "online")
+		{
+			struct.screen.game.online = true;
+			const myInterval = setInterval(() => {
+				console.log("fetch /user/matchMaking");
+				fetch("/user/matchMaking/", { method: "GET", credentials: "include"})
+					.then(response => function(response) {
+						if (response.ok)
+						{
+							console.log("response /user/matchMaking ok; clear interval // Need to start game");
+							clearInterval(myInterval);
+						}
+						else
+						{
+							console.log("response /user/matchMaking not good; Wait 10s");
+							console.log(response.status);
+							console.log(response.json());
+						}
+					})
+					.catch(() => console.error("Error: failed to fetch the matchMaking route"));
+			}, 10000);
+		}
 		resolve();
 	});
 }

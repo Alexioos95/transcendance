@@ -32,6 +32,7 @@ function	login()
 	});
 	struct.connection.addEventListener("click", function(event) {
 		event.preventDefault();
+		
 		const form = document.getElementsByTagName("form")[0];
 		const data = new FormData(form);
 		const obj = {
@@ -39,23 +40,41 @@ function	login()
 			password: data.get("password"),
 			lang: struct.langSelect.value
 		};
-		
-		console.log("fetch /user/login");
-		fetch("/user/login/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-			.then(response => function(response) {
-				if (response.ok)
-				{
-					console.log("response /user/login ok; navigate to Game");
-					navigate("game", JSON.parse(response.json()))
-				}
-				else
-				{
-					console.log("response /user/login not good; do nothing // Need to place error");
-					console.log(response.status);
-					console.log(response.json());
-				}
-			})
-			.catch(() => console.error("Error: failed to fetch the login route"));
+		if (struct.connection.classList.contains("recovery"))
+		{
+			console.log("fetch /user/resetPaswd");
+			fetch("/user/resetPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+				.then(response => function(response) {
+					if (response.ok)
+						console.log("response /user/resetPaswd ok; do nothing // Need to continue");
+					else
+					{
+						console.log("response /user/resetPaswd not good; do nothing // Need to place error");
+						console.log(response.status);
+						console.log(response.json());
+					}
+				})
+				.catch(() => console.error("Error: failed to fetch the resetPaswd route"));
+		}
+		else
+		{
+			console.log("fetch /user/login");
+			fetch("/user/login/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+				.then(response => function(response) {
+					if (response.ok)
+					{
+						console.log("response /user/login ok; navigate to Game");
+						navigate("game", JSON.parse(response.json()))
+					}
+					else
+					{
+						console.log("response /user/login not good; do nothing // Need to place error");
+						console.log(response.status);
+						console.log(response.json());
+					}
+				})
+				.catch(() => console.error("Error: failed to fetch the login route"));
+		}
 	});
 	struct.signUp.addEventListener("click", function() {
 		if (struct.signUp.classList.contains("primary"))
@@ -72,7 +91,7 @@ function	login()
 			console.log("fetch /user/register");
 			fetch("/user/register/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 				.then(response => function(response) {
-					if (response.ok)
+					if (response.status === 201)
 					{
 						console.log("response /user/register ok; navigate to Game");
 						navigate("game", JSON.parse(response.json()))

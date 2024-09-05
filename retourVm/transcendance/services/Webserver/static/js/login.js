@@ -44,7 +44,7 @@ function	login()
 		{
 			console.log("fetch /user/resetPaswd");
 			fetch("/user/resetPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-				.then(response => function(response) {
+				.then(response => {
 					if (response.ok)
 						console.log("response /user/resetPaswd ok; do nothing // Need to continue");
 					else
@@ -60,7 +60,7 @@ function	login()
 		{
 			console.log("fetch /user/login");
 			fetch("/user/login/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-				.then(response => function(response) {
+				.then(response => {
 					if (response.ok)
 					{
 						console.log("response /user/login ok; navigate to Game");
@@ -90,7 +90,7 @@ function	login()
 
 			console.log("fetch /user/register");
 			fetch("/user/register/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-				.then(response => function(response) {
+				.then(response => {
 					if (response.status === 201)
 					{
 						console.log("response /user/register ok; navigate to Game");

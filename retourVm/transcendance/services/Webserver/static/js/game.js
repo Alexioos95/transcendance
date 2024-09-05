@@ -61,7 +61,11 @@ function	setupEventListeners(struct, data)
 		struct.run = 0;
 		if (struct.chat.socket !== undefined)
 			struct.chat.socket.close(1000);
-		navigate("login", undefined)
+		fetch("/user/disconnect/", { method: "GET", credentials: "include"})
+		.then(response => {
+			navigate("login", undefined);
+		})
+		.catch(() => console.error("Error: failed to fetch the matchMaking route"));
 			// .then(() => {
 			// 	if (guestMode === true)
 			// 		window.history.pushState({ login: true, signUp: false, game: false }, null, "");
@@ -101,7 +105,7 @@ function	setupEventListeners(struct, data)
 		}
 		console.log("fetch /user/updateUserInfos");
 		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-			.then(response => function(response) {
+			.then(response => {
 				if (response.ok)
 					console.log("response /user/updateUserInfos ok; do nothing // Need to place success");
 				else
@@ -660,7 +664,7 @@ async function	checkGameSelectorValidation(struct)
 			const myInterval = setInterval(() => {
 				console.log("fetch /user/matchMaking");
 				fetch("/user/matchMaking/", { method: "GET", credentials: "include"})
-					.then(response => function(response) {
+					.then(response => {
 						if (response.ok)
 						{
 							console.log("response /user/matchMaking ok; clear interval // Need to start game");

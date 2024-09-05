@@ -76,42 +76,7 @@ function	login()
 				.catch(() => console.error("Error: failed to fetch the login route"));
 		}
 	});
-	struct.signUp.addEventListener("click", function(event) {
-		if (struct.signUp.classList.contains("primary"))
-		{
-			const form = document.getElementsByTagName("form")[0];
-			const data = new FormData(form);
-			const obj = {
-				username: data.get("username"),
-				email: data.get("email"),
-				password: data.get("password"),
-				lang: struct.langSelect.value
-			};
-
-			console.log("fetch /user/register");
-			fetch("/user/register/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-				.then(response => {
-					if (response.status === 201)
-					{
-						console.log("response /user/register ok; navigate to Game");
-						navigate("game", JSON.parse(response.json()))
-					}
-					else
-					{
-						console.log("response /user/register not good; do nothing // Need to place error");
-						console.log(response.status);
-						console.log(response.json());
-					}
-				})
-				.catch(() => console.error("Error: failed to fetch the register route"));
-		}
-		else
-		{
-			signUpForm(struct);
-			event.preventDefault();
-			// window.history.pushState({ login: true, signUp: true, game: false }, null, "");
-		}
-	});
+	struct.signUp.addEventListener("click", signUpFunction(struct));
 	struct.cancelSignUp.addEventListener("click", function() {
 		struct.signUp.classList.remove("primary");
 		// window.history.back();
@@ -205,6 +170,43 @@ function	restore(struct)
 	}
 	struct.signUp.classList.remove("hideInFade");
 	struct.signUp.disabled = false;
+}
+
+function	signUpFunction(struct)
+{
+	if (struct.signUp.classList.contains("primary"))
+		{
+			const form = document.getElementsByTagName("form")[0];
+			const data = new FormData(form);
+			const obj = {
+				username: data.get("username"),
+				email: data.get("email"),
+				password: data.get("password"),
+				lang: struct.langSelect.value
+			};
+
+			console.log("fetch /user/register");
+			fetch("/user/register/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+				.then(response => {
+					if (response.status === 201)
+					{
+						console.log("response /user/register ok; navigate to Game");
+						navigate("game", JSON.parse(response.json()))
+					}
+					else
+					{
+						console.log("response /user/register not good; do nothing // Need to place error");
+						console.log(response.status);
+						console.log(response.json());
+					}
+				})
+				.catch(() => console.error("Error: failed to fetch the register route"));
+		}
+		else
+		{
+			signUpForm(struct);
+			// window.history.pushState({ login: true, signUp: true, game: false }, null, "");
+		}
 }
 
 function	signUpForm(struct)

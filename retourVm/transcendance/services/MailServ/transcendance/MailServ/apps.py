@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class CatConfig(AppConfig):
+class MailservConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'cat'
+    name = 'MailServ'

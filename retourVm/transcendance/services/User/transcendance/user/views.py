@@ -22,6 +22,11 @@ import bcrypt
 # response = requests.post('http://localhost:8001/sendMail/', json=mailData)#mettre la route dans l'env ou set la route definitive dans le build final?
 # print(response.status_code)
 
+class customException(Exception):
+    def __init__(self, data, code):
+        self.data = data
+        self.code = code
+
 def index(request):#a degager
     print('coucou')
     if request.method == 'POST':
@@ -50,14 +55,14 @@ def get_user_in_db(field_name: str, value: str):#middleware //a utliser pour che
     try:
         user = User.objects.get(**{field_name: value})
         return user
-    except ObjectDoesNotExist:  #Not defined
+    except Exception:  #Not defined
         return None
 
 def register_user_in_database(user_info:dict):
     try:
         user_info.save()
-    except Exception as e:
-        raise HttpResponse(status=403)
+    except Exception:
+        raise customException("User already exists", 409)
 
 def generate_bcrypt_hash(password: str) -> str:#middleware
     salt = bcrypt.gensalt()
@@ -143,29 +148,22 @@ def decodeJwt(auth_coockie):	#Middleware
     try:
         decoded_token = jwt.decode(auth_coockie, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
         username = decoded_token.get('userName')  # Extract the username from the token	#	Quelle utilité ?
-        # decodedJwt = json.loads(decoded_token)
-    # except jwt.ExpiredSignatureError:
-    #     response_data = JsonResponse("error":"Connection expired")
-    #     response_data.status_code = 401
-    #     raise response_data
     except jwt.InvalidTokenError:
-        response_data = JsonResponse({'error': 'Forbidden'}, status=403)
-		#response_data.status_code = 403
-        raise response_data#throw custom exception
+        raise customException("Forbidden", 403)
     print(username)
     print(decoded_token)
     print(decoded_token.get("expirationDate"))
     print(time.time())
     if decoded_token.get("expirationDate") < time.time():
-        raise JsonResponse({'error': 'Token expired'}, status=401)#throw custom exception
+        raise customException("Token expired", 401)
     # check si user existe toujours en db
     user = get_user_in_db("Username", username)
     if not user:
-        raise JsonResponse({'error': 'User does not exist'}, status=403)#custom esception
+        raise customException("User does not exists", 403)
     # return JsonResponse({'success': 'User connected'}, status=200)
     return user
 
-@require_http_methods(["GET"])
+#@require_http_methods(["GET"])
 def checkJwt(request):
     print('test')
 	#if request.method != 'GET':
@@ -175,34 +173,40 @@ def checkJwt(request):
         print("couocu")
         return JsonResponse({"error": "user not log"}, status=401)
     print(f'le cookie est {auth}')
-    user = decodeJwt(auth)
-    response_data = JsonResponse({"username":user.Username, "Avatar":user.Avatar, "Language": user.Language})
-    response_data.status_code = 200
-    return(response_data)
+    try:
+        user = decodeJwt(auth)
+        response_data = JsonResponse({"username":user.Username, "Avatar":user.Avatar, "Language": user.Language})
+        response_data.status_code = 200
+        return(response_data)
+    except customException as e:
+        return JsonResponse({"error": e.data}, status=e.code)
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def login(request):
     data = json.loads(request.body)
-    requestUserName = data['username']
-    password = data['password']
+    userData = {}
+    if 'email' in data:
+        userData['email'] = data['email']
+    #if 'username' in data:
+       # userData['username'] = data['username']
+    if 'password' in data:
+        userData['password'] = data['password']
+
+#    requestUserName = data['username']
+ #   password = data['password']
     # hash for comparison with db
     # Guard against injection/xss here?
     # Check if empty name or password?
     # Check for minimum lengths?
-    dbUser = ''
-    try:
-        mydata = User.objects.all().values()
-        print(mydata)
-        print(list(mydata))
-
-        dbUser = User.objects.filter(Username__exact=requestUserName)
-        dbUserList = list(dbUser)
-
-        for user in dbUserList:
-            print(f'dbUser == {dbUserList} Username {user.Username} password == {user.Password}')
-            print(f'Language: {user.get_Language_display()}')
-            print(f'TwoFA: {user.get_twoFA_display()}')
+    dbUser = get_user_in_db("email", userData['email'])
+    if dbUser is None:
+        return HttpResponse({"error":"invalid credentials"}, status=401)
+    
+#        for user in dbUserList:
+#            print(f'dbUser == {dbUserList} Username {user.Username} password == {user.Password}')
+#            print(f'Language: {user.get_Language_display()}')
+#            print(f'TwoFA: {user.get_twoFA_display()}')
         # mydata = User.objects.all().values()
         # print(mydata)
         # print(list(mydata))
@@ -211,15 +215,12 @@ def login(request):
         # dbUserList = list(dbUser)
         # print(f'dbUser == {dbUserList} Username {dbUserList[0].Username} password == {dbUserList[0].Password}')
         # print(f'dbUser == {dbUserList} Username {dbUserList[0].Username} password == {dbUserList[0].Password}')
-    except Exception as e:
-        print(f'database exception == {e}')
-        return JsonResponse({'error': 'invalid credentials'}, status=401)
-    if bcrypt.checkpw(password.encode('utf-8'), dbUserList[0].Password.encode('utf-8')):
+    if bcrypt.checkpw(userData.password.encode('utf-8'), dbUser.Password.encode('utf-8')):
         print("Le mot de passe est valide.")
         encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")    #    Export to .env file        #    Add env_example file
-        if dbUserList[0].twoFA != 'NONE':
+        if dbUser.twoFA != 'NONE':
             return JsonResponse({"2fa": 'True'}, status=200)#code a verifier code 2fa attendu
-        response_data = JsonResponse({"2fa": 'False', "username":dbUserList[0].Username, "Avatar":dbUserList[0].Avatar, "Language": dbUserList[0].Language})
+        response_data = JsonResponse({"2fa": 'False', "username":dbUser.Username, "Avatar":dbUser.Avatar, "Language": dbUser.Language})
         response_data.status = 200
         response_data.set_cookie(
         'auth',
@@ -353,7 +354,7 @@ def image_validation():
         return save_file(uploaded_file)
         
     else:
-        raise JsonResponse({"errorImage": "invalide image format"}, status=403)
+        raise customException("Invalid image format", 403)
 
 
 
@@ -367,10 +368,14 @@ def updateUserInfos(request):
     auth = checkCookie(request, 'auth')
     if auth is None:
         return HttpResponse(status=403)
-    userName = decodeJwt(auth)
-    user = get_user_in_db(Username, userName)
+    user = ""
+    try:
+        userName = decodeJwt(auth)
+        user = get_user_in_db(Username, userName)
+    except customException as e:
+        return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
-        return HttpResponse(status=403)
+        return JsonResponse({"error": "User does not exists"}, status=403)
     # try:
     #     user = User.objects.filter(Username__exact=userName)
     #     dbUserList = list(dbUser)
@@ -418,12 +423,14 @@ def updateInfo(request):
     user = ''
     if auth is None:
         return JsonResponse({'error': 'Unauthorized request'}, status=403)
-    userName = decodeJwt(auth)
+    user = ""
     try:
-        user = User.objects.get(username=userName)
-    except User.DoesNotExist:
-        print('User does not exist')
-        return JsonResponse({'error': 'User does not exist'}, status=403)
+        userName = decodeJwt(auth)
+        user = get_user_in_db(Username, userName)
+    except customException as e:
+        return JsonResponse({"error": e.data}, status=e.code)
+    if user is None:
+        return JsonResponse({"error": "User does not exists"}, status=403)
     response = JsonResponse({"username":user.Username, "Avatar":user.Avatar, "Language": user.Language})#ajouter plus tard friends et bloques + get dans le cache les defis lances ou acceptes
     return response(status=200)
 
@@ -544,22 +551,20 @@ def checkCodeModifyPassword(request):
 
 @require_http_methods(["POST"])
 def resetPasswd(request):
-    auth = checkCookie(request, 'auth')
-    if auth is None:
-        return JsonResponse({'error': 'Unauthorized request'}, status=403)
-    userName = decodeJwt(auth)
-    print(userName)
     validationCode = generate_code()
     try:
-        user = User.objects.get(username=userName)
-        email = user.Email
-        cache.set(validationCode, user.Username,timeout=600)
-    except User.DoesNotExist:
-        print('User does not exist')
-        return JsonResponse({'error': 'User does not exist'}, status=404)
-    except Exception as e:
-        print(f'Database exception: {e}')
-        return JsonResponse({'error': 'Database error'}, status=500)
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return HttpResponseBadRequest({'error': 'Invalid JSON'}, status=403)
+    email = ""
+    if "email" not in data:
+        return JsonResponse({'error': 'Invalid format'}, status=403)
+    email = data['email']
+    user = get_user_in_db(Email, email)
+    if user is None:
+        return JsonResponse({'error': 'User does not exist'}, status=403)
+    cache.set(validationCode, user.Username,timeout=600)
+    print('User does not exist')
     mailData = {
         'title': 'Transcendance Reset Password',
         'body': (
@@ -574,7 +579,7 @@ def resetPasswd(request):
             'The Team'
             ),
             'destinataire': email}
-    response = requests.post('http://localhost:8001/sendMail/', json=mailData)
+    response = requests.post('http://mail:8002/sendMail/', json=mailData)
     if response.status_code != 200:
         print({'error': 'Failed to send email'})
         return JsonResponse({'error': 'Failed to send email'}, status=500)
@@ -588,20 +593,18 @@ def matchMaking(request):
     # check si le joueur est dans le cache , l'enlever et set la marge lvladveraire
     # check dans le cache si on lui trouve un avdversaire
     # sinon ajouter le joueur dans le cache
-    response = HttpResponse()
     auth = checkCookie(request, 'auth')
     if auth is None:
-        response.status_code = 403
-        return response
-    
+        return JsonResponse({'error': 'User not connected'}, status=403)
     print(f'le cookie est {auth}')
     username = ""
-    decodedJwt(auth)
-    user = User.objects.filter(Username__exact=username).first()
-    
-    if not user:
-        response.status_code = 403
-        return response
+    try:
+        username = decodedJwt(auth)
+    except customException as e:
+        return JsonResponse({"error": e.data}, status=e.code)
+    user = get_user_in_db("Username", username)
+    if user is None:
+        return JsonResponse({"error": "User does not exits"}, status=403)
     print(f'le username est {username}')
     matchmakingDict = cache.get('matchmaking', {})
     print(f"cache == {matchmakingDict}")
@@ -635,7 +638,7 @@ def matchMaking(request):
     print(gameResponse.status_code)
     matchmakingDict[username] = userMatchmaking
     cache.set('matchmaking', matchmakingDict, timeout=3600)#si pas trouve sinon inscrire en bdd game
-    return HttpResponse(status=100)
+    return HttpResponse(status=204)
 
 @require_http_methods(["GET"])
 def ping(request):

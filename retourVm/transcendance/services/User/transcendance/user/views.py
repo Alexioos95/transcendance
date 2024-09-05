@@ -17,6 +17,7 @@ import pyotp
 import qrcode
 import jwt
 import bcrypt
+import sys
 
 # mailData = {'title':'transcendance registration','body':f'welcome {username}, successfully registered', 'destinataire':'ftTranscendanceAMFEA@gmail.com'}
 # response = requests.post('http://localhost:8001/sendMail/', json=mailData)#mettre la route dans l'env ou set la route definitive dans le build final?
@@ -82,20 +83,27 @@ def compare_bcrypt_hash(username:str, password: str) -> bool:#middleware
 @csrf_exempt
 @require_http_methods(["POST"])
 def register(request):#check si user est unique sinon refuser try except get?	#Set Language par default ou la récupérer du front ?
+    
+    print(f"ici body == {request.body}")
+    print(f"ici body == {request.body}", file=sys.stderr)
     data = json.loads(request.body)
-    username = data['username']#penser a is chaques parametres
-    password = data['password']
-    email = data['email']
+    userData = {}
+    if 'username' in data:
+        userData['username'] = data['username']
+    if 'password' in data:
+        userData['password'] = data['password']
+    if 'email' in data:
+        userData['email'] = data['email']
     time = datetime.now()
     tz = pytz.timezone('CET')
     tzTime = tz.localize(time)
     new_user = User(
-        Email=email,
-        Username=username,
-        Password=generate_bcrypt_hash(password),
+        Email=userData['email'],
+        Username=userData['username'],
+        Password=generate_bcrypt_hash(userData['password']),
         lastTimeOnline=tzTime,
         pongLvl=0,
-        Language='NL',	##
+        Language='FR',	##
         tetrisLvl=0,
         twoFA=True	##	False par default ?
     )
@@ -115,9 +123,33 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
     except Exception as error:
         print('ca a echouer a ecrie en bdd')
         response_data = JsonResponse({"error": "erreur in database"}, status=409)
-        #response_data.status = 409
         print(error)
         return(response_data)
+
+
+    mailData = {
+        'title': 'Transcendance Reset Password',
+        'body': (
+            f'Hey,\n\n'
+            'It looks like you requested to reset your password. No worries, we’ve got you covered!\n\n'
+            'Click the link below to set a new password:\n\n'
+            f'https://localhost:8000/resetmypassword/?code=validationCode\n\n'
+            'This link will be good for 10 minutes, so make sure to use it before it expires. If you missed it, just request another one.\n\n'
+            'If you didn’t ask for a password reset, just ignore this email – your account is safe.\n\n'
+            'Got any questions? Feel free to reach out to us!\n\n'
+            'Cheers,\n'
+            'The Team'
+            ),
+            'destinataire': userData['email']}
+    response = requests.post('http://mail:8002/sendMail/', json=mailData)
+    print({'error': 'Failed to send email'}, file=sys.stderr)
+
+
+
+
+
+
+
     # user = User.objects.filter(Username__exact='h').first()
     # if user:
     #     print(f'user={user}')
@@ -130,7 +162,7 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
 	#response_data.status = 201
     response_data = JsonResponse({"message": "User successfully registered"}, status=201)
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes
-    encoded_jwt = jwt.encode({"userName": username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
+    encoded_jwt = jwt.encode({"userName": userData['username'], "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
     response_data.set_cookie(
         'auth',
         encoded_jwt,
@@ -434,86 +466,25 @@ def updateInfo(request):
     response = JsonResponse({"username":user.Username, "Avatar":user.Avatar, "Language": user.Language})#ajouter plus tard friends et bloques + get dans le cache les defis lances ou acceptes
     return response(status=200)
 
-# def checkCode2faAPK(user, code):
-#     return
+def checkCodeLog(request):
+    #recupere le code dans le json
+    #le get dans le cache la value est == a l'user
+    #recuperer l'user en bdd et renvoyer les infos au front
+    return JsonResponse()
 
-# def checkCode2faMail(user, code):
-#     return
-
-# def generateAPKCode(masterCode):
-#     return
-
-def twoFA(request):
-    #requete gen cle chaque 00.01s 30.01s
-    # attend un code et dit si valide ou non 
-
-
-    key = keyFromDb
-    totp = pyotp.TOTP(key)
-    #print(f'Code: {totp.now()}')
-
-    #ask generated key in front!
-    userInput = input("Enter generated code (6 digits): ")
-
-    # check user input ?!
-
-    if (totp.verify(userInput)):
-        print("Code OK")
-        #    send OK to front!
-    else:
-        print("NOT OK :(")
-        #    send KO to front!
-
-    return
+def checkCodeSet(request):
+    #recupere le code dans le json
+    #le get dans le cache la value est == a l'user
+    #recuperer l'user en bdd et changer la value 2fa par mail
+    retun JsonResponse({"message": "2fa activation success"},status=200)
 
 def set2FA(request):
-    #requete gen cle chaque 00.01s 30.01s
-    #set 2fa a true en bdd code deja stocke si c'est mail si apk check le code en cache
-
-    # if 2FA == key:
-        # key = cache.get('"USERNAME" + 2FA') # Get from JWT
-        # totp = pyotp.TOTP(key)
-        # print(f'Code: {totp.now()}')
-    # 
-        # ask generated key in front!
-        # userInput = input("Enter generated code (6 digits): ")    # Get from request ?
-    # 
-        # check user input ?!
-    # 
-        # if (totp.verify(userInput)):
-        # if true, save key to db + remove from cache
-            # keyToDb = User.objects.get(Username = 'USERNAME')
-            # keyToDb.twoFA = APK
-            # keyToDb.key2FA = key
-            # keyToDb.save()
-            # print("Code OK")
-            #    send OK to front!
-        # else:
-            # print("NOT OK :(")
-            #    start over in front!
-    # 
-        #    delete image !
-        # if os.path.exists('PATH TO QRCODE.png'):
-            # os.remove('PATH TO QRCODE.png')
-        # cache.clear('"USERNAME" + 2FA')
-    # else:
-        # pass #for now
+    #recoit un demande d'activation 2fa on recupere l'usser via le JWT et on lui envoie un mail contannt le code + le stocker en cache cle code value user 10 minutes
     return
 
-def preSet2FA(request):
-    # sert a teser la 2fa et enregistrer la cle user puis on effectue une 2fa
-
-    key = pyotp.random_base32()
-    #    save key in cache
-    cache.set('"USERNAME" + 2FA', key, 30)    # Get Username or ID from JWT
-
-    otpUri = pyotp.totp.TOTP(key).provisioning_uri(name= "GET USERNAME OR ID FROM JWT", issuer_name="Transcendance")
-    qrcode.make(otpUri).save("FIND USEFULL NAME.png")
-    return
-
-def generate_code():#a mettre dans les middleware
+def generate_code(size=100):#a mettre dans les middleware
     code = []
-    for _ in range(30):
+    for _ in range(size):
         value = random.randint(0, 61)
         if value < 26:
             code.append(chr(97 + value))
@@ -581,7 +552,7 @@ def resetPasswd(request):
             'destinataire': email}
     response = requests.post('http://mail:8002/sendMail/', json=mailData)
     if response.status_code != 200:
-        print({'error': 'Failed to send email'})
+        print({'error': 'Failed to send email'}, file=sys.stderr)
         return JsonResponse({'error': 'Failed to send email'}, status=500)
     return JsonResponse({'message': 'Password reset email sent successfully'}, status=200)
 

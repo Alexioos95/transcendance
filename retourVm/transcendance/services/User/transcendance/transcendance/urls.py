@@ -35,9 +35,11 @@ urlpatterns = [
     #non publique redirecion du line 42
     path('user/auth42/', views.auth42),
     #POST
-    path('user/2fa/', views.twoFA), #envoyer un code user qu'il a obtenu via son moyen de double authentification retourn 200 + # {"username":"username", "Avatar":PATH, "Language": "FR"} si le code est valide
+    
+    path('user/set2fa/', views.checkCodeSet),
+    path('user/log2fa/', views.checkCodeLog), #envoyer un code user qu'il a obtenu via son moyen de double authentification retourn 200 + # {"username":"username", "Avatar":PATH, "Language": "FR"} si le code est valide
     #POST
-    path('user/set2FA/', views.set2FA), #envoi le type de 2fa voulu si mail un code sera envoye au mail et le retour sera 200 si ca c'est corectement passe (403 si invalide user) et un code sera attendu en retour via la meme route qui le settera la 2fa si le code est bon sinon code d'erreur et 2fa non set 
+    path('user/init2fa/', views.set2FA), #envoi le type de 2fa voulu si mail un code sera envoye au mail et le retour sera 200 si ca c'est corectement passe (403 si invalide user) et un code sera attendu en retour via la meme route qui le settera la 2fa si le code est bon sinon code d'erreur et 2fa non set 
     #GET
     path('user/disconnect/', views.disconnect), #supprime le coockie auth
     #GET

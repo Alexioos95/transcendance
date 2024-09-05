@@ -26,12 +26,14 @@ SECRET_KEY = 'django-insecure-5^(-nbd0q!z_9-gzir377a09m$lga9_5r2_q(2s7_d#ow0i!3m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
 
 INSTALLED_APPS = [
+    'MailServ',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

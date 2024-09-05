@@ -6,7 +6,7 @@ COPY requirements.txt ./
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY transcendance/ transcendance/
 
 HEALTHCHECK     --interval=10s --timeout=1s --retries=3 --start-period=30s \
         CMD wget -q --tries=1 --spider --no-check-certificate http://localhost:8000/chat/ping; if [ $? -eq 0 ]; then exit 0; else exit 1; fi

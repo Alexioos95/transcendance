@@ -17,7 +17,7 @@ async function	run(data)
 		translation: getTranslationStruct(),
 		run: 1
 	};
-	setupEventListeners(struct, guestMode);
+	setupEventListeners(struct, data);
 	replaceDatas(struct, data);
 	while (struct.run === 1)
 	{
@@ -33,7 +33,7 @@ async function	run(data)
 	}
 }
 
-function	setupEventListeners(struct, guestMode)
+function	setupEventListeners(struct, data)
 {
 	// Header Buttons
 	struct.header.historyButton.addEventListener("click", function() {
@@ -123,7 +123,7 @@ function	setupEventListeners(struct, guestMode)
 	struct.screen.wrapperCanvas.addEventListener("mousemove", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mouseup", function(event) { disableStickMove(event, struct); });
 	// Chat
-	if (guestMode === false)
+	if (obj.guestMode !== undefined && obj.guestMode === false)
 		liveChat(struct);
 }
 

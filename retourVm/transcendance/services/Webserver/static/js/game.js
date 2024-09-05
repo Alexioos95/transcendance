@@ -64,7 +64,7 @@ function	setupEventListeners(struct, data)
 		fetch("/user/disconnect/", { method: "GET", credentials: "include"})
 		.then(response => {
 			navigate("login", undefined);
-		})
+		})	
 		.catch(() => console.error("Error: failed to fetch the matchMaking route"));
 			// .then(() => {
 			// 	if (guestMode === true)

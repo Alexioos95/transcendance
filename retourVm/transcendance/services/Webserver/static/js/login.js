@@ -76,7 +76,7 @@ function	login()
 				.catch(() => console.error("Error: failed to fetch the login route"));
 		}
 	});
-	struct.signUp.addEventListener("click", function() {
+	struct.signUp.addEventListener("click", function(event) {
 		if (struct.signUp.classList.contains("primary"))
 		{
 			const form = document.getElementsByTagName("form")[0];
@@ -108,12 +108,13 @@ function	login()
 		else
 		{
 			signUpForm(struct);
+			event.preventDefault();
 			// window.history.pushState({ login: true, signUp: true, game: false }, null, "");
 		}
 	});
 	struct.cancelSignUp.addEventListener("click", function() {
-		struct.connection.type = "button";
-		window.history.back();
+		struct.signUp.classList.remove("primary");
+		// window.history.back();
 	});
 	struct.guestConnection.addEventListener("click", function() {
 		navigate("game", { guestMode: true, lang: struct.lang.value } )
@@ -210,7 +211,6 @@ function	signUpForm(struct)
 {
 	struct.username.classList.remove("hidden");
 	struct.connection.classList.add("hidden");
-	struct.connection.type = "button";
 	struct.forgotPassword.classList.add("hidden");
 	struct.wrapperSpecialLogin.classList.add("hideInFade");
 	struct.signUp.classList.add("primary");

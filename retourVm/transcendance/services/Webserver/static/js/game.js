@@ -97,12 +97,12 @@ function	setupEventListeners(struct, data)
 			passwordConf: get("options-password-confirmation")
 		};
 
-		if (obj.passwordNew !== obj.passwordConf)
-		{
+		// if (obj.passwordNew !== obj.passwordConf)
+		// {
 			// Place error
-			console.log("Passwords do not match");
-			return ;
-		}
+			// console.log("Passwords do not match");
+			// return ;
+		// }
 		console.log("fetch /user/updateUserInfos");
 		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
@@ -217,8 +217,9 @@ function	replaceDatas(struct, data)
 	else
 	{
 		const inputs = document.querySelectorAll(".options-wrapper-connection input");
-		inputs[0] = data.username;
-		inputs[1] = data.email;
+
+		inputs[0].innerHTML = data.username;
+		inputs[1].innerHTML = data.email;
 	}
 }
 

@@ -2,7 +2,7 @@
 /////////////////////////
 // Script
 /////////////////////////
-function	login(signUpMode)
+function	login()
 {
 	const struct = getLoginStruct();
 
@@ -32,22 +32,30 @@ function	login(signUpMode)
 	});
 	struct.connection.addEventListener("click", function(event) {
 		event.preventDefault();
-
-		// const form = document.getElementsByTagName("form")[0];
-		// const data = new FormData(form);
-		// const obj = {
-		// 	email: data.get("email"),
-		// 	password: data.get("password"),
-		// 	lang: struct.langSelect.value
-		// };
-		// fetch("/user/login/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-		// 	.then(response => function(response) {
-		// 		console.log(response.status);
-		// 		console.log(response.json());
-		// 	});
-		navigate("game")
-			.then(() => launchPageScript("game", false, false))
-			.catch((e) => console.log(e));
+		const form = document.getElementsByTagName("form")[0];
+		const data = new FormData(form);
+		const obj = {
+			email: data.get("email"),
+			password: data.get("password"),
+			lang: struct.langSelect.value
+		};
+		
+		console.log("fetch /user/login");
+		fetch("/user/login/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => function(response) {
+				if (response.ok)
+				{
+					console.log("response /user/login ok; navigate to Game");
+					navigate("game", JSON.parse(response.json()))
+				}
+				else
+				{
+					console.log("response /user/login not good; do nothing // Need to place error");
+					console.log(response.status);
+					console.log(response.json());
+				}
+			})
+			.catch(() => console.error("Error: failed to fetch the login route"));
 	});
 	struct.signUp.addEventListener("click", function() {
 		if (struct.signUp.classList.contains("primary"))
@@ -60,17 +68,28 @@ function	login(signUpMode)
 				password: data.get("password"),
 				lang: struct.langSelect.value
 			};
+
+			console.log("fetch /user/register");
 			fetch("/user/register/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 				.then(response => function(response) {
-					console.log(response.status);
-					console.log(response.json());
-				});
-			// struct.signUp.type = "submit";
+					if (response.ok)
+					{
+						console.log("response /user/register ok; navigate to Game");
+						navigate("game", JSON.parse(response.json()))
+					}
+					else
+					{
+						console.log("response /user/register not good; do nothing // Need to place error");
+						console.log(response.status);
+						console.log(response.json());
+					}
+				})
+				.catch(() => console.error("Error: failed to fetch the register route"));
 		}
 		else
 		{
 			signUpForm(struct);
-			window.history.pushState({ login: true, signUp: true, game: false }, null, "");
+			// window.history.pushState({ login: true, signUp: true, game: false }, null, "");
 		}
 	});
 	struct.cancelSignUp.addEventListener("click", function() {
@@ -78,18 +97,17 @@ function	login(signUpMode)
 		window.history.back();
 	});
 	struct.guestConnection.addEventListener("click", function() {
-		navigate("game")
-			.then(() => launchPageScript("game", true, false))
-			.then(() => window.history.pushState({ login: false, signUp: false, game: true }, null, ""))
+		navigate("game", { guestMode: true, lang: struct.lang.value } )
 			.catch((e) => console.log(e));
+			// .then(() => window.history.pushState({ login: false, signUp: false, game: true }, null, ""))
 	});
 	struct.langSelect.addEventListener("change", function(event) {
 		fetch("/lang/" + event.target.value + ".json")
 			.then(response => response.json())
 			.then(result => { translateLoginPage(struct, result); })
 	});
-	if (signUpMode !== undefined && signUpMode === true)
-		signUpForm(struct);
+	// if (signUpMode !== undefined && signUpMode === true)
+	// 	signUpForm(struct);
 }
 
 function	getLoginStruct()

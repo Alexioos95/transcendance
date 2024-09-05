@@ -2,7 +2,7 @@
 /////////////////////////
 // Script
 /////////////////////////
-async function	run(guestMode)
+async function	run(data)
 {
 	const struct = {
 		header: getHeaderStruct(),
@@ -18,8 +18,7 @@ async function	run(guestMode)
 		run: 1
 	};
 	setupEventListeners(struct, guestMode);
-	if (guestMode === true)
-		setGuestRestrictions(struct);
+	replaceDatas(struct, data);
 	while (struct.run === 1)
 	{
 		await waitCoin(struct.gameForm)
@@ -169,6 +168,24 @@ function	liveChat(struct)
 			}
 		}
 	});
+}
+
+function	replaceDatas(struct, data)
+{
+	if (data.lang == "fr")
+		struct.options.lang.fr.click();
+	else if (data.lang == "en")
+		struct.options.lang.en.click();
+	else if (data.lang == "nl")
+		struct.options.lang.nl.click();
+	if (data.guestMode !== undefined && data.guestMode === true)
+		setGuestRestrictions(struct, data);
+	else
+	{
+		const inputs = document.querySelectorAll(".options-wrapper-connection input");
+		inputs[0] = data.username;
+		inputs[1] = data.email;
+	}
 }
 
 async function	launchGame(struct)
@@ -332,7 +349,14 @@ async function	setGuestRestrictions(struct)
 	const historyIcon = document.querySelectorAll("header .fa-clock-rotate-left")[0];
 	const lockIcon = document.querySelectorAll(".tab-tabs .fa-lock")[0];
 	const hideForGuest = document.getElementsByClassName("hide-for-guest");
+	const username = document.querySelector(".nav-user span");
 
+	if (struct.options.lang.curr === "fr")
+		username = "Invité";
+	else if (struct.options.lang.curr === "en")
+		username = "Guest";
+	else if (struct.options.lang.curr === "nl")
+		username = "Gast";
 	historyIcon.classList.add("hidden");
 	for (let i = 0; i < 3; i++)
 		hideForGuest[i].classList.add("hidden");
@@ -696,7 +720,7 @@ function	setupGameControls(struct, game)
 /////////////////////////
 async function	activateStick(struct)
 {
-	const path = "../svg/stick/state";
+	const path = "/svg/stick/state";
 	const extension = ".svg";
 
 	await sleep(450);
@@ -834,7 +858,7 @@ function	disableStickMove(event, struct)
 
 async function	deactivateStick(sticks)
 {
-	const path = "../svg/stick/state";
+	const path = "/svg/stick/state";
 	const extension = ".svg";
 
 	for (let i = 4; i > -1; i--)

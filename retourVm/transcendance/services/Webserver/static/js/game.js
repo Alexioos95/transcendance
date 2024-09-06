@@ -193,7 +193,7 @@ function	liveChat(struct)
 			struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
 	});
 	struct.chat.input.addEventListener("keydown", function(event) {
-		if (event.key === "Enter")
+		if (!event.shiftKey && event.key === "Enter")
 		{
 			event.preventDefault();
 			if (struct.chat.input.value.trim() !== "")

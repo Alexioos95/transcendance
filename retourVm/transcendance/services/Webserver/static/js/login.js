@@ -103,12 +103,32 @@ async function call2FA(struct, data)
 {
 	console.log(data);
 	if (data.twoFA === false)
-		return ;
-	const code = document.querySelector("form div.hidden");
+		return (data);
+	const div = document.querySelector("form div.hidden");
+	const input = document.querySelector("form div.hidden input");
+	const button = document.querySelector("form div.hidden button");
 	struct.username.classList.add("hidden");
 	struct.forgotPassword.classList.add("hidden");
 	struct.wrapperSpecialLogin.classList.add("hideInFade");
-	code.classList.remove("hidden");
+	div.classList.remove("hidden");
+	return new Promise((resolve, reject) => {
+		button.addEventListener("click", function() {
+			fetch("user/log2fa//", { method: "POST", credentials: "include"})
+			.then(response => {
+				if (response.ok)
+				{
+					resolve();
+					return (response.json());
+				}
+				else
+				{
+					console.log("response user/log2fa/ not good; // do nothing");
+					console.log(response.status);
+				}
+			})
+			.catch(() => console.error("Error: failed to fetch the log2fa route"));
+		});
+	});
 }
 
 function	getLoginStruct()

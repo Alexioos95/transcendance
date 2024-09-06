@@ -207,22 +207,22 @@ function	liveChat(struct)
 
 function	replaceDatas(struct, data)
 {
-	if (data.lang == "FR")
+	if (data.lang === "FR")
 		struct.options.lang.fr.click();
-	else if (data.lang == "EN")
+	else if (data.lang === "EN")
 		struct.options.lang.en.click();
-	else if (data.lang == "NL")
+	else if (data.lang === "NL")
 		struct.options.lang.nl.click();
 	if (data.guestMode !== undefined && data.guestMode === true)
 		setGuestRestrictions(struct, data);
 	else
 	{
-		const username = document.querySelector(".nav-user span");
 		const avatar = document.querySelector(".nav-user img");
+		const username = document.querySelector(".nav-user span");
 		const inputs = document.querySelectorAll(".options-wrapper-connection input");
 
-		username.innerHTML = data.username;
 		avatar.src = data.avatar;
+		username.innerHTML = data.username;
 		inputs[0].innerHTML = data.username;
 		inputs[1].innerHTML = data.email;
 	}
@@ -679,7 +679,6 @@ async function waitMatchMaking(struct)
 	if (struct.screen.game.online === true)
 	{
 		return new Promise((resolve, reject) => {
-
 			const myInterval = setInterval(() => {
 				console.log("fetch /user/matchMaking");
 				fetch("/user/matchMaking/", { method: "GET", credentials: "include"})
@@ -699,7 +698,7 @@ async function waitMatchMaking(struct)
 					})
 					.catch(() => console.error("Error: failed to fetch the matchMaking route"));
 			}, 10000);
-			});
+		});
 	}
 }
 

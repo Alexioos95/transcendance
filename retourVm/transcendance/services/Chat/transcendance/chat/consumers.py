@@ -28,7 +28,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json.get("message", "")
 
         # Désinfecter le message pour prévenir les attaques XSS
-        clean_message = bleach.clean(message, tags=[], attributes={}, styles=[], strip=True)
+        clean_message = bleach.clean(message, tags=[], attributes={}, strip=True)
 
         # Envoyer le message désinfecté au groupe de chat
         await self.channel_layer.group_send(

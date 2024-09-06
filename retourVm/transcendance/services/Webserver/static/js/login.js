@@ -102,7 +102,7 @@ function	login()
 async function call2FA(struct, data)
 {
 	console.log(data);
-	if (data.twoFA === false)
+	if (data.twoFA === "false")
 		return (data);
 	const div = document.querySelector("form div.hidden");
 	const input = document.querySelector("form div.hidden input");
@@ -118,10 +118,7 @@ async function call2FA(struct, data)
 			fetch("user/log2fa//", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
-				{
-					resolve();
 					return (response.json());
-				}
 				else
 				{
 					console.log("response user/log2fa/ not good; // do nothing");

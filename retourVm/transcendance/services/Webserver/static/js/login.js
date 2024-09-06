@@ -64,7 +64,7 @@ function	login()
 					if (response.ok)
 					{
 						console.log("response /user/login ok; navigate to Game");
-						return (response.json().then(data => { navigate("game", data); }));
+						return (response.json().then(data => { call2FA(struct, data) }).then(data => { navigate("game", data); }));
 					}
 					else
 					{
@@ -97,6 +97,17 @@ function	login()
 	});
 	// if (signUpMode !== undefined && signUpMode === true)
 	// 	signUpForm(struct);
+}
+
+async function call2FA(struct, data)
+{
+	if (data.twoFA === false)
+		return ;
+	const code = document.querySelector("form div.hidden");
+	struct.username.classList.add("hidden");
+	struct.forgotPassword.classList.add("hidden");
+	struct.wrapperSpecialLogin.classList.add("hideInFade");
+	code.classList.remove("hidden");
 }
 
 function	getLoginStruct()

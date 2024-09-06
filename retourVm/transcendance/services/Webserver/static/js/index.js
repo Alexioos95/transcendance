@@ -6,7 +6,7 @@ checkJWT();
 
 async function	checkJWT()
 {
-	await fetch("/user/checkJwt/")
+	await fetch("http://made-f0br7s18:7000/user/checkJwt/")
 		.then(response => {
 			if (response.ok)
 			{

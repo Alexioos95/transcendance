@@ -24,6 +24,7 @@ async function	run(data)
 		await waitCoin(struct.gameForm)
 			.then(() => coinAnimation(struct))
 			.then(() => checkGameSelectorValidation(struct))
+			.then(() => waitMatchMaking(struct))
 			.then(() => setupTournament(struct))
 			.then(() => launchGame(struct))
 			.catch((e) => {
@@ -61,7 +62,7 @@ function	setupEventListeners(struct, data)
 		struct.run = 0;
 		if (struct.chat.socket !== undefined)
 			struct.chat.socket.close(1000);
-		fetch("/user/disconnect/", { method: "GET", credentials: "include"})
+		fetch("http://made-f0br7s18:7000/user/disconnect/", { method: "GET", credentials: "include"})
 		.then(response => {
 			navigate("login", undefined);
 		})
@@ -94,7 +95,7 @@ function	setupEventListeners(struct, data)
 			email: data.get("options-email"),
 			passwordCurr: data.get("options-password-actual"),
 			passwordNew: data.get("options-password-new"),
-			passwordConf: get("options-password-confirmation")
+			passwordConf: data.get("options-password-confirmation")
 		};
 
 		// if (obj.passwordNew !== obj.passwordConf)
@@ -104,7 +105,7 @@ function	setupEventListeners(struct, data)
 			// return ;
 		// }
 		console.log("fetch /user/updateUserInfos");
-		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		fetch("http://made-f0br7s18:7000/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
 					console.log("response /user/updateUserInfos ok; do nothing // Need to place success");
@@ -216,8 +217,12 @@ function	replaceDatas(struct, data)
 		setGuestRestrictions(struct, data);
 	else
 	{
+		const username = document.querySelector(".nav-user span");
+		const avatar = document.querySelector(".nav-user img");
 		const inputs = document.querySelectorAll(".options-wrapper-connection input");
 
+		username.innerHTML = data.username;
+		avatar.src = data.avatar;
 		inputs[0].innerHTML = data.username;
 		inputs[1].innerHTML = data.email;
 	}
@@ -385,13 +390,17 @@ async function	setGuestRestrictions(struct)
 	const lockIcon = document.querySelectorAll(".tab-tabs .fa-lock")[0];
 	const hideForGuest = document.getElementsByClassName("hide-for-guest");
 	const username = document.querySelector(".nav-user span");
+	const avatar = document.querySelector(".nav-user img");
+	const inputs = document.querySelectorAll(".mode-selector input");
 
 	if (struct.options.lang.curr === "FR")
-		username = "Invité";
+		username.innerHTML = "Invité";
 	else if (struct.options.lang.curr === "EN")
-		username = "Guest";
+		username.innerHTML = "Guest";
 	else if (struct.options.lang.curr === "NL")
-		username = "Gast";
+		username.innerHTML = "Gast";
+	avatar.src = "/images/default_avatar.png";
+	inputs[3].disabled = true;
 	historyIcon.classList.add("hidden");
 	for (let i = 0; i < 3; i++)
 		hideForGuest[i].classList.add("hidden");
@@ -660,16 +669,26 @@ async function	checkGameSelectorValidation(struct)
 		if (mode === "tournament")
 			struct.tournament.on = true;
 		else if (mode === "online")
-		{
 			struct.screen.game.online = true;
+		resolve();
+	});
+}
+
+async function waitMatchMaking(struct)
+{
+	if (struct.screen.game.online === true)
+	{
+		return new Promise((resolve, reject) => {
+
 			const myInterval = setInterval(() => {
 				console.log("fetch /user/matchMaking");
-				fetch("/user/matchMaking/", { method: "GET", credentials: "include"})
+				fetch("http://made-f0br7s18:7000/user/matchMaking/", { method: "GET", credentials: "include"})
 					.then(response => {
 						if (response.ok)
 						{
 							console.log("response /user/matchMaking ok; clear interval // Need to start game");
 							clearInterval(myInterval);
+							resolve();
 						}
 						else
 						{
@@ -680,9 +699,8 @@ async function	checkGameSelectorValidation(struct)
 					})
 					.catch(() => console.error("Error: failed to fetch the matchMaking route"));
 			}, 10000);
-		}
-		resolve();
-	});
+			});
+	}
 }
 
 async function	waitGoButton(struct)
@@ -799,33 +817,33 @@ function	enableStickMove(event, struct)
 		{
 			struct.screen.sticks.keys.w = 1;
 			if (struct.screen.sticks.keys.s === 0)
-				struct.screen.sticks.left.src = "/svg/stick/up.svg";
+				struct.screen.sticks.left.src = "../svg/stick/up.svg";
 			else
-				struct.screen.sticks.left.src = "/svg/stick/state4.svg";
+				struct.screen.sticks.left.src = "../svg/stick/state4.svg";
 		}
 		else if (event.key === "s" || event.key === "S")
 		{
 			struct.screen.sticks.keys.s = 1;
 			if (struct.screen.sticks.keys.w === 0)
-				struct.screen.sticks.left.src = "/svg/stick/down.svg";
+				struct.screen.sticks.left.src = "../svg/stick/down.svg";
 			else
-				struct.screen.sticks.left.src = "/svg/stick/state4.svg";
+				struct.screen.sticks.left.src = "../svg/stick/state4.svg";
 		}
 		else if (event.key === "ArrowUp")
 		{
 			struct.screen.sticks.keys.up = 1;
 			if (struct.screen.sticks.keys.down === 0)
-				struct.screen.sticks.right.src = "/svg/stick/up.svg";
+				struct.screen.sticks.right.src = "../svg/stick/up.svg";
 			else
-				struct.screen.sticks.right.src = "/svg/stick/state4.svg";
+				struct.screen.sticks.right.src = "../svg/stick/state4.svg";
 		}
 		else if (event.key === "ArrowDown")
 		{
 			struct.screen.sticks.keys.down = 1;
 			if (struct.screen.sticks.keys.up === 0)
-				struct.screen.sticks.right.src = "/svg/stick/down.svg";
+				struct.screen.sticks.right.src = "../svg/stick/down.svg";
 			else
-				struct.screen.sticks.right.src = "/svg/stick/state4.svg";
+				struct.screen.sticks.right.src = "../svg/stick/state4.svg";
 		}
 	}
 	else if (event.type === "mousemove")
@@ -837,14 +855,14 @@ function	enableStickMove(event, struct)
 				struct.screen.sticks.keys.down = 0;
 				struct.screen.sticks.keys.up = 1;
 				struct.screen.sticks.keys.mouseLeft = 1;
-				struct.screen.sticks.left.src = "/svg/stick/up.svg";
+				struct.screen.sticks.left.src = "../svg/stick/up.svg";
 			}
 			else if (struct.screen.game.paddles.left.move_bot === 1)
 			{
 				struct.screen.sticks.keys.up = 0;
 				struct.screen.sticks.keys.down = 1;
 				struct.screen.sticks.keys.mouseLeft = 1;
-				struct.screen.sticks.left.src = "/svg/stick/down.svg";
+				struct.screen.sticks.left.src = "../svg/stick/down.svg";
 			}
 		}
 		else if (struct.screen.game.paddles && struct.screen.game.paddles.right.mouse === 1)
@@ -854,14 +872,14 @@ function	enableStickMove(event, struct)
 				struct.screen.sticks.keys.down = 0;
 				struct.screen.sticks.keys.up = 1;
 				struct.screen.sticks.keys.mouseRight = 1;
-				struct.screen.sticks.right.src = "/svg/stick/up.svg";
+				struct.screen.sticks.right.src = "../svg/stick/up.svg";
 			}
 			else if (struct.screen.game.paddles.right.move_bot === 1)
 			{
 				struct.screen.sticks.keys.up = 0;
 				struct.screen.sticks.keys.down = 1;
 				struct.screen.sticks.keys.mouseRight = 1;
-				struct.screen.sticks.right.src = "/svg/stick/down.svg";
+				struct.screen.sticks.right.src = "../svg/stick/down.svg";
 			}
 		}
 	}
@@ -876,22 +894,22 @@ function	disableStickMove(event, struct)
 		if (event.key === "w" || event.key === "W")
 		{
 			struct.screen.sticks.keys.w = 0;
-			struct.screen.sticks.left.src = "/svg/stick/state4.svg";
+			struct.screen.sticks.left.src = "../svg/stick/state4.svg";
 		}
 		else if (event.key === "s" || event.key === "S")
 		{
 			struct.screen.sticks.keys.s = 0;
-			struct.screen.sticks.left.src = "/svg/stick/state4.svg";
+			struct.screen.sticks.left.src = "../svg/stick/state4.svg";
 		}
 		else if (event.key === "ArrowUp")
 		{
 			struct.screen.sticks.keys.up = 0;
-			struct.screen.sticks.right.src = "/svg/stick/state4.svg";
+			struct.screen.sticks.right.src = "../svg/stick/state4.svg";
 		}
 		else if (event.key === "ArrowDown")
 		{
 			struct.screen.sticks.keys.down = 0;
-			struct.screen.sticks.right.src = "/svg/stick/state4.svg";
+			struct.screen.sticks.right.src = "../svg/stick/state4.svg";
 		}
 	}
 	else if (event.type === "mouseup")
@@ -901,21 +919,21 @@ function	disableStickMove(event, struct)
 			struct.screen.sticks.keys.mouseLeft = 0;
 			struct.screen.sticks.keys.up = 0;
 			struct.screen.sticks.keys.down = 0;
-			struct.screen.sticks.left.src = "/svg/stick/state4.svg";
+			struct.screen.sticks.left.src = "../svg/stick/state4.svg";
 		}
 		else if (struct.screen.sticks.keys.mouseRight === 1)
 		{
 			struct.screen.sticks.keys.mouseRight = 0;
 			struct.screen.sticks.keys.up = 0;
 			struct.screen.sticks.keys.down = 0;
-			struct.screen.sticks.right.src = "/svg/stick/state4.svg";
+			struct.screen.sticks.right.src = "../svg/stick/state4.svg";
 		}
 	}
 }
 
 async function	deactivateStick(sticks)
 {
-	const path = "/svg/stick/state";
+	const path = "../svg/stick/state";
 	const extension = ".svg";
 
 	for (let i = 4; i > -1; i--)

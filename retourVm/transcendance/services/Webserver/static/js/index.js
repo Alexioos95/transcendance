@@ -21,7 +21,7 @@ async function	checkJWT()
 				navigate("login", undefined);
 			}
 		})
-		.catch(() => console.error("Error: failed to fetch the checkJwt route"))
+		// .catch(() => console.error("Error: failed to fetch the checkJwt route"))
 }
 
 // window.onpopstate = function(event) {

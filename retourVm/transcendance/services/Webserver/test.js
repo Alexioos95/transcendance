@@ -76,7 +76,7 @@ main();
 function fetchUntilSuccess() {
     const intervalId = setInterval(async () => {
         try {
-            const response = await fetch('http://made-f0Br6s19:8000/user/checkAuth42/', {
+            const response = await fetch('/user/checkAuth42/', {
                 method: 'POST'
             });
             

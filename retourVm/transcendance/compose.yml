@@ -92,17 +92,17 @@ services:
   webserver:
     hostname: webserver
     container_name: webserver
-    depends_on:
-      user:
-        condition: service_healthy
-        restart: true
-      chat:
-        condition: service_healthy
-        restart: true
-      mail:
-        condition: service_healthy
-        restart: true
-    pull_policy: build
+#    depends_on:
+      #      user:
+      #        condition: service_healthy
+      #        restart: true
+      #      chat:
+      #        condition: service_healthy
+      #        restart: true
+      #      mail:
+      #        condition: service_healthy
+      #        restart: true
+      #    pull_policy: build
     build:
       context: services/Webserver/
       dockerfile: Dockerfile

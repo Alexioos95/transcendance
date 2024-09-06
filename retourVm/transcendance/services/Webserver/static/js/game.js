@@ -62,7 +62,7 @@ function	setupEventListeners(struct, data)
 		struct.run = 0;
 		if (struct.chat.socket !== undefined)
 			struct.chat.socket.close(1000);
-		fetch("http://made-f0br7s18:7000/user/disconnect/", { method: "GET", credentials: "include"})
+		fetch("/user/disconnect/", { method: "GET", credentials: "include"})
 		.then(response => {
 			navigate("login", undefined);
 		})
@@ -105,7 +105,7 @@ function	setupEventListeners(struct, data)
 			// return ;
 		// }
 		console.log("fetch /user/updateUserInfos");
-		fetch("http://made-f0br7s18:7000/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
 					console.log("response /user/updateUserInfos ok; do nothing // Need to place success");
@@ -682,7 +682,7 @@ async function waitMatchMaking(struct)
 
 			const myInterval = setInterval(() => {
 				console.log("fetch /user/matchMaking");
-				fetch("http://made-f0br7s18:7000/user/matchMaking/", { method: "GET", credentials: "include"})
+				fetch("/user/matchMaking/", { method: "GET", credentials: "include"})
 					.then(response => {
 						if (response.ok)
 						{

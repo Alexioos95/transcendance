@@ -43,7 +43,7 @@ function	login()
 		if (struct.connection.classList.contains("recovery"))
 		{
 			console.log("fetch /user/resetPaswd");
-			fetch("http://made-f0br7s18:7000/user/resetPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			fetch("/user/resetPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 				.then(response => {
 					if (response.ok)
 						console.log("response /user/resetPaswd ok; do nothing // Need to continue");
@@ -59,7 +59,7 @@ function	login()
 		else
 		{
 			console.log("fetch /user/login");
-			fetch("http://made-f0br7s18:7000/user/login/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			fetch("/user/login/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 				.then(response => {
 					if (response.ok)
 					{
@@ -190,7 +190,7 @@ function	signUpFunction(struct)
 		};
 
 		console.log("fetch /user/register");
-		fetch("http://made-f0br7s18:7000/user/register/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		fetch("/user/register/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.status === 201)
 				{

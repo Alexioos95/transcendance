@@ -169,7 +169,7 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
         'auth',
         encoded_jwt,
         httponly=True,
-        secure=None,
+        secure=True,
         samesite='None',
         expires=datetime.utcnow() + timedelta(hours=25),	# Expire avant le JWT...
         # domain="*"
@@ -204,14 +204,16 @@ def checkJwt(request):
 		#return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
     auth = checkCookie(request, 'auth')
     if auth is None:
-        print("couocu")
         return JsonResponse({"error": "user not log"}, status=401)
-    print(f'le cookie est {auth}')
+    print(f'le cookie est {auth}', file=sys.stderr)
     try:
-        user = decodeJwt(auth)
-        response_data = JsonResponse({"username":user.Username, "Avatar":user.Avatar, "Language": user.Language})
-        response_data.status_code = 200
-        return(response_data)
+        username = decodeJwt(auth)
+        user = get_user_in_db('Username', username)
+        if not user:
+            return JsonResponse({"error": "user does nor exist"}, status=403)
+        print(f'le cookie est {auth}', file=sys.stderr)
+        print(f'"alng":{user.language} "username":{user.Username}, "Avatar":{user.Avatar}, "Language": {user.Language})
+        return JsonResponse({'langue': "username":user.Username, "Avatar":user.Avatar, "Language": user.Language}, status=200)
     except customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
 

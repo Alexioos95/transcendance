@@ -426,7 +426,7 @@ def updateUserInfos(request):
         user.Avatar = data['avatar']
     if 'lang' in data and data['lang']:
         print("je passe par les langues 1", file=sys.stderr)
-        if data['lang'] in dict(User.Language.choices):
+        if data.get('lang') in User._meta.get_field('lang').choices:
             print("jep asse par les langues 2", file=sys.stderr)
             user.Language = data['lang']
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
@@ -597,7 +597,7 @@ def matchMaking(request):
     auth = checkCookie(request, 'auth')
     if auth is None:
         return JsonResponse({'error': 'User not connected'}, status=403)
-    print(f'le cookie est {auth}')
+    print(f'le cookie est {auth}', file=sys.stderr)
     username = ""
     try:
         username = decodeJwt(auth)
@@ -606,7 +606,7 @@ def matchMaking(request):
     user = get_user_in_db("Username", username)
     if user is None:
         return JsonResponse({"error": "User does not exits"}, status=403)
-    print(f'le username est {username}')
+    print(f'le username est {username}', file=sys.stderr)
     matchmakingDict = cache.get('matchmaking', {})
     print(f"cache == {matchmakingDict}")
     userMatchmaking = {'time': datetime.now(), 'difLevel': 5, 'game': "pong" ,'levelPong': user.pongLvl, 'levelTetris':user.tetrisLvl, 'matched':False}#si marchd a true return 200
@@ -622,7 +622,6 @@ def matchMaking(request):
         return HttpResponse(status=200)
     maxLevel = userMatchmaking['levelPong'] if userMatchmaking['game'] == "pong" else userMatchmaking['levelTetris']
     maxLevel+=userMatchmaking['difLevel']
-    
     minLevel = userMatchmaking['levelPong'] if userMatchmaking['game'] == "pong" else userMatchmaking['levelTetris']
     minLevel-=userMatchmaking['difLevel']
     for userName, data in matchmakingDict.items():
@@ -632,11 +631,11 @@ def matchMaking(request):
             cache.set('matchmaking', matchmakingDict, timeout=3600)
             return HttpResponse(status=200)
         else:
-            print('ca matchamake pas la')
-        print(f"Username: {userName}, Time: {data['time'].timestamp()}, difference Level: {data['difLevel']}")
+            print('ca matchamake pas la', file=sys.stderr)
+        print(f"Username: {userName}, Time: {data['time'].timestamp()}, difference Level: {data['difLevel']}", file=sys.stderr)
     gameData = {'player1': "fguarrac", 'player2': "madaguen"}
     gameResponse = requests.post('http://localhost:8001/Tetris/initGame/', json=gameData)#inscrit la partie en bdd jeu
-    print(gameResponse.status_code)
+    print(gameResponse.status_code, file=sys.stderr)
     matchmakingDict[username] = userMatchmaking
     cache.set('matchmaking', matchmakingDict, timeout=3600)#si pas trouve sinon inscrire en bdd game
     return HttpResponse(status=204)

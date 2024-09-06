@@ -144,6 +144,8 @@ volumes:
 #		ws
 #	mail
 #	        -
+#	ping
+#	        -
 
 #       chat
 #               daphne  8000
@@ -152,4 +154,6 @@ volumes:
 #               daphne  8001
 #       mail
 #               daphne  8002
+#       ping
+#               daphne  8003
 

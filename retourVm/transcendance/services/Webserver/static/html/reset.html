@@ -28,7 +28,7 @@
 								<i class="fa-solid fa-eye-slash"></i>
 							</button>
 						</div>
-						<button type="button" class="w-100 py-2 mb-1 text-break submit translate-text">Reinitialiser !</button>
+						<button type="button" class="w-100 py-2 mb-1 text-break submit translate-text" onclick="clicked()">Reinitialiser !</button>
 					</form>
 					<select>
 						<option value="FR">Français</option>
@@ -39,4 +39,26 @@
 			</div>
 		</main>
 	</body>
+
+	<script>
+		function	clicked()
+		{
+			const input = document.querySelector("form input");
+			const obj = { password: input.value }
+
+			fetch("/user/sendNewPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => {
+				if (response.ok)
+					console.log("response /user/sendNewPaswd ok; do nothing");
+				else
+				{
+					console.log("response /user/sendNewPaswd not good; do nothing // Need to place error");
+					console.log(response.status);
+					return (response.json().then(data => { console.log(data) }));
+				}
+			})
+			.catch(() => console.error("Error: failed to fetch the sendNewPaswd route"));
+		}
+	</script>
+
 </html>

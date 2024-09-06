@@ -121,7 +121,7 @@ async function waitCode(struct, data)
 		button.addEventListener("click", function() {
 			const obj = { code: input.value };
 
-			fetch("user/log2fa//", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			fetch("/user/log2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
 					return (response.json().then(data => { navigate("game", data) }));

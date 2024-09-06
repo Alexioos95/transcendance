@@ -66,7 +66,7 @@ function	setupEventListeners(struct, data)
 			.then(() => { navigate("login", undefined) })
 			.catch(() => console.error("Error: failed to fetch the matchMaking route"));
 			// .then(() => {
-			// 	if (guestMode === true)
+			// 	if (guestMode === "true")
 			// 		window.history.pushState({ login: true, signUp: false, game: false }, null, "");
 			// })
 	});
@@ -126,7 +126,7 @@ function	setupEventListeners(struct, data)
 	struct.screen.wrapperCanvas.addEventListener("mousemove", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mouseup", function(event) { disableStickMove(event, struct); });
 	// Chat
-	if (data.guestMode === false)
+	if (data.guestMode === "false")
 		liveChat(struct);
 }
 
@@ -212,7 +212,7 @@ function	replaceDatas(struct, data)
 		struct.options.lang.en.click();
 	else if (data.lang === "NL")
 		struct.options.lang.nl.click();
-	if (data.guestMode !== undefined && data.guestMode === true)
+	if (data.guestMode === "true")
 		setGuestRestrictions(struct, data);
 	else
 	{

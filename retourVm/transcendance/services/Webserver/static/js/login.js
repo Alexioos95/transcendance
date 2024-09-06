@@ -87,7 +87,7 @@ function	login()
 		// window.history.back();
 	});
 	struct.guestConnection.addEventListener("click", function() {
-		navigate("game", { guestMode: true, lang: struct.langSelect.value } )
+		navigate("game", { guestMode: "true", lang: struct.langSelect.value } )
 			// .then(() => window.history.pushState({ login: false, signUp: false, game: true }, null, ""))
 	});
 	struct.langSelect.addEventListener("change", function(event) {

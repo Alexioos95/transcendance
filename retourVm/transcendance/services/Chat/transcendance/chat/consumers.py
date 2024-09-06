@@ -5,8 +5,6 @@ import jwt
 import os
 import time
 
-SERVER_JWT_KEY = "SuperSecretServerKey"
-
 # Exception personnalisée pour gérer les erreurs spécifiques
 class customException(Exception):
     def __init__(self, data, code):
@@ -23,7 +21,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def get_username_from_jwt(self, auth_cookie):
         try:
             # Décrypter le JWT avec la clé secrète
-            decoded_token = jwt.decode(auth_cookie, SERVER_JWT_KEY, algorithms=["HS256"])#os.environ['SERVER_JWT_KEY'],)
+            decoded_token = jwt.decode(auth_cookie, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
             
             # Extraire le nom d'utilisateur du JWT
             username = decoded_token.get('userName')
@@ -37,7 +35,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             return username
 
-        except jwt.InvalidTokenError:
+        except jwt.ExpiredSignatureError:
+            # Gérer les erreurs de token expiré
+            raise customException("Token expired", 401)
+
+        except jwt.exceptions.InvalidTokenError:
             # Gérer les erreurs de token JWT invalide
             raise customException("Forbidden", 403)
 
@@ -58,7 +60,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # Si le cookie auth est trouvé, décoder le JWT pour obtenir le nom d'utilisateur
             if auth_cookie:
                 try:
-                    username = self.get_username_from_jwt(auth_cookie)
+                    self.username = self.get_username_from_jwt(auth_cookie)
                 except customException as e:
                     # Si le JWT est invalide, on ferme la connexion
                     await self.close()
@@ -136,4 +138,3 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Envoyer le message au WebSocket
         await self.send(text_data=json.dumps({"message": message}))
-

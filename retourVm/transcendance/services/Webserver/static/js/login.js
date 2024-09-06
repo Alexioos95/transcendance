@@ -105,7 +105,7 @@ async function call2FA(struct, data)
 
 	if (data.twoFA === "false")
 		return (navigate("game", data));
-	const div = document.querySelector("form div.hidden");
+	const div = document.getElementsByClassName("div-2fa")[0];
 	struct.username.classList.add("hidden");
 	struct.forgotPassword.classList.add("hidden");
 	struct.wrapperSpecialLogin.classList.add("hideInFade");
@@ -117,7 +117,9 @@ async function call2FA(struct, data)
 async function waitCode(struct, data)
 {
 	return new Promise((resolve, reject) => {
-		const button = document.querySelector("form div button");
+		const button = document.querySelector(".div-2fa button")[0];
+		const input = document.querySelector(".div-2fa input")[0];
+
 		button.addEventListener("click", function() {
 			const obj = { code: input.value };
 

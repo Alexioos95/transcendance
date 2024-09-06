@@ -11,7 +11,7 @@ async function	checkJWT()
 			if (response.ok)
 			{
 				console.log("response /user/checkJwt ok; navigate to Game");
-				navigate("game", JSON.parse(response.json()));
+				return (response.json().then(data => { navigate("game", data); }));
 			}
 			else
 			{

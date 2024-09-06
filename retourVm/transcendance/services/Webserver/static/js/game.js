@@ -64,7 +64,7 @@ function	setupEventListeners(struct, data)
 		fetch("/user/disconnect/", { method: "GET", credentials: "include"})
 		.then(response => {
 			navigate("login", undefined);
-		})	
+		})
 		.catch(() => console.error("Error: failed to fetch the matchMaking route"));
 			// .then(() => {
 			// 	if (guestMode === true)
@@ -80,9 +80,9 @@ function	setupEventListeners(struct, data)
 	});
 	struct.history.leaveButton.addEventListener("click", function() { resetHistoryClasses(struct); });
 	// Lang
-	struct.options.lang.fr.addEventListener("click", function() { fetchTranslation(struct, "fr") });
-	struct.options.lang.en.addEventListener("click", function() { fetchTranslation(struct, "en") });
-	struct.options.lang.nl.addEventListener("click", function() { fetchTranslation(struct, "nl") });
+	struct.options.lang.fr.addEventListener("click", function() { fetchTranslation(struct, "FR") });
+	struct.options.lang.en.addEventListener("click", function() { fetchTranslation(struct, "EN") });
+	struct.options.lang.nl.addEventListener("click", function() { fetchTranslation(struct, "NL") });
 	// Tabs Account/Blocked
 	struct.options.account.button.addEventListener("click", function() { showTab(struct.options.account, struct.options.blocked) });
 	struct.options.account.formSubmit.addEventListener("click", function() {
@@ -206,11 +206,11 @@ function	liveChat(struct)
 
 function	replaceDatas(struct, data)
 {
-	if (data.lang == "fr")
+	if (data.lang == "FR")
 		struct.options.lang.fr.click();
-	else if (data.lang == "en")
+	else if (data.lang == "EN")
 		struct.options.lang.en.click();
-	else if (data.lang == "nl")
+	else if (data.lang == "NL")
 		struct.options.lang.nl.click();
 	if (data.guestMode !== undefined && data.guestMode === true)
 		setGuestRestrictions(struct, data);
@@ -386,11 +386,11 @@ async function	setGuestRestrictions(struct)
 	const hideForGuest = document.getElementsByClassName("hide-for-guest");
 	const username = document.querySelector(".nav-user span");
 
-	if (struct.options.lang.curr === "fr")
+	if (struct.options.lang.curr === "FR")
 		username = "Invité";
-	else if (struct.options.lang.curr === "en")
+	else if (struct.options.lang.curr === "EN")
 		username = "Guest";
-	else if (struct.options.lang.curr === "nl")
+	else if (struct.options.lang.curr === "NL")
 		username = "Gast";
 	historyIcon.classList.add("hidden");
 	for (let i = 0; i < 3; i++)
@@ -517,7 +517,7 @@ function	getOptionsStruct()
 		table: document.getElementsByClassName("wrapper-blocked")[0]
 	};
 	const langStruct = {
-		curr: "fr",
+		curr: "FR",
 		fr: labels[0],
 		en: labels[1],
 		nl: labels[2]
@@ -1024,11 +1024,11 @@ function	updateTournamentMarkers(struct, shift)
 {
 	let array;
 
-	if (struct.options.lang.curr === "fr")
+	if (struct.options.lang.curr === "FR")
 		array = struct.tournament.markerArrayStringsFR;
-	else if (struct.options.lang.curr === "en")
+	else if (struct.options.lang.curr === "EN")
 		array = struct.tournament.markerArrayStringsEN;
-	else if (struct.options.lang.curr === "nl")
+	else if (struct.options.lang.curr === "NL")
 		array = struct.tournament.markerArrayStringsNL;
 	for (let i = 0; i < 3; i++)
 		struct.tournament.markers[i].innerHTML = array[struct.tournament.markerArray[0][i]];

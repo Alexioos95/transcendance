@@ -32,7 +32,7 @@ function	login()
 	});
 	struct.connection.addEventListener("click", function(event) {
 		event.preventDefault();
-		
+
 		const form = document.getElementsByTagName("form")[0];
 		const data = new FormData(form);
 		const obj = {
@@ -123,19 +123,19 @@ function	move(struct)
 	struct.password.classList.add("hideInFade");
 	struct.showPassword.classList.add("hideInFade");
 	struct.connection.classList.add("recovery");
-	if (struct.langSelect.value === "fr")
+	if (struct.langSelect.value === "FR")
 	{
 		struct.connection.innerText = "Envoyer un mail de recuperation";
 		struct.forgotPassword.innerText = "Je me souviens !";
 		struct.forgotPassword.setAttribute("aria-label", "Je me souviens");
 	}
-	if (struct.langSelect.value === "en")
+	if (struct.langSelect.value === "EN")
 	{
 		struct.connection.innerText = "Send a recovery email";
 		struct.forgotPassword.innerText = "I remember!";
 		struct.forgotPassword.setAttribute("aria-label", "I remember");
 	}
-	if (struct.langSelect.value === "nl")
+	if (struct.langSelect.value === "NL")
 	{
 		struct.connection.innerText = "Zend een recuperatie email";
 		struct.forgotPassword.innerText = "Ik herinner mijn paswoord!";
@@ -150,19 +150,19 @@ function	restore(struct)
 	struct.password.classList.remove("hideInFade");
 	struct.showPassword.classList.remove("hideInFade");
 	struct.connection.classList.remove("recovery");
-	if (struct.langSelect.value === "fr")
+	if (struct.langSelect.value === "FR")
 	{
 		struct.connection.innerText = "Connexion";
 		struct.forgotPassword.innerText = "Mot de passe oublie";
 		struct.forgotPassword.setAttribute("aria-label", "Mot de passe oublie");
 	}
-	else if (struct.langSelect.value === "en")
+	else if (struct.langSelect.value === "EN")
 	{
 		struct.connection.innerText = "Sign in";
 		struct.forgotPassword.innerText = "Forgotten password";
 		struct.forgotPassword.setAttribute("aria-label", "Forgotten password");
 	}
-	else if (struct.langSelect.value === "nl")
+	else if (struct.langSelect.value === "NL")
 	{
 		struct.connection.innerText = "Aanmelden";
 		struct.forgotPassword.innerText = "Paswoord vergeten";

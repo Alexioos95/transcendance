@@ -375,7 +375,7 @@ def updateUserInfos(request):
     user = ""
     try:
         userName = decodeJwt(auth)
-        user = get_user_in_db(Username, userName)
+        user = get_user_in_db('Username', userName)
     except customException as e:
         print('e.data')
         return JsonResponse({"error": e.data}, status=e.code)
@@ -392,12 +392,12 @@ def updateUserInfos(request):
     # except Exception as e:
         # return JsonResponse({'error': 'user do not exist'}, status=403)
     if 'username' in data:
-        if get_user_in_db(Username, data['username']) is not None:
+        if get_user_in_db('Username', data['username']) is not None:
             print('userneame')
             return JsonResponse({"errorUsername": "username already exists"}, status=403)
         user.Username = data['username']
     if 'email' in data:
-        if get_user_in_db(Email, data['email']) is not None:
+        if get_user_in_db('Email', data['email']) is not None:
             print('enmail')
             return JsonResponse({"errorEmail": "email already exists"}, status=403)
         user.Email = data['email']
@@ -410,7 +410,7 @@ def updateUserInfos(request):
             user.language = data['language']
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
     user.save()
-    encoded_jwt = jwt.encode({"userName": username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
+    encoded_jwt = jwt.encode({"userName": user.Username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
     response_data.set_cookie(
     'auth',
     encoded_jwt,

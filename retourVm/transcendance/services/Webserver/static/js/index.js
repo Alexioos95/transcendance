@@ -4,45 +4,22 @@
 /////////////////////////
 checkJWT();
 
-//    await fetch("/user/checkJwt/")
-//        .then(response => {
-//			if (response.ok)
-//			{
-//				console.log("response /user/checkJwt ok; navigate to Game");
-//				navigate("game", JSON.parse(response.json()));
-//			}
-//			else
-//			{
-//				console.log("response /user/checkJwt not good; navigate to login");
-//				console.log("response.status=", response.status);
-//				console.log("response.text=", response.text());
-//				navigate("login", undefined);
-//			}
-//        })
-//        .catch(() => console.error("Error: failed to fetch the checkJwt route"))
-
-
-
 async function	checkJWT()
 {
-	// PING ALL MODULES
-	console.log("fetch /user/checkJwt");
 	await fetch("/user/checkJwt/")
 		.then(response => {
-            if (response.ok)
-            {
-                console.log(response.json());
-                navigate("game")
-                    .then(() => launchPageScript("game", false, null)); // Envoy JSON
-            }
-            else
-            {
-                console.log(response.status);
-                console.log(response.text());
-                navigate("login")
-                    .then(() => launchPageScript("login", false, null))
-                    .catch((e) => console.log(e));
-            }
+			if (response.ok)
+			{
+				console.log("response /user/checkJwt ok; navigate to Game");
+				navigate("game", JSON.parse(response.json()));
+			}
+			else
+			{
+				console.log("response /user/checkJwt not good; navigate to login");
+				console.log("response.status=", response.status);
+				console.log("response.text=", response.text());
+				navigate("login", undefined);
+			}
 		})
 		.catch(() => console.error("Error: failed to fetch the checkJwt route"))
 }

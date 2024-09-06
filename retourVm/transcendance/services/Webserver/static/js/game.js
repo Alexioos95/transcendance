@@ -146,6 +146,7 @@ function	liveChat(struct)
 		lock.classList.remove("hidden");
 	});
 	struct.chat.socket.addEventListener("message", function(event) {
+		const obj = JSON.parse(event.data);
 		const tr = document.createElement("tr");
 		const td = document.createElement("td");
 		const chatMessage = document.createElement("div");
@@ -153,7 +154,7 @@ function	liveChat(struct)
 		const avatar = document.createElement("img");
 		const p = document.createElement("p");
 		const span = document.createElement("span");
-		const text = document.createTextNode(": " + JSON.parse(event.data).message);
+		const text = document.createTextNode(": " + obj.message);
 		const chatOptions = document.createElement("div");
 		const i1 = document.createElement("i");
 		const i2 = document.createElement("i");
@@ -163,11 +164,11 @@ function	liveChat(struct)
 
 		avatar.src = "/default_avatar.png";
 		avatar.alt = "Avatar";
-		span.innerHTML = "USERNAME";
-		p.appendChild(span);
-		p.appendChild(text);
 		chatUserAvatar.classList.add("chat-user-avatar");
 		chatUserAvatar.appendChild(avatar);
+		span.innerHTML = obj.user;
+		p.appendChild(span);
+		p.appendChild(text);
 		chatMessage.classList.add("chat-message");
 		chatMessage.appendChild(chatUserAvatar);
 		chatMessage.appendChild(p);

@@ -1,0 +1,157 @@
+name: transcendance
+
+services:
+
+  chat_cache:
+    hostname: redis
+    container_name: redis_chat
+    image: redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - transcendance
+
+#  pong_cache:
+#    image: redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
+#
+#  tetris_cache:
+#    image: redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
+#
+#  pong_db:
+#    volume:
+#
+#  tetris_db:
+#    volume:
+#
+#  user_db:
+#    volume:
+
+  user:
+    hostname: user
+    container_name: user
+    pull_policy: build
+    build:
+      context: User
+      dockerfile: Dockerfile
+    networks:
+      - transcendance
+    restart: unless-stopped
+    environment:
+      - SERVER_JWT_KEY=$SERVER_JWT_KEY
+
+  chat:
+    hostname: chat
+    container_name: chat
+    depends_on:
+      chat_cache:
+        condition: service_healthy
+        restart: true
+    pull_policy: build
+    build:
+      context: Chat
+      dockerfile: Dockerfile
+    networks:
+      - transcendance
+    restart: unless-stopped
+    environment:
+      - SERVER_JWT_KEY=$SERVER_JWT_KEY
+
+  mail:
+    hostname: mail
+    container_name: mail
+    pull_policy: build
+    build:
+      context: MailServ
+      dockerfile: Dockerfile
+    networks:
+      - transcendance
+    restart: unless-stopped
+    environment:
+      - EMAIL_HOST=$EMAIL_HOST
+      - EMAIL_PORT=$EMAIL_PORT
+      - EMAIL_HOST_USER=$EMAIL_HOST_USER
+      - EMAIL_HOST_PASSWORD=$EMAIL_HOST_PASSWORD
+
+#  pong:
+#    pull_policy: build
+#    build:
+#      context: services
+#      dockerfile: Pong/Dockerfile
+#
+#  tetris:
+#    pull_policy: build
+#    build:
+#      context: services
+#      dockerfile: Tetris/Dockerfile
+
+  webserver:
+    hostname: webserver
+    container_name: webserver
+#    depends_on:
+      #      user:
+      #        condition: service_healthy
+      #        restart: true
+      #      chat:
+      #        condition: service_healthy
+      #        restart: true
+      #      mail:
+      #        condition: service_healthy
+      #        restart: true
+      #    pull_policy: build
+    build:
+      context: Webserver/
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - transcendance
+    volumes:
+      - static-data:/app/
+    restart: unless-stopped
+
+networks:
+  transcendance:
+
+volumes:
+  static-data:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "${PWD}/services/Webserver/static"
+
+
+#	pong
+#		db
+#		redis
+#		ws
+#	tetris
+#		db
+#		redis
+#		ws
+#	user
+#		db
+#	chat
+#		redis
+#		ws
+#	mail
+#	        -
+#	ping
+#	        -
+
+#       chat
+#               daphne  8000
+#               redis   6379
+#       user
+#               daphne  8001
+#       mail
+#               daphne  8002
+#       ping
+#               daphne  8003
+

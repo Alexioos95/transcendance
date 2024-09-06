@@ -1,0 +1,3 @@
+CHATWSS=wss://DUMP:4433/ws/chat
+PONGWS=
+TETRISWS=

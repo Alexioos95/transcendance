@@ -116,8 +116,8 @@ async function call2FA(struct, data)
 
 async function waitCode(struct, data)
 {
-	const button = document.querySelector("form div.hidden button");
 	return new Promise((resolve, reject) => {
+		const button = document.querySelector("form div.hidden button");
 		button.addEventListener("click", function() {
 			const obj = { code: input.value };
 

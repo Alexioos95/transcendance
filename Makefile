@@ -6,7 +6,7 @@
 #    By: fguarrac <fguarrac@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/29 19:19:01 by fguarrac          #+#    #+#              #
-#    Updated: 2024/09/06 20:43:05 by fguarrac         ###   ########.fr        #
+#    Updated: 2024/09/06 23:04:13 by fguarrac         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,6 +22,7 @@ all : build
 
 .PHONY: build
 build:
+	#./.script $(DUMP)
 #	mkdir -p /home/fguarrac/data/mariadb
 #	mkdir -p /home/fguarrac/data/wordpress
 	docker compose -f services/compose.yml build

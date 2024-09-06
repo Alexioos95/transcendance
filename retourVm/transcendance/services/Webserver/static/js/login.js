@@ -117,8 +117,8 @@ async function call2FA(struct, data)
 async function waitCode(struct, data)
 {
 	return new Promise((resolve, reject) => {
-		const button = document.querySelector(".div-2fa button")[0];
-		const input = document.querySelector(".div-2fa input")[0];
+		const button = document.querySelector(".div-2fa button");
+		const input = document.querySelector(".div-2fa input");
 
 		button.addEventListener("click", function() {
 			const obj = { code: input.value };

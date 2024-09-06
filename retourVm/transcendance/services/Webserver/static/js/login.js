@@ -43,7 +43,7 @@ function	login()
 		if (struct.connection.classList.contains("recovery"))
 		{
 			console.log("fetch /user/resetPaswd");
-			fetch("/user/resetPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			fetch("http://made-f0br7s18:7000/user/resetPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 				.then(response => {
 					if (response.ok)
 						console.log("response /user/resetPaswd ok; do nothing // Need to continue");
@@ -59,12 +59,12 @@ function	login()
 		else
 		{
 			console.log("fetch /user/login");
-			fetch("/user/login/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			fetch("http://made-f0br7s18:7000/user/login/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 				.then(response => {
 					if (response.ok)
 					{
 						console.log("response /user/login ok; navigate to Game");
-						navigate("game", JSON.parse(response.json()))
+						return (response.json().then(data => { navigate("game", data); }));
 					}
 					else
 					{
@@ -78,12 +78,16 @@ function	login()
 	});
 	struct.signUp.addEventListener("click", function() { signUpFunction(struct) });
 	struct.cancelSignUp.addEventListener("click", function() {
+		struct.username.classList.add("hidden");
+		struct.cancelSignUp.classList.add("hideInFade");
+		struct.connection.classList.remove("hidden");
+		struct.forgotPassword.classList.remove("hidden");
+		struct.wrapperSpecialLogin.classList.remove("hideInFade");
 		struct.signUp.classList.remove("primary");
 		// window.history.back();
 	});
 	struct.guestConnection.addEventListener("click", function() {
-		navigate("game", { guestMode: true, lang: struct.lang.value } )
-			.catch((e) => console.log(e));
+		navigate("game", { guestMode: true, lang: struct.langSelect.value } )
 			// .then(() => window.history.pushState({ login: false, signUp: false, game: true }, null, ""))
 	});
 	struct.langSelect.addEventListener("change", function(event) {
@@ -175,38 +179,38 @@ function	restore(struct)
 function	signUpFunction(struct)
 {
 	if (struct.signUp.classList.contains("primary"))
-		{
-			const form = document.getElementsByTagName("form")[0];
-			const data = new FormData(form);
-			const obj = {
-				username: data.get("username"),
-				email: data.get("email"),
-				password: data.get("password"),
-				lang: struct.langSelect.value
-			};
+	{
+		const form = document.getElementsByTagName("form")[0];
+		const data = new FormData(form);
+		const obj = {
+			username: data.get("username"),
+			email: data.get("email"),
+			password: data.get("password"),
+			lang: struct.langSelect.value
+		};
 
-			console.log("fetch /user/register");
-			fetch("/user/register/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-				.then(response => {
-					if (response.status === 201)
-					{
-						console.log("response /user/register ok; navigate to Game");
-						navigate("game", JSON.parse(response.json()))
-					}
-					else
-					{
-						console.log("response /user/register not good; do nothing // Need to place error");
-						console.log(response.status);
-						console.log(response.json());
-					}
-				})
-				.catch(() => console.error("Error: failed to fetch the register route"));
-		}
-		else
-		{
-			signUpForm(struct);
-			// window.history.pushState({ login: true, signUp: true, game: false }, null, "");
-		}
+		console.log("fetch /user/register");
+		fetch("http://made-f0br7s18:7000/user/register/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => {
+				if (response.status === 201)
+				{
+					console.log("response /user/register ok; navigate to Game");
+					return (response.json().then(data => { navigate("game", data); }));
+				}
+				else
+				{
+					console.log("response /user/register not good; do nothing // Need to place error");
+					console.log(response.status);
+					console.log(response.json());
+				}
+			})
+			// .catch(() => console.error("Error: failed to fetch the register route"));
+	}
+	else
+	{
+		signUpForm(struct);
+		// window.history.pushState({ login: true, signUp: true, game: false }, null, "");
+	}
 }
 
 function	signUpForm(struct)

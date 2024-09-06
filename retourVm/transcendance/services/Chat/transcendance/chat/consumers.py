@@ -4,6 +4,7 @@ import bleach
 import jwt
 import os
 import time
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
 # Exception personnalisée pour gérer les erreurs spécifiques
 class customException(Exception):
@@ -35,11 +36,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             return username
 
-        except jwt.ExpiredSignatureError:
+        except ExpiredSignatureError:
             # Gérer les erreurs de token expiré
             raise customException("Token expired", 401)
 
-        except jwt.exceptions.InvalidTokenError:
+        except InvalidTokenError:
             # Gérer les erreurs de token JWT invalide
             raise customException("Forbidden", 403)
 

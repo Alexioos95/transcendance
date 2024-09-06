@@ -398,7 +398,7 @@ async function	setGuestRestrictions(struct)
 		username.innerHTML = "Guest";
 	else if (struct.options.lang.curr === "NL")
 		username.innerHTML = "Gast";
-	avatar.src = "/default_avatar.png";
+	avatar.src = "/images/default_avatar.png";
 	inputs[3].disabled = true;
 	historyIcon.classList.add("hidden");
 	for (let i = 0; i < 3; i++)

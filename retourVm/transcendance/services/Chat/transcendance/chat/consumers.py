@@ -5,7 +5,7 @@ import jwt
 import os
 import time
 
-SERVER_JWT_KEY = SuperSecretServerKey
+SERVER_JWT_KEY = "SuperSecretServerKey"
 
 # Exception personnalisée pour gérer les erreurs spécifiques
 class customException(Exception):

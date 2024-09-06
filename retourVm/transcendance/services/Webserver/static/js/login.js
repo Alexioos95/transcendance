@@ -101,6 +101,7 @@ function	login()
 
 async function call2FA(struct, data)
 {
+	console.log(data);
 	if (data.twoFA === false)
 		return ;
 	const code = document.querySelector("form div.hidden");

@@ -398,7 +398,7 @@ async function	setGuestRestrictions(struct)
 		username.innerHTML = "Guest";
 	else if (struct.options.lang.curr === "NL")
 		username.innerHTML = "Gast";
-	avatar.src = "/images/default_avatar.png";
+	avatar.src = "/default_avatar.png";
 	inputs[3].disabled = true;
 	historyIcon.classList.add("hidden");
 	for (let i = 0; i < 3; i++)
@@ -815,33 +815,33 @@ function	enableStickMove(event, struct)
 		{
 			struct.screen.sticks.keys.w = 1;
 			if (struct.screen.sticks.keys.s === 0)
-				struct.screen.sticks.left.src = "../svg/stick/up.svg";
+				struct.screen.sticks.left.src = "/svg/stick/up.svg";
 			else
-				struct.screen.sticks.left.src = "../svg/stick/state4.svg";
+				struct.screen.sticks.left.src = "/svg/stick/state4.svg";
 		}
 		else if (event.key === "s" || event.key === "S")
 		{
 			struct.screen.sticks.keys.s = 1;
 			if (struct.screen.sticks.keys.w === 0)
-				struct.screen.sticks.left.src = "../svg/stick/down.svg";
+				struct.screen.sticks.left.src = "/svg/stick/down.svg";
 			else
-				struct.screen.sticks.left.src = "../svg/stick/state4.svg";
+				struct.screen.sticks.left.src = "/svg/stick/state4.svg";
 		}
 		else if (event.key === "ArrowUp")
 		{
 			struct.screen.sticks.keys.up = 1;
 			if (struct.screen.sticks.keys.down === 0)
-				struct.screen.sticks.right.src = "../svg/stick/up.svg";
+				struct.screen.sticks.right.src = "/svg/stick/up.svg";
 			else
-				struct.screen.sticks.right.src = "../svg/stick/state4.svg";
+				struct.screen.sticks.right.src = "/svg/stick/state4.svg";
 		}
 		else if (event.key === "ArrowDown")
 		{
 			struct.screen.sticks.keys.down = 1;
 			if (struct.screen.sticks.keys.up === 0)
-				struct.screen.sticks.right.src = "../svg/stick/down.svg";
+				struct.screen.sticks.right.src = "/svg/stick/down.svg";
 			else
-				struct.screen.sticks.right.src = "../svg/stick/state4.svg";
+				struct.screen.sticks.right.src = "/svg/stick/state4.svg";
 		}
 	}
 	else if (event.type === "mousemove")
@@ -853,14 +853,14 @@ function	enableStickMove(event, struct)
 				struct.screen.sticks.keys.down = 0;
 				struct.screen.sticks.keys.up = 1;
 				struct.screen.sticks.keys.mouseLeft = 1;
-				struct.screen.sticks.left.src = "../svg/stick/up.svg";
+				struct.screen.sticks.left.src = "/svg/stick/up.svg";
 			}
 			else if (struct.screen.game.paddles.left.move_bot === 1)
 			{
 				struct.screen.sticks.keys.up = 0;
 				struct.screen.sticks.keys.down = 1;
 				struct.screen.sticks.keys.mouseLeft = 1;
-				struct.screen.sticks.left.src = "../svg/stick/down.svg";
+				struct.screen.sticks.left.src = "/svg/stick/down.svg";
 			}
 		}
 		else if (struct.screen.game.paddles && struct.screen.game.paddles.right.mouse === 1)
@@ -870,14 +870,14 @@ function	enableStickMove(event, struct)
 				struct.screen.sticks.keys.down = 0;
 				struct.screen.sticks.keys.up = 1;
 				struct.screen.sticks.keys.mouseRight = 1;
-				struct.screen.sticks.right.src = "../svg/stick/up.svg";
+				struct.screen.sticks.right.src = "/svg/stick/up.svg";
 			}
 			else if (struct.screen.game.paddles.right.move_bot === 1)
 			{
 				struct.screen.sticks.keys.up = 0;
 				struct.screen.sticks.keys.down = 1;
 				struct.screen.sticks.keys.mouseRight = 1;
-				struct.screen.sticks.right.src = "../svg/stick/down.svg";
+				struct.screen.sticks.right.src = "/svg/stick/down.svg";
 			}
 		}
 	}
@@ -892,22 +892,22 @@ function	disableStickMove(event, struct)
 		if (event.key === "w" || event.key === "W")
 		{
 			struct.screen.sticks.keys.w = 0;
-			struct.screen.sticks.left.src = "../svg/stick/state4.svg";
+			struct.screen.sticks.left.src = "/svg/stick/state4.svg";
 		}
 		else if (event.key === "s" || event.key === "S")
 		{
 			struct.screen.sticks.keys.s = 0;
-			struct.screen.sticks.left.src = "../svg/stick/state4.svg";
+			struct.screen.sticks.left.src = "/svg/stick/state4.svg";
 		}
 		else if (event.key === "ArrowUp")
 		{
 			struct.screen.sticks.keys.up = 0;
-			struct.screen.sticks.right.src = "../svg/stick/state4.svg";
+			struct.screen.sticks.right.src = "/svg/stick/state4.svg";
 		}
 		else if (event.key === "ArrowDown")
 		{
 			struct.screen.sticks.keys.down = 0;
-			struct.screen.sticks.right.src = "../svg/stick/state4.svg";
+			struct.screen.sticks.right.src = "/svg/stick/state4.svg";
 		}
 	}
 	else if (event.type === "mouseup")
@@ -917,21 +917,21 @@ function	disableStickMove(event, struct)
 			struct.screen.sticks.keys.mouseLeft = 0;
 			struct.screen.sticks.keys.up = 0;
 			struct.screen.sticks.keys.down = 0;
-			struct.screen.sticks.left.src = "../svg/stick/state4.svg";
+			struct.screen.sticks.left.src = "/svg/stick/state4.svg";
 		}
 		else if (struct.screen.sticks.keys.mouseRight === 1)
 		{
 			struct.screen.sticks.keys.mouseRight = 0;
 			struct.screen.sticks.keys.up = 0;
 			struct.screen.sticks.keys.down = 0;
-			struct.screen.sticks.right.src = "../svg/stick/state4.svg";
+			struct.screen.sticks.right.src = "/svg/stick/state4.svg";
 		}
 	}
 }
 
 async function	deactivateStick(sticks)
 {
-	const path = "../svg/stick/state";
+	const path = "/svg/stick/state";
 	const extension = ".svg";
 
 	for (let i = 4; i > -1; i--)

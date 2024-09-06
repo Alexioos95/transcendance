@@ -64,7 +64,7 @@ function	login()
 					if (response.ok)
 					{
 						console.log("response /user/login ok; navigate to Game");
-						return (response.json().then(data => { call2FA(struct, data) }).then(data => { navigate("game", data); }));
+						return (response.json().then(data => { call2FA(struct, data) }));
 					}
 					else
 					{
@@ -102,15 +102,21 @@ function	login()
 async function call2FA(struct, data)
 {
 	console.log(data);
+
 	if (data.twoFA === "false")
-		return (data);
+		return (navigate("game", data));
 	const div = document.querySelector("form div.hidden");
-	const input = document.querySelector("form div.hidden input");
-	const button = document.querySelector("form div.hidden button");
 	struct.username.classList.add("hidden");
 	struct.forgotPassword.classList.add("hidden");
 	struct.wrapperSpecialLogin.classList.add("hideInFade");
 	div.classList.remove("hidden");
+
+	await waitCode(struct, data);
+}
+
+async function waitCode(struct, data)
+{
+	const button = document.querySelector("form div.hidden button");
 	return new Promise((resolve, reject) => {
 		button.addEventListener("click", function() {
 			const obj = { code: input.value };
@@ -118,7 +124,7 @@ async function call2FA(struct, data)
 			fetch("user/log2fa//", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
-					return (response.json());
+					return (response.json().then(data => { navigate("game", data) }));
 				else
 				{
 					console.log("response user/log2fa/ not good; // do nothing");
@@ -126,7 +132,7 @@ async function call2FA(struct, data)
 				}
 			})
 			.catch(() => console.error("Error: failed to fetch the log2fa route"));
-		});
+		}, { once: true });
 	});
 }
 

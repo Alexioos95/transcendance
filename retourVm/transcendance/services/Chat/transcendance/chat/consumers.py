@@ -5,6 +5,8 @@ import jwt
 import os
 import time
 
+SERVER_JWT_KEY = SuperSecretServerKey
+
 # Exception personnalisée pour gérer les erreurs spécifiques
 class customException(Exception):
     def __init__(self, data, code):
@@ -21,7 +23,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def get_username_from_jwt(self, auth_cookie):
         try:
             # Décrypter le JWT avec la clé secrète
-            decoded_token = jwt.decode(auth_cookie, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
+            decoded_token = jwt.decode(auth_cookie, SERVER_JWT_KEY, algorithms=["HS256"])#os.environ['SERVER_JWT_KEY'],)
             
             # Extraire le nom d'utilisateur du JWT
             username = decoded_token.get('userName')

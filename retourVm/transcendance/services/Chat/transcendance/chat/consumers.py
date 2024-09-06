@@ -116,14 +116,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         clean_message = bleach.clean(message, tags=[], attributes={}, strip=True)
 
         # Construire un message avec le nom d'utilisateur à la place du titre
-        final_message = f"{clean_message}"
+        final_message = f"{username}: {clean_message}"
 
         # Envoyer le message à tous les utilisateurs dans le groupe
         await self.channel_layer.group_send(
             self.room_group_name,
             {
-                'user': username
                 'type': 'chat_message',
+                'user': username,
                 'message': final_message
             }
         )
@@ -134,3 +134,4 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Envoyer le message au WebSocket
         await self.send(text_data=json.dumps({"message": message}))
+

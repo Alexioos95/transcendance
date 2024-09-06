@@ -212,8 +212,8 @@ def checkJwt(request):
         if not user:
             return JsonResponse({"error": "user does nor exist"}, status=403)
         print(f'le cookie est {auth}', file=sys.stderr)
-        print(f'"alng":{user.language} "username":{user.Username}, "Avatar":{user.Avatar}, "Language": {user.Language})
-        return JsonResponse({'langue': "username":user.Username, "Avatar":user.Avatar, "Language": user.Language}, status=200)
+        print(f'username:{user.Username}, Avatar:{user.Avatar}, Language: {user.Language}', file=sys.stderr)
+        return JsonResponse({"username":user.Username, "Avatar":user.Avatar, "Language": user.Language}, status=200)
     except customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
 

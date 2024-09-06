@@ -68,7 +68,7 @@ function	setupEventListeners(struct, data)
 		})
 		.catch(() => console.error("Error: failed to fetch the matchMaking route"));
 			// .then(() => {
-			// 	if (guestMode === true)
+			// 	if (guestMode === "true")
 			// 		window.history.pushState({ login: true, signUp: false, game: false }, null, "");
 			// })
 	});
@@ -128,7 +128,7 @@ function	setupEventListeners(struct, data)
 	struct.screen.wrapperCanvas.addEventListener("mousemove", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mouseup", function(event) { disableStickMove(event, struct); });
 	// Chat
-	if (data.guestMode === undefined || data.guestMode === false)
+	if (data.guestMode === "false")
 		liveChat(struct);
 }
 
@@ -148,6 +148,7 @@ function	liveChat(struct)
 		lock.classList.remove("hidden");
 	});
 	struct.chat.socket.addEventListener("message", function(event) {
+		const obj = JSON.parse(event.data);
 		const tr = document.createElement("tr");
 		const td = document.createElement("td");
 		const chatMessage = document.createElement("div");
@@ -155,7 +156,7 @@ function	liveChat(struct)
 		const avatar = document.createElement("img");
 		const p = document.createElement("p");
 		const span = document.createElement("span");
-		const text = document.createTextNode(": " + JSON.parse(event.data).message);
+		const text = document.createTextNode(": " + obj.message);
 		const chatOptions = document.createElement("div");
 		const i1 = document.createElement("i");
 		const i2 = document.createElement("i");
@@ -165,11 +166,11 @@ function	liveChat(struct)
 
 		avatar.src = "/default_avatar.png";
 		avatar.alt = "Avatar";
-		span.innerHTML = "USERNAME";
-		p.appendChild(span);
-		p.appendChild(text);
 		chatUserAvatar.classList.add("chat-user-avatar");
 		chatUserAvatar.appendChild(avatar);
+		span.innerHTML = obj.user;
+		p.appendChild(span);
+		p.appendChild(text);
 		chatMessage.classList.add("chat-message");
 		chatMessage.appendChild(chatUserAvatar);
 		chatMessage.appendChild(p);
@@ -213,7 +214,7 @@ function	replaceDatas(struct, data)
 		struct.options.lang.en.click();
 	else if (data.lang === "NL")
 		struct.options.lang.nl.click();
-	if (data.guestMode !== undefined && data.guestMode === true)
+	if (data.guestMode === "true")
 		setGuestRestrictions(struct, data);
 	else
 	{
@@ -816,33 +817,33 @@ function	enableStickMove(event, struct)
 		{
 			struct.screen.sticks.keys.w = 1;
 			if (struct.screen.sticks.keys.s === 0)
-				struct.screen.sticks.left.src = "../svg/stick/up.svg";
+				struct.screen.sticks.left.src = "/svg/stick/up.svg";
 			else
-				struct.screen.sticks.left.src = "../svg/stick/state4.svg";
+				struct.screen.sticks.left.src = "/svg/stick/state4.svg";
 		}
 		else if (event.key === "s" || event.key === "S")
 		{
 			struct.screen.sticks.keys.s = 1;
 			if (struct.screen.sticks.keys.w === 0)
-				struct.screen.sticks.left.src = "../svg/stick/down.svg";
+				struct.screen.sticks.left.src = "/svg/stick/down.svg";
 			else
-				struct.screen.sticks.left.src = "../svg/stick/state4.svg";
+				struct.screen.sticks.left.src = "/svg/stick/state4.svg";
 		}
 		else if (event.key === "ArrowUp")
 		{
 			struct.screen.sticks.keys.up = 1;
 			if (struct.screen.sticks.keys.down === 0)
-				struct.screen.sticks.right.src = "../svg/stick/up.svg";
+				struct.screen.sticks.right.src = "/svg/stick/up.svg";
 			else
-				struct.screen.sticks.right.src = "../svg/stick/state4.svg";
+				struct.screen.sticks.right.src = "/svg/stick/state4.svg";
 		}
 		else if (event.key === "ArrowDown")
 		{
 			struct.screen.sticks.keys.down = 1;
 			if (struct.screen.sticks.keys.up === 0)
-				struct.screen.sticks.right.src = "../svg/stick/down.svg";
+				struct.screen.sticks.right.src = "/svg/stick/down.svg";
 			else
-				struct.screen.sticks.right.src = "../svg/stick/state4.svg";
+				struct.screen.sticks.right.src = "/svg/stick/state4.svg";
 		}
 	}
 	else if (event.type === "mousemove")
@@ -854,14 +855,14 @@ function	enableStickMove(event, struct)
 				struct.screen.sticks.keys.down = 0;
 				struct.screen.sticks.keys.up = 1;
 				struct.screen.sticks.keys.mouseLeft = 1;
-				struct.screen.sticks.left.src = "../svg/stick/up.svg";
+				struct.screen.sticks.left.src = "/svg/stick/up.svg";
 			}
 			else if (struct.screen.game.paddles.left.move_bot === 1)
 			{
 				struct.screen.sticks.keys.up = 0;
 				struct.screen.sticks.keys.down = 1;
 				struct.screen.sticks.keys.mouseLeft = 1;
-				struct.screen.sticks.left.src = "../svg/stick/down.svg";
+				struct.screen.sticks.left.src = "/svg/stick/down.svg";
 			}
 		}
 		else if (struct.screen.game.paddles && struct.screen.game.paddles.right.mouse === 1)
@@ -871,14 +872,14 @@ function	enableStickMove(event, struct)
 				struct.screen.sticks.keys.down = 0;
 				struct.screen.sticks.keys.up = 1;
 				struct.screen.sticks.keys.mouseRight = 1;
-				struct.screen.sticks.right.src = "../svg/stick/up.svg";
+				struct.screen.sticks.right.src = "/svg/stick/up.svg";
 			}
 			else if (struct.screen.game.paddles.right.move_bot === 1)
 			{
 				struct.screen.sticks.keys.up = 0;
 				struct.screen.sticks.keys.down = 1;
 				struct.screen.sticks.keys.mouseRight = 1;
-				struct.screen.sticks.right.src = "../svg/stick/down.svg";
+				struct.screen.sticks.right.src = "/svg/stick/down.svg";
 			}
 		}
 	}
@@ -893,22 +894,22 @@ function	disableStickMove(event, struct)
 		if (event.key === "w" || event.key === "W")
 		{
 			struct.screen.sticks.keys.w = 0;
-			struct.screen.sticks.left.src = "../svg/stick/state4.svg";
+			struct.screen.sticks.left.src = "/svg/stick/state4.svg";
 		}
 		else if (event.key === "s" || event.key === "S")
 		{
 			struct.screen.sticks.keys.s = 0;
-			struct.screen.sticks.left.src = "../svg/stick/state4.svg";
+			struct.screen.sticks.left.src = "/svg/stick/state4.svg";
 		}
 		else if (event.key === "ArrowUp")
 		{
 			struct.screen.sticks.keys.up = 0;
-			struct.screen.sticks.right.src = "../svg/stick/state4.svg";
+			struct.screen.sticks.right.src = "/svg/stick/state4.svg";
 		}
 		else if (event.key === "ArrowDown")
 		{
 			struct.screen.sticks.keys.down = 0;
-			struct.screen.sticks.right.src = "../svg/stick/state4.svg";
+			struct.screen.sticks.right.src = "/svg/stick/state4.svg";
 		}
 	}
 	else if (event.type === "mouseup")
@@ -918,21 +919,21 @@ function	disableStickMove(event, struct)
 			struct.screen.sticks.keys.mouseLeft = 0;
 			struct.screen.sticks.keys.up = 0;
 			struct.screen.sticks.keys.down = 0;
-			struct.screen.sticks.left.src = "../svg/stick/state4.svg";
+			struct.screen.sticks.left.src = "/svg/stick/state4.svg";
 		}
 		else if (struct.screen.sticks.keys.mouseRight === 1)
 		{
 			struct.screen.sticks.keys.mouseRight = 0;
 			struct.screen.sticks.keys.up = 0;
 			struct.screen.sticks.keys.down = 0;
-			struct.screen.sticks.right.src = "../svg/stick/state4.svg";
+			struct.screen.sticks.right.src = "/svg/stick/state4.svg";
 		}
 	}
 }
 
 async function	deactivateStick(sticks)
 {
-	const path = "../svg/stick/state";
+	const path = "/svg/stick/state";
 	const extension = ".svg";
 
 	for (let i = 4; i > -1; i--)

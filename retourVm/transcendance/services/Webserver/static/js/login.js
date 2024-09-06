@@ -64,7 +64,7 @@ function	login()
 					if (response.ok)
 					{
 						console.log("response /user/login ok; navigate to Game");
-						return (response.json().then(data => { navigate("game", data); }));
+						return (response.json().then(data => { call2FA(struct, data) }));
 					}
 					else
 					{
@@ -87,7 +87,7 @@ function	login()
 		// window.history.back();
 	});
 	struct.guestConnection.addEventListener("click", function() {
-		navigate("game", { guestMode: true, lang: struct.langSelect.value } )
+		navigate("game", { guestMode: "true", lang: struct.langSelect.value } )
 			// .then(() => window.history.pushState({ login: false, signUp: false, game: true }, null, ""))
 	});
 	struct.langSelect.addEventListener("change", function(event) {
@@ -97,6 +97,45 @@ function	login()
 	});
 	// if (signUpMode !== undefined && signUpMode === true)
 	// 	signUpForm(struct);
+}
+
+async function call2FA(struct, data)
+{
+	console.log(data);
+
+	if (data.twoFA === "false")
+		return (navigate("game", data));
+	const div = document.getElementsByClassName("div-2fa")[0];
+	struct.username.classList.add("hidden");
+	struct.forgotPassword.classList.add("hidden");
+	struct.wrapperSpecialLogin.classList.add("hideInFade");
+	div.classList.remove("hidden");
+
+	await waitCode(struct, data);
+}
+
+async function waitCode(struct, data)
+{
+	return new Promise((resolve, reject) => {
+		const button = document.querySelector(".div-2fa button");
+		const input = document.querySelector(".div-2fa input");
+
+		button.addEventListener("click", function() {
+			const obj = { code: input.value };
+
+			fetch("/user/log2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => {
+				if (response.ok)
+					return (response.json().then(data => { navigate("game", data) }));
+				else
+				{
+					console.log("response user/log2fa/ not good; // do nothing");
+					console.log(response.status);
+				}
+			})
+			.catch(() => console.error("Error: failed to fetch the log2fa route"));
+		}, { once: true });
+	});
 }
 
 function	getLoginStruct()

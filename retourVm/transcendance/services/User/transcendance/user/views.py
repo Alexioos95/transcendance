@@ -84,7 +84,6 @@ def compare_bcrypt_hash(username:str, password: str) -> bool:#middleware
 @require_http_methods(["POST"])
 def register(request):#check si user est unique sinon refuser try except get?	#Set Language par default ou la récupérer du front ?
     
-    # print(f"ici body == {request.body}")
     print(f"ici body == {request.body}", file=sys.stderr)
     data = json.loads(request.body)
     userData = {}
@@ -105,27 +104,18 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
     time = datetime.now()
     tz = pytz.timezone('CET')
     tzTime = tz.localize(time)
+    hashed_password = bcrypt.hashpw(userData['password'].encode('utf-8'), bcrypt.gensalt())
     new_user = User(
         Email=userData['email'],
         Username=userData['username'],
-        Password=generate_bcrypt_hash(userData['password']),
+        Password=hashed_password.decode('utf-8'),  # Décodage du hash en UTF-8
         lastTimeOnline=tzTime,
         pongLvl=0,
-        Language=userData['lang'],	##
+        Language=userData['lang'],
         tetrisLvl=0,
-        twoFA=True	##	False par default ?
+        twoFA=True
     )
-    # new_user.Language = 'FR'
-    # user = User.objects.all().filter(Username__exact=decodedJwt["userName"]).value_list()
-    # if not user:
-    #     print(username pas trouve)
-    # else:
-    #     print(username trouve)
-    # user = User.objects.all().filter(Username__exact=decodedJwt["Email"]).value_list()
-    # if not user:
-    #     print(email pas trouve)
-    # else:
-    #     print(email trouve)
+
     try:
         new_user.save()
     except Exception as error:
@@ -133,34 +123,6 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
         response_data = JsonResponse({"error": "erreur in database"}, status=409)
         print(error)
         return(response_data)
-
-
-    # mailData = {
-    #     'title': 'Transcendance Reset Password',
-    #     'body': (
-    #         f'Hey,\n\n'
-    #         'It looks like you requested to reset your password. No worries, we’ve got you covered!\n\n'
-    #         'Click the link below to set a new password:\n\n'
-    #         f'https://localhost:8000/resetmypassword/?code=validationCode\n\n'
-    #         'This link will be good for 10 minutes, so make sure to use it before it expires. If you missed it, just request another one.\n\n'
-    #         'If you didn’t ask for a password reset, just ignore this email – your account is safe.\n\n'
-    #         'Got any questions? Feel free to reach out to us!\n\n'
-    #         'Cheers,\n'
-    #         'The Team'
-    #         ),
-    #         'destinataire': userData['email']}
-    # response = requests.post('http://mail:8002/sendMail/', json=mailData)
-    # print({'error': 'Failed to send email'}, file=sys.stderr)
-    # user = User.objects.filter(Username__exact='h').first()
-    # if user:
-    #     print(f'user={user}')
-    #     print(f'user.password={user.Password}')
-    #     if bcrypt.checkpw(prevpassword, user.Password.encode('utf-8')):
-    #         print("Le mot de passe est valide.")
-    #     else:
-    #         print("Le mot de passe est invalide.")
-    # Réponse JSON
-	#response_data.status = 201
     print(f'new user username {new_user.Username}, avatar = {new_user.Avatar}, langage = {new_user.Language}')
     response_data = JsonResponse({"2fa": 'False', "username":new_user.Username, "Avatar":new_user.Avatar, "Language": new_user.Language}, status=201)
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes
@@ -224,8 +186,6 @@ def login(request):
     userData = {}
     if 'email' in data:
         userData['email'] = data['email']
-    #if 'username' in data:
-       # userData['username'] = data['username']
     if 'password' in data:
         userData['password'] = data['password']
 
@@ -235,9 +195,10 @@ def login(request):
     # Guard against injection/xss here?
     # Check if empty name or password?
     # Check for minimum lengths?
-    dbUser = get_user_in_db("email", userData['email'])
+    dbUser = get_user_in_db("Email", userData['email'])
+    print(f"le user{dbUser}", file=sys.stderr)
     if dbUser is None:
-        print('on passe par ici')
+        print('on passe par ici', file=sys.stderr)
         return HttpResponse({"error":"invalid credentials"}, status=401)
     
 #        for user in dbUserList:
@@ -252,24 +213,27 @@ def login(request):
         # dbUserList = list(dbUser)
         # print(f'dbUser == {dbUserList} Username {dbUserList[0].Username} password == {dbUserList[0].Password}')
         # print(f'dbUser == {dbUserList} Username {dbUserList[0].Username} password == {dbUserList[0].Password}')
-    if bcrypt.checkpw(userData.password.encode('utf-8'), dbUser.Password.encode('utf-8')):
-        print("Le mot de passe est valide.")
-        encoded_jwt = jwt.encode({"userName": requestUserName, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")    #    Export to .env file        #    Add env_example file
-        if dbUser.twoFA != 'NONE':
-            return JsonResponse({"2fa": 'True'}, status=200)#code a verifier code 2fa attendu
-        response_data = JsonResponse({"2fa": 'False', "username":dbUser.Username, "Avatar":dbUser.Avatar, "Language": dbUser.Language})
-        response_data.status = 200
-        response_data.set_cookie(
-        'auth',
-        encoded_jwt,
-        httponly=True,   # Empêche l'accès JavaScript au cookie
-        secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
-        samesite='Strict',
-        expires=datetime.utcnow() + timedelta(hours=100))
-        return (response_data)
+    print(f"pwd == {dbUser.Password}", file=sys.stderr)
+    if bcrypt.checkpw(userData['password'].encode('utf-8'), dbUser.Password.encode('utf-8')):
+        print("Le mot de passe est valide.", file=sys.stderr)
     else:
-        print("Le mot de passe est invalide.")
+        print("Le mot de passe est invalide.", file=sys.stderr)
         return JsonResponse({'error': 'invalid credentials'}, status=401)
+    encoded_jwt = jwt.encode({"userName": dbUser.Username, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")    #    Export to .env file        #    Add env_example file
+    if dbUser.twoFA != 'None':
+        print("coucou 2fa", file=sys.stderr)
+        return JsonResponse({"2fa": 'True'}, status=200)#code a verifier code 2fa attendu
+    response_data = JsonResponse({"2fa": 'False', "username":dbUser.Username, "Avatar":dbUser.Avatar, "Language": dbUser.Language})
+    response_data.status = 200
+    response_data.set_cookie(
+    'auth',
+    encoded_jwt,
+    httponly=True,   # Empêche l'accès JavaScript au cookie
+    secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
+    samesite='Strict',
+    expires=datetime.utcnow() + timedelta(hours=100))
+    print("tout va bien", file=sys.stderr)
+    return (response_data)
     # userIp = request.META.get('REMOTE_ADDR')
     # print(f"voici l'ip user{userIp}")
 
@@ -411,7 +375,7 @@ def updateUserInfos(request):
     user = ""
     try:
         userName = decodeJwt(auth)
-        user = get_user_in_db(Username, userName)
+        user = get_user_in_db('Username', userName)
     except customException as e:
         print('e.data')
         return JsonResponse({"error": e.data}, status=e.code)
@@ -428,12 +392,12 @@ def updateUserInfos(request):
     # except Exception as e:
         # return JsonResponse({'error': 'user do not exist'}, status=403)
     if 'username' in data:
-        if get_user_in_db(Username, data['username']) is not None:
+        if get_user_in_db('Username', data['username']) is not None:
             print('userneame')
             return JsonResponse({"errorUsername": "username already exists"}, status=403)
         user.Username = data['username']
     if 'email' in data:
-        if get_user_in_db(Email, data['email']) is not None:
+        if get_user_in_db('Email', data['email']) is not None:
             print('enmail')
             return JsonResponse({"errorEmail": "email already exists"}, status=403)
         user.Email = data['email']
@@ -446,7 +410,7 @@ def updateUserInfos(request):
             user.language = data['language']
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
     user.save()
-    encoded_jwt = jwt.encode({"userName": username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
+    encoded_jwt = jwt.encode({"userName": user.Username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
     response_data.set_cookie(
     'auth',
     encoded_jwt,
@@ -582,7 +546,7 @@ def matchMaking(request):
     print(f'le cookie est {auth}')
     username = ""
     try:
-        username = decodedJwt(auth)
+        username = decodeJwt(auth)
     except customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
     user = get_user_in_db("Username", username)

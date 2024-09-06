@@ -161,6 +161,7 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
     #         print("Le mot de passe est invalide.")
     # Réponse JSON
 	#response_data.status = 201
+    print(f'new user username {new_user.Username}, avatar = {new_user.Avatar}, langage = {new_user.Language}')
     response_data = JsonResponse({"2fa": 'False', "username":new_user.Username, "Avatar":new_user.Avatar, "Language": new_user.Language}, status=201)
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes
     encoded_jwt = jwt.encode({"userName": userData['username'], "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
@@ -169,7 +170,7 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
         encoded_jwt,
         httponly=True,
         secure=None,
-        samesite='Lax',
+        samesite='None',
         expires=datetime.utcnow() + timedelta(hours=25),	# Expire avant le JWT...
         # domain="*"
     )
@@ -196,7 +197,7 @@ def decodeJwt(auth_coockie):
     # return JsonResponse({'success': 'User connected'}, status=200)
     return user
 
-#@require_http_methods(["GET"])
+@require_http_methods(["GET"])
 def checkJwt(request):
     print('test')
 	#if request.method != 'GET':
@@ -234,6 +235,7 @@ def login(request):
     # Check for minimum lengths?
     dbUser = get_user_in_db("email", userData['email'])
     if dbUser is None:
+        print('on passe par ici')
         return HttpResponse({"error":"invalid credentials"}, status=401)
     
 #        for user in dbUserList:
@@ -390,24 +392,29 @@ def image_validation():
         raise customException("Invalid image format", 403)
 
 
-
+@csrf_exempt
 @require_http_methods(["POST"])
 def updateUserInfos(request):
+    print('cic')
     data = {}
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
+        print('json')
         return HttpResponseBadRequest({'error': 'Invalid JSON'}, status=403)
     auth = checkCookie(request, 'auth')
     if auth is None:
+        print('coockie missing')
         return HttpResponse(status=403)
     user = ""
     try:
         userName = decodeJwt(auth)
         user = get_user_in_db(Username, userName)
     except customException as e:
+        print('e.data')
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
+        print(e.data)
         return JsonResponse({"error": "User does not exists"}, status=403)
     # try:
     #     user = User.objects.filter(Username__exact=userName)
@@ -420,10 +427,12 @@ def updateUserInfos(request):
         # return JsonResponse({'error': 'user do not exist'}, status=403)
     if 'username' in data:
         if get_user_in_db(Username, data['username']) is not None:
+            print('userneame')
             return JsonResponse({"errorUsername": "username already exists"}, status=403)
         user.Username = data['username']
     if 'email' in data:
         if get_user_in_db(Email, data['email']) is not None:
+            print('enmail')
             return JsonResponse({"errorEmail": "email already exists"}, status=403)
         user.Email = data['email']
     if 'password' in data:

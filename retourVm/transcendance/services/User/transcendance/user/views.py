@@ -222,8 +222,8 @@ def login(request):
     encoded_jwt = jwt.encode({"userName": dbUser.Username, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")    #    Export to .env file        #    Add env_example file
     if dbUser.twoFA != 'None':
         print("coucou 2fa", file=sys.stderr)
-        return JsonResponse({"2fa": 'True'}, status=200)#code a verifier code 2fa attendu
-    response_data = JsonResponse({"2fa": 'False', "username":dbUser.Username, "Avatar":dbUser.Avatar, "Language": dbUser.Language})
+        return JsonResponse({"twoFA": 'true', 'guestMode': 'false'}, status=200)#code a verifier code 2fa attendu
+    response_data = JsonResponse({"twoFA": 'false', "guestMode": "false", "username":dbUser.Username, "Avatar":dbUser.Avatar, "Language": dbUser.Language})
     response_data.status = 200
     response_data.set_cookie(
     'auth',
@@ -353,16 +353,16 @@ def image_validation():
         ]
     if mime_type in accepted_mime_types:
         return save_file(uploaded_file)
-        
+
     else:
         raise customException("Invalid image format", 403)
-
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def updateUserInfos(request):
     print('cic')
     data = {}
+    print(request.body, file=sys.stderr)
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
@@ -391,25 +391,26 @@ def updateUserInfos(request):
     #         print(f'TwoFA: {user.get_twoFA_display()}')
     # except Exception as e:
         # return JsonResponse({'error': 'user do not exist'}, status=403)
-    if 'username' in data:
+    if 'username' in data and data['username']:
         if get_user_in_db('Username', data['username']) is not None:
             print('userneame')
             return JsonResponse({"errorUsername": "username already exists"}, status=403)
         user.Username = data['username']
-    if 'email' in data:
+    if 'email' in data and data['email']:
         if get_user_in_db('Email', data['email']) is not None:
             print('enmail')
             return JsonResponse({"errorEmail": "email already exists"}, status=403)
         user.Email = data['email']
-    if 'password' in data:
+    if 'password' in data and data['password']:
         user.Password = data['password']
-    if 'avatar' in data:#on recoit une image je l'enregistre dans le volume et stock l'url
+    if 'avatar' in data and data['avatar']:#on recoit une image je l'enregistre dans le volume et stock l'url
         user.Avatar = data['avatar']
-    if 'language' in data:
+    if 'language' in data and data['language']:
         if data['language'] in dict(User.Language.choices):
             user.language = data['language']
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
     user.save()
+    response_data = JsonResponse({"message": "User information updated successfully"})
     encoded_jwt = jwt.encode({"userName": user.Username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
     response_data.set_cookie(
     'auth',
@@ -418,8 +419,10 @@ def updateUserInfos(request):
     secure=True,
     samesite='Strict',
     expires=datetime.utcnow() + timedelta(hours=100))
-    return (response_data)
-    return JsonResponse({"message": "User information updated successfully"})
+    return response_data
+
+def sendNewPaswd(request):
+    return JsonResponse({'message': "new password set successfuly"})
 
 def disconnect(request):
     response = HttpResponse()
@@ -439,7 +442,7 @@ def updateInfo(request):
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
         return JsonResponse({"error": "User does not exists"}, status=403)
-    response = JsonResponse({"username":user.Username, "Avatar":user.Avatar, "Language": user.Language})#ajouter plus tard friends et bloques + get dans le cache les defis lances ou acceptes
+    response = JsonResponse({"guestMode": "false", "username":user.Username, "Avatar":user.Avatar, "Language": user.Language})#ajouter plus tard friends et bloques + get dans le cache les defis lances ou acceptes
     return response(status=200)
 
 def checkCodeLog(request):

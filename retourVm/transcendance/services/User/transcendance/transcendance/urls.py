@@ -50,7 +50,9 @@ urlpatterns = [
     # path('user/addFriend/', views.addFriend),en attene de postgres
     # path('user/blockUser/', views.blockUser),en attene de postgres
     #POST
-    path('user/resetPaswd/', views.resetPasswd), #envoi un username auquel sera envoye un mail de reset de son password via un lien fourni
+    path('user/resetPaswd/', views.resetPasswd), #envoi un mail auquel sera envoye un mail de reset de son password via un lien fourni
+    #POST
+    path('user/sendNewPaswd/', views.sendNewPaswd),
     #GET
     path('user/matchMaking/', views.matchMaking), #a ping regulierement renverra 403 si token invalide une 100 si la recherche et en cours une 200 si un adveraire a ete trouve il faudra ensuite se connecter a la socket du jeu
     #GET

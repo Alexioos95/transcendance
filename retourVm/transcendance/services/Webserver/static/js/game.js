@@ -128,7 +128,7 @@ function	setupEventListeners(struct, data)
 	struct.screen.wrapperCanvas.addEventListener("mousemove", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mouseup", function(event) { disableStickMove(event, struct); });
 	// Chat
-	if (data.guestMode !== undefined && data.guestMode === false)
+	if (data.guestMode === undefined || data.guestMode === false)
 		liveChat(struct);
 }
 

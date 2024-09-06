@@ -18,6 +18,7 @@ import qrcode
 import jwt
 import bcrypt
 import sys
+import random
 
 # mailData = {'title':'transcendance registration','body':f'welcome {username}, successfully registered', 'destinataire':'ftTranscendanceAMFEA@gmail.com'}
 # response = requests.post('http://localhost:8001/sendMail/', json=mailData)#mettre la route dans l'env ou set la route definitive dans le build final?
@@ -124,7 +125,7 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
         print(error)
         return(response_data)
     print(f'new user username {new_user.Username}, avatar = {new_user.Avatar}, langage = {new_user.Language}')
-    response_data = JsonResponse({"2fa": 'False', "username":new_user.Username, "Avatar":new_user.Avatar, "Language": new_user.Language}, status=201)
+    response_data = JsonResponse({"2fa": 'False', "guestMode":"false", "username":new_user.Username, "avatar": '/images/default_avatar.png' , "Language": new_user.Language}, status=201)
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes
     encoded_jwt = jwt.encode({"userName": userData['username'], "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
     response_data.set_cookie(
@@ -219,9 +220,27 @@ def login(request):
     else:
         print("Le mot de passe est invalide.", file=sys.stderr)
         return JsonResponse({'error': 'invalid credentials'}, status=401)
-    encoded_jwt = jwt.encode({"userName": dbUser.Username, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")    #    Export to .env file        #    Add env_example file
+    encoded_jwt = jwt.encode({"userName": dbUser.Username, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")#    Export to .env file        #    Add env_example file
     if dbUser.twoFA != 'None':
         print("coucou 2fa", file=sys.stderr)
+        code = generate_code(8)
+        cache.set(code, dbUser.Username, 600)
+        mailData = {
+        'title': 'Your 2FA code for Transcendance',
+        'body': (
+            f'Hey {dbUser.Username},\n\n'
+            f'Looks like you\'re trying to log in. No worries, mate! We\'ve got you covered.\n\n'
+            f'Here\'s your 2FA code:\n\n{code}\n\n'
+            f'This code is good for 10 minutes, so make sure you use it pronto. If you miss it, just try again.'
+            f'If someone else asked for this, don\'t sweat it - your account\'s still safe.\n\n'
+            f'Cheers,\n\nThe Team\n'
+            ),
+            'destinataire': dbUser.Email}
+        response = requests.post('http://mail:8002/sendMail/', json=mailData)
+        print({'error': 'Failed to send email {}'}, file=sys.stderr)
+        if response.status_code != 200:
+            return JsonResponse({'error': 'Failed to send email'}, status=500)
+
         return JsonResponse({"twoFA": 'true', 'guestMode': 'false'}, status=200)#code a verifier code 2fa attendu
     response_data = JsonResponse({"twoFA": 'false', "guestMode": "false", "username":dbUser.Username, "Avatar":dbUser.Avatar, "Language": dbUser.Language})
     response_data.status = 200
@@ -230,7 +249,7 @@ def login(request):
     encoded_jwt,
     httponly=True,   # Empêche l'accès JavaScript au cookie
     secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
-    samesite='Strict',
+    samesite='None',
     expires=datetime.utcnow() + timedelta(hours=100))
     print("tout va bien", file=sys.stderr)
     return (response_data)
@@ -405,10 +424,14 @@ def updateUserInfos(request):
         user.Password = data['password']
     if 'avatar' in data and data['avatar']:#on recoit une image je l'enregistre dans le volume et stock l'url
         user.Avatar = data['avatar']
-    if 'language' in data and data['language']:
-        if data['language'] in dict(User.Language.choices):
-            user.language = data['language']
+    if 'lang' in data and data['lang']:
+        print("je passe par les langues 1", file=sys.stderr)
+        if data['lang'] in dict(User.Language.choices):
+            print("jep asse par les langues 2", file=sys.stderr)
+            user.Language = data['lang']
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
+    print("uptade de new user", file=sys.stderr)
+    print(f"username == {user.Username}, email == {user.Email}, Avatar == {user.Avatar}, langue == {user.Language}", file=sys.stderr)
     user.save()
     response_data = JsonResponse({"message": "User information updated successfully"})
     encoded_jwt = jwt.encode({"userName": user.Username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
@@ -445,11 +468,34 @@ def updateInfo(request):
     response = JsonResponse({"guestMode": "false", "username":user.Username, "Avatar":user.Avatar, "Language": user.Language})#ajouter plus tard friends et bloques + get dans le cache les defis lances ou acceptes
     return response(status=200)
 
+@csrf_exempt
 def checkCodeLog(request):
-    #recupere le code dans le json
-    #le get dans le cache la value est == a l'user
-    #recuperer l'user en bdd et renvoyer les infos au front
-    return JsonResponse()
+    try:
+        data = json.loads(request.body)
+    except Exception:
+        return HttpResponse(status=403)
+    #recoit un demande d'activation 2fa on recupere l'usser via le JWT et on lui envoie un mail contannt le code + le stocker en cache cle code value user 10 minutes
+    if 'code' in data:
+        print(f"code == {data['code']}", file=sys.stderr)
+        code = data['code']
+        username = cache.get(code)
+        cache.delete(code)
+        user = get_user_in_db("Username", username)
+        if user is None:
+            return JsonResponse({"error":"user does not exist"}, status=401)
+        expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
+        encoded_jwt = jwt.encode({"userName": user.Username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
+        response = HttpResponse(json.dumps({"guestMode": "false", 'username': user.Username, 'avatar':user.Avatar, 'language':user.Language}), content_type="application/json")
+        response.set_cookie(
+        'auth',
+        encoded_jwt,
+        httponly=True,
+        secure=True,
+        samesite='Strict',
+        expires=datetime.utcnow() + timedelta(hours=100))
+        return response
+    else:
+        return HttpResponse(status=401)    #recupere le code dans le json
 
 def checkCodeSet(request):
     #recupere le code dans le json
@@ -463,6 +509,7 @@ def set2FA(request):
 
 def generate_code(size=100):#a mettre dans les middleware
     code = []
+    #banir i l 1 0 o maj+min
     for _ in range(size):
         value = random.randint(0, 61)
         if value < 26:
@@ -473,7 +520,7 @@ def generate_code(size=100):#a mettre dans les middleware
             code.append(chr(48 + value - 52))
     return ''.join(code)
 
-
+@csrf_exempt
 def checkCodeModifyPassword(request):
     code = request.GET.get('code')
     if code:
@@ -498,30 +545,34 @@ def checkCodeModifyPassword(request):
         print('User does not exist')
         return JsonResponse({'error': 'User does not exist'}, status=404)
 
-
+@csrf_exempt
 @require_http_methods(["POST"])
 def resetPasswd(request):
+    print("jep asse par ici", file=sys.stderr)
     validationCode = generate_code()
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
+        print("je passe par erreur json", file=sys.stderr)
         return HttpResponseBadRequest({'error': 'Invalid JSON'}, status=403)
     email = ""
     if "email" not in data:
+        print("je passe par erreur email", file=sys.stderr)
         return JsonResponse({'error': 'Invalid format'}, status=403)
     email = data['email']
-    user = get_user_in_db(Email, email)
+    user = get_user_in_db('Email', email)
     if user is None:
+        print("je passe par erreur no user", file=sys.stderr)
         return JsonResponse({'error': 'User does not exist'}, status=403)
     cache.set(validationCode, user.Username,timeout=600)
-    print('User does not exist')
+    print(f'reset code == {validationCode}', file=sys.stderr)
     mailData = {
         'title': 'Transcendance Reset Password',
         'body': (
-            f'Hey {user.username},\n\n'
+            f'Hey {user.Username},\n\n'
             'It looks like you requested to reset your password. No worries, we’ve got you covered!\n\n'
             'Click the link below to set a new password:\n\n'
-            f'https://localhost:8000/resetmypassword/?code={validationCode}\n\n'
+            f'https://made-f0Ar6s5:4433/resetmypassword/?code={validationCode}\n\n'
             'This link will be good for 10 minutes, so make sure to use it before it expires. If you missed it, just request another one.\n\n'
             'If you didn’t ask for a password reset, just ignore this email – your account is safe.\n\n'
             'Got any questions? Feel free to reach out to us!\n\n'
@@ -530,8 +581,8 @@ def resetPasswd(request):
             ),
             'destinataire': email}
     response = requests.post('http://mail:8002/sendMail/', json=mailData)
+    print({'error': 'Failed to send email {}'}, file=sys.stderr)
     if response.status_code != 200:
-        print({'error': 'Failed to send email'}, file=sys.stderr)
         return JsonResponse({'error': 'Failed to send email'}, status=500)
     return JsonResponse({'message': 'Password reset email sent successfully'}, status=200)
 

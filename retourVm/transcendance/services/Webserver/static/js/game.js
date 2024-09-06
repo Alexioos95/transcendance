@@ -63,10 +63,8 @@ function	setupEventListeners(struct, data)
 		if (struct.chat.socket !== undefined)
 			struct.chat.socket.close(1000);
 		fetch("/user/disconnect/", { method: "GET", credentials: "include"})
-		.then(response => {
-			navigate("login", undefined);
-		})
-		.catch(() => console.error("Error: failed to fetch the matchMaking route"));
+			.then(() => { navigate("login", undefined) })
+			.catch(() => console.error("Error: failed to fetch the matchMaking route"));
 			// .then(() => {
 			// 	if (guestMode === true)
 			// 		window.history.pushState({ login: true, signUp: false, game: false }, null, "");
@@ -113,7 +111,7 @@ function	setupEventListeners(struct, data)
 				{
 					console.log("response /user/updateUserInfos not good; do nothing // Need to place error");
 					console.log(response.status);
-					console.log(response.json());
+					return (response.json().then(data => { console.log(data) }));
 				}
 			})
 			.catch(() => console.error("Error: failed to fetch the updateUserInfos route"));
@@ -693,7 +691,7 @@ async function waitMatchMaking(struct)
 						{
 							console.log("response /user/matchMaking not good; Wait 10s");
 							console.log(response.status);
-							console.log(response.json());
+							return (response.json().then(data => { console.log(data) }));
 						}
 					})
 					.catch(() => console.error("Error: failed to fetch the matchMaking route"));

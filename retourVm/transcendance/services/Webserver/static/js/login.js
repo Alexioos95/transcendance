@@ -51,7 +51,7 @@ function	login()
 					{
 						console.log("response /user/resetPaswd not good; do nothing // Need to place error");
 						console.log(response.status);
-						console.log(response.json());
+						return (response.json().then(data => { console.log(data) }));
 					}
 				})
 				.catch(() => console.error("Error: failed to fetch the resetPaswd route"));
@@ -70,7 +70,7 @@ function	login()
 					{
 						console.log("response /user/login not good; do nothing // Need to place error");
 						console.log(response.status);
-						console.log(response.json());
+						return (response.json().then(data => { console.log(data) }));
 					}
 				})
 				.catch(() => console.error("Error: failed to fetch the login route"));
@@ -201,7 +201,7 @@ function	signUpFunction(struct)
 				{
 					console.log("response /user/register not good; do nothing // Need to place error");
 					console.log(response.status);
-					console.log(response.json());
+					return (response.json().then(data => { console.log(data) }));
 				}
 			})
 			// .catch(() => console.error("Error: failed to fetch the register route"));

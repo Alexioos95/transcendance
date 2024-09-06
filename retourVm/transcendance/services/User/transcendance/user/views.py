@@ -84,7 +84,7 @@ def compare_bcrypt_hash(username:str, password: str) -> bool:#middleware
 @require_http_methods(["POST"])
 def register(request):#check si user est unique sinon refuser try except get?	#Set Language par default ou la récupérer du front ?
     
-    print(f"ici body == {request.body}")
+    # print(f"ici body == {request.body}")
     print(f"ici body == {request.body}", file=sys.stderr)
     data = json.loads(request.body)
     userData = {}
@@ -94,6 +94,14 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
         userData['password'] = data['password']
     if 'email' in data:
         userData['email'] = data['email']
+    if 'lang' in data:
+        userData['lang'] = data['lang']
+        missing_fields = []
+    for field in ['username', 'password', 'email', 'lang']:
+        if field not in userData or not userData[field].strip():
+            missing_fields.append(field)
+    if missing_fields:
+        return JsonResponse({'message': 'Missing or empty fields','missing_fields': missing_fields}, status=401)
     time = datetime.now()
     tz = pytz.timezone('CET')
     tzTime = tz.localize(time)
@@ -103,7 +111,7 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
         Password=generate_bcrypt_hash(userData['password']),
         lastTimeOnline=tzTime,
         pongLvl=0,
-        Language='FR',	##
+        Language=userData['lang'],	##
         tetrisLvl=0,
         twoFA=True	##	False par default ?
     )
@@ -127,29 +135,22 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
         return(response_data)
 
 
-    mailData = {
-        'title': 'Transcendance Reset Password',
-        'body': (
-            f'Hey,\n\n'
-            'It looks like you requested to reset your password. No worries, we’ve got you covered!\n\n'
-            'Click the link below to set a new password:\n\n'
-            f'https://localhost:8000/resetmypassword/?code=validationCode\n\n'
-            'This link will be good for 10 minutes, so make sure to use it before it expires. If you missed it, just request another one.\n\n'
-            'If you didn’t ask for a password reset, just ignore this email – your account is safe.\n\n'
-            'Got any questions? Feel free to reach out to us!\n\n'
-            'Cheers,\n'
-            'The Team'
-            ),
-            'destinataire': userData['email']}
-    response = requests.post('http://mail:8002/sendMail/', json=mailData)
-    print({'error': 'Failed to send email'}, file=sys.stderr)
-
-
-
-
-
-
-
+    # mailData = {
+    #     'title': 'Transcendance Reset Password',
+    #     'body': (
+    #         f'Hey,\n\n'
+    #         'It looks like you requested to reset your password. No worries, we’ve got you covered!\n\n'
+    #         'Click the link below to set a new password:\n\n'
+    #         f'https://localhost:8000/resetmypassword/?code=validationCode\n\n'
+    #         'This link will be good for 10 minutes, so make sure to use it before it expires. If you missed it, just request another one.\n\n'
+    #         'If you didn’t ask for a password reset, just ignore this email – your account is safe.\n\n'
+    #         'Got any questions? Feel free to reach out to us!\n\n'
+    #         'Cheers,\n'
+    #         'The Team'
+    #         ),
+    #         'destinataire': userData['email']}
+    # response = requests.post('http://mail:8002/sendMail/', json=mailData)
+    # print({'error': 'Failed to send email'}, file=sys.stderr)
     # user = User.objects.filter(Username__exact='h').first()
     # if user:
     #     print(f'user={user}')
@@ -160,7 +161,7 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
     #         print("Le mot de passe est invalide.")
     # Réponse JSON
 	#response_data.status = 201
-    response_data = JsonResponse({"message": "User successfully registered"}, status=201)
+    response_data = JsonResponse({"2fa": 'False', "username":new_user.Username, "Avatar":new_user.Avatar, "Language": new_user.Language}, status=201)
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes
     encoded_jwt = jwt.encode({"userName": userData['username'], "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
     response_data.set_cookie(
@@ -175,7 +176,7 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
     print("tout est ok")
     return (response_data)
 
-def decodeJwt(auth_coockie):	#Middleware
+def decodeJwt(auth_coockie):
     decodedJwt = ""
     try:
         decoded_token = jwt.decode(auth_coockie, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
@@ -476,7 +477,7 @@ def checkCodeSet(request):
     #recupere le code dans le json
     #le get dans le cache la value est == a l'user
     #recuperer l'user en bdd et changer la value 2fa par mail
-    retun JsonResponse({"message": "2fa activation success"},status=200)
+    return JsonResponse({"message": "2fa activation success"},status=200)
 
 def set2FA(request):
     #recoit un demande d'activation 2fa on recupere l'usser via le JWT et on lui envoie un mail contannt le code + le stocker en cache cle code value user 10 minutes

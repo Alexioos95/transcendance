@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-9obru)rv1$06n59&$)10eg7h8q2z!ieudka&_8w)h+)-)!#hyk'
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'made-f0Ar13s2', '*', 'made-f0Br7s18', 'made-f0Br6s19']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'made-f0Ar13s2', '*', 'made-f0Br7s18', 'made-f0Br6s19', 'made-f0Br7s19', '0.0.0.0']
 
 # Application definition
 INSTALLED_APPS = [
@@ -106,8 +106,9 @@ CSRF_TRUSTED_ORIGINS = [
     'http://paul-f4Ar5s3:8000',
     'http://bess-f2r1s14:8000',
     'http://made-f0Br7s18:8000',
-    'http://made-f0Br6s19:8000/',
-    'http://made-f0Br7s19:5500/',
+    'http://made-f0Br6s19:8000',
+    'http://made-f0Br7s19:8000',
+    'http://0.0.0.0:8000',
 ]
 
 # Static files (CSS, JavaScript, Images)

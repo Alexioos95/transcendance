@@ -47,26 +47,26 @@ function	setupEventListeners(struct, data)
 	struct.header.chatButton.addEventListener("click", function() {
 		resetPhoneClasses(struct, struct.cards.chat);
 		resetHistoryClasses(struct);
-		showTab(struct.tabs.chat, struct.tabs.friend)
+		showTab(struct.tabs.chat, struct.tabs.friend);
 	});
 	struct.header.friendButton.addEventListener("click", function() {
 		resetPhoneClasses(struct, struct.cards.chat);
 		resetHistoryClasses(struct);
-		showTab(struct.tabs.friend, struct.tabs.chat)
+		showTab(struct.tabs.friend, struct.tabs.chat);
 	});
 	struct.header.optionButton.addEventListener("click", function() {
 		resetPhoneClasses(struct, struct.cards.screen);
 		showScreen(struct.screen, struct.screen.wrapperOptions)
 	});
 	struct.header.logoutButton.addEventListener("click", function() {
-		struct.run = 0;
-		if (struct.chat.socket !== undefined)
-			struct.chat.socket.close(1000);
 		fetch("/user/disconnect/", { method: "GET", credentials: "include"})
-		.then(response => {
-			navigate("login", undefined);
-		})
-		.catch(() => console.error("Error: failed to fetch the matchMaking route"));
+			.then(() => { struct.run = 0; })
+			.then(() => {
+				if (struct.chat.socket !== undefined)
+					struct.chat.socket.close(1000);
+			})
+			.then(() => { return (navigate("login", undefined)); })
+			.catch(() => console.error("Error: failed to fetch the matchMaking route"));
 			// .then(() => {
 			// 	if (guestMode === "true")
 			// 		window.history.pushState({ login: true, signUp: false, game: false }, null, "");
@@ -74,6 +74,10 @@ function	setupEventListeners(struct, data)
 	});
 	// Cross Buttons
 	struct.options.leaveButton.addEventListener("click", function() {
+		struct.options.account.twoFA.codeInput.value = "";
+		struct.options.account.twoFA.emailInput.value = "";
+		struct.options.account.twoFA.div.classList.add("hidden");
+		struct.options.account.twoFA.secondDiv.classList.add("hidden");
 		if (struct.tournament.on === true && struct.tournament.names.length === 0)
 			showScreen(struct.screen, struct.screen.wrapperTournamentForm);
 		else
@@ -86,13 +90,23 @@ function	setupEventListeners(struct, data)
 	struct.options.lang.nl.addEventListener("click", function() { fetchTranslation(struct, "NL") });
 	// Tabs Account/Blocked
 	struct.options.account.button.addEventListener("click", function() { showTab(struct.options.account, struct.options.blocked) });
-	struct.options.account.twoFAInputs[0].addEventListener("change", function() {
-		struct.options.account.twoFADiv.classList.remove("hidden");
+	struct.options.account.twoFA.radios[0].addEventListener("change", function() {
+		struct.options.account.twoFA.codeInput.value = "";
+		struct.options.account.twoFA.emailInput.value = "";
+		struct.options.account.twoFA.wrapper.classList.add("hidden");
+		struct.options.account.twoFA.secondDiv.classList.add("hidden");
 	});
-	struct.options.account.twoFAInputs[1].addEventListener("change", function() {
-		struct.options.account.twoFADiv.classList.remove("hidden");
+	struct.options.account.twoFA.radios[1].addEventListener("change", function() { struct.options.account.twoFA.wrapper.classList.remove("hidden"); });
+	struct.options.account.twoFA.emailButton.addEventListener("click", function() {
+		// !!!!!!!!!!!!
+		struct.options.account.twoFA.secondDiv.classList.remove("hidden");
 	});
-	struct.options.account.formSubmit.addEventListener("click", function() {
+	struct.options.account.twoFA.codeButton.addEventListener("click", function() {
+		// !!!!!!!!!!!!
+	});
+	struct.options.account.formSubmit.addEventListener("click", function(event) {
+		event.preventDefault();
+
 		const data = new FormData(struct.options.account.form);
 		const obj = {
 			lang: data.get("lang"),
@@ -101,17 +115,23 @@ function	setupEventListeners(struct, data)
 			email: data.get("options-email"),
 			passwordCurr: data.get("options-password-curr"),
 			passwordNew: data.get("options-password-new"),
+			twoFA: data.get("2fa")
 		};
+
 		console.log("fetch /user/updateUserInfos");
 		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
-					console.log("response /user/updateUserInfos ok; do nothing // Need to place success");
+				{
+					struct.options.account.error.classList.remove("error");
+					struct.options.account.error.classList.add("success");
+					struct.options.account.error.innerHTML = "SUCCESS";
+				}
 				else
 				{
-					console.log("response /user/updateUserInfos not good; do nothing // Need to place error");
-					console.log(response.status);
-					console.log(response.json());
+					struct.options.account.error.classList.remove("success");
+					struct.options.account.error.classList.add("error");
+					struct.options.account.error.innerHTML = "YIKES";
 				}
 			})
 			.catch(() => console.error("Error: failed to fetch the updateUserInfos route"));
@@ -132,7 +152,7 @@ function	setupEventListeners(struct, data)
 
 function	liveChat(struct)
 {
-	struct.chat.socket = new WebSocket("wss://localhost:433/ws/chat/");
+	struct.chat.socket = new WebSocket("wss://localhost:443/ws/chat/");
 	struct.chat.socket.addEventListener("error", function() {
 		const tr = document.querySelectorAll(".tab-chat tr");
 		const buttons = document.querySelector(".tab-chat button");
@@ -212,6 +232,7 @@ function	replaceDatas(struct, data)
 		struct.options.lang.en.click();
 	else if (data.lang === "NL")
 		struct.options.lang.nl.click();
+	struct.options.lang.curr = data.lang;
 	if (data.guestMode === "true")
 		setGuestRestrictions(struct, data);
 	else
@@ -500,7 +521,7 @@ function	getTournamentStruct()
 		players: document.getElementsByClassName("tournament-player"),
 		winners: document.getElementsByClassName("tournament-winner"),
 		markers: document.getElementsByClassName("tournament-marker"),
-		markerArray: [[0, 2, 3], [1, 2, 3], [4, 0, 3], [4, 1, 3], [4, 4, 0], [4, 4, 1], [4, 4, 4]], // 0 = WAITING, 1 = ONGOING, 2 = NEXT, 3 = SOON, 4 = "" (Finished);
+		markerArray: [[0, 2, 3], [1, 2, 3], [4, 0, 3], [4, 1, 3], [4, 4, 0], [4, 4, 1], [4, 4, 4]],
 		markerArrayStringsFR: ["EN ATTENTE", "EN COURS", "SUIVANT", "PROCHAINEMENT", ""],
 		markerArrayStringsEN: ["WAITING", "ONGOING", "NEXT", "SOON", ""],
 		markerArrayStringsNL: ["WACHTEND", "DOORLOPEND", "VOLGENDE", "BINNENKORT", ""],
@@ -514,13 +535,24 @@ function	getOptionsStruct()
 {
 	const buttons = document.querySelectorAll(".wrapper-options-buttons button");
 	const labels = document.getElementsByClassName("lang-label");
+	const twoFAInputs = document.querySelectorAll(".twofa-set-div div input");
+	const twoFAButtons = document.querySelectorAll(".twofa-set-div div button");
 
+	const twoFAStruct = {
+		radios: document.querySelectorAll(".twofa-label input"),
+		wrapper: document.getElementsByClassName("twofa-set-div")[0],
+		emailInput: twoFAInputs[0],
+		emailButton: twoFAButtons[0],
+		secondDiv: document.querySelectorAll(".twofa-set-div div")[1],
+		codeInput: twoFAButtons[1],
+		codeButton: twoFAButtons[1],
+	};
 	const accountStruct = {
 		button: buttons[0],
 		table: document.getElementsByClassName("wrapper-options-forms")[0],
 		form: document.getElementsByClassName("options-form")[0],
-		twoFAInputs: document.querySelectorAll(".twofa-label input"),
-		twoFADiv: document.getElementsByClassName("twofa-set-div")[0],
+		twoFA: twoFAStruct,
+		error: document.getElementsByClassName("error-update")[0],
 		formSubmit: document.getElementsByClassName("options-save")[0]
 	};
 	const blockedStruct = {

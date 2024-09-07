@@ -11,7 +11,7 @@ async function	checkJWT()
 			if (response.ok)
 				return (response.json().then(data => { data.guestMode = "false"; navigate("game", data); }));
 			else
-				navigate("login", undefined);
+				return (navigate("login", undefined));
 		})
 		.catch(() => console.error("Error: failed to fetch the checkJwt route"))
 }

@@ -71,7 +71,7 @@ function	handleSignUp(struct)
 				if (response.status === 201)
 					return (response.json().then(data => { navigate("game", data); }));
 				else
-					response.json().then(data => { console.log(data); struct.errorRegister.innerHTML = data.e; });
+					response.json().then(data => { console.log(data); struct.error.register.innerHTML = data.error; });
 			})
 			.catch(() => console.error("Error: failed to fetch the register route"));
 	}
@@ -84,6 +84,7 @@ function	handleSignUp(struct)
 
 function	cancelSignUp(struct)
 {
+	struct.error.register.innerHTML = "";
 	struct.formInput.username.classList.add("hidden");
 	struct.formButton.cancelSignUp.classList.add("hideInFade");
 	struct.formButton.connection.classList.remove("hidden");
@@ -124,11 +125,11 @@ function	handleConnection(struct)
 			.then(response => {
 				if (response.ok)
 				{
-					struct.errorLogin.innerHTML = "";
+					struct.error.login.innerHTML = "";
 					return (response.json().then(data => { call2FA(struct, data) }));
 				}
 				else
-					response.json().then(data => { console.log(data); struct.errorLogin.innerHTML = data.e; });
+					response.json().then(data => { console.log(data); struct.error.login.innerHTML = data.error; });
 			})
 			.catch(() => console.error("Error: failed to fetch the login route"));
 	}
@@ -165,7 +166,7 @@ async function waitCode(struct)
 				if (response.ok)
 					return (response.json().then(data => { navigate("game", data) }));
 				else
-					response.json().then(data => { struct.errors.twoFA.innerHTML = data.e; });
+					response.json().then(data => { struct.error.twoFA.innerHTML = data.error; });
 			})
 			.catch(() => console.error("Error: failed to fetch the log2fa route"));
 		});
@@ -205,6 +206,7 @@ function	showConnection(struct)
 
 function	showRecovery(struct)
 {
+	struct.error.login.innerHTML = "";
 	struct.formButton.signUp.disabled = true;
 	struct.formInput.password.ariaHidden = "false";
 	struct.formInput.password.classList.add("hideInFade");
@@ -233,6 +235,7 @@ function	showRecovery(struct)
 
 function	showSignUpForm(struct)
 {
+	struct.error.login.innerHTML = "";
 	struct.formInput.username.classList.remove("hidden");
 	struct.formButton.connection.classList.add("hidden");
 	struct.formButton.forgotPassword.classList.add("hidden");
@@ -293,7 +296,7 @@ function	getLoginStruct()
 		placeholder: document.getElementsByClassName("translate-pholder"),
 		ariaLabel: document.getElementsByClassName("translate-aria-label"),
 	};
-	const errorsStruct = {
+	const errorStruct = {
 		login: document.getElementsByClassName("error-login")[0],
 		twoFA: document.getElementsByClassName("error-2fa")[0],
 		register: document.getElementsByClassName("error-register")[0]
@@ -305,7 +308,7 @@ function	getLoginStruct()
 		guestConnection: document.getElementsByClassName("special-login-guest")[0],
 		langSelect: document.getElementsByTagName("select")[0],
 		translate: translateStruct,
-		errors: errorsStruct
+		error: errorStruct
 	};
 	return (struct);
 }

@@ -221,19 +221,20 @@
 											<input type="radio" name="2fa" value="email">
 											<span class="translate-txt">Email</span>
 										</label>
-										<div class="twofa-set-div hidden">
-											<div>
-												<input type="email" name="2fa-mail">
-												<button type="button">Activer</button>
-											</div>
-											<div>
-												<input name="2fa" type="text" minlength="8" maxlength="8" placeholder="Code reçu">
-												<button type="submit" class="w-100 py-2 mb-1 text-break translate-text">Valider</button>
-											</div>
+									</div>
+									<div class="twofa-set-div hidden">
+										<div>
+											<input type="email" name="2fa-mail" placeholder="Email">
+											<button type="button">Envoyer</button>
+										</div>
+										<div class="hidden">
+											<input name="2fa" type="text" minlength="8" maxlength="8" placeholder="Code reçu">
+											<button type="button">Activer</button>
 										</div>
 									</div>
 								</div>
-								<button class="options-save translate-txt" type="button">Sauvegarder</button>
+								<p class="error error-update"></p>
+								<button class="options-save translate-txt" type="submit">Sauvegarder</button>
 							</form>
 						</div>
 						<table class="wrapper-blocked">

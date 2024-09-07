@@ -110,7 +110,13 @@ button:focus:not(:focus-visible) {
 	padding: 3%;
 }
 
+.success {
+	text-align: center;
+	color: #32CD32;
+}
+
 .error {
+	text-align: center;
 	color: #FF6347;
 }
 
@@ -1012,6 +1018,32 @@ canvas.pong {
 	width: auto;
 	height: auto;
 	opacity: 1;
+}
+
+.wrapper-options-forms .twofa-set-div {
+	display: flex;
+	flex-direction: column;
+}
+
+.wrapper-options-forms .twofa-set-div div {
+	width: 100%;
+	padding-left: 1.4rem;
+	margin-bottom: 0.5rem;
+}
+
+.wrapper-options-forms .twofa-set-div input {
+	width: 45%;
+	padding: 2px;
+	margin-left: 1.4rem;
+	margin-bottom: 0.5rem;
+	border: 2px solid white;
+}
+
+.wrapper-options-forms .twofa-set-div button {
+	width: 15%;
+	padding: 2px 0;
+	margin: 0;
+	border-radius: 0;
 }
 
 .wrapper-options-forms button {

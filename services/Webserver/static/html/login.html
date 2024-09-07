@@ -3,7 +3,7 @@
 		<div class="w-100 h-100 px-3 py-5 d-flex flex-column justify-content-between align-items-center overflow-auto">
 			<form method="POST" class="w-100 form-group text-center d-flex flex-column" autocomplete="on">
 				<h1 class="text-center mb-5 font-weight-bolder text-break">ft_transcendance</h1>
-				<input name="email" type="email" class="form-control border-top-0 border-left-0 border-right-0 border-bottom border-light rounded-0 form-group translate-pholder translate-aria-label" placeholder="Email" aria-label="Email">
+				<input name="email" type="email" class="form-control border-top-0 border-left-0 border-right-0 border-bottom border-light rounded-0 form-group email translate-pholder translate-aria-label" placeholder="Email" aria-label="Email">
 				<div class="position-relative">
 					<input name="password" type="password" minlength="10" class="form-control pr-5 border-top-0 border-left-0 border-right-0 border-bottom border-light rounded-0 form-group password translate-pholder translate-aria-label" placeholder="Mot de passe" aria-label="Mot de passe">
 					<button type="button" class="position-absolute border-0 show-password">
@@ -11,13 +11,16 @@
 					</button>
 				</div>
 				<input name="username" type="text" minlength="1" maxlength="30" class="form-control border-top-0 border-left-0 border-right-0 border-bottom border-light rounded-0 form-group username hidden translate-pholder translate-aria-label" placeholder="Nom d'utilisateur" aria-label="Nom d'utilisateur">
-				<button type="button" class="w-100 py-2 mb-1 text-break submit translate-text">Connexion</button>
+				<p class="error error-login"></p>
+				<button type="submit" class="w-100 py-2 mb-1 text-break submit translate-text">Connexion</button>
 				<button type="button" class="mx-auto border-0 forgot-password translate-text translate-aria-label" aria-label="Mot de passe oublie">Mot de passe oublié</button>
+				<p class="error error-register"></p>
 				<button type="button" class="mx-auto mt-2 signup translate-text translate-aria-label" aria-label="Inscription">Inscription</button>
 				<button type="button" class="mx-auto mt-2 cancel-signup hideInFade translate-text translate-aria-label" aria-label="Annuler">Annuler</button>
-				<div class="hidden div-2fa">
-					<input name="2fa" type="text" minlength="8" maxlength="8">
-					<button type="button">Connexion</button>
+				<div class="div-2fa hidden">
+					<p class="error error-twofa"></p>
+					<input name="2fa" type="text" minlength="8" maxlength="8" placeholder="Code reçu" class="form-control border-top-0 border-left-0 border-right-0 border-bottom border-light rounded-0 form-group translate-pholder translate-aria-label" aria-label="Code reçu">
+					<button type="submit" class="w-100 py-2 mb-1 text-break translate-text">Valider</button>
 				</div>
 			</form>
 			<div class="w-100 text-center">

@@ -110,6 +110,10 @@ button:focus:not(:focus-visible) {
 	padding: 3%;
 }
 
+.error {
+	color: #FF6347;
+}
+
 .hover-green:hover, .hover-green:focus-visible {
 	color: #32CD32;
 }

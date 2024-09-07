@@ -86,6 +86,12 @@ function	setupEventListeners(struct, data)
 	struct.options.lang.nl.addEventListener("click", function() { fetchTranslation(struct, "NL") });
 	// Tabs Account/Blocked
 	struct.options.account.button.addEventListener("click", function() { showTab(struct.options.account, struct.options.blocked) });
+	struct.options.account.twoFAInputs[0].addEventListener("change", function() {
+		struct.options.account.twoFADiv.classList.remove("hidden");
+	});
+	struct.options.account.twoFAInputs[1].addEventListener("change", function() {
+		struct.options.account.twoFADiv.classList.remove("hidden");
+	});
 	struct.options.account.formSubmit.addEventListener("click", function() {
 		const data = new FormData(struct.options.account.form);
 		const obj = {
@@ -93,17 +99,9 @@ function	setupEventListeners(struct, data)
 			avatar: data.get("avatar"),
 			username: data.get("options-username"),
 			email: data.get("options-email"),
-			passwordCurr: data.get("options-password-actual"),
+			passwordCurr: data.get("options-password-curr"),
 			passwordNew: data.get("options-password-new"),
-			passwordConf: data.get("options-password-confirmation")
 		};
-
-		// if (obj.passwordNew !== obj.passwordConf)
-		// {
-			// Place error
-			// console.log("Passwords do not match");
-			// return ;
-		// }
 		console.log("fetch /user/updateUserInfos");
 		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
@@ -134,7 +132,7 @@ function	setupEventListeners(struct, data)
 
 function	liveChat(struct)
 {
-	struct.chat.socket = new WebSocket("wss://made-f0Ar6s5:4433/ws/chat/");
+	struct.chat.socket = new WebSocket("wss://localhost:433/ws/chat/");
 	struct.chat.socket.addEventListener("error", function() {
 		const tr = document.querySelectorAll(".tab-chat tr");
 		const buttons = document.querySelector(".tab-chat button");
@@ -222,10 +220,11 @@ function	replaceDatas(struct, data)
 		const username = document.querySelector(".nav-user span");
 		const inputs = document.querySelectorAll(".options-wrapper-connection input");
 
-		avatar.src = data.avatar;
+		if (avatar.src != "")
+			avatar.src = data.avatar;
 		username.innerHTML = data.username;
-		inputs[0].innerHTML = data.username;
-		inputs[1].innerHTML = data.email;
+		inputs[0].value = data.username;
+		inputs[1].value = data.email;
 	}
 }
 
@@ -401,7 +400,7 @@ async function	setGuestRestrictions(struct)
 	else if (struct.options.lang.curr === "NL")
 		username.innerHTML = "Gast";
 	avatar.src = "/images/default_avatar.png";
-	inputs[3].disabled = true;
+	inputs[2].disabled = true;
 	historyIcon.classList.add("hidden");
 	for (let i = 0; i < 3; i++)
 		hideForGuest[i].classList.add("hidden");
@@ -520,6 +519,8 @@ function	getOptionsStruct()
 		button: buttons[0],
 		table: document.getElementsByClassName("wrapper-options-forms")[0],
 		form: document.getElementsByClassName("options-form")[0],
+		twoFAInputs: document.querySelectorAll(".twofa-label input"),
+		twoFADiv: document.getElementsByClassName("twofa-set-div")[0],
 		formSubmit: document.getElementsByClassName("options-save")[0]
 	};
 	const blockedStruct = {
@@ -705,6 +706,8 @@ async function waitMatchMaking(struct)
 
 async function	waitGoButton(struct)
 {
+	if (struct.screen.game.online === true)
+		return ;
 	return new Promise((resolve, reject) => {
 		const button = document.createElement("button");
 		const controls = document.getElementsByClassName("wrapper-bottom-section")[0];

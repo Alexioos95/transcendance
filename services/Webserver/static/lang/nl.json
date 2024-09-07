@@ -5,13 +5,15 @@
 			"forgotten": "Paswoord vergeten",
 			"signup": "Inschrijven",
 			"cancel": "Annuleren",
+			"validate": "Validate",
 			"continue-42": "Doorgaan met 42",
 			"continue-guest": "Doorgaan als Gast"
 		},
 		"placeholder": {
 			"email": "Email",
 			"password": "Paswoord",
-			"username": "Gebruikersnaam"
+			"username": "Gebruikersnaam",
+			"code": "Code received"
 		},
 		"ariaLabel": {
 			"email": "Email",
@@ -20,6 +22,7 @@
 			"forgottenPassword": "Paswoord vergeten",
 			"signup": "Inschrijven",
 			"cancel": "Annuleren",
+			"code": "Code received",
 			"continue-42": "Inloggen met 42",
 			"continue-guest": "Spelen zonder zich aan te melden"
 		}
@@ -30,7 +33,6 @@
 		"logout": "Afmelden",
 		"game": "Spel",
 		"mode": "Mode",
-		"ai": "1vAI",
 		"local": "Locaal 1v1",
 		"tournament": "Locaal 4-spelers toernooi",
 		"online": "Online 1v1",
@@ -47,11 +49,10 @@
 		"changeUsername": "Gebruikersnaam:",
 		"changeEmail": "Email:",
 		"changePassword": "Paswoord:",
-		"save": "Opslaan",
 		"2fa": "2-factor-authenticatie",
 		"2fa-off": "Uitgeschakeld",
 		"2fa-email": "Email",
-		"2fa-app": "QRCode Applicatie",
+		"save": "Opslaan",
 		"unblock": "Deblokkeren",
 		"chat": "Chat",
 		"friend": "Vrienden",
@@ -62,9 +63,8 @@
 		"p2": "Speler 2",
 		"p3": "Speler 3",
 		"p4": "Speler 4",
-		"passwordActual": "Huidige",
-		"passwordNew": "Nieuw",
-		"passwordConfirmation": "Bevestiging"
+		"passwordCurr": "Huidige",
+		"passwordNew": "Nieuw"
 	},
 	"title": {
 		"me": "Zie mijn historie",
@@ -77,7 +77,6 @@
 	"ariaLabel": {
 		"chooseGame": "Kies het spel: Pong of Tetris",
 		"mode": "Kies het spel mode: ",
-		"1vAI": "Speler tegen computer",
 		"1v1": "Speler tegen tegen locaal speler",
 		"tournament": "Locaal 4-speler toernooi",
 		"online": "Online spelen tegen een andere speler",

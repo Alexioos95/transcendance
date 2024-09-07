@@ -69,15 +69,6 @@
 					<div class="wrapper-mode-selectors">
 						<h3 class="translate-txt translate-aria-label" aria-label="Choisissez le mode de jeu: ">Mode</h3>
 						<div class="wrapper-mode-selector">
-							<label class="mode-selector">
-								<input disabled class="translate-aria-label" type="radio" name="mode" value="1vAI" aria-label="Joueur contre Ordinateur">
-								<span class="wrapper-circle">
-									<span class="base-circle">
-										<span class="top-circle"></span>
-									</span>
-								</span>
-								<span class="mode-text translate-txt">1vIA</span>
-							</label>
 							<label class="mode-selector translate-title">
 								<input class="translate-aria-label" type="radio" name="mode" value="1v1" aria-label="Joueur contre Joueur en local">
 								<span class="wrapper-circle">
@@ -211,35 +202,38 @@
 										<div class="options-wrapper-password">
 											<span class="translate-txt">Mot de passe:</span>
 											<label>
-												<input class="translate-pholder" type="password" name="options-password-actual" placeholder="Actuel">
+												<input class="translate-pholder" type="password" name="options-password-curr" placeholder="Actuel">
 											</label>
 											<label>
 												<input class="translate-pholder" type="password" name="options-password-new" placeholder="Nouveau">
 											</label>
-											<label>
-												<input class="translate-pholder" type="password" name="options-password-confirmation" placeholder="Confirmation">
-											</label>
+										</div>
+									</div>
+								</div>
+								<div class="options-section">
+									<h4 class="translate-txt">Authentification à deux facteurs</h4>
+									<div class="options-wrapper-2fa">
+										<label class="twofa-label">
+											<input type="radio" name="2fa" value="off">
+											<span class="translate-txt">Désactiver</span>
+										</label>
+										<label class="twofa-label">
+											<input type="radio" name="2fa" value="email">
+											<span class="translate-txt">Email</span>
+										</label>
+										<div class="twofa-set-div hidden">
+											<div>
+												<input type="email" name="2fa-mail">
+												<button type="button">Activer</button>
+											</div>
+											<div>
+												<input name="2fa" type="text" minlength="8" maxlength="8" placeholder="Code reçu">
+												<button type="submit" class="w-100 py-2 mb-1 text-break translate-text">Valider</button>
+											</div>
 										</div>
 									</div>
 								</div>
 								<button class="options-save translate-txt" type="button">Sauvegarder</button>
-								<div class="options-section">
-									<h4 class="translate-txt">Authentification à deux facteurs</h4>
-									<div class="options-wrapper-2fa">
-										<label class="2fa-label">
-											<input type="radio" name="2fa" value="off" checked>
-											<span class="translate-txt">Désactiver</span>
-										</label>
-										<label class="2fa-label">
-											<input type="radio" name="2fa" value="email">
-											<span class="translate-txt">Email</span>
-										</label>
-										<label class="2fa-label">
-											<input type="radio" name="2fa" value="app">
-											<span class="translate-txt">Application à QRCode</span>
-										</label>
-									</div>
-								</div>
 							</form>
 						</div>
 						<table class="wrapper-blocked">

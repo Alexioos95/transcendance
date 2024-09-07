@@ -9,19 +9,11 @@ async function	checkJWT()
 	await fetch("/user/checkJwt/")
 		.then(response => {
 			if (response.ok)
-			{
-				console.log("response /user/checkJwt ok; navigate to Game");
-				return (response.json().then(data => { navigate("game", data); }));
-			}
+				return (response.json().then(data => { data.guestMode = "false"; navigate("game", data); }));
 			else
-			{
-				console.log("response /user/checkJwt not good; navigate to login");
-				console.log("response.status=", response.status);
-				console.log("response.text=", response.text());
 				navigate("login", undefined);
-			}
 		})
-		// .catch(() => console.error("Error: failed to fetch the checkJwt route"))
+		.catch(() => console.error("Error: failed to fetch the checkJwt route"))
 }
 
 // window.onpopstate = function(event) {
@@ -49,14 +41,11 @@ async function navigate(page, data)
 	await fetch("/html/" + page + ".html")
 		.then(response => response.text())
 		.then(html => { container.innerHTML = html; })
-		.then(() => { launchPageScript(page, data) })
+		.then(() => {
+			if (page === "game")
+				run(data);
+			else if (page === "login")
+				login();
+		})
 		.catch(() => Promise.reject("Error: couldn't fetch the page"))
-}
-
-async function	launchPageScript(page, data)
-{
-	if (page === "game")
-		run(data);
-	else if (page === "login")
-		login();
 }

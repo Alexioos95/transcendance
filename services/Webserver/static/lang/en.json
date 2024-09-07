@@ -5,13 +5,15 @@
 			"forgotten": "Forgotten password",
 			"signup": "Sign up",
 			"cancel": "Cancel",
+			"validate": "Validate",
 			"continue-42": "Continue with 42",
 			"continue-guest": "Continue as Guest"
 		},
 		"placeholder": {
 			"email": "Email",
 			"password": "Password",
-			"username": "Username"
+			"username": "Username",
+			"code": "Code received"
 		},
 		"ariaLabel": {
 			"email": "Email",
@@ -20,6 +22,7 @@
 			"forgottenPassword": "Forgotten password",
 			"signup": "Sign up",
 			"cancel": "Cancel",
+			"code": "Code received",
 			"continue-42": "Sign in avec 42",
 			"continue-guest": "Playing without signing in"
 		}
@@ -30,7 +33,6 @@
 		"logout": "Logout",
 		"game": "Game",
 		"mode": "Mode",
-		"ai": "1vAI",
 		"local": "Local 1v1",
 		"tournament": "Local 4-player tournament",
 		"online": "Online 1v1",
@@ -47,11 +49,10 @@
 		"changeUsername": "Username:",
 		"changeEmail": "Email:",
 		"changePassword": "Password:",
-		"save": "Save",
 		"2fa": "2-factor Authentication",
 		"2fa-off": "Disabled",
 		"2fa-email": "Email",
-		"2fa-app": "QRCode Application",
+		"save": "Save",
 		"unblock": "Unblock",
 		"chat": "Chat",
 		"friend": "Friends",
@@ -62,9 +63,8 @@
 		"p2": "Player 2",
 		"p3": "Player 3",
 		"p4": "Player 4",
-		"passwordActual": "Current",
-		"passwordNew": "New",
-		"passwordConfirmation": "Confirmation"
+		"passwordCurr": "Current",
+		"passwordNew": "New"
 	},
 	"title": {
 		"me": "See my history",
@@ -77,7 +77,6 @@
 	"ariaLabel": {
 		"chooseGame": "Choose the game: Pong or Tetris",
 		"mode": "Choose the gamemode: ",
-		"1vAI": "Player against computer",
 		"1v1": "Local player against player",
 		"tournament": "Local 4-player tournament",
 		"online": "Online player against player",

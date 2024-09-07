@@ -5,13 +5,15 @@
 			"forgotten": "Mot de passe oublié",
 			"signup": "Inscription",
 			"cancel": "Annuler",
+			"validate": "Valider",
 			"continue-42": "Continuer avec 42",
 			"continue-guest": "Continuer en tant qu'Invite"
 		},
 		"placeholder": {
 			"email": "Email",
 			"password": "Mot de passe",
-			"username": "Nom d'utilisateur"
+			"username": "Nom d'utilisateur",
+			"code": "Code reçu"
 		},
 		"ariaLabel": {
 			"email": "Email",
@@ -20,6 +22,7 @@
 			"forgottenPassword": "Mot de passe oublié",
 			"signup": "Inscription",
 			"cancel": "Annuler",
+			"code": "Code reçu",
 			"continue-42": "Connexion avec 42",
 			"continue-guest": "Jouer sans se connecter"
 		}
@@ -30,7 +33,6 @@
 		"logout": "Se déconnecter",
 		"game": "Jeu",
 		"mode": "Mode",
-		"ai": "1vIA",
 		"local": "1v1 local",
 		"tournament": "Tournoi local a 4",
 		"online": "1v1 en ligne",
@@ -47,11 +49,10 @@
 		"changeUsername": "Nom d'utilisateur:",
 		"changeEmail": "Email:",
 		"changePassword": "Mot de passe:",
-		"save": "Sauvegarder",
 		"2fa": "Authentification à deux facteurs",
 		"2fa-off": "Désactivé",
 		"2fa-email": "Email",
-		"2fa-app": "Application à QRCode",
+		"save": "Sauvegarder",
 		"unblock": "Débloquer",
 		"chat": "Chat",
 		"friend": "Amis",
@@ -62,9 +63,8 @@
 		"p2": "Joueur 2",
 		"p3": "Joueur 3",
 		"p4": "Joueur 4",
-		"passwordActual": "Actuel",
-		"passwordNew": "Nouveau",
-		"passwordConfirmation": "Confirmation"
+		"passwordCurr": "Actuel",
+		"passwordNew": "Nouveau"
 	},
 	"title": {
 		"me": "Voir mon historique",
@@ -77,7 +77,6 @@
 	"ariaLabel": {
 		"chooseGame": "Choisissez le jeu: Pong ou Tetris",
 		"mode": "Choisissez le mode de jeu: ",
-		"1vAI": "Joueur contre Ordinateur",
 		"1v1": "Joueur contre Joueur en local",
 		"tournament": "Tournoi a 4 joueurs en local",
 		"online": "Joueur contre Joueur en ligne",

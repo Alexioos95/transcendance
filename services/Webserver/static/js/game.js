@@ -65,12 +65,8 @@ function	setupEventListeners(struct, data)
 				if (struct.chat.socket !== undefined)
 					struct.chat.socket.close(1000);
 			})
-			.then(() => { return (navigate("login", undefined)); })
+			.then(() => { return (navigate("login", undefined, { signUp: "false", lang: data.lang }))})
 			.catch(() => console.error("Error: failed to fetch the matchMaking route"));
-			// .then(() => {
-			// 	if (guestMode === "true")
-			// 		window.history.pushState({ login: true, signUp: false, game: false }, null, "");
-			// })
 	});
 	// Cross Buttons
 	struct.options.leaveButton.addEventListener("click", function() {
@@ -636,7 +632,6 @@ function	getTranslationStruct()
 //////////////////////////////////////////////////////
 // Menu (Game selector's form; Tournament Overview)
 //////////////////////////////////////////////////////
-
 async function waitCoin(struct) {
 	return new Promise((resolve, reject) => {
 		function handleClick() { resolve(); }

@@ -3,38 +3,44 @@
 // Script
 /////////////////////////
 checkJWT();
+popState();
 
 async function	checkJWT()
 {
 	await fetch("/user/checkJwt/")
 		.then(response => {
 			if (response.ok)
-				return (response.json().then(data => { data.guestMode = "false"; navigate("game", data); }));
+				return (response.json().then(data => { data.guestMode = "false"; navigate("game", data,  { signUp: "false", lang: "FR" })}));
 			else
-				return (navigate("login", undefined));
+			{
+				history.replaceState({ state: "login", lang: "FR" }, "", "");
+				return (navigate("login", undefined,  { signUp: "false", lang: "FR" }));
+			}
 		})
-		.catch(() => console.error("Error: failed to fetch the checkJwt route"))
+		.catch(() => console.error("Error: failed to fetch the checkJwt route"));
 }
 
-// window.onpopstate = function(event) {
-// 	if (event.state)
-// 	{
-// 		if (event.state.login === true)
-// 		{
-// 			navigate("login")
-// 				.then(() => launchPageScript("login", false, event.state.signUp))
-// 				.catch((e) => console.log(e));
-// 		}
-// 		else if (event.state.game === true)
-// 		{
-// 			navigate("game")
-// 				.then(() => launchPageScript("game", true, false))
-// 				.catch((e) => console.log(e));
-// 		}
-// 	}
-// };
+async function popState()
+{
+	window.addEventListener("popstate", function(event) {
+		if (event.state)
+		{
+			const data = event.state;
 
-async function navigate(page, data)
+			if (data.state === "login")
+				navigate("login", undefined, { signUp: "false", lang: data.lang })
+			else if (data.state === "signUp")
+				navigate("login", undefined, { signUp: "true", lang: data.lang })
+			else if (data.state === "guestMode")
+			{
+				const data = { guestMode: "true", lang: data.lang };
+				navigate("game", data, { signUp: "false", lang: data.lang });
+			}
+		}
+	});
+}
+
+async function navigate(page, data, infos)
 {
 	const container = document.getElementsByTagName("body")[0];
 
@@ -45,7 +51,7 @@ async function navigate(page, data)
 			if (page === "game")
 				run(data);
 			else if (page === "login")
-				login();
+				login(infos);
 		})
 		.catch(() => Promise.reject("Error: couldn't fetch the page"))
 }

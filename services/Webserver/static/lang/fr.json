@@ -52,6 +52,8 @@
 		"2fa": "Authentification à deux facteurs",
 		"2fa-off": "Désactivé",
 		"2fa-email": "Email",
+		"send": "Envoyer",
+		"activate": "Activer",
 		"save": "Sauvegarder",
 		"unblock": "Débloquer",
 		"chat": "Chat",
@@ -64,7 +66,9 @@
 		"p3": "Joueur 3",
 		"p4": "Joueur 4",
 		"passwordCurr": "Actuel",
-		"passwordNew": "Nouveau"
+		"passwordNew": "Nouveau",
+		"email": "Email",
+		"code": "Code reçu"
 	},
 	"title": {
 		"me": "Voir mon historique",
@@ -85,7 +89,8 @@
 		"pseudo2": "Pseudonyme du joueur 2",
 		"pseudo3": "Pseudonyme du joueur 3",
 		"pseudo4": "Pseudonyme du joueur 4",
-		"validate": "Valider"
+		"email": "Email",
+		"code": "Code reçu"
 	},
 	"tabOptions": {
 		"addFriend": "Ajouter en ami",

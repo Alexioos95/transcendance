@@ -2,7 +2,7 @@
 /////////////////////////
 // Script
 /////////////////////////
-function	login()
+function	login(prevData)
 {
 	const struct = getLoginStruct();
 
@@ -37,19 +37,26 @@ function	login()
 	struct.formButton.signUp.addEventListener("click", function() { handleSignUp(struct) });
 	struct.formButton.cancelSignUp.addEventListener("click", function() {
 		cancelSignUp(struct);
-		// window.history.back();
+		window.history.pushState({ state: "login", lang: struct.langSelect.value }, "", "");
 	});
 	struct.guestConnection.addEventListener("click", function() {
-		navigate("game", { guestMode: "true", lang: struct.langSelect.value } )
-			// .then(() => window.history.pushState({ login: false, signUp: false, game: true }, null, ""))
+		navigate("game", { guestMode: "true", lang: struct.langSelect.value }, { signUp: "false", lang: struct.langSelect.value });
+		window.history.pushState({ state: "guestMode", lang: struct.langSelect.value }, "", "");
 	});
 	struct.langSelect.addEventListener("change", function(event) {
 		fetch("/lang/" + event.target.value + ".json")
 			.then(response => response.json())
 			.then(result => { translateLoginPage(struct, result); })
 	});
-	// if (signUpMode !== undefined && signUpMode === true)
-	// 	showSignUpForm(struct);
+	if (prevData)
+	{
+		fetch("/lang/" + prevData.lang + ".json")
+			.then(response => response.json())
+			.then(result => { translateLoginPage(struct, result); })
+			.then(() => { struct.langSelect.value = prevData.lang; });
+		if (prevData.signUp === "true")
+			showSignUpForm(struct);
+	}
 }
 
 /////////////////////////
@@ -69,7 +76,7 @@ function	handleSignUp(struct)
 		fetch("/user/register/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.status === 201)
-					return (response.json().then(data => { navigate("game", data); }));
+					return (response.json().then(data => { navigate("game", data, { signUp: "false", lang: struct.langSelect.value }); }));
 				else
 					response.json().then(data => { console.log(data); struct.error.register.innerHTML = data.error; });
 			})
@@ -78,7 +85,7 @@ function	handleSignUp(struct)
 	else
 	{
 		showSignUpForm(struct);
-		// window.history.pushState({ login: true, signUp: true, game: false }, null, "");
+		window.history.pushState({ state: "signUp", lang: struct.langSelect.value }, "", "");
 	}
 }
 
@@ -138,7 +145,7 @@ function	handleConnection(struct)
 async function call2FA(struct, data)
 {
 	if (data.twoFA === "false")
-		return (navigate("game", data));
+		return (navigate("game", data, { signUp: "false", lang: struct.langSelect.value }));
 	const div = document.getElementsByClassName("div-2fa")[0];
 
 	struct.formInput.username.classList.add("hidden");
@@ -164,7 +171,7 @@ async function waitCode(struct)
 			fetch("/user/log2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
-					return (response.json().then(data => { navigate("game", data) }));
+					return (response.json().then(data => { navigate("game", data, { signUp: "false", lang: struct.langSelect.value })}));
 				else
 					response.json().then(data => { struct.error.twoFA.innerHTML = data.error; });
 			})

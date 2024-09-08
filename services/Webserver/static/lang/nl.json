@@ -52,6 +52,8 @@
 		"2fa": "2-factor-authenticatie",
 		"2fa-off": "Uitgeschakeld",
 		"2fa-email": "Email",
+		"send": "Send",
+		"activate": "Activate",
 		"save": "Opslaan",
 		"unblock": "Deblokkeren",
 		"chat": "Chat",
@@ -64,7 +66,9 @@
 		"p3": "Speler 3",
 		"p4": "Speler 4",
 		"passwordCurr": "Huidige",
-		"passwordNew": "Nieuw"
+		"passwordNew": "Nieuw",
+		"email": "Email",
+		"code": "Code received"
 	},
 	"title": {
 		"me": "Zie mijn historie",
@@ -85,7 +89,8 @@
 		"pseudo2": "Bijnaam of speler 2",
 		"pseudo3": "Bijnaam of speler 3",
 		"pseudo4": "Bijnaam of speler 4",
-		"validate": "Bevestigen"
+		"email": "Email",
+		"code": "Code received"
 	},
 	"tabOptions": {
 		"addFriend": "Aan vriendenlijst toevoegen",

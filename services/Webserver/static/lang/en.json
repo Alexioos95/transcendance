@@ -52,6 +52,8 @@
 		"2fa": "2-factor Authentication",
 		"2fa-off": "Disabled",
 		"2fa-email": "Email",
+		"send": "Send",
+		"activate": "Activate",
 		"save": "Save",
 		"unblock": "Unblock",
 		"chat": "Chat",
@@ -64,7 +66,9 @@
 		"p3": "Player 3",
 		"p4": "Player 4",
 		"passwordCurr": "Current",
-		"passwordNew": "New"
+		"passwordNew": "New",
+		"email": "Email",
+		"code": "Code received"
 	},
 	"title": {
 		"me": "See my history",
@@ -85,7 +89,8 @@
 		"pseudo2": "Pseudo of player 2",
 		"pseudo3": "Pseudo of player 3",
 		"pseudo4": "Pseudo of player 4",
-		"validate": "Validate"
+		"email": "Email",
+		"code": "Code received"
 	},
 	"tabOptions": {
 		"addFriend": "Add to friendlist",

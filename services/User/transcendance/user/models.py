@@ -33,7 +33,7 @@ class User(models.Model):
         MAIL = 'MAIL', 'Mail'
         APK = 'APK', 'APK'
     
-    Language = models.CharField(max_length=3, choices=Language.choices, default=Language.FR)
+    language = models.CharField(max_length=3, choices=Language.choices, default=Language.FR)
     twoFA = models.CharField(max_length=4, choices=TwoFA.choices, default=TwoFA.NONE)
     key2FA = models.CharField(max_length=100)
     lastTimeOnline = models.DateTimeField()  # instance de datetime.date

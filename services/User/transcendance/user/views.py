@@ -55,7 +55,14 @@ def checkCookie(request, str):#middleware
 
 def get_user_in_db(field_name: str, value: str):#middleware //a utliser pour check si un champ unique est deja utilise dans update info
     try:
+        print(f'fieldname {field_name}, value {value}', file=sys.stderr)
         user = User.objects.get(**{field_name: value})
+        print(user, file=sys.stderr)
+        print("Informations de l'utilisateur :")
+        for attr_name, attr_value in vars(user).items():
+            print(f"{attr_name}: {attr_value}", end=" ")
+    
+        print()  # Ajout d'une ligne après la liste des attributs
         return user
     except Exception:  #Not defined
         return None
@@ -377,6 +384,11 @@ def image_validation():
     else:
         raise customException("Invalid image format", 403)
 
+
+def is_valid_choice(value, model_class):#middleware
+    choices = getattr(model_class, 'Language').choices
+    return value in {choice[0] for choice in choices}
+
 @csrf_exempt
 @require_http_methods(["POST"])
 def updateUserInfos(request):
@@ -411,14 +423,16 @@ def updateUserInfos(request):
     #         print(f'TwoFA: {user.get_twoFA_display()}')
     # except Exception as e:
         # return JsonResponse({'error': 'user do not exist'}, status=403)
-    if 'username' in data and data['username']:
+    if 'username' in data and data['username'] and user.Username != data['username']:
+        print("verification user already existing", file=sys.stderr)
         if get_user_in_db('Username', data['username']) is not None:
-            print('userneame')
+            print('userneame', file=sys.stderr)
             return JsonResponse({"errorUsername": "username already exists"}, status=403)
         user.Username = data['username']
-    if 'email' in data and data['email']:
+    if 'email' in data and data['email'] and user.Email != data['email']:
+        print("verification email already existing", file=sys.stderr)
         if get_user_in_db('Email', data['email']) is not None:
-            print('enmail')
+            print('enmail', file=sys.stderr)
             return JsonResponse({"errorEmail": "email already exists"}, status=403)
         user.Email = data['email']
     if 'password' in data and data['password']:
@@ -427,7 +441,8 @@ def updateUserInfos(request):
         user.Avatar = data['avatar']
     if 'lang' in data and data['lang']:
         print("je passe par les langues 1", file=sys.stderr)
-        if data.get('lang') in User._meta.get_field('lang').choices:
+        if is_valid_choice(data['lang'], User.language):
+            print("La langue est valide", file=sys.stderr)
             print("jep asse par les langues 2", file=sys.stderr)
             user.Language = data['lang']
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart

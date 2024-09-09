@@ -27,7 +27,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             decoded_token = jwt.decode(auth_cookie, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
             
             # Extraire le nom d'utilisateur du JWT
-            self.username = decoded_token.get('userName')
+            username = decoded_token.get('userName')
+            print(username, file=sys.stderr)
             if not username:
                 return None
             # Vérifier si le token est expiré

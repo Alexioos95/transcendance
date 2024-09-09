@@ -237,10 +237,11 @@ def login(request):
             ),
             'destinataire': dbUser.Email}
         response = requests.post('http://mail:8002/sendMail/', json=mailData)
-        print({'error': 'Failed to send email {}'}, file=sys.stderr)
+        print(f"error: Failed to send email {response.status_code}", file=sys.stderr)
         if response.status_code != 200:
+            print('je retourne ici', file=sys.stderr)
             return JsonResponse({'error': 'Failed to send email'}, status=500)
-
+        print('je reetourne succes', file=sys.stderr)
         return JsonResponse({"twoFA": 'true', 'guestMode': 'false'}, status=200)#code a verifier code 2fa attendu
     response_data = JsonResponse({"twoFA": 'false', "guestMode": "false", "username":dbUser.Username, "Avatar":dbUser.Avatar, "Language": dbUser.Language})
     response_data.status = 200
@@ -509,6 +510,7 @@ def set2FA(request):
 
 def generate_code(size=100):#a mettre dans les middleware
     code = []
+    ersseChar = "iIljJLoO01" 
     #banir i l 1 0 o maj+min
     for _ in range(size):
         value = random.randint(0, 61)
@@ -572,7 +574,7 @@ def resetPasswd(request):
             f'Hey {user.Username},\n\n'
             'It looks like you requested to reset your password. No worries, we’ve got you covered!\n\n'
             'Click the link below to set a new password:\n\n'
-            f'https://made-f0Ar6s5:4433/resetmypassword/?code={validationCode}\n\n'
+            f'https://bess-f2r5s12:4433/resetmypassword/?code={validationCode}\n\n'
             'This link will be good for 10 minutes, so make sure to use it before it expires. If you missed it, just request another one.\n\n'
             'If you didn’t ask for a password reset, just ignore this email – your account is safe.\n\n'
             'Got any questions? Feel free to reach out to us!\n\n'
@@ -581,7 +583,7 @@ def resetPasswd(request):
             ),
             'destinataire': email}
     response = requests.post('http://mail:8002/sendMail/', json=mailData)
-    print({'error': 'Failed to send email {}'}, file=sys.stderr)
+    print({'error': 'Failed to send email {response.status_code}'}, file=sys.stderr)
     if response.status_code != 200:
         return JsonResponse({'error': 'Failed to send email'}, status=500)
     return JsonResponse({'message': 'Password reset email sent successfully'}, status=200)

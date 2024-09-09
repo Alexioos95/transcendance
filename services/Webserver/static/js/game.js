@@ -178,7 +178,7 @@ function	liveChat(struct)
 		const i4 = document.createElement("i");
 		let isScrolled = false;
 
-		avatar.src = "/default_avatar.png";
+		avatar.src = "/images/default_avatar.png";
 		avatar.alt = "Avatar";
 		chatUserAvatar.classList.add("chat-user-avatar");
 		chatUserAvatar.appendChild(avatar);

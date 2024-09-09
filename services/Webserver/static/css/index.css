@@ -1377,6 +1377,7 @@ canvas.pong {
 	display: flex;
 	align-items: center;
 	gap: 0.3rem;
+	word-break: break-all;
 }
 
 .tab-chat .chat-message .chat-user-avatar {
@@ -1389,6 +1390,7 @@ canvas.pong {
 .tab-chat .chat-message p {
 	margin: 0;
 	width: 100%;
+	word-break: break-word;
 }
 
 .tab-chat .chat-announcement {

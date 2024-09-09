@@ -572,7 +572,7 @@ def resetPasswd(request):
             f'Hey {user.Username},\n\n'
             'It looks like you requested to reset your password. No worries, we’ve got you covered!\n\n'
             'Click the link below to set a new password:\n\n'
-            f'https://made-f0Ar6s5:4433/resetmypassword/?code={validationCode}\n\n'
+            f'https://made-f0Ar6s5:4433/index.html?reset=resetmypassword&code={validationCode}\n\n'
             'This link will be good for 10 minutes, so make sure to use it before it expires. If you missed it, just request another one.\n\n'
             'If you didn’t ask for a password reset, just ignore this email – your account is safe.\n\n'
             'Got any questions? Feel free to reach out to us!\n\n'

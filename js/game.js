@@ -256,9 +256,9 @@ function	shuffle(array)
 
 	while (i != 0)
 	{
-	  let j = Math.floor(Math.random() * i);
-	  i--;
-	  [array[i], array[j]] = [array[j], array[i]];
+		let j = Math.floor(Math.random() * i);
+		i--;
+		[array[i], array[j]] = [array[j], array[i]];
 	}
 }
 

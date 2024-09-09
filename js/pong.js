@@ -446,7 +446,7 @@ function	collisionSide(paddles, ball)
 
 function angle(paddleStartY, height, ball)
 {
-	const len  = height / 3;
+	const len = height / 3;
 	const edge = len / 3;
 	const fromTop = ball.y - paddleStartY;
 	const fromBot = ball.y - (paddleStartY + height);

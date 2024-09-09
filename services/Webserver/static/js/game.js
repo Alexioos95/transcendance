@@ -115,6 +115,7 @@ function	setupEventListeners(struct, data)
 		};
 
 		console.log("fetch /user/updateUserInfos");
+		console.log("send=", obj);
 		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
@@ -128,6 +129,7 @@ function	setupEventListeners(struct, data)
 					struct.options.account.error.classList.remove("success");
 					struct.options.account.error.classList.add("error");
 					struct.options.account.error.innerHTML = "YIKES";
+					console.log("Response=", response.text());
 				}
 			})
 			.catch(() => console.error("Error: failed to fetch the updateUserInfos route"));
@@ -163,6 +165,7 @@ function	liveChat(struct)
 	});
 	struct.chat.socket.addEventListener("message", function(event) {
 		const obj = JSON.parse(event.data);
+		console.log(obj)
 		const tr = document.createElement("tr");
 		const td = document.createElement("td");
 		const chatMessage = document.createElement("div");

@@ -22,20 +22,25 @@ class customException(Exception):
 class ChatConsumer(AsyncWebsocketConsumer):
     # Fonction pour récupérer le nom d'utilisateur à partir du JWT
     def get_username_from_jwt(self, auth_cookie):
+        print(f'cookie ==== {auth_cookie}', file=sys.stderr)
         try:
             # Décrypter le JWT avec la clé secrète
             decoded_token = jwt.decode(auth_cookie, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
-            
+            print(f'decoded_token ==== {decoded_token}', file=sys.stderr)
             # Extraire le nom d'utilisateur du JWT
-            self.username = decoded_token.get('userName')
+            username = decoded_token.get('userName')
+            print(f'username ==== {username}', file=sys.stderr)
             if not username:
+                print(f'not username T.T ==== {username}', file=sys.stderr)
                 return None
             # Vérifier si le token est expiré
             expiration_date = decoded_token.get("expirationDate")
             if expiration_date and expiration_date < time.time():
+                print(f'l\'apparityion de ce essge est hautement improbable', file=sys.stderr)
                 raise customException("Token expired", 401)
             return username
         except Exception as e:
+            print(f'coucou l\'esxception ==== {e}', file=sys.stderr)
             return None
 
     async def connect(self):
@@ -118,13 +123,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'chat_message',
                 'user': self.username,
-                'message': message
+                'message': clean_message
             }
         )
 
     # Recevoir un message du groupe de chat
     async def chat_message(self, event):
         message = event["message"]
-
+        user = event["user"]
         # Envoyer le message au WebSocket
-        await self.send(text_data=json.dumps({"message": message}))
+        await self.send(text_data=json.dumps({"user": user, "message": message}))

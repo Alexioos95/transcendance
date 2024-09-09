@@ -150,7 +150,7 @@ function	setupEventListeners(struct, data)
 
 function	liveChat(struct)
 {
-	struct.chat.socket = new WebSocket("wss://bess-f2r6s1:4243/ws/chat/");
+	struct.chat.socket = new WebSocket("wss://bess-f2r5s12:4433/ws/chat/");
 	struct.chat.socket.addEventListener("error", function() {
 		const tr = document.querySelectorAll(".tab-chat tr");
 		const buttons = document.querySelector(".tab-chat button");
@@ -165,6 +165,7 @@ function	liveChat(struct)
 	});
 	struct.chat.socket.addEventListener("message", function(event) {
 		const obj = JSON.parse(event.data);
+		console.log(obj)
 		const tr = document.createElement("tr");
 		const td = document.createElement("td");
 		const chatMessage = document.createElement("div");

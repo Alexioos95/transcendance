@@ -237,7 +237,7 @@ function	replaceDatas(struct, data)
 		const username = document.querySelector(".nav-user span");
 		const inputs = document.querySelectorAll(".options-wrapper-connection input");
 
-		if (avatar.src != "")
+		if (data.avatar !== undefined && data.avatar !== "")
 			avatar.src = data.avatar;
 		username.innerHTML = data.username;
 		inputs[0].value = data.username;

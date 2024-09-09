@@ -34,7 +34,10 @@ function	login(prevData)
 		event.preventDefault();
 		handleConnection(struct);
 	});
-	struct.formButton.signUp.addEventListener("click", function() { handleSignUp(struct) });
+	struct.formButton.signUp.addEventListener("click", function(event) {
+		event.preventDefault();
+		handleSignUp(struct);
+	});
 	struct.formButton.cancelSignUp.addEventListener("click", function() {
 		cancelSignUp(struct);
 		window.history.pushState({ state: "login", lang: struct.langSelect.value }, "", "");
@@ -98,6 +101,8 @@ function	cancelSignUp(struct)
 	struct.formButton.forgotPassword.classList.remove("hidden");
 	struct.formButton.signUp.classList.remove("primary");
 	struct.wrapperSpecialLogin.classList.remove("hideInFade");
+	struct.formButton.connection.type = "button";
+	struct.formButton.signUp.type = "submit";
 }
 
 /////////////////////////
@@ -113,18 +118,18 @@ function	handleConnection(struct)
 
 	if (struct.formButton.connection.classList.contains("recovery"))
 	{
-		console.log("fetch /user/resetPaswd");
-		fetch("/user/resetPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		console.log("fetch /user/resetPasswd");
+		fetch("/user/resetPasswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
-					console.log("response /user/resetPaswd ok; do nothing // Need to continue");
+					console.log("response /user/resetPasswd ok; do nothing // Need to continue");
 				else
 				{
-					console.log("response /user/resetPaswd not good; do nothing // Need to place error");
-					console.log(response.status);
+					console.log("response /user/resetPasswd not good; do nothing // Need to place error");
+					console.log(response.text());
 				}
 			})
-			.catch(() => console.error("Error: failed to fetch the resetPaswd route"));
+			.catch(() => console.error("Error: failed to fetch the resetPasswd route"));
 	}
 	else
 	{
@@ -250,6 +255,8 @@ function	showSignUpForm(struct)
 	struct.formButton.signUp.classList.add("primary");
 	struct.formButton.cancelSignUp.classList.remove("hideInFade");
 	struct.wrapperSpecialLogin.classList.add("hideInFade");
+	struct.formButton.connection.type = "button";
+	struct.formButton.signUp.type = "submit";
 }
 
 /////////////////////////

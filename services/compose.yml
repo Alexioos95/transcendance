@@ -3,7 +3,7 @@ name: transcendance
 services:
 
   chat_cache:
-    hostname: redis
+    hostname: redis_chat
     container_name: redis_chat
     image: redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
     healthcheck:
@@ -22,24 +22,52 @@ services:
 #  tetris_cache:
 #    image: redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
 #
+#
+#
+#
+#
+#
 #  pong_db:
 #    volume:
 #
 #  tetris_db:
 #    volume:
-#
-#  user_db:
-#    volume:
+
+  user_db:
+    hostname: postgre_user
+    container_name: postgre_user
+    image: postgres@sha256:d898b0b78a2627cb4ee63464a14efc9d296884f1b28c841b0ab7d7c42f1fffdf
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U $${POSTGRES_USER} -d postgres'"]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - transcendance
+    #volumes:
+    #  - user-data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_PASSWORD=$USER_POSTGRES_PASSWORD
+      - POSTGRES_USER=$USER_POSTGRES_USER
+      - PGPORT=$USER_POSTGRES_PORT
 
   user:
     hostname: user
     container_name: user
+      #depends_on:
+      #user_db:
+      #  condition: service_healthy
+      #  restart: true
     pull_policy: build
     build:
       context: User
       dockerfile: Dockerfile
     networks:
       - transcendance
+    volumes:
+      - image-data:/images/
     restart: unless-stopped
     environment:
       - SERVER_JWT_KEY=$SERVER_JWT_KEY
@@ -92,17 +120,17 @@ services:
   webserver:
     hostname: webserver
     container_name: webserver
-#    depends_on:
-      #      user:
-      #        condition: service_healthy
-      #        restart: true
-      #      chat:
-      #        condition: service_healthy
-      #        restart: true
-      #      mail:
-      #        condition: service_healthy
-      #        restart: true
-      #    pull_policy: build
+    depends_on:
+      user:
+        condition: service_healthy
+        restart: true
+      chat:
+        condition: service_healthy
+        restart: true
+      mail:
+        condition: service_healthy
+        restart: true
+    pull_policy: build
     build:
       context: Webserver/
       dockerfile: Dockerfile
@@ -114,6 +142,8 @@ services:
     volumes:
       - static-data:/app/
     restart: unless-stopped
+    environment:
+      - DUMP=$DUMP
 
 networks:
   transcendance:
@@ -125,6 +155,15 @@ volumes:
       type: "none"
       o: "bind"
       device: "${PWD}/services/Webserver/static"
+
+  image-data:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "${PWD}/services/Webserver/static/images"
+
+  user-data:
 
 
 #	pong
@@ -150,6 +189,7 @@ volumes:
 #               redis   6379
 #       user
 #               daphne  8001
+#               postgre 5432
 #       mail
 #               daphne  8002
 #       ping

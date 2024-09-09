@@ -115,7 +115,6 @@ function	setupEventListeners(struct, data)
 		};
 
 		console.log("fetch /user/updateUserInfos");
-		console.log("send=", obj);
 		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
@@ -129,7 +128,6 @@ function	setupEventListeners(struct, data)
 					struct.options.account.error.classList.remove("success");
 					struct.options.account.error.classList.add("error");
 					struct.options.account.error.innerHTML = "YIKES";
-					console.log("Response=", response.text());
 				}
 			})
 			.catch(() => console.error("Error: failed to fetch the updateUserInfos route"));
@@ -150,7 +148,7 @@ function	setupEventListeners(struct, data)
 
 function	liveChat(struct)
 {
-	struct.chat.socket = new WebSocket("wss://bess-f2r5s12:4433/ws/chat/");
+	struct.chat.socket = new WebSocket(CHATWSS);
 	struct.chat.socket.addEventListener("error", function() {
 		const tr = document.querySelectorAll(".tab-chat tr");
 		const buttons = document.querySelector(".tab-chat button");
@@ -165,7 +163,6 @@ function	liveChat(struct)
 	});
 	struct.chat.socket.addEventListener("message", function(event) {
 		const obj = JSON.parse(event.data);
-		console.log(obj)
 		const tr = document.createElement("tr");
 		const td = document.createElement("td");
 		const chatMessage = document.createElement("div");

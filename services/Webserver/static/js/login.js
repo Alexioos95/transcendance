@@ -34,10 +34,7 @@ function	login(prevData)
 		event.preventDefault();
 		handleConnection(struct);
 	});
-	struct.formButton.signUp.addEventListener("click", function(event) {
-		event.preventDefault();
-		handleSignUp(struct);
-	});
+	struct.formButton.signUp.addEventListener("click", function() { handleSignUp(struct) });
 	struct.formButton.cancelSignUp.addEventListener("click", function() {
 		cancelSignUp(struct);
 		window.history.pushState({ state: "login", lang: struct.langSelect.value }, "", "");
@@ -101,8 +98,6 @@ function	cancelSignUp(struct)
 	struct.formButton.forgotPassword.classList.remove("hidden");
 	struct.formButton.signUp.classList.remove("primary");
 	struct.wrapperSpecialLogin.classList.remove("hideInFade");
-	struct.formButton.connection.type = "button";
-	struct.formButton.signUp.type = "submit";
 }
 
 /////////////////////////
@@ -126,7 +121,7 @@ function	handleConnection(struct)
 				else
 				{
 					console.log("response /user/resetPaswd not good; do nothing // Need to place error");
-					console.log(response.text());
+					console.log(response.status);
 				}
 			})
 			.catch(() => console.error("Error: failed to fetch the resetPaswd route"));
@@ -255,8 +250,6 @@ function	showSignUpForm(struct)
 	struct.formButton.signUp.classList.add("primary");
 	struct.formButton.cancelSignUp.classList.remove("hideInFade");
 	struct.wrapperSpecialLogin.classList.add("hideInFade");
-	struct.formButton.connection.type = "button";
-	struct.formButton.signUp.type = "submit";
 }
 
 /////////////////////////

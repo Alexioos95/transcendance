@@ -46,13 +46,13 @@ function	login(prevData)
 	struct.langSelect.addEventListener("change", function(event) {
 		fetch("/lang/" + event.target.value + ".json")
 			.then(response => response.json())
-			.then(result => { translateLoginPage(struct, result); })
+			.then(result => { translateLoginPage(struct, result.login); })
 	});
 	if (prevData)
 	{
 		fetch("/lang/" + prevData.lang + ".json")
 			.then(response => response.json())
-			.then(result => { translateLoginPage(struct, result); })
+			.then(result => { translateLoginPage(struct, result.login); })
 			.then(() => { struct.langSelect.value = prevData.lang; });
 		if (prevData.signUp === "true")
 			showSignUpForm(struct);
@@ -252,13 +252,47 @@ function	showSignUpForm(struct)
 }
 
 /////////////////////////
+// Reset Password
+/////////////////////////
+function resetPassword()
+{
+	const struct = {
+		input: document.querySelector("form input"),
+		button: document.getElementsByClassName("submit")[0],
+		langSelect: document.getElementsByTagName("select")[0]
+	};
+
+	struct.button.addEventListener("click", function() {
+		const obj = { password: struct.input.value }
+
+		fetch("/user/sendNewPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => {
+				if (response.ok)
+					console.log("response /user/sendNewPaswd ok; do nothing");
+				else
+				{
+					console.log("response /user/sendNewPaswd not good; do nothing // Need to place error");
+					console.log(response.status);
+					return (response.json().then(data => { console.log(data) }));
+				}
+			})
+			.catch(() => console.error("Error: failed to fetch the sendNewPaswd route"));
+	});
+	langSelect.addEventListener("change", function(event) {
+		fetch("/lang/" + event.target.value + ".json")
+			.then(response => response.json())
+			.then(result => { translateLoginPage(struct, result.reset); })
+	});
+}
+
+/////////////////////////
 // Translation
 /////////////////////////
 function	translateLoginPage(struct, obj)
 {
-	let plainTexts = Object.values(obj.login.plainText);
-	let placeHolders = Object.values(obj.login.placeholder);
-	let ariaLabels = Object.values(obj.login.ariaLabel);
+	let plainTexts = Object.values(obj.plainText);
+	let placeHolders = Object.values(obj.placeholder);
+	let ariaLabels = Object.values(obj.ariaLabel);
 
 	let i = 0;
 	for (let text of plainTexts)
@@ -318,26 +352,4 @@ function	getLoginStruct()
 		error: errorStruct
 	};
 	return (struct);
-}
-
-/////////////////////////
-// Reset Password
-/////////////////////////
-function resetPassword()
-{
-	const input = document.querySelector("form input");
-	const obj = { password: input.value }
-
-	fetch("/user/sendNewPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-	.then(response => {
-		if (response.ok)
-			console.log("response /user/sendNewPaswd ok; do nothing");
-		else
-		{
-			console.log("response /user/sendNewPaswd not good; do nothing // Need to place error");
-			console.log(response.status);
-			return (response.json().then(data => { console.log(data) }));
-		}
-	})
-	.catch(() => console.error("Error: failed to fetch the sendNewPaswd route"));
 }

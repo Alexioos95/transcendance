@@ -19,12 +19,25 @@
 			"email": "Email",
 			"password": "Paswoord",
 			"username": "Gebruikersnaam",
+			"showPassword": "Change the display of my password",
 			"forgottenPassword": "Paswoord vergeten",
 			"signup": "Inschrijven",
 			"cancel": "Annuleren",
 			"code": "Code received",
 			"continue-42": "Inloggen met 42",
 			"continue-guest": "Spelen zonder zich aan te melden"
+		}
+	},
+	"reset": {
+		"plainText": {
+			"reset": "Reset!"
+		},
+		"placeholder": {
+			"newPassword": "New password"
+		},
+		"ariaLabel": {
+			"newPassword": "New password",
+			"showPassword": "Change the display of my password"
 		}
 	},
 	"plainText": {

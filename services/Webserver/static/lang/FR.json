@@ -19,12 +19,25 @@
 			"email": "Email",
 			"password": "Mot de passe",
 			"username": "Nom d'utilisateur",
+			"showPassword": "Changer l'affichage de mon mot de passe",
 			"forgottenPassword": "Mot de passe oublié",
 			"signup": "Inscription",
 			"cancel": "Annuler",
 			"code": "Code reçu",
 			"continue-42": "Connexion avec 42",
 			"continue-guest": "Jouer sans se connecter"
+		}
+	},
+	"reset": {
+		"plainText": {
+			"reset": "Reinitialiser !"
+		},
+		"placeholder": {
+			"newPassword": "Nouveau mot de passe"
+		},
+		"ariaLabel": {
+			"newPassword": "Nouveau mot de passe",
+			"showPassword": "Changer l'affichage de mon mot de passe"
 		}
 	},
 	"plainText": {

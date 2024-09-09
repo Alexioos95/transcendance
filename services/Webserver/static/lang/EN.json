@@ -19,12 +19,25 @@
 			"email": "Email",
 			"password": "Password",
 			"username": "Username",
+			"showPassword": "Change the display of my password",
 			"forgottenPassword": "Forgotten password",
 			"signup": "Sign up",
 			"cancel": "Cancel",
 			"code": "Code received",
 			"continue-42": "Sign in avec 42",
 			"continue-guest": "Playing without signing in"
+		}
+	},
+	"reset": {
+		"plainText": {
+			"reset": "Reset!"
+		},
+		"placeholder": {
+			"newPassword": "New password"
+		},
+		"ariaLabel": {
+			"newPassword": "New password",
+			"showPassword": "Change the display of my password"
 		}
 	},
 	"plainText": {

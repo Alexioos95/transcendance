@@ -136,7 +136,8 @@ function	handleConnection(struct)
 					return (response.json().then(data => { call2FA(struct, data) }));
 				}
 				else
-					response.json().then(data => { console.log(data); struct.error.login.innerHTML = data.error; });
+					response.text().then(data => { console.log(data); struct.error.login.innerHTML = data.error; });
+					// response.json().then(data => { console.log(data); struct.error.login.innerHTML = data.error; });
 			})
 			.catch(() => console.error("Error: failed to fetch the login route"));
 	}

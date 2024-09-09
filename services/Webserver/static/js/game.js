@@ -72,7 +72,7 @@ function	setupEventListeners(struct, data)
 	struct.options.leaveButton.addEventListener("click", function() {
 		struct.options.account.twoFA.codeInput.value = "";
 		struct.options.account.twoFA.emailInput.value = "";
-		struct.options.account.twoFA.div.classList.add("hidden");
+		struct.options.account.twoFA.wrapper.classList.add("hidden");
 		struct.options.account.twoFA.secondDiv.classList.add("hidden");
 		if (struct.tournament.on === true && struct.tournament.names.length === 0)
 			showScreen(struct.screen, struct.screen.wrapperTournamentForm);

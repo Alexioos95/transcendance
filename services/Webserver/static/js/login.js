@@ -118,18 +118,18 @@ function	handleConnection(struct)
 
 	if (struct.formButton.connection.classList.contains("recovery"))
 	{
-		console.log("fetch /user/resetPasswd");
-		fetch("/user/resetPasswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		console.log("fetch /user/resetPaswd");
+		fetch("/user/resetPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
-					console.log("response /user/resetPasswd ok; do nothing // Need to continue");
+					console.log("response /user/resetPaswd ok; do nothing // Need to continue");
 				else
 				{
-					console.log("response /user/resetPasswd not good; do nothing // Need to place error");
+					console.log("response /user/resetPaswd not good; do nothing // Need to place error");
 					console.log(response.text());
 				}
 			})
-			.catch(() => console.error("Error: failed to fetch the resetPasswd route"));
+			.catch(() => console.error("Error: failed to fetch the resetPaswd route"));
 	}
 	else
 	{

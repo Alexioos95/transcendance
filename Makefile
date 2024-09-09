@@ -23,8 +23,6 @@ all : build
 .PHONY: build
 build:
 	#./.script $(DUMP)
-#	mkdir -p /home/fguarrac/data/mariadb
-#	mkdir -p /home/fguarrac/data/wordpress
 	docker compose -f services/compose.yml build
 
 .PHONY: up
@@ -35,14 +33,23 @@ up: build
 down:
 	docker compose -f services/compose.yml down
 
+.PHONY: log
+log: build
+	docker compose -f services/compose.yml up
+
+.PHONY: re
+re: mrproper
+	$(MAKE) --no-print-directory up
+
 .PHONY: mrproper
 mrproper: down
 	docker image rm -f $(NAME)-user
 	docker image rm -f $(NAME)-chat
 	docker image rm -f $(NAME)-mail
 #	docker image rm -f $(NAME)-ping
+	docker image rm -f redis
+	docker image rm -f postgres
 	docker image rm -f $(NAME)-webserver
 	docker volume rm -f $(NAME)_static-data
+	docker volume rm -f $(NAME)_image-data
 	docker builder prune -af
-#	rm -rf /home/fguarrac/data/wordpress
-#	rm -rf /home/fguarrac/data/mariadb

@@ -5,7 +5,6 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 import os
-import sys
 
 @csrf_exempt
 def sendMail(request):
@@ -34,7 +33,7 @@ def sendMail(request):
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON format'}, status=400)
     except Exception as e:
-        print(f'mail send coucou error: {e}', file=sys.stderr)
+        print(f'Error: {e}')
         return JsonResponse({'error': 'An unexpected error occurred'}, status=500)
 
 def ping(request):

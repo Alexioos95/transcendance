@@ -244,11 +244,10 @@ def login(request):
             ),
             'destinataire': dbUser.Email}
         response = requests.post('http://mail:8002/sendMail/', json=mailData)
-        print(f"error: Failed to send email {response.status_code}", file=sys.stderr)
+        print({'error': 'Failed to send email {}'}, file=sys.stderr)
         if response.status_code != 200:
-            print('je retourne ici', file=sys.stderr)
             return JsonResponse({'error': 'Failed to send email'}, status=500)
-        print('je reetourne succes', file=sys.stderr)
+
         return JsonResponse({"twoFA": 'true', 'guestMode': 'false'}, status=200)#code a verifier code 2fa attendu
     response_data = JsonResponse({"twoFA": 'false', "guestMode": "false", "username":dbUser.Username, "Avatar":dbUser.Avatar, "Language": dbUser.Language})
     response_data.status = 200
@@ -525,7 +524,6 @@ def set2FA(request):
 
 def generate_code(size=100):#a mettre dans les middleware
     code = []
-    ersseChar = "iIljJLoO01" 
     #banir i l 1 0 o maj+min
     for _ in range(size):
         value = random.randint(0, 61)
@@ -598,7 +596,7 @@ def resetPasswd(request):
             ),
             'destinataire': email}
     response = requests.post('http://mail:8002/sendMail/', json=mailData)
-    print({'error': 'Failed to send email {response.status_code}'}, file=sys.stderr)
+    print({'error': 'Failed to send email {}'}, file=sys.stderr)
     if response.status_code != 200:
         return JsonResponse({'error': 'Failed to send email'}, status=500)
     return JsonResponse({'message': 'Password reset email sent successfully'}, status=200)

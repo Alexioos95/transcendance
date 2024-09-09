@@ -7,10 +7,16 @@ popState();
 
 async function	checkJWT()
 {
-	await fetch("/user/checkJwt/")
+	if (window.location.href.indexOf("resetmypassword") > -1)
+	{
+		navigate("reset", undefined, undefined);
+	}
+	else
+	{
+		await fetch("/user/checkJwt/")
 		.then(response => {
 			if (response.ok)
-				return (response.json().then(data => { data.guestMode = "false"; navigate("game", data,  { signUp: "false", lang: "FR" })}));
+				return (response.json().then(data => { data.guestMode = "false"; navigate("game", data, { signUp: "false", lang: "FR" })}));
 			else
 			{
 				history.replaceState({ state: "login", lang: "FR" }, "", "");
@@ -18,6 +24,7 @@ async function	checkJWT()
 			}
 		})
 		.catch(() => console.error("Error: failed to fetch the checkJwt route"));
+	}
 }
 
 async function popState()
@@ -25,17 +32,24 @@ async function popState()
 	window.addEventListener("popstate", function(event) {
 		if (event.state)
 		{
-			const data = event.state;
+			fetch("/user/checkJwt/")
+				.then(response => {
+					if (response.ok)
+						return (response.json().then(data => { data.guestMode = "false"; navigate("game", data, { signUp: "false", lang: "FR" })}));
+					else
+					{
+						const data = event.state;
 
-			if (data.state === "login")
-				navigate("login", undefined, { signUp: "false", lang: data.lang })
-			else if (data.state === "signUp")
-				navigate("login", undefined, { signUp: "true", lang: data.lang })
-			else if (data.state === "guestMode")
-			{
-				const data = { guestMode: "true", lang: data.lang };
-				navigate("game", data, { signUp: "false", lang: data.lang });
-			}
+						if (data.state === "login")
+							navigate("login", undefined, { signUp: "false", lang: data.lang })
+						else if (data.state === "signUp")
+							navigate("login", undefined, { signUp: "true", lang: data.lang })
+						else if (data.state === "guestMode")
+						{
+							const data = { guestMode: "true", lang: data.lang };
+							navigate("game", data, { signUp: "false", lang: data.lang });
+						}
+				}});
 		}
 	});
 }
@@ -52,6 +66,8 @@ async function navigate(page, data, infos)
 				run(data);
 			else if (page === "login")
 				login(infos);
+			else if (page === "reset")
+				resetPassword();
 		})
 		.catch(() => Promise.reject("Error: couldn't fetch the page"))
 }

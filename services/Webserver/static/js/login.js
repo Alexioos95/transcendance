@@ -319,3 +319,25 @@ function	getLoginStruct()
 	};
 	return (struct);
 }
+
+/////////////////////////
+// Reset Password
+/////////////////////////
+function resetPassword()
+{
+	const input = document.querySelector("form input");
+	const obj = { password: input.value }
+
+	fetch("/user/sendNewPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+	.then(response => {
+		if (response.ok)
+			console.log("response /user/sendNewPaswd ok; do nothing");
+		else
+		{
+			console.log("response /user/sendNewPaswd not good; do nothing // Need to place error");
+			console.log(response.status);
+			return (response.json().then(data => { console.log(data) }));
+		}
+	})
+	.catch(() => console.error("Error: failed to fetch the sendNewPaswd route"));
+}

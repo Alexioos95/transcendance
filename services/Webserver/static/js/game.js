@@ -148,7 +148,7 @@ function	setupEventListeners(struct, data)
 
 function	liveChat(struct)
 {
-	struct.chat.socket = new WebSocket("wss://localhost:443/ws/chat/");
+	struct.chat.socket = new WebSocket("wss://bess-f2r5s12:4433/ws/chat/");
 	struct.chat.socket.addEventListener("error", function() {
 		const tr = document.querySelectorAll(".tab-chat tr");
 		const buttons = document.querySelector(".tab-chat button");

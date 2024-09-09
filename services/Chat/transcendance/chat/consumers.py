@@ -118,7 +118,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'chat_message',
                 'user': self.username,
-                'message': message
+                'message': clean_message
             }
         )
 

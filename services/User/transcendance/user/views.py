@@ -90,7 +90,7 @@ def compare_bcrypt_hash(username:str, password: str) -> bool:#middleware
 
 @csrf_exempt
 @require_http_methods(["POST"])
-def register(request):#check si user est unique sinon refuser try except get?	#Set Language par default ou la récupérer du front ?
+def register(request):#check si user est unique sinon refuser try except get?	#Set language par default ou la récupérer du front ?
     
     print(f"ici body == {request.body}", file=sys.stderr)
     data = json.loads(request.body)
@@ -119,7 +119,7 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
         Password=hashed_password.decode('utf-8'),  # Décodage du hash en UTF-8
         lastTimeOnline=tzTime,
         pongLvl=0,
-        Language=userData['lang'],
+        language=userData['lang'],
         tetrisLvl=0,
         twoFA=True
     )
@@ -131,8 +131,8 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
         response_data = JsonResponse({"error": "erreur in database"}, status=409)
         print(error)
         return(response_data)
-    print(f'new user username {new_user.Username}, avatar = {new_user.Avatar}, langage = {new_user.Language}')
-    response_data = JsonResponse({"2fa": 'False', "guestMode":"false", "username":new_user.Username, "avatar": '/images/default_avatar.png' , "Language": new_user.Language}, status=201)
+    print(f'new user username {new_user.Username}, avatar = {new_user.Avatar}, langage = {new_user.language}')
+    response_data = JsonResponse({"2fa": 'False', "guestMode":"false", "username":new_user.Username, "avatar": '/images/default_avatar.png' , "lang": new_user.language}, status=201)
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes
     encoded_jwt = jwt.encode({"userName": userData['username'], "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
     response_data.set_cookie(
@@ -182,8 +182,8 @@ def checkJwt(request):
         if not user:
             return JsonResponse({"error": "user does nor exist"}, status=403)
         print(f'le cookie est {auth}', file=sys.stderr)
-        print(f'username:{user.Username}, Avatar:{user.Avatar}, Language: {user.Language}', file=sys.stderr)
-        return JsonResponse({"username":user.Username, "Avatar":user.Avatar, "Language": user.Language}, status=200)
+        print(f'username:{user.Username}, Avatar:{user.Avatar}, lang: {user.language}', file=sys.stderr)
+        return JsonResponse({"username":user.Username, "Avatar":user.Avatar, "lang": user.language}, status=200)
     except customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
 
@@ -211,7 +211,7 @@ def login(request):
     
 #        for user in dbUserList:
 #            print(f'dbUser == {dbUserList} Username {user.Username} password == {user.Password}')
-#            print(f'Language: {user.get_Language_display()}')
+#            print(f'language: {user.get_language_display()}')
 #            print(f'TwoFA: {user.get_twoFA_display()}')
         # mydata = User.objects.all().values()
         # print(mydata)
@@ -249,7 +249,7 @@ def login(request):
             return JsonResponse({'error': 'Failed to send email'}, status=500)
 
         return JsonResponse({"twoFA": 'true', 'guestMode': 'false'}, status=200)#code a verifier code 2fa attendu
-    response_data = JsonResponse({"twoFA": 'false', "guestMode": "false", "username":dbUser.Username, "Avatar":dbUser.Avatar, "Language": dbUser.Language})
+    response_data = JsonResponse({"twoFA": 'false', "guestMode": "false", "username":dbUser.Username, "Avatar":dbUser.Avatar, "lang": dbUser.language})
     response_data.status = 200
     response_data.set_cookie(
     'auth',
@@ -383,10 +383,21 @@ def image_validation():
     else:
         raise customException("Invalid image format", 403)
 
+# def is_valid_choice(value, model_class):
+#     try:
+#         print(f'value == {value}', file=sys.stderr)
+#         choices = getattr(model_class, 'language', None)
+#         if choices is None:
+#             print(f'choices == {choices}', file=sys.stderr)
+#             return False 
+#         print(f'return value == {value in [choice[0] for choice in choices]}', file=sys.stderr)
+#         return value in [choice[0] for choice in choices]
+#     except Exception as e:
+#         print(f'exception == {e}', file=sys.stderr)
 
-def is_valid_choice(value, model_class):#middleware
-    choices = getattr(model_class, 'Language').choices
-    return value in {choice[0] for choice in choices}
+def is_valid_choice(value, model_class):
+    valid_choices = ["FR", "EN", "NL"]
+    return value in valid_choices
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -418,7 +429,7 @@ def updateUserInfos(request):
     #     dbUserList = list(dbUser)
     #     for user in dbUserList:
     #         print(f'dbUser == {dbUserList} Username {user.Username} password == {user.Password}')
-    #         print(f'Language: {user.get_Language_display()}')
+    #         print(f'language: {user.get_language_display()}')
     #         print(f'TwoFA: {user.get_twoFA_display()}')
     # except Exception as e:
         # return JsonResponse({'error': 'user do not exist'}, status=403)
@@ -443,10 +454,10 @@ def updateUserInfos(request):
         if is_valid_choice(data['lang'], User.language):
             print("La langue est valide", file=sys.stderr)
             print("jep asse par les langues 2", file=sys.stderr)
-            user.Language = data['lang']
+            user.language = data['lang']
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
     print("uptade de new user", file=sys.stderr)
-    print(f"username == {user.Username}, email == {user.Email}, Avatar == {user.Avatar}, langue == {user.Language}", file=sys.stderr)
+    print(f"username == {user.Username}, email == {user.Email}, Avatar == {user.Avatar}, langue == {user.language}", file=sys.stderr)
     user.save()
     response_data = JsonResponse({"message": "User information updated successfully"})
     encoded_jwt = jwt.encode({"userName": user.Username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
@@ -480,7 +491,7 @@ def updateInfo(request):
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
         return JsonResponse({"error": "User does not exists"}, status=403)
-    response = JsonResponse({"guestMode": "false", "username":user.Username, "Avatar":user.Avatar, "Language": user.Language})#ajouter plus tard friends et bloques + get dans le cache les defis lances ou acceptes
+    response = JsonResponse({"guestMode": "false", "username":user.Username, "Avatar":user.Avatar, "language": user.language})#ajouter plus tard friends et bloques + get dans le cache les defis lances ou acceptes
     return response(status=200)
 
 @csrf_exempt
@@ -500,7 +511,7 @@ def checkCodeLog(request):
             return JsonResponse({"error":"user does not exist"}, status=401)
         expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
         encoded_jwt = jwt.encode({"userName": user.Username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
-        response = HttpResponse(json.dumps({"guestMode": "false", 'username': user.Username, 'avatar':user.Avatar, 'language':user.Language}), content_type="application/json")
+        response = HttpResponse(json.dumps({"guestMode": "false", 'username': user.Username, 'avatar':user.Avatar, 'language':user.language}), content_type="application/json")
         response.set_cookie(
         'auth',
         encoded_jwt,
@@ -522,17 +533,40 @@ def set2FA(request):
     #recoit un demande d'activation 2fa on recupere l'usser via le JWT et on lui envoie un mail contannt le code + le stocker en cache cle code value user 10 minutes
     return
 
-def generate_code(size=100):#a mettre dans les middleware
+# def generate_code(size=100):#a mettre dans les middleware
+#     code = []
+#     #banir i l 1 0 o maj+min
+#     for _ in range(size):
+#         value = random.randint(0, 61)
+#         if value < 26:
+#             code.append(chr(97 + value))
+#         elif value < 52:
+#             code.append(chr(65 + value - 26))
+#         else:
+#             code.append(chr(48 + value - 52))
+#     return ''.join(code)
+
+def generate_code(size=100):
     code = []
-    #banir i l 1 0 o maj+min
+    # Banir i l 1 0 o maj+min
     for _ in range(size):
         value = random.randint(0, 61)
         if value < 26:
-            code.append(chr(97 + value))
+            # Ajouter 5 si le caractère généré est dans "0oOiIlLjJ"
+            if chr(value + 97) in "0oOiIlLjJ ":
+                code.append(chr(ord(value + 97) + 5))
+            else:
+                code.append(chr(value + 97))
         elif value < 52:
-            code.append(chr(65 + value - 26))
+            if chr(value + 65 - 26) in "0oOiIlLjJ":
+                code.append(chr(ord(value + 65 - 26) + 5))
+            else:
+                code.append(chr(value + 65 - 26))
         else:
-            code.append(chr(48 + value - 52))
+            if chr(value + 48 - 52) in "0oOiIlLjJ":
+                code.append(chr(ord(value + 48 - 52) + 5))
+            else:
+                code.append(chr(value + 48 - 52))
     return ''.join(code)
 
 @csrf_exempt

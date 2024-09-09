@@ -25,7 +25,7 @@ body {
 	height: 0;
 }
 
-label:not([type="radio"]) {
+label:not(> [type="radio"]) {
 	outline: none;
 }
 
@@ -854,14 +854,9 @@ h2 {
 	position: relative;
 }
 
-.wrapper-screen-all {
+.wrapper-screen-all:not(> .wrapper-canvas canvas:focus-visible) {
 	box-shadow: 0 0.188rem 0.688rem 0.188rem rgb(131, 126, 126);
 }
-
-.wrapper-screen-all > .wrapper-canvas canvas:not(:focus-visible) {
-	box-shadow: none;
-}
-
 .wrapper-screen-all > .wrapper-canvas canvas:focus-visible {
 	box-shadow: 0 0.188rem 0.688rem 0.188rem rgb(210, 210, 210);
 }

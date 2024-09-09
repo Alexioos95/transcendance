@@ -144,6 +144,7 @@ function	setupEventListeners(struct, data)
 	// Chat
 	if (data.guestMode === "false")
 		liveChat(struct);
+	setupEventListenerCSS(struct);
 }
 
 function	liveChat(struct)
@@ -218,6 +219,11 @@ function	liveChat(struct)
 			}
 		}
 	});
+}
+
+function	setupEventListenerCSS(struct)
+{
+	struct.
 }
 
 function	replaceDatas(struct, data)

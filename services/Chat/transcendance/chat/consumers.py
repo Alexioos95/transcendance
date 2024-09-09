@@ -22,20 +22,19 @@ class customException(Exception):
 class ChatConsumer(AsyncWebsocketConsumer):
     # Fonction pour récupérer le nom d'utilisateur à partir du JWT
     def get_username_from_jwt(self, auth_cookie):
+        print(f"getusername", file=sys.stderr)
         try:
             # Décrypter le JWT avec la clé secrète
             decoded_token = jwt.decode(auth_cookie, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
-            
+            print(f"decodedJwt == {decoded_token}", file=sys.stderr)
             # Extraire le nom d'utilisateur du JWT
-            self.username = decoded_token.get('userName')
+            username = decoded_token.get('userName')
+            print(f"decodedJwt == {username}", file=sys.stderr)
             if not username:
                 return None
-            # Vérifier si le token est expiré
-            expiration_date = decoded_token.get("expirationDate")
-            if expiration_date and expiration_date < time.time():
-                raise customException("Token expired", 401)
             return username
         except Exception as e:
+            print(f"except getusername == {e}", file=sys.stderr)
             return None
 
     async def connect(self):
@@ -47,12 +46,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             cookies = headers[b"cookie"].decode()  # Décoder les cookies en chaîne de caractères
             cookies_dict = dict(item.split("=") for item in cookies.split("; "))  # Parse cookies en dictionnaire
             auth_cookie = cookies_dict.get('auth')  # Récupérer le cookie 'auth'
+            print(f'authcoockie == {auth_cookie}', file=sys.stderr)
+
             self.username = ''
             # Si le cookie auth est trouvé, décoder le JWT pour obtenir le nom d'utilisateur
             if auth_cookie:
                 try:
                     self.username = self.get_username_from_jwt(auth_cookie)
                 except customException as e:
+                    print(f"e == {e}", file=sys.stderr)
                     # Si le JWT est invalide, on ferme la connexion
                     await self.close()
                     return
@@ -64,7 +66,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # Si aucun cookie n'est présent, fermer la connexion
             await self.close()
             return
-        print(self.username, file=sys.stderr)
+        print(f'username == {self.username}', file=sys.stderr)
         # Si le JWT est valide, définir le nom du groupe de chat (ici, chat_1)
         self.room_group_name = f"chat_{1}"
 
@@ -118,13 +120,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'chat_message',
                 'user': self.username,
-                'message': message
+                'message': clean_message
             }
         )
 
     # Recevoir un message du groupe de chat
     async def chat_message(self, event):
         message = event["message"]
+        user = event['user']
 
         # Envoyer le message au WebSocket
-        await self.send(text_data=json.dumps({"message": message}))
+        await self.send(text_data=json.dumps({"message": message, 'user':user}))

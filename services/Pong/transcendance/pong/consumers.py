@@ -180,6 +180,17 @@ def collision(canvas_width, canvas_height, paddle_width, paddle_height, x_paddle
     
     return dir_x, dir_y
 
+async  def get_username_from_jwt(self, auth_cookie):
+                try:
+                    # Décrypter le JWT avec la clé secrète
+                    decoded_token = jwt.decode(auth_cookie, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
+                    # Extraire le nom d'utilisateur du JWT
+                    username = decoded_token.get('userName')                    
+                    if not username:
+                        return None
+                    return username
+                except Exception as e:
+                    return None
 
 class GameConsumer(AsyncWebsocketConsumer):
     games = {}  # Dictionnaire pour stocker les instances de jeux par room_name
@@ -206,12 +217,35 @@ class GameConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
-
+        headers = dict(self.scope["headers"])
+        cookies = headers[b"cookie"].decode()
+        cookies_dict = dict(item.split("=") for item in cookies.split("; "))
+        auth_cookie = cookies_dict.get('auth')
         # Définir le rôle du joueur
         if GameConsumer.players_in_room[self.room_name] == 0:
             self.role = 'paddleLeft'
+            self.paddleLeft_name = ''
+            if auth_cookie:
+                
+                self.paddleLeft_name = self.get_username_from_jwt(auth_cookie)
+                if self.paddleLeft_name is None: 
+                    await self.close()
+                    return
+            else:
+                await self.close()
+                return
         else:
             self.role = 'paddleRight'
+            self.paddleRight_name = ''
+            if auth_cookie:
+                try:
+                    self.paddleRight_name = self.get_username_from_jwt(auth_cookie)
+               if self.paddleRight_name is None:
+                    await self.close()
+                    return
+            else:
+                await self.close()
+                return
 
         GameConsumer.players_in_room[self.room_name] += 1
 
@@ -254,7 +288,11 @@ class GameConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                 {
                     'type': 'game_over',
-                    'winner': winner
+                    if (self.role == 'paddleLeft')
+                        'winner' = self.paddleLeft_name
+                    else
+                        'winner' = self.paddleRight_name
+                    #'winner': winner
                 }
             )
 
@@ -313,6 +351,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             game.move_ball()
 
             game_state = {
+                "paddleLeft_name": self.paddleLeft_name,
+                "paddleRight_name": self.paddleRight_name,
                 "canvas_width": game.canvas_width,
                 "canvas_height": game.canvas_height,
                 "paddle_width": game.paddle_width,
@@ -336,7 +376,10 @@ class GameConsumer(AsyncWebsocketConsumer):
                     self.room_group_name,
                     {
                         'type': 'game_over',
-                        'winner': winner
+                        if (self.role == 'paddleLeft')
+                            'winner': self.paddleLeft_name
+                        else
+                            'winner': self.paddleRight_name
                     }
                 )
                 game.running = False
@@ -373,8 +416,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         # Déterminer si ce consommateur est le vainqueur
         if (self.role == 'paddleLeft' and winner == 'Player1') or (self.role == 'paddleRight' and winner == 'Player2'):
             # Obtenir les noms réels des joueurs (à ajuster selon votre logique)
-            player1 = "Player1"  # Remplacer par la logique réelle pour obtenir le nom du joueur 1
-            player2 = "Player2"  # Remplacer par la logique réelle pour obtenir le nom du joueur 2
+            player1 = self.paddleLeft_name  # Remplacer par la logique réelle pour obtenir le nom du joueur 1
+            player2 =  self.paddleRight_name#"Player2"  # Remplacer par la logique réelle pour obtenir le nom du joueur 2
 
             # Créer un objet Pong pour sauvegarder les résultats du jeu
             pong_game = Pong(

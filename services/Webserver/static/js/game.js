@@ -229,13 +229,15 @@ function	liveChat(struct)
 
 function	replaceDatas(struct, data)
 {
+	console.log(data);
+	struct.options.lang.curr = data.lang;
+	console.log(struct.options.lang.curr);
 	if (data.lang === "FR")
 		struct.options.lang.fr.click();
 	else if (data.lang === "EN")
 		struct.options.lang.en.click();
 	else if (data.lang === "NL")
 		struct.options.lang.nl.click();
-	struct.options.lang.curr = data.lang;
 	if (data.guestMode === "true")
 		setGuestRestrictions(struct, data);
 	else

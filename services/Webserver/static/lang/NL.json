@@ -2,28 +2,28 @@
 	"login": {
 		"plainText": {
 			"signin": "Aanmelden",
-			"forgotten": "Paswoord vergeten",
+			"forgotten": "Wachtwoord vergeten",
 			"signup": "Inschrijven",
 			"cancel": "Annuleren",
-			"validate": "Validate",
+			"validate": "Bevestigen",
 			"continue-42": "Doorgaan met 42",
 			"continue-guest": "Doorgaan als Gast"
 		},
 		"placeholder": {
 			"email": "Email",
-			"password": "Paswoord",
+			"password": "Wachtwoord",
 			"username": "Gebruikersnaam",
-			"code": "Code received"
+			"code": "Code ontvangen"
 		},
 		"ariaLabel": {
 			"email": "Email",
-			"password": "Paswoord",
+			"password": "Wachtwoord",
 			"username": "Gebruikersnaam",
-			"showPassword": "Change the display of my password",
-			"forgottenPassword": "Paswoord vergeten",
+			"showPassword": "De weergave van mijn wachtwoord wijzigen",
+			"forgottenPassword": "Wachtwoord vergeten",
 			"signup": "Inschrijven",
 			"cancel": "Annuleren",
-			"code": "Code received",
+			"code": "Code ontvangen",
 			"continue-42": "Inloggen met 42",
 			"continue-guest": "Spelen zonder zich aan te melden"
 		}
@@ -33,11 +33,11 @@
 			"reset": "Reset!"
 		},
 		"placeholder": {
-			"newPassword": "New password"
+			"newPassword": "Nieuw wachtwoord"
 		},
 		"ariaLabel": {
-			"newPassword": "New password",
-			"showPassword": "Change the display of my password"
+			"newPassword": "Nieuw wachtwoord",
+			"showPassword": "De weergave van mijn wachtwoord wijzigen"
 		}
 	},
 	"plainText": {
@@ -61,17 +61,17 @@
 		"connection": "Verbinding",
 		"changeUsername": "Gebruikersnaam:",
 		"changeEmail": "Email:",
-		"changePassword": "Paswoord:",
+		"changePassword": "Wachtwoord:",
 		"2fa": "2-factor-authenticatie",
 		"2fa-off": "Uitgeschakeld",
 		"2fa-email": "Email",
-		"send": "Send",
-		"activate": "Activate",
+		"send": "Zend",
+		"activate": "Activeer",
 		"save": "Opslaan",
 		"unblock": "Deblokkeren",
 		"chat": "Chat",
 		"friend": "Vrienden",
-		"criticalChat": "A critical error impacted the online Chat"
+		"criticalChat": "Een kritieke fout beïnvloedde de online Chat"
 	},
 	"placeholder": {
 		"p1": "Speler 1",
@@ -81,7 +81,7 @@
 		"passwordCurr": "Huidige",
 		"passwordNew": "Nieuw",
 		"email": "Email",
-		"code": "Code received"
+		"code": "Code ontvangen"
 	},
 	"title": {
 		"me": "Zie mijn historie",
@@ -94,7 +94,7 @@
 	"ariaLabel": {
 		"chooseGame": "Kies het spel: Pong of Tetris",
 		"mode": "Kies het spel mode: ",
-		"1v1": "Speler tegen tegen locaal speler",
+		"1v1": "Speler tegen locaal speler",
 		"tournament": "Locaal 4-speler toernooi",
 		"online": "Online spelen tegen een andere speler",
 		"play": "Speel!",
@@ -103,7 +103,7 @@
 		"pseudo3": "Bijnaam of speler 3",
 		"pseudo4": "Bijnaam of speler 4",
 		"email": "Email",
-		"code": "Code received"
+		"code": "Code ontvangen"
 	},
 	"tabOptions": {
 		"addFriend": "Aan vriendenlijst toevoegen",

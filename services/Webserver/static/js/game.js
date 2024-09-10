@@ -110,9 +110,18 @@ function	setupEventListeners(struct, data)
 		event.preventDefault();
 
 		const data = new FormData(struct.options.account.form);
+		const avatarForm = document.getElementsByClassName("change-avatar")[0];
+		const avatarData = new FormData();
+
+		avatarData.append("file", avatarForm[0]);
+		const options = {
+			method: "POST",
+			body: avatarData
+		};
+
 		const obj = {
 			lang: data.get("lang"),
-			avatar: data.get("avatar"),
+			avatar: avatarData,
 			username: data.get("options-username"),
 			email: data.get("options-email"),
 			passwordCurr: data.get("options-password-curr"),
@@ -120,6 +129,7 @@ function	setupEventListeners(struct, data)
 			twoFA: data.get("2fa")
 		};
 
+		console.log(obj.avatar);
 		console.log("fetch /user/updateUserInfos");
 		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {

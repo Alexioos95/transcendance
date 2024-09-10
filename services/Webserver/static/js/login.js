@@ -274,7 +274,8 @@ function resetPassword()
 	const struct = {
 		input: document.querySelector("form input"),
 		button: document.getElementsByClassName("submit")[0],
-		langSelect: document.getElementsByTagName("select")[0]
+		langSelect: document.getElementsByTagName("select")[0],
+		error: document.getElementsByClassName("error-reset")[0]
 	};
 
 	struct.button.addEventListener("click", function() {
@@ -283,12 +284,17 @@ function resetPassword()
 		fetch("/user/sendNewPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
-					console.log("response /user/sendNewPaswd ok; do nothing");
+				{
+					showMessage(struct.error)
+						.then(() => sleep(1000))
+						.then(() => navigate("login", undefined, { guestMode: "false", lang: struct.langSelect.value }))
+				}
 				else
 				{
-					console.log("response /user/sendNewPaswd not good; do nothing // Need to place error");
-					console.log(response.status);
-					return (response.json().then(data => { console.log(data) }));
+					struct.error.classList.add("error");
+					struct.error.classList.remove("success");
+					response.text().then(data => { console.log(data) });
+					// response.json().then(data => { struct.error.innerHTML = data.error });
 				}
 			})
 			.catch(() => console.error("Error: failed to fetch the sendNewPaswd route"));
@@ -298,6 +304,13 @@ function resetPassword()
 			.then(response => response.json())
 			.then(result => { translateLoginPage(struct, result.reset); })
 	});
+}
+
+async function showMessage(p)
+{
+	p.classList.add("success");
+	p.classList.remove("error");
+	p.innerHTML = "Success";	
 }
 
 /////////////////////////

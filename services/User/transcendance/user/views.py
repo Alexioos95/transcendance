@@ -699,3 +699,52 @@ def matchMaking(request):
 @require_http_methods(["GET"])
 def ping(request):
     return HttpResponse(status=204)
+
+@require_http_methods(["POST"])
+def addFriend(request):
+    #1 checkJwt pour identifier la personne qui veut ajouter un ami et s'assurer que le JWT est toujours valide .
+    #2 verifier qu'on ne s'ajoute pas soi meme
+    #3 check si ami en db
+    #4 check si ami a ajouter est dans la liste d'ennemis et l'en supprimer s'il y est.
+    # Ajouter ami dans la liste d'amis.
+    # renvoyer status == 200
+
+
+    #1
+    # try
+    #   user = checkJwt(cookie)
+    # except customException as e
+    #   return JsonResponse({'error': e.data}, status=e.status)
+
+    #2
+
+    #3
+    # data = json.loads(request.body)
+    # if not 'username' in data:
+    #   retourner qqc
+    # newFriend = get_user_in_db(Username, data['username'])
+    # if newFriend is None:
+    #   retourner qqc
+     
+    #4
+
+@require_http_methods(["POST"])
+def blockUser(request):
+    # checkJwt pour identifier la personne qui veut bloquer une persone et s'assurer que le JWT est toujours valide .
+    # verifier qu'on ne s'ajoute pas soi meme
+    # check si personne en db
+    # check si personne a bloquer est dans la liste d'amis et l'en supprimer s'il y est.
+    # Ajouter personne dans la liste d'ennemis.
+    # renvoyer status == 200
+
+@require_http_methods(["POST"])
+def deleteFriend(request):
+    # checkJwt pour identifier la personne qui veut supprimer un ami et s'assurer que le JWT est toujours valide .
+    # check si ami a supprimer est dans la liste d'amis et l'en supprimer s'il y est.
+    # renvoyer status == 200
+
+@require_http_methods(["POST"])
+def deleteBlockedUser(request):
+    # checkJwt pour identifier la personne qui veut supprimer une personne bloquee et s'assurer que le JWT est toujours valide .
+    # check si personne a supprimer est dans la liste de bloques et l'en supprimer s'il y est.
+    # renvoyer status == 200

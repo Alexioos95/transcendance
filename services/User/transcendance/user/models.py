@@ -1,5 +1,5 @@
 from django.db import models
-# from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField
 
 # # Create your models here.
 # class User(models.Model):
@@ -39,6 +39,8 @@ class User(models.Model):
     lastTimeOnline = models.DateTimeField()  # instance de datetime.date
     pongLvl = models.PositiveBigIntegerField()
     tetrisLvl = models.PositiveBigIntegerField()  # start at 0, no negative values
+    friendsList = ArrayField(models.CharField(max_length=30, blank=True))
+    foeList = ArrayField(models.CharField(max_length=30, blank=True))
     
     def __str__(self):
         return self.Username

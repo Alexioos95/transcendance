@@ -65,7 +65,6 @@ function	setupEventListeners(struct, data)
 			struct.run = 0;
 			return (navigate("login", undefined, { signUp: "false", lang: struct.options.lang.curr }));
 		}
-		console.log(struct.options.lang.curr);
 		fetch("/user/disconnect/", { method: "GET", credentials: "include"})
 			.then(() => { struct.run = 0; })
 			.then(() => {
@@ -229,15 +228,8 @@ function	liveChat(struct)
 
 function	replaceDatas(struct, data)
 {
-	console.log(data);
+	fetchTranslation(struct, data.lang);
 	struct.options.lang.curr = data.lang;
-	console.log(struct.options.lang.curr);
-	if (data.lang === "FR")
-		struct.options.lang.fr.click();
-	else if (data.lang === "EN")
-		struct.options.lang.en.click();
-	else if (data.lang === "NL")
-		struct.options.lang.nl.click();
 	if (data.guestMode === "true")
 		setGuestRestrictions(struct, data);
 	else
@@ -375,8 +367,10 @@ function	fetchTranslation(struct, lang)
 			.catch(() => { console.error("Error: couldn't translate the page"); });
 	}
 }
+
 async function	translateGamePage(struct, obj, currLang)
 {
+	console.log("TRANSLATE");
 	struct.options.lang.curr = currLang;
 	let plainTexts = Object.values(obj.plainText);
 	let placeHolders = Object.values(obj.placeholder);
@@ -438,7 +432,7 @@ async function	setGuestRestrictions(struct)
 	struct.tabs.chat.table.classList.add("hidden");
 	struct.tabs.friend.input.classList.add("hidden");
 	struct.tabs.friend.table.classList.add("hidden");
-	struct.guessMode = true;
+	struct.guestMode = true;
 }
 
 function	createChatButton(title, addClass, child)

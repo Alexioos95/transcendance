@@ -121,7 +121,7 @@ function	setupEventListeners(struct, data)
 
 		const obj = {
 			lang: data.get("lang"),
-			avatar: avatarData,
+			avatar: options,
 			username: data.get("options-username"),
 			email: data.get("options-email"),
 			passwordCurr: data.get("options-password-curr"),

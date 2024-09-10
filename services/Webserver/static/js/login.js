@@ -293,7 +293,7 @@ function resetPassword()
 			})
 			.catch(() => console.error("Error: failed to fetch the sendNewPaswd route"));
 	});
-	langSelect.addEventListener("change", function(event) {
+	struct.langSelect.addEventListener("change", function(event) {
 		fetch("/lang/" + event.target.value + ".json")
 			.then(response => response.json())
 			.then(result => { translateLoginPage(struct, result.reset); })

@@ -1,4 +1,32 @@
 "use strict";
+
+function	deleteFriend()
+{
+	const obj = { unfriend: "toUnfriend" };
+
+	fetch("/user/deleteFriend/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+	.then(response => {
+		if (response.ok)
+			console.log("deleteFriend OK");
+		else
+			response.json().then(data => console.log(data))
+	})
+	.catch(() => console.error("Error: failed to fetch the deleteFriend route"));
+}
+function	deleteBlocked()
+{
+	const obj = { unblock: "toUnblock" };
+
+	fetch("/user/deleteBlockedUser/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+	.then(response => {
+		if (response.ok)
+			console.log("deleteFriend OK");
+		else
+			response.json().then(data => console.log(data))
+	})
+	.catch(() => console.error("Error: failed to fetch the deleteBlockedUser route"));
+}
+
 /////////////////////////
 // Script
 /////////////////////////

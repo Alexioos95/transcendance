@@ -178,7 +178,7 @@ function	liveChat(struct)
 		lock.classList.remove("hidden");
 	});
 	struct.chat.socket.addEventListener("message", function(event) {
-		const obj = JSON.parse(event.data);
+		const data = JSON.parse(event.data);
 		const tr = document.createElement("tr");
 		const td = document.createElement("td");
 		const chatMessage = document.createElement("div");
@@ -186,7 +186,7 @@ function	liveChat(struct)
 		const avatar = document.createElement("img");
 		const p = document.createElement("p");
 		const span = document.createElement("span");
-		const text = document.createTextNode(": " + obj.message);
+		const text = document.createTextNode(": " + data.message);
 		const chatOptions = document.createElement("div");
 		const i1 = document.createElement("i");
 		const i2 = document.createElement("i");
@@ -194,11 +194,11 @@ function	liveChat(struct)
 		const i4 = document.createElement("i");
 		let isScrolled = false;
 
-		avatar.src = "/images/default_avatar.png";
+		avatar.src = data.avatar;
 		avatar.alt = "Avatar";
 		chatUserAvatar.classList.add("chat-user-avatar");
 		chatUserAvatar.appendChild(avatar);
-		span.innerHTML = obj.user;
+		span.innerHTML = data.user;
 		p.appendChild(span);
 		p.appendChild(text);
 		chatMessage.classList.add("chat-message");
@@ -208,6 +208,32 @@ function	liveChat(struct)
 		i2.classList.add("fa-solid", "fa-clock-rotate-left");
 		i3.classList.add("fa-solid", "fa-table-tennis-paddle-ball");
 		i4.classList.add("fa-solid", "fa-circle-xmark");
+
+		i1.addEventListener("click", function() {
+			const obj = { newFriend: "usernameToFriend" };
+
+			fetch("/user/addFriend/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => {
+				if (response.ok)
+					console.log("addFriend success");
+				else
+					response.json().then(data => { console.log(data); });
+			})
+			.catch(() => console.error("Error: failed to fetch the addFriend route"));
+		});
+		i4.addEventListener("click", function() {
+			const obj = { toBlock: "usernameToBlock" };
+
+			fetch("/user/blockUser/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => {
+				if (response.ok)
+					console.log("blockUser success");
+				else
+					response.json().then(data => { console.log(data); });
+			})
+			.catch(() => console.error("Error: failed to fetch the blockUser route"));
+		});
+
 		chatOptions.appendChild(createChatButton("Ajouter en ami", "hover-green", i1));
 		chatOptions.appendChild(createChatButton("Voir l'historique", "hover-purple", i2));
 		chatOptions.appendChild(createChatButton("Inviter pour un Pong", "hover-blue", i3));

@@ -34,8 +34,8 @@ services:
 #    volume:
 
   user_db:
-    hostname: postgre_user
-    container_name: postgre_user
+    hostname: postgres_user
+    container_name: postgres_user
     image: postgres@sha256:d898b0b78a2627cb4ee63464a14efc9d296884f1b28c841b0ab7d7c42f1fffdf
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'pg_isready -U $${POSTGRES_USER} -d postgres'"]
@@ -71,6 +71,9 @@ services:
     restart: unless-stopped
     environment:
       - SERVER_JWT_KEY=$SERVER_JWT_KEY
+      - POSTGRES_PASSWORD=$USER_POSTGRES_PASSWORD
+      - POSTGRES_USER=$USER_POSTGRES_USER
+      - PGPORT=$USER_POSTGRES_PORT
 
   chat:
     hostname: chat

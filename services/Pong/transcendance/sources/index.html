@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+    <!-- Charger le tag static -->
+    {% load static %}
+</head>
+<body>
+    <h1>Pong Game</h1>
+    <label for="room-name">Nom de la Room:</label>
+    <input type="text" id="room-name" placeholder="Entrez le nom de la room">
+    <button id="start-game">Démarrer le jeu</button>
+
+    <canvas id="Pong" width="1000" height="300"></canvas>
+
+    <script>
+        let socket = null; // Déclaration globale
+
+        document.getElementById('start-game').addEventListener('click', () => {
+            const roomName = document.getElementById('room-name').value.trim();
+            if (roomName) {
+                openSocket(roomName);
+            } else {
+                alert('Veuillez entrer un nom de room.');
+            }
+        });
+
+        function openSocket(roomName) {
+            try {
+                // Utilisation du nom de la room saisi par l'utilisateur
+                socket = new WebSocket(`ws://localhost:8000/ws/pong/`);
+                socket.onopen = () => console.log('WebSocket est ouvert.');
+                socket.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'game_update') {
+                        updateCanvas(data.game_state);
+                    } else if (data.type === 'game_over') {
+                        console.log('Game Over:', data.winner);
+                        // Ajouter la logique pour afficher un message de fin de jeu
+                    }
+                };
+                socket.onerror = (error) => console.error('Erreur WebSocket:', error);
+                socket.onclose = () => console.log('WebSocket fermé.');
+            } catch (error) {
+                console.error('Erreur lors de l\'ouverture de la connexion WebSocket:', error);
+            }
+        }
+
+        // Obtenir le contexte du canvas
+        function getCanvas(name) {
+            const canvas = document.getElementById(name);
+            return canvas.getContext('2d');
+        }
+
+        const ctx = getCanvas("Pong");
+
+        // Fonction pour mettre à jour le canvas avec les données reçues du serveur
+        function updateCanvas(gameState) {
+            const canvasWidth = ctx.canvas.width;
+            const canvasHeight = ctx.canvas.height;
+
+            // Effacer le canvas
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+            // Dessiner la balle
+            const ballX = gameState.ball.x * canvasWidth / 100;
+            const ballY = gameState.ball.y * canvasHeight / 100;
+            const ballRadius = gameState.ball.radius * canvasWidth / 100; // Assumer que le rayon est en pourcentage du canvas largeur
+
+            ctx.fillStyle = "green";
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballRadius, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Dessiner les paddles
+            const paddleWidth = gameState.paddle_width * canvasWidth / 100;
+            const paddleHeight = gameState.paddle_height * canvasHeight / 100;
+
+            const paddleLeftX = gameState.x_paddleLeft * canvasWidth / 100;
+            const paddleLeftY = gameState.y_paddleLeft * canvasHeight / 100;
+            const paddleRightX = gameState.x_paddleRight * canvasWidth / 100;
+            const paddleRightY = gameState.y_paddleRight * canvasHeight / 100;
+
+            ctx.fillStyle = "#FF0000";
+            ctx.fillRect(paddleLeftX, paddleLeftY, paddleWidth, paddleHeight);
+            ctx.fillRect(paddleRightX, paddleRightY, paddleWidth, paddleHeight);
+
+            // Afficher le score
+            ctx.fillStyle = "#000000";
+            ctx.font = "20px Arial";
+            ctx.fillText("Score Left: " + gameState.score[1], 10, 20);
+            ctx.fillText("Score Right: " + gameState.score[0], canvasWidth - 100, 20);
+        }
+
+        // Envoyer les entrées du joueur au serveur
+        document.body.addEventListener("keydown", function(event) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                const dataToSend = {
+                    key: event.key
+                };
+                socket.send(JSON.stringify(dataToSend));
+            }
+        });
+
+    </script>
+</body>
+</html>

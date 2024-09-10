@@ -247,8 +247,16 @@ textarea { font-size: 0.9rem; }
 	color: var(--textColor);
 }
 
-.login-page form button.recovery {
+.login-page form p {
+	transition: margin 0.7s ease-out, background 0s;
+}
+
+.login-page form p.recovery {
 	margin-top: -3.350rem;
+}
+
+.login-page form button.recovery {
+	margin-top: -0.350rem;
 }
 
 .login-page form button.signup, .login-page form button.cancel-signup {

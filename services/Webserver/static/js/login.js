@@ -279,7 +279,10 @@ function resetPassword()
 	};
 
 	struct.button.addEventListener("click", function() {
-		const obj = { password: struct.input.value }
+		const urlParams = new URLSearchParams(window.location.search);
+		const code = urlParams.get('code');
+		console.log(code);
+		const obj = { password: struct.input.value, 'code': code};
 
 		fetch("/user/sendNewPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {

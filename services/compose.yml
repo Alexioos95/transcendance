@@ -71,6 +71,7 @@ services:
     restart: unless-stopped
     environment:
       - SERVER_JWT_KEY=$SERVER_JWT_KEY
+      - DUMP=$DUMP
 
   chat:
     hostname: chat
@@ -100,6 +101,7 @@ services:
       - transcendance
     restart: unless-stopped
     environment:
+      - DUMP=$DUMP
       - EMAIL_HOST=$EMAIL_HOST
       - EMAIL_PORT=$EMAIL_PORT
       - EMAIL_HOST_USER=$EMAIL_HOST_USER

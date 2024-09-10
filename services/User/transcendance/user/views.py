@@ -546,27 +546,34 @@ def set2FA(request):
 #             code.append(chr(48 + value - 52))
 #     return ''.join(code)
 
-def generate_code(size=100):
+
+def get_alpha_maj(value:int)->str:
+    if chr(value) in "IJLO":
+        value += 5
+    return chr(value)
+
+def get_alpha_min(value:int)->str:
+    if chr(value) in "ijlo":
+        value += 5
+    return chr(value)
+
+def get_digit(value:int)->str:
+    if value == chr(0):
+        value += 1
+    return chr(value)
+
+def generate_code(size:int=100)->str:
     code = []
-    # Banir i l 1 0 o maj+min
+    if size <= 0:
+        size = 100
     for _ in range(size):
         value = random.randint(0, 61)
-        if value < 26:
-            # Ajouter 5 si le caractère généré est dans "0oOiIlLjJ"
-            if chr(value + 97) in "0oOiIlLjJ ":
-                code.append(chr(ord(value + 97) + 5))
-            else:
-                code.append(chr(value + 97))
-        elif value < 52:
-            if chr(value + 65 - 26) in "0oOiIlLjJ":
-                code.append(chr(ord(value + 65 - 26) + 5))
-            else:
-                code.append(chr(value + 65 - 26))
+        if value < 10:
+            code += get_digit(value + ord('0'))
+        elif value < 35:
+            code += get_alpha_min(value - 10 + ord('a'))
         else:
-            if chr(value + 48 - 52) in "0oOiIlLjJ":
-                code.append(chr(ord(value + 48 - 52) + 5))
-            else:
-                code.append(chr(value + 48 - 52))
+            code += get_alpha_maj(value - 35 + ord('A'))
     return ''.join(code)
 
 @csrf_exempt

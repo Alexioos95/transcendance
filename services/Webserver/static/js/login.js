@@ -59,6 +59,13 @@ function	login(prevData)
 	}
 }
 
+function	resetErrorDisplay(p)
+{
+	p.classList.remove("success");
+	p.classList.add("error");
+	p.innerHTML = "";
+}
+
 /////////////////////////
 // Sign Up
 /////////////////////////
@@ -117,7 +124,11 @@ function	handleConnection(struct)
 		fetch("/user/resetPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
-					console.log("response /user/resetPaswd ok; do nothing // Need to continue");
+				{
+					struct.error.login.classList.add("success");
+					struct.error.login.classList.remove("error");
+					struct.error.login.innerHTML = "Success";
+				}
 				else
 				{
 					console.log("response /user/resetPaswd not good; do nothing // Need to place error");
@@ -132,7 +143,7 @@ function	handleConnection(struct)
 			.then(response => {
 				if (response.ok)
 				{
-					struct.error.login.innerHTML = "";
+					resetErrorDisplay(struct.error.login);
 					return (response.json().then(data => { call2FA(struct, data) }));
 				}
 				else
@@ -186,6 +197,8 @@ async function waitCode(struct)
 /////////////////////////
 function	showConnection(struct)
 {
+	resetErrorDisplay(struct.error.login);
+	struct.error.login.classList.remove("recovery");
 	struct.formInput.password.ariaHidden = "false";
 	struct.formInput.password.classList.remove("hideInFade");
 	struct.formButton.showPassword.classList.remove("hideInFade");
@@ -214,7 +227,8 @@ function	showConnection(struct)
 
 function	showRecovery(struct)
 {
-	struct.error.login.innerHTML = "";
+	resetErrorDisplay(struct.error.login);
+	struct.error.login.classList.add("recovery");
 	struct.formButton.signUp.disabled = true;
 	struct.formInput.password.ariaHidden = "false";
 	struct.formInput.password.classList.add("hideInFade");
@@ -243,7 +257,7 @@ function	showRecovery(struct)
 
 function	showSignUpForm(struct)
 {
-	struct.error.login.innerHTML = "";
+	resetErrorDisplay(struct.error.login);
 	struct.formInput.username.classList.remove("hidden");
 	struct.formButton.connection.classList.add("hidden");
 	struct.formButton.forgotPassword.classList.add("hidden");

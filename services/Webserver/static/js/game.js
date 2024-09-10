@@ -15,6 +15,7 @@ async function	run(data)
 		tabs: getTabsStruct(),
 		chat: getChatStruct(),
 		translation: getTranslationStruct(),
+		guestMode: false,
 		run: 1
 	};
 	setupEventListeners(struct, data);
@@ -59,13 +60,19 @@ function	setupEventListeners(struct, data)
 		showScreen(struct.screen, struct.screen.wrapperOptions)
 	});
 	struct.header.logoutButton.addEventListener("click", function() {
+		if (struct.guestMode === true)
+		{
+			struct.run = 0;
+			return (navigate("login", undefined, { signUp: "false", lang: struct.options.lang.curr }));
+		}
+		console.log(struct.options.lang.curr);
 		fetch("/user/disconnect/", { method: "GET", credentials: "include"})
 			.then(() => { struct.run = 0; })
 			.then(() => {
 				if (struct.chat.socket !== undefined)
 					struct.chat.socket.close(1000);
 			})
-			.then(() => { return (navigate("login", undefined, { signUp: "false", lang: data.lang }))})
+			.then(() => { return (navigate("login", undefined, { signUp: "false", lang: struct.options.lang.curr }))})
 			.catch(() => console.error("Error: failed to fetch the matchMaking route"));
 	});
 	// Cross Buttons
@@ -429,6 +436,7 @@ async function	setGuestRestrictions(struct)
 	struct.tabs.chat.table.classList.add("hidden");
 	struct.tabs.friend.input.classList.add("hidden");
 	struct.tabs.friend.table.classList.add("hidden");
+	struct.guessMode = true;
 }
 
 function	createChatButton(title, addClass, child)

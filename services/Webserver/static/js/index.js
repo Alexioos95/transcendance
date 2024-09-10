@@ -14,16 +14,16 @@ async function	checkJWT()
 	else
 	{
 		await fetch("/user/checkJwt/")
-		.then(response => {
-			if (response.ok)
-				return (response.json().then(data => { data.guestMode = "false"; navigate("game", data, { signUp: "false", lang: "FR" })}));
-			else
-			{
-				history.replaceState({ state: "login", lang: "FR" }, "", "");
-				return (navigate("login", undefined,  { signUp: "false", lang: "FR" }));
-			}
-		})
-		.catch(() => console.error("Error: failed to fetch the checkJwt route"));
+			.then(response => {
+				if (response.ok)
+					return (response.json().then(data => { data.guestMode = "false"; navigate("game", data, { signUp: "false", lang: "FR" })}));
+				else
+				{
+					history.replaceState({ state: "login", lang: "FR" }, "", "");
+					return (navigate("login", undefined,  { signUp: "false", lang: "FR" }));
+				}
+			})
+			.catch(() => console.error("Error: failed to fetch the checkJwt route"));
 	}
 }
 

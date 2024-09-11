@@ -573,6 +573,14 @@ def updateInfo(request):
     response = JsonResponse({"guestMode": "false", "username":user.Username, "Avatar":user.Avatar, "language": user.language})#ajouter plus tard friends et bloques + get dans le cache les defis lances ou acceptes
     return JsonResponse({'message': 'OK'}, status=200)
 
+    friendObject = []
+
+    for friend in user.friendsList:
+        DBFriend = get_user_in_db("Username", friend)#penser a change par les ids
+        friendObject += {DBFriend.Username, DBFriend.lastTimeOnline}
+    objectPing = {'FriendList':friendObject,'BlockList':DBFriend.foeList,'gameInvitation':[],'challengeAccepted':{'game':'pong', 'username':[]}}
+
+
 @csrf_exempt
 def checkCodeLog(request):
     try:

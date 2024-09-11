@@ -37,12 +37,12 @@ services:
     hostname: postgres_user
     container_name: postgres_user
     image: postgres@sha256:d898b0b78a2627cb4ee63464a14efc9d296884f1b28c841b0ab7d7c42f1fffdf
-    healthcheck:
-      test: ["CMD-SHELL", "sh -c 'pg_isready -U $${POSTGRES_USER} -d postgres'"]
-      start_period: 30s
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    # healthcheck:
+    #   test: ["CMD-SHELL", "sh -c 'pg_isready -U $${POSTGRES_USER} -d postgres'"]
+    #   start_period: 30s
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
     restart: unless-stopped
     networks:
       - transcendance
@@ -80,10 +80,10 @@ services:
   chat:
     hostname: chat
     container_name: chat
-    depends_on:
-      chat_cache:
-        condition: service_healthy
-        restart: true
+    # depends_on:
+    #   chat_cache:
+    #     condition: service_healthy
+    #     restart: true
     pull_policy: build
     build:
       context: Chat

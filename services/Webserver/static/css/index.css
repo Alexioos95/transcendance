@@ -1190,6 +1190,10 @@ canvas.pong {
 	user-select: none;
 }
 
+.wrapper-player-controls.solo {
+	width: 100%;
+}
+
 .wrapper-player-controls .playername {
 	position: absolute;
 	bottom: 1%;
@@ -1276,6 +1280,24 @@ canvas.pong {
 .wrapper-bottom-section-hover .key, .wrapper-bottom-section-hover .wrapper-controls-keys {
 	display: flex;
 	opacity: 1;
+}
+
+.wrapper-player-controls.solo .stick {
+	width: 70%;
+}
+
+.wrapper-player-controls.solo .rotate {
+	width: 40%;
+}
+
+.wrapper-player-controls.solo .wrapper-controls-keys {
+	width: 100%;
+	left: 0%;
+}
+
+.wrapper-player-controls.solo .rotate + .key {
+	width: 33%;
+	height: 111%;
 }
 
 /*/////////////*/

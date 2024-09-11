@@ -187,6 +187,18 @@ function	setupEventListeners(struct, data)
 	struct.screen.wrapperCanvas.addEventListener("keyup", function(event) { disableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mousemove", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mouseup", function(event) { disableStickMove(event, struct); });
+	struct.gameForm.inputs[0].addEventListener("change", function() {
+		struct.screen.primaryPlayer.classList.remove("solo");
+		struct.screen.secondaryPlayer.classList.remove("hidden");
+	});
+	struct.gameForm.inputs[1].addEventListener("change", function() {
+		struct.screen.primaryPlayer.classList.remove("solo");
+		struct.screen.secondaryPlayer.classList.remove("hidden");
+	});
+	struct.gameForm.inputs[2].addEventListener("change", function() {
+		struct.screen.primaryPlayer.classList.add("solo");
+		struct.screen.secondaryPlayer.classList.add("hidden");
+	});
 	// Chat
 	if (data.guestMode === "false")
 		liveChat(struct);
@@ -557,6 +569,8 @@ function	getScreenStruct()
 		wrapperCanvas: document.getElementsByClassName("wrapper-canvas")[0],
 		wrapperOptions: document.getElementsByClassName("wrapper-options")[0],
 		wrapperTournamentForm: document.getElementsByClassName("tournament-form")[0],
+		primaryPlayer: document.getElementsByClassName("wrapper-player-controls")[1],
+		secondaryPlayer: document.getElementsByClassName("wrapper-player-controls")[0],
 		sticks: getSticksStruct(),
 		keys: document.getElementsByClassName("key"),
 		playerOnControls: document.getElementsByClassName("playername"),

@@ -279,11 +279,27 @@ function resetPassword()
 {
 	const struct = {
 		input: document.querySelector("form input"),
+		showPassword: document.getElementsByClassName("show-password")[0],
+		showPasswordIcon: document.querySelector(".show-password .i"),
 		button: document.getElementsByClassName("submit")[0],
 		langSelect: document.getElementsByTagName("select")[0],
 		error: document.getElementsByClassName("error-reset")[0]
 	};
 
+	struct.showPassword.addEventListener("click", function() {
+		if (password.type == "password")
+			{
+				struct.input.type = "text";
+				struct.showPasswordIcon.classList.remove("fa-eye-slash");
+				struct.showPasswordIcon.classList.add("fa-eye");
+			}
+			else
+			{
+				struct.input.type = "password";
+				struct.showPasswordIcon.classList.remove("fa-eye");
+				struct.showPasswordIcon.classList.add("fa-eye-slash");
+			}
+	});
 	struct.button.addEventListener("click", function() {
 		const urlParams = new URLSearchParams(window.location.search);
 		const code = urlParams.get('code');

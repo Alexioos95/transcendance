@@ -75,6 +75,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Accepter la connexion WebSocket
         await self.accept()
+        await self.channel_layer.group_send(
+        self.room_group_name,
+        {
+            'type': 'connect_info',
+            'user': self.username,
+        })
+
 
     async def disconnect(self, close_code):
         # Quitter le groupe de chat lors de la déconnexion
@@ -125,9 +132,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     # Recevoir un message du groupe de chat
+    async def connect_info(self, event):
+        user = event['user']
+
+        # Envoyer le message au WebSocket
+        await self.send(text_data=json.dumps({"type":"connected" , 'user':user}))
+
+
+    # Recevoir un message du groupe de chat
     async def chat_message(self, event):
         message = event["message"]
         user = event['user']
 
         # Envoyer le message au WebSocket
-        await self.send(text_data=json.dumps({"message": message, 'user':user}))
+        await self.send(text_data=json.dumps({"type":"message" ,"message": message, 'user':user}))

@@ -1,4 +1,32 @@
 "use strict";
+
+function	deleteFriend()
+{
+	const obj = { unfriend: "toUnfriend" };
+
+	fetch("/user/deleteFriend/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+	.then(response => {
+		if (response.ok)
+			console.log("deleteFriend OK");
+		else
+			response.json().then(data => console.log(data))
+	})
+	.catch(() => console.error("Error: failed to fetch the deleteFriend route"));
+}
+function	deleteBlocked()
+{
+	const obj = { unblock: "toUnblock" };
+
+	fetch("/user/deleteBlockedUser/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+	.then(response => {
+		if (response.ok)
+			console.log("deleteFriend OK");
+		else
+			response.json().then(data => console.log(data))
+	})
+	.catch(() => console.error("Error: failed to fetch the deleteBlockedUser route"));
+}
+
 /////////////////////////
 // Script
 /////////////////////////
@@ -110,28 +138,30 @@ function	setupEventListeners(struct, data)
 		event.preventDefault();
 
 		const data = new FormData(struct.options.account.form);
-		const avatarForm = document.getElementsByClassName("change-avatar")[0];
-		const avatarData = new FormData();
+		const avatarImage = document.getElementsByClassName("change-avatar")[0].files[0];
+		const avatarForm = new FormData();
 
-		avatarData.append("file", avatarForm[0]);
-		const options = {
-			method: "POST",
-			body: avatarData
-		};
+		avatarForm.append("file", avatarImage);
+		avatarForm.append("lang", data.get("lang"));
+		avatarForm.append("username", data.get("options-username"));
+		avatarForm.append("email", data.get("options-email"));
+		avatarForm.append("passwordCurr", data.get("options-password-curr"));
+		avatarForm.append("passwordNew", data.get("options-password-new"));
+		avatarForm.append("twoFA", data.get("2fa"));
 
-		const obj = {
-			lang: data.get("lang"),
-			avatar: options,
-			username: data.get("options-username"),
-			email: data.get("options-email"),
-			passwordCurr: data.get("options-password-curr"),
-			passwordNew: data.get("options-password-new"),
-			twoFA: data.get("2fa")
-		};
+		// const obj = {
+		//	lang: data.get("lang"),
+		//	avatar: options,
+		//	username: data.get("options-username"),
+		//	email: data.get("options-email"),
+		//	passwordCurr: data.get("options-password-curr"),
+		//	passwordNew: data.get("options-password-new"),
+		//	twoFA: data.get("2fa")
+		//};
 
 		console.log(obj.avatar);
 		console.log("fetch /user/updateUserInfos");
-		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		fetch("/user/updateUserInfos/", { method: "POST", body: avatarForm, credentials: "include"})
 			.then(response => {
 				if (response.ok)
 				{
@@ -157,6 +187,18 @@ function	setupEventListeners(struct, data)
 	struct.screen.wrapperCanvas.addEventListener("keyup", function(event) { disableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mousemove", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mouseup", function(event) { disableStickMove(event, struct); });
+	struct.gameForm.inputs[0].addEventListener("change", function() {
+		struct.screen.primaryPlayer.classList.remove("solo");
+		struct.screen.secondaryPlayer.classList.remove("hidden");
+	});
+	struct.gameForm.inputs[1].addEventListener("change", function() {
+		struct.screen.primaryPlayer.classList.remove("solo");
+		struct.screen.secondaryPlayer.classList.remove("hidden");
+	});
+	struct.gameForm.inputs[2].addEventListener("change", function() {
+		struct.screen.primaryPlayer.classList.add("solo");
+		struct.screen.secondaryPlayer.classList.add("hidden");
+	});
 	// Chat
 	if (data.guestMode === "false")
 		liveChat(struct);
@@ -178,7 +220,7 @@ function	liveChat(struct)
 		lock.classList.remove("hidden");
 	});
 	struct.chat.socket.addEventListener("message", function(event) {
-		const obj = JSON.parse(event.data);
+		const data = JSON.parse(event.data);
 		const tr = document.createElement("tr");
 		const td = document.createElement("td");
 		const chatMessage = document.createElement("div");
@@ -186,7 +228,7 @@ function	liveChat(struct)
 		const avatar = document.createElement("img");
 		const p = document.createElement("p");
 		const span = document.createElement("span");
-		const text = document.createTextNode(": " + obj.message);
+		const text = document.createTextNode(": " + data.message);
 		const chatOptions = document.createElement("div");
 		const i1 = document.createElement("i");
 		const i2 = document.createElement("i");
@@ -194,11 +236,11 @@ function	liveChat(struct)
 		const i4 = document.createElement("i");
 		let isScrolled = false;
 
-		avatar.src = "/images/default_avatar.png";
+		avatar.src = data.avatar;
 		avatar.alt = "Avatar";
 		chatUserAvatar.classList.add("chat-user-avatar");
 		chatUserAvatar.appendChild(avatar);
-		span.innerHTML = obj.user;
+		span.innerHTML = data.user;
 		p.appendChild(span);
 		p.appendChild(text);
 		chatMessage.classList.add("chat-message");
@@ -208,6 +250,32 @@ function	liveChat(struct)
 		i2.classList.add("fa-solid", "fa-clock-rotate-left");
 		i3.classList.add("fa-solid", "fa-table-tennis-paddle-ball");
 		i4.classList.add("fa-solid", "fa-circle-xmark");
+
+		i1.addEventListener("click", function() {
+			const obj = { newFriend: "usernameToFriend" };
+
+			fetch("/user/addFriend/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => {
+				if (response.ok)
+					console.log("addFriend success");
+				else
+					response.json().then(data => { console.log(data); });
+			})
+			.catch(() => console.error("Error: failed to fetch the addFriend route"));
+		});
+		i4.addEventListener("click", function() {
+			const obj = { toBlock: "usernameToBlock" };
+
+			fetch("/user/blockUser/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => {
+				if (response.ok)
+					console.log("blockUser success");
+				else
+					response.json().then(data => { console.log(data); });
+			})
+			.catch(() => console.error("Error: failed to fetch the blockUser route"));
+		});
+
 		chatOptions.appendChild(createChatButton("Ajouter en ami", "hover-green", i1));
 		chatOptions.appendChild(createChatButton("Voir l'historique", "hover-purple", i2));
 		chatOptions.appendChild(createChatButton("Inviter pour un Pong", "hover-blue", i3));
@@ -501,6 +569,8 @@ function	getScreenStruct()
 		wrapperCanvas: document.getElementsByClassName("wrapper-canvas")[0],
 		wrapperOptions: document.getElementsByClassName("wrapper-options")[0],
 		wrapperTournamentForm: document.getElementsByClassName("tournament-form")[0],
+		primaryPlayer: document.getElementsByClassName("wrapper-player-controls")[1],
+		secondaryPlayer: document.getElementsByClassName("wrapper-player-controls")[0],
 		sticks: getSticksStruct(),
 		keys: document.getElementsByClassName("key"),
 		playerOnControls: document.getElementsByClassName("playername"),

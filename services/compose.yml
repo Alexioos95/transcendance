@@ -70,6 +70,7 @@ services:
       - image-data:/images/
     restart: unless-stopped
     environment:
+      - DUMP=$DUMP
       - SERVER_JWT_KEY=$SERVER_JWT_KEY
 	  - POSTGRES_HOST=$USER_POSTGRES_HOST
       - POSTGRES_PASSWORD=$USER_POSTGRES_PASSWORD
@@ -104,6 +105,7 @@ services:
       - transcendance
     restart: unless-stopped
     environment:
+      - DUMP=$DUMP
       - EMAIL_HOST=$EMAIL_HOST
       - EMAIL_PORT=$EMAIL_PORT
       - EMAIL_HOST_USER=$EMAIL_HOST_USER

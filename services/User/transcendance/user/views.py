@@ -73,10 +73,15 @@ def register_user_in_database(user_info:dict):
     except Exception:
         raise customException("User already exists", 409)
 
-def generate_bcrypt_hash(password: str) -> str:#middleware
+def generate_bcrypt_hash(password: str) -> bytes:
     salt = bcrypt.gensalt()
-    passwordEncoded = bcrypt.hashpw(password.encode('utf-8'), salt)
-    return password
+    password_encoded = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return password_encoded
+
+# def generate_bcrypt_hash(password: str) -> str:#middleware
+#     salt = bcrypt.gensalt()
+#     passwordEncoded = bcrypt.hashpw(password.encode('utf-8'), salt)
+#     return passwordEncoded
 
 def compare_bcrypt_hash(username:str, password: str) -> bool:#middleware
     dbUser = get_user_in_db(Username, username)
@@ -91,7 +96,7 @@ def compare_bcrypt_hash(username:str, password: str) -> bool:#middleware
 @csrf_exempt
 @require_http_methods(["POST"])
 def register(request):#check si user est unique sinon refuser try except get?	#Set language par default ou la récupérer du front ?
-    
+  
     print(f"ici body == {request.body}", file=sys.stderr)
     data = json.loads(request.body)
     userData = {}
@@ -123,7 +128,6 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
         tetrisLvl=0,
         twoFA=True
     )
-
     try:
         new_user.save()
     except Exception as error:
@@ -132,7 +136,7 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
         print(error)
         return(response_data)
     print(f'new user username {new_user.Username}, avatar = {new_user.Avatar}, langage = {new_user.language}')
-    response_data = JsonResponse({"2fa": 'False', "guestMode":"false", "username":new_user.Username, "avatar": '/images/default_avatar.png' , "lang": new_user.language}, status=201)
+    response_data = JsonResponse({"2fa": 'False',  "email": userData['email'], "guestMode":"false", "username":new_user.Username, "avatar": '/images/default_avatar.png' , "lang": new_user.language}, status=201)
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes
     encoded_jwt = jwt.encode({"userName": userData['username'], "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
     response_data.set_cookie(
@@ -249,7 +253,7 @@ def login(request):
             return JsonResponse({'error': 'Failed to send email'}, status=500)
 
         return JsonResponse({"twoFA": 'true', 'guestMode': 'false'}, status=200)#code a verifier code 2fa attendu
-    response_data = JsonResponse({"twoFA": 'false', "guestMode": "false", "username":dbUser.Username, "Avatar":dbUser.Avatar, "lang": dbUser.language})
+    response_data = JsonResponse({"twoFA": 'false', "guestMode": "false", "username":dbUser.Username, "Avatar":dbUser.Avatar, "lang": dbUser.language, "email": dbUser.Email})
     response_data.status = 200
     response_data.set_cookie(
     'auth',
@@ -358,17 +362,18 @@ def checkAuth42(request):
     return response
 
 def save_file(uploaded_file):
-    upload_dir = '/leSuperVolumeCommunAvecNginx'
+    upload_dir = '/images'
     file_name = generate_code()
     file_path = os.path.join(upload_dir, file_name)
+    print(f"path image == {file_path}", file=sys.stderr)
     with open(file_path, 'wb+') as destination:
         for chunk in uploaded_file.chunks():
             destination.write(chunk)
     return file_path
 
 
-def image_validation():
-    if request.method == 'POST' and 'image' in request.FILES:
+def image_validation(request):
+    if 'image' in request.FILES:
         uploaded_file = request.FILES['image']
         mime_type = uploaded_file.content_type
         accepted_mime_types = [
@@ -379,9 +384,8 @@ def image_validation():
         ]
     if mime_type in accepted_mime_types:
         return save_file(uploaded_file)
-
     else:
-        raise customException("Invalid image format", 403)
+        raise customException("Invalid image format", 200)
 
 # def is_valid_choice(value, model_class):
 #     try:
@@ -402,14 +406,33 @@ def is_valid_choice(value, model_class):
 @csrf_exempt
 @require_http_methods(["POST"])
 def updateUserInfos(request):
-    print('cic')
     data = {}
-    print(request.body, file=sys.stderr)
+
+    # Parsez le JSON
+    # parsed_json = {}
+    # try:
+    #     parsed_json = json.loads(decoded_body)
+    # except json.JSONDecodeError:
+    #     print("Erreur lors du parsing JSON", file=sys.stderr)
+    #     return
+
+    # # Accédez au champ "avatar"
+    # if 'avatar' in parsed_json:
+    #     avatar_info = parsed_json['avatar']
+    # print(f'avatar: {request.body['avatar'].body}')
+    # print("Body:", avatar_info.get('body'), file=sys.stderr)
+    # print(f'avatar update user info: {request.body['avatar']}', file=sys.stderr)
+    decoded_body = request.body.decode('utf-8')
+    print(f'body dans updta user info: {request.body}', file=sys.stderr)
+    data = json.loads(request.body.decode('utf-8'))#try catch
+
+    avatar = data['avatar']
+    print(f'Avatar update user info: {avatar}', file=sys.stderr)
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
         print('json')
-        return HttpResponseBadRequest({'error': 'Invalid JSON'}, status=403)
+        return JsonResponse({'error': 'Invalid JSON'}, status=403)
     auth = checkCookie(request, 'auth')
     if auth is None:
         print('coockie missing')
@@ -445,9 +468,23 @@ def updateUserInfos(request):
             print('enmail', file=sys.stderr)
             return JsonResponse({"errorEmail": "email already exists"}, status=403)
         user.Email = data['email']
-    if 'password' in data and data['password']:
-        user.Password = data['password']
+    if 'passwordNew' in data and data['passwordNew']:
+        print(f'passwordd: |{data['passwordNew']}|', file=sys.stderr)
+        if (len(data['passwordNew'])) < 8 or len(data['passwordNew']) > 70:
+            return JsonResponse({'error': 'password length should be between 8 and 70 characters'}, status=200)
+        try:#penser a comparer le currpasswd avec celui en bdd
+            encoded_password = generate_bcrypt_hash(data['passwordNew'])
+            user.Password = encoded_password.decode('utf-8')
+        except Exception as e:
+            print(f"error == {e}", file=sys.stderr)
+            return JsonResponse({"error":e}, status=200)
     if 'avatar' in data and data['avatar']:#on recoit une image je l'enregistre dans le volume et stock l'url
+        # image_validation()
+        print(f'ceci est un fichier ! {request.FILES}',file=sys.stderr)
+        print(f'avant la boucle',file=sys.stderr)
+        for key, value in request.FILES.items():
+            print(f"cle: {key}, Valoeur {value}")
+        print(f'apres la boucle',file=sys.stderr)
         user.Avatar = data['avatar']
     if 'lang' in data and data['lang']:
         print("je passe par les langues 1", file=sys.stderr)
@@ -470,14 +507,44 @@ def updateUserInfos(request):
     expires=datetime.utcnow() + timedelta(hours=100))
     return response_data
 
+@csrf_exempt
 def sendNewPaswd(request):
+    decoded_body = request.body.decode('utf-8')
+    print(f'body dans get new psswd: {request.body}', file=sys.stderr)
+    data= {}
+    try:
+        data = json.loads(request.body.decode('utf-8'))#try catch
+    except Exception as e:
+        return JsonResponse({"error": "wrong Json format"}, status=403)
+    url = request.build_absolute_uri()
+    print(url, file=sys.stderr)
+    if 'code' not in data or not data['code']:
+        return JsonResponse({"error": "code is missing"}, status=403)
+    if 'password' not in data or not data['password']:
+        return JsonResponse({"error": "password is missing"}, status=403)
+    username = cache.get(data['code'], None)
+    if username is None:
+        return JsonResponse({"error": "invalid code"}, status=401)
+    dbUser = get_user_in_db('Username', username)
+    if dbUser is None:
+        return JsonResponse({"error": "user does not exist"}, status=403)
+    try:
+        encoded_password = generate_bcrypt_hash(data['password'])
+        dbUser.Password = encoded_password.decode('utf-8')
+    except Exception as e:
+        print(f"error == {e}", file=sys.stderr)
+        return JsonResponse({"error": "There's something wrong, please try again."}, status=200)
+    dbUser.save()
+    # if 'username' in data and data['username'] and user.Username != data['username']:
     return JsonResponse({'message': "new password set successfuly"})
 
+@csrf_exempt
 def disconnect(request):
     response = HttpResponse()
     response.set_cookie('auth', '', expires='Thu, 01 Jan 1970 00:00:00 GMT')
     return response
 
+@csrf_exempt
 def updateInfo(request):
     auth = checkCookie(request, 'auth')
     user = ''
@@ -548,18 +615,24 @@ def set2FA(request):
 
 
 def get_alpha_maj(value:int)->str:
+    print(f'originale value == {value}', file=sys.stderr)
     if chr(value) in "IJLO":
         value += 5
+    print(f'generated letter == {chr(value)}', file=sys.stderr)
     return chr(value)
 
 def get_alpha_min(value:int)->str:
+    print(f'originale value == {value}', file=sys.stderr)
     if chr(value) in "ijlo":
         value += 5
+    print(f'generated letter == {chr(value)}', file=sys.stderr)
     return chr(value)
 
 def get_digit(value:int)->str:
+    print(f'originale value == {value}', file=sys.stderr)
     if value == chr(0):
         value += 1
+    print(f'generated letter == {chr(value)}', file=sys.stderr)
     return chr(value)
 
 def generate_code(size:int=100)->str:
@@ -571,7 +644,7 @@ def generate_code(size:int=100)->str:
         if value < 10:
             code += get_digit(value + ord('0'))
         elif value < 35:
-            code += get_alpha_min(value - 10 + ord('a'))
+            code += get_alpha_min(value - 9 + ord('a'))
         else:
             code += get_alpha_maj(value - 35 + ord('A'))
     return ''.join(code)
@@ -628,7 +701,7 @@ def resetPasswd(request):
             f'Hey {user.Username},\n\n'
             'It looks like you requested to reset your password. No worries, we’ve got you covered!\n\n'
             'Click the link below to set a new password:\n\n'
-            f'https://made-f0Ar6s5:4433/index.html?reset=resetmypassword&code={validationCode}\n\n'
+            f'https://{os.environ["DUMP"]}:4433/index.html?reset=resetmypassword&code={validationCode}\n\n'
             'This link will be good for 10 minutes, so make sure to use it before it expires. If you missed it, just request another one.\n\n'
             'If you didn’t ask for a password reset, just ignore this email – your account is safe.\n\n'
             'Got any questions? Feel free to reach out to us!\n\n'
@@ -727,6 +800,7 @@ def addFriend(request):
     #   retourner qqc
      
     #4
+    return JsonResponse({}, status=200)
 
 @require_http_methods(["POST"])
 def blockUser(request):
@@ -736,15 +810,21 @@ def blockUser(request):
     # check si personne a bloquer est dans la liste d'amis et l'en supprimer s'il y est.
     # Ajouter personne dans la liste d'ennemis.
     # renvoyer status == 200
+    return JsonResponse({}, status=200)
+
 
 @require_http_methods(["POST"])
 def deleteFriend(request):
     # checkJwt pour identifier la personne qui veut supprimer un ami et s'assurer que le JWT est toujours valide .
     # check si ami a supprimer est dans la liste d'amis et l'en supprimer s'il y est.
     # renvoyer status == 200
+    return JsonResponse({}, status=200)
+
 
 @require_http_methods(["POST"])
 def deleteBlockedUser(request):
     # checkJwt pour identifier la personne qui veut supprimer une personne bloquee et s'assurer que le JWT est toujours valide .
     # check si personne a supprimer est dans la liste de bloques et l'en supprimer s'il y est.
     # renvoyer status == 200
+    return JsonResponse({}, status=200)
+

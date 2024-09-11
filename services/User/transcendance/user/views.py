@@ -800,6 +800,7 @@ def addFriend(request):
     #   retourner qqc
      
     #4
+    return JsonResponse({}, status=200)
 
 @require_http_methods(["POST"])
 def blockUser(request):
@@ -809,15 +810,21 @@ def blockUser(request):
     # check si personne a bloquer est dans la liste d'amis et l'en supprimer s'il y est.
     # Ajouter personne dans la liste d'ennemis.
     # renvoyer status == 200
+    return JsonResponse({}, status=200)
+
 
 @require_http_methods(["POST"])
 def deleteFriend(request):
     # checkJwt pour identifier la personne qui veut supprimer un ami et s'assurer que le JWT est toujours valide .
     # check si ami a supprimer est dans la liste d'amis et l'en supprimer s'il y est.
     # renvoyer status == 200
+    return JsonResponse({}, status=200)
+
 
 @require_http_methods(["POST"])
 def deleteBlockedUser(request):
     # checkJwt pour identifier la personne qui veut supprimer une personne bloquee et s'assurer que le JWT est toujours valide .
     # check si personne a supprimer est dans la liste de bloques et l'en supprimer s'il y est.
     # renvoyer status == 200
+    return JsonResponse({}, status=200)
+

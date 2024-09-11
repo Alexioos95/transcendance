@@ -17,7 +17,7 @@ function	login(prevData)
 			struct.formInput.password.value = "";
 	});
 	struct.formButton.showPassword.addEventListener("click", function() {
-		if (struct.formInput.password.type == "password")
+		if (struct.formInput.password.type === "password")
 		{
 			struct.formInput.password.type = "text";
 			struct.formButton.showPasswordIcon.classList.remove("fa-eye-slash");
@@ -280,14 +280,14 @@ function resetPassword()
 	const struct = {
 		input: document.querySelector("form input"),
 		showPassword: document.getElementsByClassName("show-password")[0],
-		showPasswordIcon: document.querySelector(".show-password .i"),
+		showPasswordIcon: document.querySelector(".show-password i"),
 		button: document.getElementsByClassName("submit")[0],
 		langSelect: document.getElementsByTagName("select")[0],
 		error: document.getElementsByClassName("error-reset")[0]
 	};
 
 	struct.showPassword.addEventListener("click", function() {
-		if (password.type == "password")
+		if (struct.input.type === "password")
 			{
 				struct.input.type = "text";
 				struct.showPasswordIcon.classList.remove("fa-eye-slash");
@@ -311,7 +311,8 @@ function resetPassword()
 				if (response.ok)
 				{
 					showMessage(struct.error)
-						.then(() => sleep(1000))
+						.then(() => sleep(2000))
+						.then(() => window.history.replaceState({ state: "login", lang: struct.langSelect.value }, "", "/"))
 						.then(() => navigate("login", undefined, { guestMode: "false", lang: struct.langSelect.value }))
 				}
 				else

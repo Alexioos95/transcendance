@@ -126,7 +126,9 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
         pongLvl=0,
         language=userData['lang'],
         tetrisLvl=0,
-        twoFA=True
+        twoFA=True,
+        friendsList = [],
+        foeList = [],
     )
     try:
         new_user.save()

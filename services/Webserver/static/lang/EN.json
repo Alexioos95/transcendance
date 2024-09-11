@@ -65,7 +65,6 @@
 		"2fa": "2-factor Authentication",
 		"2fa-off": "Disabled",
 		"2fa-email": "Email",
-		"send": "Send",
 		"activate": "Activate",
 		"save": "Save",
 		"unblock": "Unblock",
@@ -80,7 +79,6 @@
 		"p4": "Player 4",
 		"passwordCurr": "Current",
 		"passwordNew": "New",
-		"email": "Email",
 		"code": "Code received"
 	},
 	"title": {
@@ -104,7 +102,6 @@
 		"pseudo4": "Pseudo of player 4",
 		"showPassword1": "Change the display of my password",
 		"showPassword2": "Change the display of my password",
-		"email": "Email",
 		"code": "Code received"
 	},
 	"tabOptions": {

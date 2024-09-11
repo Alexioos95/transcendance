@@ -136,8 +136,9 @@ function	handleConnection(struct)
 				}
 				else
 				{
-					console.log("response /user/resetPaswd not good; do nothing // Need to place error");
-					console.log(response.status);
+					struct.error.login.classList.remove("success");
+					struct.error.login.classList.add("error");
+					response.json().then(data => struct.error.login.innerHTML = data.error);
 				}
 			})
 			.catch(() => console.error("Error: failed to fetch the resetPaswd route"));

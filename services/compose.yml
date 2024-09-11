@@ -169,7 +169,7 @@ volumes:
       o: "bind"
       device: "${PWD}/services/Webserver/static/images"
 
-  user-data:
+#  user-data:
 
 
 #	pong

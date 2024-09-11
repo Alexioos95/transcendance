@@ -138,28 +138,30 @@ function	setupEventListeners(struct, data)
 		event.preventDefault();
 
 		const data = new FormData(struct.options.account.form);
-		const avatarForm = document.getElementsByClassName("change-avatar")[0];
-		const avatarData = new FormData();
+		const avatarImage = document.getElementsByClassName("change-avatar")[0].files[0];
+		const avatarForm = new FormData();
 
-		avatarData.append("file", avatarForm[0]);
-		const options = {
-			method: "POST",
-			body: avatarData
-		};
+		avatarForm.append("file", avatarImage);
+		avatarForm.append("lang", data.get("lang"));
+		avatarForm.append("username", data.get("options-username"));
+		avatarForm.append("email", data.get("options-email"));
+		avatarForm.append("passwordCurr", data.get("options-password-curr"));
+		avatarForm.append("passwordNew", data.get("options-password-new"));
+		avatarForm.append("twoFA", data.get("2fa"));
 
-		const obj = {
-			lang: data.get("lang"),
-			avatar: options,
-			username: data.get("options-username"),
-			email: data.get("options-email"),
-			passwordCurr: data.get("options-password-curr"),
-			passwordNew: data.get("options-password-new"),
-			twoFA: data.get("2fa")
-		};
+		// const obj = {
+		//	lang: data.get("lang"),
+		//	avatar: options,
+		//	username: data.get("options-username"),
+		//	email: data.get("options-email"),
+		//	passwordCurr: data.get("options-password-curr"),
+		//	passwordNew: data.get("options-password-new"),
+		//	twoFA: data.get("2fa")
+		//};
 
 		console.log(obj.avatar);
 		console.log("fetch /user/updateUserInfos");
-		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		fetch("/user/updateUserInfos/", { method: "POST", body: avatarForm, credentials: "include"})
 			.then(response => {
 				if (response.ok)
 				{

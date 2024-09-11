@@ -34,7 +34,10 @@ function	login(prevData)
 		event.preventDefault();
 		handleConnection(struct);
 	});
-	struct.formButton.signUp.addEventListener("click", function() { handleSignUp(struct) });
+	struct.formButton.signUp.addEventListener("click", function(event) {
+		event.preventDefault();
+		handleSignUp(struct)
+	});
 	struct.formButton.cancelSignUp.addEventListener("click", function() {
 		cancelSignUp(struct);
 		window.history.pushState({ state: "login", lang: struct.langSelect.value }, "", "");
@@ -105,6 +108,8 @@ function	cancelSignUp(struct)
 	struct.formButton.forgotPassword.classList.remove("hidden");
 	struct.formButton.signUp.classList.remove("primary");
 	struct.wrapperSpecialLogin.classList.remove("hideInFade");
+	struct.formButton.connection.type = "submit";
+	struct.formButton.signUp.type = "button";
 }
 
 /////////////////////////
@@ -199,7 +204,6 @@ function	showConnection(struct)
 {
 	resetErrorDisplay(struct.error.login);
 	struct.error.login.classList.remove("recovery");
-	struct.formInput.password.ariaHidden = "false";
 	struct.formInput.password.classList.remove("hideInFade");
 	struct.formButton.showPassword.classList.remove("hideInFade");
 	struct.formButton.connection.classList.remove("recovery");
@@ -230,7 +234,6 @@ function	showRecovery(struct)
 	resetErrorDisplay(struct.error.login);
 	struct.error.login.classList.add("recovery");
 	struct.formButton.signUp.disabled = true;
-	struct.formInput.password.ariaHidden = "false";
 	struct.formInput.password.classList.add("hideInFade");
 	struct.formButton.showPassword.classList.add("hideInFade");
 	struct.formButton.connection.classList.add("recovery");
@@ -264,6 +267,8 @@ function	showSignUpForm(struct)
 	struct.formButton.signUp.classList.add("primary");
 	struct.formButton.cancelSignUp.classList.remove("hideInFade");
 	struct.wrapperSpecialLogin.classList.add("hideInFade");
+	struct.formButton.connection.type = "button";
+	struct.formButton.signUp.type = "submit"
 }
 
 /////////////////////////

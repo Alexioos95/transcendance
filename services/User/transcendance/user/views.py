@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from user import userMiddleware as middleware
+from user import userMiddleware
 import time
 from datetime import date, datetime, timedelta
 from user.models import User
@@ -93,12 +93,7 @@ def compare_bcrypt_hash(username:str, password: str) -> bool:#middleware
         return False
 
 
-@csrf_exempt
-@require_http_methods(["POST"])
-def register(request):#check si user est unique sinon refuser try except get?	#Set language par default ou la récupérer du front ?
-  
-    print(f"ici body == {request.body}", file=sys.stderr)
-    data = json.loads(request.body)
+def CheckInfoRegister(data):
     userData = {}
     if 'username' in data:
         userData['username'] = data['username']
@@ -113,7 +108,21 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
         if field not in userData or not userData[field].strip():
             missing_fields.append(field)
     if missing_fields:
-        return JsonResponse({'message': 'Missing or empty fields','missing_fields': missing_fields}, status=401)
+        raise customException(f'missing field: {missing_fields}', 401)
+    return userData
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def register(request):#check si user est unique sinon refuser try except get?	#Set language par default ou la récupérer du front ?
+  
+    print(f"ici body == {request.body}", file=sys.stderr)
+
+    data = json.loads(request.body)
+    userData = {}
+    try:
+        userData = CheckInfoRegister(data)
+    except customException as e:
+        return JsonResponse({'error': e.data}, status=e.code)
     time = datetime.now()
     tz = pytz.timezone('CET')
     tzTime = tz.localize(time)
@@ -570,15 +579,15 @@ def updateInfo(request):
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
         return JsonResponse({"error": "User does not exists"}, status=403)
-    response = JsonResponse({"guestMode": "false", "username":user.Username, "Avatar":user.Avatar, "language": user.language})#ajouter plus tard friends et bloques + get dans le cache les defis lances ou acceptes
-    return JsonResponse({'message': 'OK'}, status=200)
-
     friendObject = []
-
+    foe = user.foeList
+    print(f'foe == {foe}', file=sys.stderr)
     for friend in user.friendsList:
         DBFriend = get_user_in_db("Username", friend)#penser a change par les ids
-        friendObject += {DBFriend.Username, DBFriend.lastTimeOnline}
-    objectPing = {'FriendList':friendObject,'BlockList':DBFriend.foeList,'gameInvitation':[],'challengeAccepted':{'game':'pong', 'username':[]}}
+        friendObject += {DBFriend.Username, DBFriend.lastTimeOnline, DBFriend.id}
+    objectPing = {"username":user.Username, "Avatar":user.Avatar, "language": user.language, 'FriendList':friendObject,'BlockList':foe,'gameInvitation':[],'challengeAccepted':{'game':'pong', 'username':[]}}
+    print(f'object: {objectPing}', file=sys.stderr)
+    return JsonResponse(objectPing, status=200)
 
 
 @csrf_exempt
@@ -843,7 +852,7 @@ def addFriend(request):
     if user is None:
         return JsonResponse({'error': 'User does not exist'}, status=401)
     for x in user.foeList:
-      if x == newFriend:
+      if x == newFriend.Username:
           user.foeList.remove(newFriend)
 
     #5
@@ -900,8 +909,10 @@ def blockUser(request):
     if user is None:
         return JsonResponse({'error': 'User does not exist'}, status=401)
     for x in user.friendsList:
-      if x == toBlock:
-          user.friendsList.remove(toBlock)
+        print(f'x: {x}, toBlock: {toBlock}',file=sys.stderr)
+        print(f'repr x: {repr(x)}, repr toBlock: {repr(toBlock)}',file=sys.stderr)
+        if x == toBlock.Username:
+            user.friendsList.remove(toBlock)
 
     #5
     user.foeList.append(toBlock)

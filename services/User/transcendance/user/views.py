@@ -555,13 +555,13 @@ def updateInfo(request):
     user = ""
     try:
         userName = decodeJwt(auth)
-        user = get_user_in_db(Username, userName)
+        user = get_user_in_db('Username', userName)
     except customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
         return JsonResponse({"error": "User does not exists"}, status=403)
     response = JsonResponse({"guestMode": "false", "username":user.Username, "Avatar":user.Avatar, "language": user.language})#ajouter plus tard friends et bloques + get dans le cache les defis lances ou acceptes
-    return response(status=200)
+    return JsonResponse({'message': 'OK'}, status=200)
 
 @csrf_exempt
 def checkCodeLog(request):
@@ -794,6 +794,9 @@ def addFriend(request):
 
 
     #1
+    cookie = checkCookie(request, 'auth')
+    if cookie is None:
+        return JsonResponse({'error': 'User not logged'}, status=401)
     try:
       user = decodeJwt(cookie)
     except customException as e:
@@ -808,12 +811,12 @@ def addFriend(request):
         return JsonResponse({'error': 'NewFriend is user itself'}, status=403)
 
     #3
-    newFriend = get_user_in_db(Username, data['newFriend'])
+    newFriend = get_user_in_db('Username', data['newFriend'])
     if newFriend is None:
         return JsonResponse({'error': 'newFriend not found'}, status=404)
      
     #4
-    user = get_user_in_db(Username, user)
+    user = get_user_in_db('Username', user)
     if user is None:
         return JsonResponse({'error': 'User does not exist'}, status=401)
     for x in user.foeList:

@@ -262,7 +262,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         # Attendre que les deux joueurs se connectent
         while GameConsumer.players_in_room[self.room_name] != 2:
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.1)
 
         asyncio.create_task(self.send_game_updates())
 
@@ -323,20 +323,20 @@ class GameConsumer(AsyncWebsocketConsumer):
        
         for role, action in self.player_actions:
             if role == 'paddleRight':
-                if action == 'w' or action == 'ArrowUp':
+                if action == 'w' or action == 'ArrowUp' or action == 'top':
                     game.y_paddleright -= 1
                     if game.y_paddleright < 0:
                         game.y_paddleright = 0
-                elif action == 's' or action == 'ArrowDown':
+                elif action == 's' or action == 'ArrowDown' or action == 'bot':
                     game.y_paddleright += 1
                     if game.y_paddleright > 80:
                         game.y_paddleright = 80
             elif role == 'paddleLeft':
-                if action == 'w' or action == 'ArrowUp':
+                if action == 'w' or action == 'ArrowUp' or action == 'top':
                     game.y_paddleleft -= 1
                     if game.y_paddleleft < 0:
                         game.y_paddleleft = 0
-                elif action == 's' or action == 'ArrowDown':
+                elif action == 's' or action == 'ArrowDown' or action == 'bot':
                     game.y_paddleleft += 1
                     if game.y_paddleleft > 80:
                         game.y_paddleleft = 80

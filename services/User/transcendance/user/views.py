@@ -85,7 +85,7 @@ def generate_bcrypt_hash(password: str) -> bytes:
 
 def compare_bcrypt_hash(username:str, password: str) -> bool:#middleware
     dbUser = get_user_in_db(Username, username)
-    if dbUser == False:
+    if dbUser == False: #Should be None ?
         return False
     if bcrypt.checkpw(password.encode('utf-8'), dbUserList[0].Password.encode('utf-8')):
         return True
@@ -481,7 +481,7 @@ def updateUserInfos(request):
             return JsonResponse({"errorEmail": "email already exists"}, status=403)
         user.Email = data['email']
     if 'passwordNew' in data and data['passwordNew']:
-        print(f'passwordd: |{data['passwordNew']}|', file=sys.stderr)
+        print(f'passwordd: |{data["passwordNew"]}|', file=sys.stderr)
         if (len(data['passwordNew'])) < 8 or len(data['passwordNew']) > 70:
             return JsonResponse({'error': 'password length should be between 8 and 70 characters'}, status=200)
         try:#penser a comparer le currpasswd avec celui en bdd
@@ -565,13 +565,13 @@ def updateInfo(request):
     user = ""
     try:
         userName = decodeJwt(auth)
-        user = get_user_in_db(Username, userName)
+        user = get_user_in_db('Username', userName)
     except customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
         return JsonResponse({"error": "User does not exists"}, status=403)
     response = JsonResponse({"guestMode": "false", "username":user.Username, "Avatar":user.Avatar, "language": user.language})#ajouter plus tard friends et bloques + get dans le cache les defis lances ou acceptes
-    return response(status=200)
+    return JsonResponse({'message': 'OK'}, status=200)
 
 @csrf_exempt
 def checkCodeLog(request):
@@ -783,61 +783,98 @@ def matchMaking(request):
     cache.set('matchmaking', matchmakingDict, timeout=3600)#si pas trouve sinon inscrire en bdd game
     return HttpResponse(status=204)
 
+@csrf_exempt
 @require_http_methods(["GET"])
 def ping(request):
     return HttpResponse(status=204)
 
+@csrf_exempt
 @require_http_methods(["POST"])
 def addFriend(request):
-    #1 checkJwt pour identifier la personne qui veut ajouter un ami et s'assurer que le JWT est toujours valide .
+    #1 decodeJwt pour identifier la personne qui veut ajouter un ami et s'assurer que le JWT est toujours valide .
     #2 verifier qu'on ne s'ajoute pas soi meme
     #3 check si ami en db
     #4 check si ami a ajouter est dans la liste d'ennemis et l'en supprimer s'il y est.
-    # Ajouter ami dans la liste d'amis.
-    # renvoyer status == 200
+    #5 Ajouter ami dans la liste d'amis.
+    #6 renvoyer status == 200
+
+
+    # addFriend:         { newFriend: username }
+    # blockUser:         { toBlock: username }
+    # deleteFriend:      { unfriend: username }
+    # deleteBlockedUser: { unblock: username }
 
 
     #1
-    # try
-    #   user = checkJwt(cookie)
-    # except customException as e
-    #   return JsonResponse({'error': e.data}, status=e.status)
+    cookie = checkCookie(request, 'auth')
+    if cookie is None:
+        return JsonResponse({'error': 'User not logged'}, status=401)
+    try:
+      user = decodeJwt(cookie)
+    except customException as e:
+      return JsonResponse({'error': e.data}, status=e.status)
 
     #2
+    data = json.loads(request.body)
+    if not 'newFriend' in data:
+        return JsonResponse({'error': 'No newFriend in request body'}, status=403)
+    newFriend = data['newFriend']
+    if newFriend is user:
+        return JsonResponse({'error': 'NewFriend is user itself'}, status=403)
 
     #3
-    # data = json.loads(request.body)
-    # if not 'username' in data:
-    #   retourner qqc
-    # newFriend = get_user_in_db(Username, data['username'])
-    # if newFriend is None:
-    #   retourner qqc
+    newFriend = get_user_in_db('Username', data['newFriend'])
+    if newFriend is None:
+        return JsonResponse({'error': 'newFriend not found'}, status=404)
      
     #4
-    return JsonResponse({}, status=200)
+    user = get_user_in_db('Username', user)
+    if user is None:
+        return JsonResponse({'error': 'User does not exist'}, status=401)
+    for x in user.foeList:
+      if x == newFriend:
+          user.foeList.remove(newFriend) #/ user.foeList.pop(x)
 
+    #5
+    user.friendsList.add(newFriend)
+    try:
+      user.save()
+    except Exception as e:
+      print(f'Erreur addFriend : {e}', file=sys.stderr)
+      return JsonResponse({'error': 'An unknown error occured'}, status=500)
+    return JsonResponse({'message': 'OK'}, status=200)
+
+@csrf_exempt
 @require_http_methods(["POST"])
 def blockUser(request):
-    # checkJwt pour identifier la personne qui veut bloquer une persone et s'assurer que le JWT est toujours valide .
+    # decodeJwt pour identifier la personne qui veut bloquer une persone et s'assurer que le JWT est toujours valide .
     # verifier qu'on ne s'ajoute pas soi meme
     # check si personne en db
     # check si personne a bloquer est dans la liste d'amis et l'en supprimer s'il y est.
     # Ajouter personne dans la liste d'ennemis.
     # renvoyer status == 200
+
+    # addFriend:         { newFriend: username }
+    # blockUser:         { toBlock: username }
+    # deleteFriend:      { unfriend: username }
+    # deleteBlockedUser: { unblock: username }
+
     return JsonResponse({}, status=200)
 
 
+@csrf_exempt
 @require_http_methods(["POST"])
 def deleteFriend(request):
-    # checkJwt pour identifier la personne qui veut supprimer un ami et s'assurer que le JWT est toujours valide .
+    # decodeJwt pour identifier la personne qui veut supprimer un ami et s'assurer que le JWT est toujours valide .
     # check si ami a supprimer est dans la liste d'amis et l'en supprimer s'il y est.
     # renvoyer status == 200
     return JsonResponse({}, status=200)
 
 
+@csrf_exempt
 @require_http_methods(["POST"])
 def deleteBlockedUser(request):
-    # checkJwt pour identifier la personne qui veut supprimer une personne bloquee et s'assurer que le JWT est toujours valide .
+    # decodeJwt pour identifier la personne qui veut supprimer une personne bloquee et s'assurer que le JWT est toujours valide .
     # check si personne a supprimer est dans la liste de bloques et l'en supprimer s'il y est.
     # renvoyer status == 200
     return JsonResponse({}, status=200)

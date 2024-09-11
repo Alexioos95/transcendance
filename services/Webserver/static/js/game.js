@@ -9,7 +9,11 @@ function	deleteFriend()
 		if (response.ok)
 			console.log("deleteFriend OK");
 		else
-			response.json().then(data => console.log(data))
+		{
+			console.log("deleteFriend NOT OK");
+			console.log("status=", response.status);
+			console.log("response=", response.json());
+		}
 	})
 	.catch(() => console.error("Error: failed to fetch the deleteFriend route"));
 }
@@ -22,7 +26,11 @@ function	deleteBlocked()
 		if (response.ok)
 			console.log("deleteFriend OK");
 		else
-			response.json().then(data => console.log(data))
+		{
+			console.log("deleteFriend NOT OK");
+			console.log("status=", response.status);
+			console.log("response=", response.json());
+		}
 	})
 	.catch(() => console.error("Error: failed to fetch the deleteBlockedUser route"));
 }
@@ -104,10 +112,6 @@ function	setupEventListeners(struct, data)
 	});
 	// Cross Buttons
 	struct.options.leaveButton.addEventListener("click", function() {
-		struct.options.account.twoFA.codeInput.value = "";
-		struct.options.account.twoFA.emailInput.value = "";
-		struct.options.account.twoFA.wrapper.classList.add("hidden");
-		struct.options.account.twoFA.secondDiv.classList.add("hidden");
 		if (struct.tournament.on === true && struct.tournament.names.length === 0)
 			showScreen(struct.screen, struct.screen.wrapperTournamentForm);
 		else
@@ -148,22 +152,40 @@ function	setupEventListeners(struct, data)
 				struct.options.account.showPasswordsIcons[1].classList.add("fa-eye-slash");
 			}
 	});
-	struct.options.account.twoFA.radios[0].addEventListener("change", function() {
-		struct.options.account.twoFA.codeInput.value = "";
-		struct.options.account.twoFA.emailInput.value = "";
-		struct.options.account.twoFA.wrapper.classList.add("hidden");
-		struct.options.account.twoFA.secondDiv.classList.add("hidden");
-	});
+	struct.options.account.twoFA.radios[0].addEventListener("change", function() { struct.options.account.twoFA.wrapper.classList.add("hidden"); });
 	struct.options.account.twoFA.radios[1].addEventListener("change", function() {
+		const obj = { type: "email" };
+		
+		fetch("/user/init2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => {
+				if (response.ok)
+					struct.options.account.twoFA.wrapper.classList.remove("hidden");
+				else
+					response.json().then(data => struct.options.account.error.innerHTML = data.error);
+			})
+			.catch(() => console.error("Error: failed to fetch the init2fa route"));
 		struct.options.account.twoFA.wrapper.classList.remove("hidden");
 	});
-	// struct.options.account.twoFA.emailButton.addEventListener("click", function() {
-	// 	// !!!!!!!!!!!!
-	// 	struct.options.account.twoFA.secondDiv.classList.remove("hidden");
-	// });
-	// struct.options.account.twoFA.codeButton.addEventListener("click", function() {
-	// 	// !!!!!!!!!!!!
-	// });
+	struct.options.account.twoFA.button.addEventListener("click", function() {
+		const obj = { type: struct.options.account.twoFA.input.value };
+		
+		fetch("/user/set2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => {
+				if (response.ok)
+					{
+						struct.options.account.error.classList.remove("error");
+						struct.options.account.error.classList.add("success");
+						struct.options.account.error.innerHTML = "SUCCESS";
+					}
+					else
+					{
+						struct.options.account.error.classList.remove("success");
+						struct.options.account.error.classList.add("error");
+						struct.options.account.error.innerHTML = "YIKES";
+					}
+			})
+			.catch(() => console.error("Error: failed to fetch the set2fa route"));
+	});
 	struct.options.account.formSubmit.addEventListener("click", function(event) {
 		event.preventDefault();
 
@@ -222,7 +244,19 @@ function	setupEventListeners(struct, data)
 	});
 	// Chat
 	if (data.guestMode === "false")
+	{
 		liveChat(struct);
+		const myInterval = setInterval(function() {
+			if (struct.run === 0)
+				clearInterval(myInterval);
+			fetch("/user/updateInfo/", { method: "GET", credentials: "include"})
+				.then(response => {
+					console.log("status=", response.status);
+					console.log("response=", response.json());
+				})
+				.catch(() => console.error("Error: failed to fetch the updateInfo route"));
+		}, 10000)
+	}
 }
 
 function	replaceDatas(struct, data)
@@ -368,7 +402,6 @@ function	fetchTranslation(struct, lang)
 
 async function	translateGamePage(struct, obj, currLang)
 {
-	console.log("TRANSLATE");
 	struct.options.lang.curr = currLang;
 	let plainTexts = Object.values(obj.plainText);
 	let placeHolders = Object.values(obj.placeholder);
@@ -584,6 +617,8 @@ function	addFriend(struct, button)
 			td.appendChild(p);
 			tr.appendChild(td);
 			struct.chat.output.appendChild(tr);
+			console.log("status=", response.status);
+			console.log("response=", response.json());
 		})
 		.catch(() => console.error("Error: failed to fetch the addFriend route"));
 }
@@ -658,6 +693,8 @@ function	blockUser(struct, button)
 			td.appendChild(p);
 			tr.appendChild(td);
 			struct.chat.output.appendChild(tr);
+			console.log("status=", response.status);
+			console.log("response=", response.json());
 		})
 		.catch(() => console.error("Error: failed to fetch the blockUser route"));
 }
@@ -753,13 +790,12 @@ function	getOptionsStruct()
 {
 	const buttons = document.querySelectorAll(".wrapper-options-buttons button");
 	const labels = document.getElementsByClassName("lang-label");
-	const input = document.querySelector(".twofa-set-div div input");
-	const button = document.querySelector(".twofa-set-div div button");
+	const input = document.querySelector(".twofa-set-div input");
+	const button = document.querySelector(".twofa-set-div button");
 
 	const twoFAStruct = {
 		radios: document.querySelectorAll(".twofa-label input"),
 		wrapper: document.getElementsByClassName("twofa-set-div")[0],
-		secondDiv: document.querySelectorAll(".twofa-set-div div")[1],
 		input: input,
 		button: button,
 	};

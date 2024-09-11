@@ -22,7 +22,6 @@ all : build
 
 .PHONY: build
 build:
-	#./.script $(DUMP)
 	docker compose -f services/compose.yml build
 
 .PHONY: up
@@ -40,6 +39,10 @@ log: build
 .PHONY: re
 re: mrproper
 	$(MAKE) --no-print-directory up
+
+.PHONY: re_log
+re_log: mrproper
+	$(MAKE) --no-print-directory log
 
 .PHONY: mrproper
 mrproper: down

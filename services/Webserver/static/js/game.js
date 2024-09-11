@@ -157,13 +157,13 @@ function	setupEventListeners(struct, data)
 	struct.options.account.twoFA.radios[1].addEventListener("change", function() {
 		struct.options.account.twoFA.wrapper.classList.remove("hidden");
 	});
-	struct.options.account.twoFA.emailButton.addEventListener("click", function() {
-		// !!!!!!!!!!!!
-		struct.options.account.twoFA.secondDiv.classList.remove("hidden");
-	});
-	struct.options.account.twoFA.codeButton.addEventListener("click", function() {
-		// !!!!!!!!!!!!
-	});
+	// struct.options.account.twoFA.emailButton.addEventListener("click", function() {
+	// 	// !!!!!!!!!!!!
+	// 	struct.options.account.twoFA.secondDiv.classList.remove("hidden");
+	// });
+	// struct.options.account.twoFA.codeButton.addEventListener("click", function() {
+	// 	// !!!!!!!!!!!!
+	// });
 	struct.options.account.formSubmit.addEventListener("click", function(event) {
 		event.preventDefault();
 

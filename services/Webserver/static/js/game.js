@@ -154,33 +154,35 @@ function	setupEventListeners(struct, data)
 		struct.options.account.twoFA.wrapper.classList.add("hidden");
 		struct.options.account.twoFA.secondDiv.classList.add("hidden");
 	});
-	struct.options.account.twoFA.radios[1].addEventListener("change", function() { struct.options.account.twoFA.wrapper.classList.remove("hidden"); });
-	struct.options.account.twoFA.emailButton.addEventListener("click", function() {
-		// !!!!!!!!!!!!
-		struct.options.account.twoFA.secondDiv.classList.remove("hidden");
+	struct.options.account.twoFA.radios[1].addEventListener("change", function() {
+		struct.options.account.twoFA.wrapper.classList.remove("hidden");
 	});
-	struct.options.account.twoFA.codeButton.addEventListener("click", function() {
-		// !!!!!!!!!!!!
-	});
+	// struct.options.account.twoFA.emailButton.addEventListener("click", function() {
+	// 	// !!!!!!!!!!!!
+	// 	struct.options.account.twoFA.secondDiv.classList.remove("hidden");
+	// });
+	// struct.options.account.twoFA.codeButton.addEventListener("click", function() {
+	// 	// !!!!!!!!!!!!
+	// });
 	struct.options.account.formSubmit.addEventListener("click", function(event) {
 		event.preventDefault();
 
 		const data = new FormData(struct.options.account.form);
 		const avatarImage = document.getElementsByClassName("change-avatar")[0].files[0];
-		const avatarForm = new FormData();
+		const form = new FormData();
 
-		avatarForm.append("file", avatarImage);
-		avatarForm.append("lang", data.get("lang"));
-		avatarForm.append("username", data.get("options-username"));
-		avatarForm.append("email", data.get("options-email"));
-		avatarForm.append("passwordCurr", data.get("options-password-curr"));
-		avatarForm.append("passwordNew", data.get("options-password-new"));
-		avatarForm.append("twoFA", data.get("2fa"));
+		form.append("file", avatarImage);
+		form.append("lang", data.get("lang"));
+		form.append("username", data.get("options-username"));
+		form.append("email", data.get("options-email"));
+		form.append("passwordCurr", data.get("options-password-curr"));
+		form.append("passwordNew", data.get("options-password-new"));
+		form.append("twoFA", data.get("2fa"));
 
-		console.log("Image=", avatarImage);
-		console.log("Body=", avatarForm);
+		const obj = {};
+		form.forEach(function(value, key) { obj[key] = value; });
 		console.log("fetch /user/updateUserInfos");
-		fetch("/user/updateUserInfos/", { method: "POST", body: avatarForm, credentials: "include"})
+		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
 				{
@@ -751,17 +753,15 @@ function	getOptionsStruct()
 {
 	const buttons = document.querySelectorAll(".wrapper-options-buttons button");
 	const labels = document.getElementsByClassName("lang-label");
-	const twoFAInputs = document.querySelectorAll(".twofa-set-div div input");
-	const twoFAButtons = document.querySelectorAll(".twofa-set-div div button");
+	const input = document.querySelector(".twofa-set-div div input");
+	const button = document.querySelector(".twofa-set-div div button");
 
 	const twoFAStruct = {
 		radios: document.querySelectorAll(".twofa-label input"),
 		wrapper: document.getElementsByClassName("twofa-set-div")[0],
-		emailInput: twoFAInputs[0],
-		emailButton: twoFAButtons[0],
 		secondDiv: document.querySelectorAll(".twofa-set-div div")[1],
-		codeInput: twoFAButtons[1],
-		codeButton: twoFAButtons[1],
+		input: input,
+		button: button,
 	};
 	const accountStruct = {
 		button: buttons[0],

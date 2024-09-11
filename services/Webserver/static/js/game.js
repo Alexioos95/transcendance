@@ -244,7 +244,19 @@ function	setupEventListeners(struct, data)
 	});
 	// Chat
 	if (data.guestMode === "false")
+	{
 		liveChat(struct);
+		const myInterval = setInterval(function() {
+			if (struct.run === 0)
+				clearInterval(myInterval);
+			fetch("/user/updateInfo/", { method: "GET", credentials: "include"})
+				.then(response => {
+					console.log("status=", response.status);
+					console.log("response=", response.json());
+				})
+				.catch(() => console.error("Error: failed to fetch the updateInfo route"));
+		}, 10000)
+	}
 }
 
 function	replaceDatas(struct, data)

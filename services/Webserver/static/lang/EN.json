@@ -102,6 +102,8 @@
 		"pseudo2": "Pseudo of player 2",
 		"pseudo3": "Pseudo of player 3",
 		"pseudo4": "Pseudo of player 4",
+		"showPassword1": "Change the display of my password",
+		"showPassword2": "Change the display of my password",
 		"email": "Email",
 		"code": "Code received"
 	},

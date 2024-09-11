@@ -120,6 +120,34 @@ function	setupEventListeners(struct, data)
 	struct.options.lang.nl.addEventListener("click", function() { fetchTranslation(struct, "NL") });
 	// Tabs Account/Blocked
 	struct.options.account.button.addEventListener("click", function() { showTab(struct.options.account, struct.options.blocked) });
+	struct.options.account.showPasswords[0].addEventListener("click", function() {
+		if (struct.options.account.passwords[0].type == "password")
+			{
+				struct.options.account.passwords[0].type = "text";
+				struct.showPasswordIcon.classList.remove("fa-eye-slash");
+				struct.showPasswordIcon.classList.add("fa-eye");
+			}
+			else
+			{
+				struct.options.account.passwords[0].type = "password";
+				struct.showPasswordIcon.classList.remove("fa-eye");
+				struct.showPasswordIcon.classList.add("fa-eye-slash");
+			}
+	});
+	struct.options.account.showPasswords[1].addEventListener("click", function() {
+		if (struct.options.account.passwords[1].type == "password")
+			{
+				struct.options.account.passwords[1].type = "text";
+				struct.showPasswordIcon.classList.remove("fa-eye-slash");
+				struct.showPasswordIcon.classList.add("fa-eye");
+			}
+			else
+			{
+				struct.options.account.passwords[1].type = "password";
+				struct.showPasswordIcon.classList.remove("fa-eye");
+				struct.showPasswordIcon.classList.add("fa-eye-slash");
+			}
+	});
 	struct.options.account.twoFA.radios[0].addEventListener("change", function() {
 		struct.options.account.twoFA.codeInput.value = "";
 		struct.options.account.twoFA.emailInput.value = "";
@@ -316,8 +344,7 @@ function	replaceDatas(struct, data)
 		const username = document.querySelector(".nav-user span");
 		const inputs = document.querySelectorAll(".options-wrapper-connection input");
 
-		if (data.avatar !== undefined && data.avatar !== "")
-			avatar.src = data.avatar;
+		avatar.src = data.avatar;
 		username.innerHTML = data.username;
 		inputs[0].value = data.username;
 		inputs[1].value = data.email;
@@ -632,6 +659,9 @@ function	getOptionsStruct()
 		table: document.getElementsByClassName("wrapper-options-forms")[0],
 		form: document.getElementsByClassName("options-form")[0],
 		twoFA: twoFAStruct,
+		passwords: document.getElementsByClassName("options-password"),
+		showPasswords: document.getElementsByClassName("show-password"),
+		showPasswordsIcons: document.querySelectorAll(".show-password .i"),
 		error: document.getElementsByClassName("error-update")[0],
 		formSubmit: document.getElementsByClassName("options-save")[0]
 	};

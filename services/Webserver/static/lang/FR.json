@@ -102,6 +102,8 @@
 		"pseudo2": "Pseudonyme du joueur 2",
 		"pseudo3": "Pseudonyme du joueur 3",
 		"pseudo4": "Pseudonyme du joueur 4",
+		"showPassword1": "Changer l'affichage de mon mot de passe",
+		"showPassword2": "Changer l'affichage de mon mot de passe",
 		"email": "Email",
 		"code": "Code reçu"
 	},

@@ -65,7 +65,6 @@
 		"2fa": "Authentification à deux facteurs",
 		"2fa-off": "Désactivé",
 		"2fa-email": "Email",
-		"send": "Envoyer",
 		"activate": "Activer",
 		"save": "Sauvegarder",
 		"unblock": "Débloquer",
@@ -80,7 +79,6 @@
 		"p4": "Joueur 4",
 		"passwordCurr": "Actuel",
 		"passwordNew": "Nouveau",
-		"email": "Email",
 		"code": "Code reçu"
 	},
 	"title": {
@@ -104,7 +102,6 @@
 		"pseudo4": "Pseudonyme du joueur 4",
 		"showPassword1": "Changer l'affichage de mon mot de passe",
 		"showPassword2": "Changer l'affichage de mon mot de passe",
-		"email": "Email",
 		"code": "Code reçu"
 	},
 	"tabOptions": {

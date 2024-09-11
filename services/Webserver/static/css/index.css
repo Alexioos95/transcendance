@@ -965,6 +965,7 @@ canvas.pong {
 	flex-direction: column;
 	width: 50%;
 	padding-left: 1.4rem;
+	position: relative;
 }
 
 .wrapper-options-forms .options-form .options-div label span {
@@ -1021,6 +1022,16 @@ canvas.pong {
 	margin-bottom: 0.2rem;
 }
 
+.options-wrapper-password .show-password {
+	position: absolute;
+    right: -2.5rem;
+    height: 100%;
+    width: 10%;
+    margin-bottom: 0;
+    padding: 0;
+    border-radius: 0;
+}
+
 .wrapper-options-forms .options-wrapper-2fa [type=radio] {
 	position: unset;
 	width: auto;
@@ -1029,11 +1040,6 @@ canvas.pong {
 }
 
 .wrapper-options-forms .twofa-set-div {
-	display: flex;
-	flex-direction: column;
-}
-
-.wrapper-options-forms .twofa-set-div div {
 	width: 100%;
 	padding-left: 1.4rem;
 	margin-bottom: 0.5rem;

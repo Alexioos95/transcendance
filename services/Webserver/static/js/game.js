@@ -9,7 +9,11 @@ function	deleteFriend()
 		if (response.ok)
 			console.log("deleteFriend OK");
 		else
-			response.json().then(data => console.log(data))
+		{
+			console.log("deleteFriend NOT OK");
+			console.log("status=", response.status);
+			console.log("response=", response.json());
+		}
 	})
 	.catch(() => console.error("Error: failed to fetch the deleteFriend route"));
 }
@@ -22,7 +26,11 @@ function	deleteBlocked()
 		if (response.ok)
 			console.log("deleteFriend OK");
 		else
-			response.json().then(data => console.log(data))
+		{
+			console.log("deleteFriend NOT OK");
+			console.log("status=", response.status);
+			console.log("response=", response.json());
+		}
 	})
 	.catch(() => console.error("Error: failed to fetch the deleteBlockedUser route"));
 }
@@ -104,10 +112,6 @@ function	setupEventListeners(struct, data)
 	});
 	// Cross Buttons
 	struct.options.leaveButton.addEventListener("click", function() {
-		struct.options.account.twoFA.codeInput.value = "";
-		struct.options.account.twoFA.emailInput.value = "";
-		struct.options.account.twoFA.wrapper.classList.add("hidden");
-		struct.options.account.twoFA.secondDiv.classList.add("hidden");
 		if (struct.tournament.on === true && struct.tournament.names.length === 0)
 			showScreen(struct.screen, struct.screen.wrapperTournamentForm);
 		else
@@ -124,72 +128,83 @@ function	setupEventListeners(struct, data)
 		if (struct.options.account.passwords[0].type == "password")
 			{
 				struct.options.account.passwords[0].type = "text";
-				struct.showPasswordIcon.classList.remove("fa-eye-slash");
-				struct.showPasswordIcon.classList.add("fa-eye");
+				struct.options.account.showPasswordsIcons[0].classList.remove("fa-eye-slash");
+				struct.options.account.showPasswordsIcons[0].classList.add("fa-eye");
 			}
 			else
 			{
 				struct.options.account.passwords[0].type = "password";
-				struct.showPasswordIcon.classList.remove("fa-eye");
-				struct.showPasswordIcon.classList.add("fa-eye-slash");
+				struct.options.account.showPasswordsIcons[0].classList.remove("fa-eye");
+				struct.options.account.showPasswordsIcons[0].classList.add("fa-eye-slash");
 			}
 	});
 	struct.options.account.showPasswords[1].addEventListener("click", function() {
 		if (struct.options.account.passwords[1].type == "password")
 			{
 				struct.options.account.passwords[1].type = "text";
-				struct.showPasswordIcon.classList.remove("fa-eye-slash");
-				struct.showPasswordIcon.classList.add("fa-eye");
+				struct.options.account.showPasswordsIcons[1].classList.remove("fa-eye-slash");
+				struct.options.account.showPasswordsIcons[1].classList.add("fa-eye");
 			}
 			else
 			{
 				struct.options.account.passwords[1].type = "password";
-				struct.showPasswordIcon.classList.remove("fa-eye");
-				struct.showPasswordIcon.classList.add("fa-eye-slash");
+				struct.options.account.showPasswordsIcons[1].classList.remove("fa-eye");
+				struct.options.account.showPasswordsIcons[1].classList.add("fa-eye-slash");
 			}
 	});
-	struct.options.account.twoFA.radios[0].addEventListener("change", function() {
-		struct.options.account.twoFA.codeInput.value = "";
-		struct.options.account.twoFA.emailInput.value = "";
-		struct.options.account.twoFA.wrapper.classList.add("hidden");
-		struct.options.account.twoFA.secondDiv.classList.add("hidden");
+	struct.options.account.twoFA.radios[0].addEventListener("change", function() { struct.options.account.twoFA.wrapper.classList.add("hidden"); });
+	struct.options.account.twoFA.radios[1].addEventListener("change", function() {
+		const obj = { type: "email" };
+		
+		fetch("/user/init2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => {
+				if (response.ok)
+					struct.options.account.twoFA.wrapper.classList.remove("hidden");
+				else
+					response.json().then(data => struct.options.account.error.innerHTML = data.error);
+			})
+			.catch(() => console.error("Error: failed to fetch the init2fa route"));
+		struct.options.account.twoFA.wrapper.classList.remove("hidden");
 	});
-	struct.options.account.twoFA.radios[1].addEventListener("change", function() { struct.options.account.twoFA.wrapper.classList.remove("hidden"); });
-	struct.options.account.twoFA.emailButton.addEventListener("click", function() {
-		// !!!!!!!!!!!!
-		struct.options.account.twoFA.secondDiv.classList.remove("hidden");
-	});
-	struct.options.account.twoFA.codeButton.addEventListener("click", function() {
-		// !!!!!!!!!!!!
+	struct.options.account.twoFA.button.addEventListener("click", function() {
+		const obj = { type: struct.options.account.twoFA.input.value };
+		
+		fetch("/user/set2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => {
+				if (response.ok)
+					{
+						struct.options.account.error.classList.remove("error");
+						struct.options.account.error.classList.add("success");
+						struct.options.account.error.innerHTML = "SUCCESS";
+					}
+					else
+					{
+						struct.options.account.error.classList.remove("success");
+						struct.options.account.error.classList.add("error");
+						struct.options.account.error.innerHTML = "YIKES";
+					}
+			})
+			.catch(() => console.error("Error: failed to fetch the set2fa route"));
 	});
 	struct.options.account.formSubmit.addEventListener("click", function(event) {
 		event.preventDefault();
 
 		const data = new FormData(struct.options.account.form);
 		const avatarImage = document.getElementsByClassName("change-avatar")[0].files[0];
-		const avatarForm = new FormData();
+		const form = new FormData();
 
-		avatarForm.append("file", avatarImage);
-		avatarForm.append("lang", data.get("lang"));
-		avatarForm.append("username", data.get("options-username"));
-		avatarForm.append("email", data.get("options-email"));
-		avatarForm.append("passwordCurr", data.get("options-password-curr"));
-		avatarForm.append("passwordNew", data.get("options-password-new"));
-		avatarForm.append("twoFA", data.get("2fa"));
+		form.append("file", avatarImage);
+		form.append("lang", data.get("lang"));
+		form.append("username", data.get("options-username"));
+		form.append("email", data.get("options-email"));
+		form.append("passwordCurr", data.get("options-password-curr"));
+		form.append("passwordNew", data.get("options-password-new"));
+		form.append("twoFA", data.get("2fa"));
 
-		// const obj = {
-		//	lang: data.get("lang"),
-		//	avatar: options,
-		//	username: data.get("options-username"),
-		//	email: data.get("options-email"),
-		//	passwordCurr: data.get("options-password-curr"),
-		//	passwordNew: data.get("options-password-new"),
-		//	twoFA: data.get("2fa")
-		//};
-
-		console.log(obj.avatar);
+		const obj = {};
+		form.forEach(function(value, key) { obj[key] = value; });
 		console.log("fetch /user/updateUserInfos");
-		fetch("/user/updateUserInfos/", { method: "POST", body: avatarForm, credentials: "include"})
+		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)
 				{
@@ -229,107 +244,19 @@ function	setupEventListeners(struct, data)
 	});
 	// Chat
 	if (data.guestMode === "false")
+	{
 		liveChat(struct);
-}
-
-function	liveChat(struct)
-{
-	struct.chat.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/chat/");
-	struct.chat.socket.addEventListener("error", function() {
-		const tr = document.querySelectorAll(".tab-chat tr");
-		const buttons = document.querySelector(".tab-chat button");
-		const lock = document.getElementsByClassName("tab-chat-lock")[0];
-
-		struct.tabs.chat.input.classList.add("hidden");
-		for (let i = 1; i < tr.length; i++)
-			tr[i].style.opacity = 0.5;
-		for (let i = 0; i < buttons.length; i++)
-			buttons[i].disabled = true;
-		lock.classList.remove("hidden");
-	});
-	struct.chat.socket.addEventListener("message", function(event) {
-		const data = JSON.parse(event.data);
-		const tr = document.createElement("tr");
-		const td = document.createElement("td");
-		const chatMessage = document.createElement("div");
-		const chatUserAvatar = document.createElement("div");
-		const avatar = document.createElement("img");
-		const p = document.createElement("p");
-		const span = document.createElement("span");
-		const text = document.createTextNode(": " + data.message);
-		const chatOptions = document.createElement("div");
-		const i1 = document.createElement("i");
-		const i2 = document.createElement("i");
-		const i3 = document.createElement("i");
-		const i4 = document.createElement("i");
-		let isScrolled = false;
-
-		avatar.src = data.avatar;
-		avatar.alt = "Avatar";
-		chatUserAvatar.classList.add("chat-user-avatar");
-		chatUserAvatar.appendChild(avatar);
-		span.innerHTML = data.user;
-		p.appendChild(span);
-		p.appendChild(text);
-		chatMessage.classList.add("chat-message");
-		chatMessage.appendChild(chatUserAvatar);
-		chatMessage.appendChild(p);
-		i1.classList.add("fa-solid", "fa-user-plus");
-		i2.classList.add("fa-solid", "fa-clock-rotate-left");
-		i3.classList.add("fa-solid", "fa-table-tennis-paddle-ball");
-		i4.classList.add("fa-solid", "fa-circle-xmark");
-
-		i1.addEventListener("click", function() {
-			const obj = { newFriend: "usernameToFriend" };
-
-			fetch("/user/addFriend/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-			.then(response => {
-				if (response.ok)
-					console.log("addFriend success");
-				else
-					response.json().then(data => { console.log(data); });
-			})
-			.catch(() => console.error("Error: failed to fetch the addFriend route"));
-		});
-		i4.addEventListener("click", function() {
-			const obj = { toBlock: "usernameToBlock" };
-
-			fetch("/user/blockUser/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-			.then(response => {
-				if (response.ok)
-					console.log("blockUser success");
-				else
-					response.json().then(data => { console.log(data); });
-			})
-			.catch(() => console.error("Error: failed to fetch the blockUser route"));
-		});
-
-		chatOptions.appendChild(createChatButton("Ajouter en ami", "hover-green", i1));
-		chatOptions.appendChild(createChatButton("Voir l'historique", "hover-purple", i2));
-		chatOptions.appendChild(createChatButton("Inviter pour un Pong", "hover-blue", i3));
-		chatOptions.appendChild(createChatButton("Bloquer l'utilisateur", "hover-red", i4));
-		chatOptions.classList.add("chat-options");
-		td.appendChild(chatMessage);
-		td.appendChild(chatOptions);
-		td.tabIndex = "0";
-		if (struct.tabs.chat.table.scrollTop === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
-			isScrolled = true;
-		tr.appendChild(td);
-		struct.chat.output.appendChild(tr);
-		if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
-			struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
-	});
-	struct.chat.input.addEventListener("keydown", function(event) {
-		if (event.key === "Enter")
-		{
-			event.preventDefault();
-			if (struct.chat.input.value.trim() !== "")
-			{
-				struct.chat.socket.send(JSON.stringify({ "message": struct.chat.input.value }));
-				struct.chat.input.value = "";
-			}
-		}
-	});
+		const myInterval = setInterval(function() {
+			if (struct.run === 0)
+				clearInterval(myInterval);
+			fetch("/user/updateInfo/", { method: "GET", credentials: "include"})
+				.then(response => {
+					console.log("status=", response.status);
+					console.log("response=", response.json());
+				})
+				.catch(() => console.error("Error: failed to fetch the updateInfo route"));
+		}, 10000)
+	}
 }
 
 function	replaceDatas(struct, data)
@@ -475,7 +402,6 @@ function	fetchTranslation(struct, lang)
 
 async function	translateGamePage(struct, obj, currLang)
 {
-	console.log("TRANSLATE");
 	struct.options.lang.curr = currLang;
 	let plainTexts = Object.values(obj.plainText);
 	let placeHolders = Object.values(obj.placeholder);
@@ -540,6 +466,126 @@ async function	setGuestRestrictions(struct)
 	struct.guestMode = true;
 }
 
+/////////////////////////
+// Live Chat
+/////////////////////////
+function	liveChat(struct)
+{
+	struct.chat.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/chat/");
+	struct.chat.socket.addEventListener("error", function() {
+		const tr = document.querySelectorAll(".tab-chat tr");
+		const buttons = document.querySelector(".tab-chat button");
+		const lock = document.getElementsByClassName("tab-chat-lock")[0];
+
+		struct.tabs.chat.input.classList.add("hidden");
+		for (let i = 1; i < tr.length; i++)
+			tr[i].style.opacity = 0.5;
+		for (let i = 0; i < buttons.length; i++)
+			buttons[i].disabled = true;
+		lock.classList.remove("hidden");
+	});
+	struct.chat.socket.addEventListener("message", function(event) {
+		const data = JSON.parse(event.data);
+		if (data.type === "connected")
+		{
+			if (data.user !== document.querySelector(".nav-user span"))
+			{
+				const tr = document.createElement("tr");
+				const td = document.createElement("td");
+				const p = document.createElement("p");
+	
+				p.classList.add("chat-announcement");
+				td.appendChild(p);
+				tr.appendChild(td);
+				struct.chat.output.appendChild(tr);
+			}
+			return ;
+		} 
+		const tr = createChatMessage(struct, data);
+		let isScrolled = false;
+
+		if (struct.tabs.chat.table.scrollTop === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
+			isScrolled = true;
+		struct.chat.output.appendChild(tr);
+		if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
+			struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
+	});
+	struct.chat.input.addEventListener("keydown", function(event) {
+		if (event.key === "Enter")
+		{
+			event.preventDefault();
+			if (struct.chat.input.value.trim() !== "")
+			{
+				struct.chat.socket.send(JSON.stringify({ "message": struct.chat.input.value }));
+				struct.chat.input.value = "";
+			}
+		}
+	});
+}
+
+function	createChatMessage(struct, data)
+{
+	const tr = document.createElement("tr");
+	const td = document.createElement("td");
+	const chatMessage = document.createElement("div");
+	const chatUserAvatar = document.createElement("div");
+	const avatar = document.createElement("img");
+	const p = document.createElement("p");
+	const span = document.createElement("span");
+	const text = document.createTextNode(": " + data.message);
+	const chatOptions = document.createElement("div");
+	const i1 = document.createElement("i");
+	const i2 = document.createElement("i");
+	const i3 = document.createElement("i");
+	const i4 = document.createElement("i");
+	let array;
+
+	// Get lang
+	if (struct.options.lang.curr === "FR")
+		array = ["Ajouter en ami", "Voir l'historique", "Inviter pour un Pong", "Bloquer l'utilisateur"];
+	else if (struct.options.lang.curr === "EN")
+		array = ["Add to friendlist", "See history", "Invite for a Pong", "Block the user"];
+	else if (struct.options.lang.curr === "NL")
+		array = ["Aan vriendenlijst toevoegen", "Zie geschiedenis", "Uitnodigen voor Pong", "Gebruiker blokkeren"];
+	// Set avatar
+	avatar.src = data.avatar;
+	avatar.alt = "Avatar";
+	chatUserAvatar.classList.add("chat-user-avatar");
+	chatUserAvatar.appendChild(avatar);
+	// Set username
+	span.innerHTML = data.user;
+	p.appendChild(span);
+	p.appendChild(text);
+	// Set message
+	chatMessage.classList.add("chat-message");
+	chatMessage.appendChild(chatUserAvatar);
+	chatMessage.appendChild(p);
+	// Set buttons
+	i1.classList.add("fa-solid", "fa-user-plus");
+	i2.classList.add("fa-solid", "fa-clock-rotate-left");
+	i3.classList.add("fa-solid", "fa-table-tennis-paddle-ball");
+	i4.classList.add("fa-solid", "fa-circle-xmark");
+	const button1 = createChatButton(array[0], "hover-green", i1);
+	const button2 = createChatButton(array[1], "hover-purple", i2);
+	const button3 = createChatButton(array[2], "hover-blue", i3);
+	const button4 = createChatButton(array[3], "hover-red", i4);
+	button1.addEventListener("click", function() { addFriend(struct, button1); });
+	button2.addEventListener("click", function() { seeHistory(struct, button2); });
+	button3.addEventListener("click", function() { sendInvite(struct, button3); });
+	button4.addEventListener("click", function() { blockUser(struct, button4); });
+	// Append
+	chatOptions.appendChild(button1);
+	chatOptions.appendChild(button2);
+	chatOptions.appendChild(button3);
+	chatOptions.appendChild(button4);
+	chatOptions.classList.add("chat-options");
+	td.appendChild(chatMessage);
+	td.appendChild(chatOptions);
+	td.tabIndex = "0";
+	tr.appendChild(td);
+	return (tr);
+}
+
 function	createChatButton(title, addClass, child)
 {
 	const button = document.createElement("button");
@@ -549,6 +595,108 @@ function	createChatButton(title, addClass, child)
 	button.classList.add(addClass);
 	button.appendChild(child);
 	return (button);
+}
+
+function	addFriend(struct, button)
+{
+	const username = button.parentElement.parentElement.querySelector(".chat-message span").innerHTML;
+	console.log("Username=", username);
+	const obj = { newFriend: username };
+
+	fetch("/user/addFriend/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		.then(response => {
+			const tr = document.createElement("tr");
+			const td = document.createElement("td");
+			const p = document.createElement("p");
+
+			p.classList.add("chat-announcement");
+			if (response.ok)
+				p.innerHTML = "Added to friend";
+			else
+				p.innerHTML = "Failed to add to friend";
+			td.appendChild(p);
+			tr.appendChild(td);
+			struct.chat.output.appendChild(tr);
+			console.log("status=", response.status);
+			console.log("response=", response.json());
+		})
+		.catch(() => console.error("Error: failed to fetch the addFriend route"));
+}
+
+function	seeHistory(struct, button)
+{
+	// !!!!!!!!!!!!!!!!!!!!!
+	const username = button.parentElement.parentElement.querySelector(".chat-message span").innerHTML;
+	console.log("Username=", username);
+	const obj = { seeHistory: username };
+
+	fetch("/user/seeHistory/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		.then(response => {
+			const tr = document.createElement("tr");
+			const td = document.createElement("td");
+			const p = document.createElement("p");
+
+			p.classList.add("chat-announcement");
+			if (response.ok)
+				p.innerHTML = "Blocked user";
+			else
+				p.innerHTML = "Failed to see history of user";
+			td.appendChild(p);
+			tr.appendChild(td);
+			struct.chat.output.appendChild(tr);
+		})
+		.catch(() => console.error("Error: failed to fetch the seeHistory route"));
+}
+
+function	sendInvite(struct, button)
+{
+	// !!!!!!!!!!!!!!!!!!!!!
+	const username = button.parentElement.parentElement.querySelector(".chat-message span").innerHTML;
+	console.log("Username=", username);
+	const obj = { toChallenge: username };
+
+	fetch("/user/Challenge/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		.then(response => {
+			const tr = document.createElement("tr");
+			const td = document.createElement("td");
+			const p = document.createElement("p");
+
+			p.classList.add("chat-announcement");
+			if (response.ok)
+				p.innerHTML = "Blocked user";
+			else
+				p.innerHTML = "Failed to challenge user";
+			td.appendChild(p);
+			tr.appendChild(td);
+			struct.chat.output.appendChild(tr);
+		})
+		.catch(() => console.error("Error: failed to fetch the Challenge route"));
+}
+
+function	blockUser(struct, button)
+{
+	const username = button.parentElement.parentElement.querySelector(".chat-message span").innerHTML;
+	console.log("Username=", username);
+	const obj = { toBlock: username };
+
+	fetch("/user/blockUser/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		.then(response => {
+			const tr = document.createElement("tr");
+			const td = document.createElement("td");
+			const p = document.createElement("p");
+
+			p.classList.add("chat-announcement");
+			if (response.ok)
+				p.innerHTML = "Blocked user";
+			else
+				p.innerHTML = "Failed to block user";
+			td.appendChild(p);
+			tr.appendChild(td);
+			struct.chat.output.appendChild(tr);
+			console.log("status=", response.status);
+			console.log("response=", response.json());
+		})
+		.catch(() => console.error("Error: failed to fetch the blockUser route"));
 }
 
 //////////////////////////////////////////////////////
@@ -642,17 +790,14 @@ function	getOptionsStruct()
 {
 	const buttons = document.querySelectorAll(".wrapper-options-buttons button");
 	const labels = document.getElementsByClassName("lang-label");
-	const twoFAInputs = document.querySelectorAll(".twofa-set-div div input");
-	const twoFAButtons = document.querySelectorAll(".twofa-set-div div button");
+	const input = document.querySelector(".twofa-set-div input");
+	const button = document.querySelector(".twofa-set-div button");
 
 	const twoFAStruct = {
 		radios: document.querySelectorAll(".twofa-label input"),
 		wrapper: document.getElementsByClassName("twofa-set-div")[0],
-		emailInput: twoFAInputs[0],
-		emailButton: twoFAButtons[0],
-		secondDiv: document.querySelectorAll(".twofa-set-div div")[1],
-		codeInput: twoFAButtons[1],
-		codeButton: twoFAButtons[1],
+		input: input,
+		button: button,
 	};
 	const accountStruct = {
 		button: buttons[0],
@@ -661,7 +806,7 @@ function	getOptionsStruct()
 		twoFA: twoFAStruct,
 		passwords: document.getElementsByClassName("options-password"),
 		showPasswords: document.getElementsByClassName("show-password"),
-		showPasswordsIcons: document.querySelectorAll(".show-password .i"),
+		showPasswordsIcons: document.querySelectorAll(".show-password i"),
 		error: document.getElementsByClassName("error-update")[0],
 		formSubmit: document.getElementsByClassName("options-save")[0]
 	};

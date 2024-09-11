@@ -9,7 +9,11 @@ function	deleteFriend()
 		if (response.ok)
 			console.log("deleteFriend OK");
 		else
-			response.json().then(data => console.log(data))
+		{
+			console.log("deleteFriend NOT OK");
+			console.log("status=", response.status);
+			console.log("response=", response.json());
+		}
 	})
 	.catch(() => console.error("Error: failed to fetch the deleteFriend route"));
 }
@@ -22,7 +26,11 @@ function	deleteBlocked()
 		if (response.ok)
 			console.log("deleteFriend OK");
 		else
-			response.json().then(data => console.log(data))
+		{
+			console.log("deleteFriend NOT OK");
+			console.log("status=", response.status);
+			console.log("response=", response.json());
+		}
 	})
 	.catch(() => console.error("Error: failed to fetch the deleteBlockedUser route"));
 }
@@ -597,6 +605,8 @@ function	addFriend(struct, button)
 			td.appendChild(p);
 			tr.appendChild(td);
 			struct.chat.output.appendChild(tr);
+			console.log("status=", response.status);
+			console.log("response=", response.json());
 		})
 		.catch(() => console.error("Error: failed to fetch the addFriend route"));
 }
@@ -671,6 +681,8 @@ function	blockUser(struct, button)
 			td.appendChild(p);
 			tr.appendChild(td);
 			struct.chat.output.appendChild(tr);
+			console.log("status=", response.status);
+			console.log("response=", response.json());
 		})
 		.catch(() => console.error("Error: failed to fetch the blockUser route"));
 }

@@ -823,11 +823,14 @@ def addFriend(request):
       return JsonResponse({'error': e.data}, status=e.status)
 
     #2
-    data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
+    except Exception as e:
+        return JsonResponse({'error': 'Invalid Json'}, status=403)
     if not 'newFriend' in data:
         return JsonResponse({'error': 'No newFriend in request body'}, status=403)
     newFriend = data['newFriend']
-    if newFriend is user:
+    if newFriend == user.Username:
         return JsonResponse({'error': 'NewFriend is user itself'}, status=403)
 
     #3
@@ -841,10 +844,10 @@ def addFriend(request):
         return JsonResponse({'error': 'User does not exist'}, status=401)
     for x in user.foeList:
       if x == newFriend:
-          user.foeList.remove(newFriend) #/ user.foeList.pop(x)
+          user.foeList.remove(newFriend)
 
     #5
-    user.friendsList.add(newFriend)
+    user.friendsList.append(newFriend)
     try:
       user.save()
     except Exception as e:
@@ -855,20 +858,59 @@ def addFriend(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def blockUser(request):
-    # decodeJwt pour identifier la personne qui veut bloquer une persone et s'assurer que le JWT est toujours valide .
-    # verifier qu'on ne s'ajoute pas soi meme
-    # check si personne en db
-    # check si personne a bloquer est dans la liste d'amis et l'en supprimer s'il y est.
-    # Ajouter personne dans la liste d'ennemis.
-    # renvoyer status == 200
+    #1 decodeJwt pour identifier la personne qui veut bloquer une persone et s'assurer que le JWT est toujours valide .
+    #2 verifier qu'on ne s'ajoute pas soi meme
+    #3 check si personne en db
+    #4 check si personne a bloquer est dans la liste d'amis et l'en supprimer s'il y est.
+    #5 Ajouter personne dans la liste d'ennemis.
+    #6 renvoyer status == 200
 
     # addFriend:         { newFriend: username }
     # blockUser:         { toBlock: username }
     # deleteFriend:      { unfriend: username }
     # deleteBlockedUser: { unblock: username }
 
-    return JsonResponse({}, status=200)
+    #1
+    cookie = checkCookie(request, 'auth')
+    if cookie is None:
+        return JsonResponse({'error': 'User not logged'}, status=401)
+    try:
+      user = decodeJwt(cookie)
+    except customException as e:
+      return JsonResponse({'error': e.data}, status=e.status)
 
+    #2
+    try:
+        data = json.loads(request.body)
+    except Exception as e:
+        return JsonResponse({'error': 'Invalid Json'}, status=403)
+    if not 'toBlock' in data:
+        return JsonResponse({'error': 'No toBlock in request body'}, status=403)
+    toBlock = data['toBlock']
+    if toBlock == user.Username:
+        return JsonResponse({'error': 'Person to block is user itself'}, status=403)
+
+    #3
+    toBlock = get_user_in_db('Username', data['toBlock'])
+    if toBlock is None:
+        return JsonResponse({'error': 'Person to block not found'}, status=404)
+     
+    #4
+    user = get_user_in_db('Username', user)
+    if user is None:
+        return JsonResponse({'error': 'User does not exist'}, status=401)
+    for x in user.friendsList:
+      if x == toBlock:
+          user.friendsList.remove(toBlock)
+
+    #5
+    user.foeList.append(toBlock)
+    try:
+      user.save()
+    except Exception as e:
+      print(f'Erreur addFriend : {e}', file=sys.stderr)
+      return JsonResponse({'error': 'An unknown error occured'}, status=500)
+    return JsonResponse({'message': 'OK'}, status=200)
 
 @csrf_exempt
 @require_http_methods(["POST"])

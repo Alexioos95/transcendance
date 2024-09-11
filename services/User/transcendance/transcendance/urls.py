@@ -48,7 +48,7 @@ urlpatterns = [
     path('user/updateUserInfos/', views.updateUserInfos), #envoyer les infos a modifer pour l'user sauf 2fa
     # POST envoi un username a jouter a une des liste ami bloque
     path('user/addFriend/', views.addFriend),
-    # path('user/blockUser/', views.blockUser),en attene de postgres
+    path('user/blockUser/', views.blockUser),
     # path('user/deleteFriend/', views.deleteFriend),
     # path('user/deleteBlockedUser/', views.deleteBlockedUser),
     #POST

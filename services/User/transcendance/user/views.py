@@ -412,23 +412,33 @@ def updateUserInfos(request):
 
     # Parsez le JSON
     # parsed_json = {}
-    # try:
-    #     parsed_json = json.loads(decoded_body)
-    # except json.JSONDecodeError:
-    #     print("Erreur lors du parsing JSON", file=sys.stderr)
-    #     return
+
+    # print(f'body: {request.body}')
+    decoded_body = request.body.decode('utf-8')
+    print(f'body dans updta user info: {request.body}', file=sys.stderr)
+    body = json.loads(request.body.decode('utf-8'))
+
+    # Vérifiez s'il y a un fichier et si son contenu est non vide
+    if 'file' in body:
+        # Imprimez le contenu du fichier
+        print("Contenu du fichier:", body['file'], file=sys.stderr)
+    else:
+        print("Aucun fichier trouvé ou vide", file=sys.stderr)
+    # print(f'file dans updta user info: {decoded_body['file']}', file=sys.stderr)
+    try:
+        data = json.loads(decoded_body)
+    except Exception as e:
+        print("Erreur lors du parsing JSON", file=sys.stderr)
+        return JsonResponse({'error': "invalid Json"}, status=403)
 
     # # Accédez au champ "avatar"
     # if 'avatar' in parsed_json:
     #     avatar_info = parsed_json['avatar']
-    # print(f'avatar: {request.body['avatar'].body}')
     # print("Body:", avatar_info.get('body'), file=sys.stderr)
     # print(f'avatar update user info: {request.body['avatar']}', file=sys.stderr)
-    decoded_body = request.body.decode('utf-8')
-    print(f'body dans updta user info: {request.body}', file=sys.stderr)
-    data = json.loads(request.body.decode('utf-8'))#try catch
+    # data = json.loads(request.body.decode('utf-8'))#try catch
 
-    avatar = data['avatar']
+    # avatar = data['avatar']
     print(f'Avatar update user info: {avatar}', file=sys.stderr)
     try:
         data = json.loads(request.body)
@@ -441,8 +451,8 @@ def updateUserInfos(request):
         return HttpResponse(status=403)
     user = ""
     try:
-        userName = decodeJwt(auth)
-        user = get_user_in_db('Username', userName)
+        user = decodeJwt(auth)
+        # user = get_user_in_db('Username', userName)
     except customException as e:
         print('e.data')
         return JsonResponse({"error": e.data}, status=e.code)
@@ -599,6 +609,8 @@ def checkCodeSet(request):
     return JsonResponse({"message": "2fa activation success"},status=200)
 
 def set2FA(request):
+    #type:email
+    #retourn 200 si mail echec + champ error set
     #recoit un demande d'activation 2fa on recupere l'usser via le JWT et on lui envoie un mail contannt le code + le stocker en cache cle code value user 10 minutes
     return
 

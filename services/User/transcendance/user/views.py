@@ -625,11 +625,12 @@ def updateInfo(request):
     return JsonResponse(objectPing, status=200)
 
 def sendInvitation(request):
-
+    print("i am here", file=stderr)
     # tjs valide sauf bidouille
     return HttpResponse(status=200)
 
 def acceptInvitation(request):
+    print("i am not here", file=stderr)
     #fail si une partie est adctuellement en cours pour le joueur defie ou pour l'user aui accepte
     return JsonResponse({}, status=200)
 

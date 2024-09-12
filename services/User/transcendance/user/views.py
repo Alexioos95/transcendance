@@ -591,15 +591,15 @@ def updateInfo(request):
             "lastTimeOnline": DBFriend.lastTimeOnline.isoformat(),
             "id": DBFriend.id
         })
-
+    usernameChallenge = ''
     objectPing = {
         "username": user.Username,
         "avatar": user.Avatar,
         "language": user.language,
         'friendList': friendObject,
         'blockList': foe,
-        'challengeReceived': {'game': 'pong', 'username': []}
-        'challengeAccepted': {'game': 'pong', 'username': }
+        'challengeReceived': {'game': 'pong', 'username': []},
+        'challengeAccepted': {'game': 'pong', 'username': usernameChallenge}
     }
 
     print(f'object: {json.dumps(objectPing)}', file=sys.stderr)

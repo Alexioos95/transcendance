@@ -59,6 +59,8 @@ urlpatterns = [
     path('user/matchMaking/', views.matchMaking), #a ping regulierement renverra 403 si token invalide une 100 si la recherche et en cours une 200 si un adveraire a ete trouve il faudra ensuite se connecter a la socket du jeu
     #GET
     path('user/updateInfo/', views.updateInfo), #requete a effetuer regulierement (1s?) afin de recevoir les defis/acceptation de defi liste d'ami avec leur date de connection liste de bloque a jour {defi:"nom du jeu si defi accepte ping la route du jeu sinon vide", friendList:[], blockedList:[]}
+    path('user/sendInvitation/', views.sendInvitation),
+    path('user/acceptInvitation/', views.sendInvitation),
     #GET
     path('user/ping/', views.ping), #renvoi 204 si ok sinon vtf
 

@@ -29,6 +29,19 @@ class customException(Exception):
         self.data = data
         self.code = code
 
+def setCookie(user, response):
+	expirationTime = 1209600
+    encoded_jwt = jwt.encode({"userName": user.Username, "expirationDate": time.time() + expirationTime}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")
+	response.set_cookie(
+        'auth',
+        encoded_jwt,
+        httponly=True,
+        secure=True,
+        samesite='None',
+        expires=datetime.utcnow() + timedelta(hours=25),	# Expire avant le JWT...
+        # domain="*"
+	)
+
 def index(request):#a degager
     print('coucou')
     if request.method == 'POST':
@@ -153,15 +166,16 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
     response_data = JsonResponse({"2fa": 'False',  "email": userData['email'], "guestMode":"false", "username":new_user.Username, "avatar": '/images/default_avatar.png' , "lang": new_user.language}, status=201)
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes
     encoded_jwt = jwt.encode({"userName": userData['username'], "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
-    response_data.set_cookie(
-        'auth',
-        encoded_jwt,
-        httponly=True,
-        secure=True,
-        samesite='None',
-        expires=datetime.utcnow() + timedelta(hours=25),	# Expire avant le JWT...
-        # domain="*"
-    )
+	setCookie(userData['username'], response_data) ### TEST THIS OUT ###
+#    response_data.set_cookie(
+#        'auth',
+#        encoded_jwt,
+#        httponly=True,
+#        secure=True,
+#        samesite='None',
+#        expires=datetime.utcnow() + timedelta(hours=25),	# Expire avant le JWT...
+#        # domain="*"
+#    )
     print("tout est ok")
     return (response_data)
 
@@ -229,7 +243,7 @@ def login(request):
     print(f"le user{dbUser}", file=sys.stderr)
     if dbUser is None:
         print('on passe par ici', file=sys.stderr)
-        return HttpResponse({"error":"invalid credentials"}, status=401)
+        return JsonResponse({"error":"invalid credentials"}, status=401)
     
 #        for user in dbUserList:
 #            print(f'dbUser == {dbUserList} Username {user.Username} password == {user.Password}')

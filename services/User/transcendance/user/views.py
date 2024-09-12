@@ -594,16 +594,25 @@ def updateInfo(request):
 
     objectPing = {
         "username": user.Username,
-        "Avatar": user.Avatar,
+        "avatar": user.Avatar,
         "language": user.language,
-        'FriendList': friendObject,
-        'BlockList': foe,
-        'gameInvitation': [],
-        'challengeAccepted': {'game': 'pong', 'username': []}
+        'friendList': friendObject,
+        'blockList': foe,
+        'challengeReceived': {'game': 'pong', 'username': []}
+        'challengeAccepted': {'game': 'pong', 'username': }
     }
 
     print(f'object: {json.dumps(objectPing)}', file=sys.stderr)
     return JsonResponse(objectPing, status=200)
+
+def sendInvitation(request):
+
+    # tjs valide sauf bidouille
+    return HttpResponse(status=200)
+
+def acceptInvitation(request):
+    #fail si une partie est adctuellement en cours pour le joueur defie ou pour l'user aui accepte
+    return JsonResponse({}, status=200)
 
 @csrf_exempt
 def checkCodeLog(request):

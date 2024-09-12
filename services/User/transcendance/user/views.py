@@ -890,7 +890,7 @@ def addFriend(request):
         return JsonResponse({'error': 'User does not exist'}, status=401)
     for x in user.foeList:
       if x == newFriend.Username:
-          user.foeList.remove(newFriend)
+          user.foeList.remove(newFriend.Username)
 
     #4.5
     for x in user.friendsList:
@@ -903,7 +903,7 @@ def addFriend(request):
       user.save()
     except Exception as e:
       print(f'Erreur addFriend : {e}', file=sys.stderr)
-      return JsonResponse({'error': 'An unknown error occured'}, status=500)
+      return JsonResponse({'error': 'Failed to write to database'}, status=500)
     return JsonResponse({'message': 'OK'}, status=200)
 
 @csrf_exempt
@@ -948,7 +948,7 @@ def blockUser(request):
         return JsonResponse({'error': 'User does not exist'}, status=401)
     for x in user.friendsList:
         if x == toBlock.Username:
-            user.friendsList.remove(toBlock)
+            user.friendsList.remove(toBlock.Username)
 
     #4.5
     for x in user.foeList:
@@ -960,7 +960,7 @@ def blockUser(request):
     try:
       user.save()
     except Exception:
-      return JsonResponse({'error': 'An unknown error occured'}, status=500)
+      return JsonResponse({'error': 'Failed to write to database'}, status=500)
     return JsonResponse({'message': 'OK'}, status=200)
 
 @csrf_exempt
@@ -991,10 +991,15 @@ def deleteFriend(request):
     if user is None:
         return JsonResponse({'error': 'User not in db'}, status=403)
     try:
+        print(f'==== user: {user.Username}, friendsList: {repr(user.friendsList)}, unfriend: {repr(unfriend)} ====', file=sys.stderr)
         user.friendsList.remove(unfriend)
     except ValueError:
         return JsonResponse({'No friend to remove'}, status=404)
-    return JsonResponse({}, status=200)
+    try:
+        user.save()
+    except Exception:
+        return JsonResponse({'error': 'Failed to write to database'}, status=500)
+    return JsonResponse({'message': 'ok'}, status=200)
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -1027,4 +1032,8 @@ def deleteBlockedUser(request):
         user.foeList.remove(unfriend)
     except ValueError:
         return JsonResponse({'No blocked person to unblock'}, status=404)
-    return JsonResponse({}, status=200)
+    try:
+        user.save()
+    except Exception:
+        return JsonResponse({'error': 'Failed to write to database'}, status=500)
+    return JsonResponse({'message': 'ok'}, status=200)

@@ -116,8 +116,11 @@ def CheckInfoRegister(data):
 def register(request):#check si user est unique sinon refuser try except get?	#Set language par default ou la récupérer du front ?
   
     print(f"ici body == {request.body}", file=sys.stderr)
-
-    data = json.loads(request.body)
+    data = {}
+    try:
+        data = json.loads(request.body)
+    except Exception as e:
+        return JsonResponse({"error": "invalid Json"}, status=403)
     userData = {}
     try:
         userData = CheckInfoRegister(data)
@@ -624,14 +627,52 @@ def updateInfo(request):
     print(f'object: {json.dumps(objectPing)}', file=sys.stderr)
     return JsonResponse(objectPing, status=200)
 
+@csrf_exempt
 def sendInvitation(request):
-    print("i am here", file=stderr)
-    # tjs valide sauf bidouille
-    return HttpResponse(status=200)
+    print("i am here", file=sys.stderr)
+    # tjs valide sauf bidouille verifier l'user
+    #ajouter dans le cache {pendingChallenge:{challanged: challenger}}
+    authCoockie = checkCookie(request, 'auth')
+    dbUser = {}
+    try:
+        dbUser = decodeJwt(authCoockie)#bdd
+    except customException as e:
+        return JsonResponse("error": e.data, status=e.code)
+    if dbUser is None:
+        return JsonResponse("error": "User does not exist", status=401)
+    usernameId = dbUser.id
+    data = {}
+    try:
+        data = json.loads(request.body)
+    except Exception as e:
+        return JsonResponse({"error": "invalid Json"}, status=403)
+    if 'toChallenge' not in data:
+        return JsonResponse({"error": "invalid Json"}, status=403)
+    challengedUser = get_user_in_db('Username', data['toChallenge'])
+    if challengedUser is None:
+        return JsonResponse({"error": "user does not exist"}, status=200)
+    challenge = cach2e.get('pendingChallenge', {})
+    challange[challengedUser.id].append(usernameId)
+    cache.set({'pendingChallenge': challenge}, 7200)
+    return JsonResponse({}, status=200)
 
+    # if challenge and :
+    #     challenge['username']
+    # cache.set()
+
+@csrf_exempt
 def acceptInvitation(request):
-    print("i am not here", file=stderr)
-    #fail si une partie est adctuellement en cours pour le joueur defie ou pour l'user aui accepte
+    print("i am not here", file=sys.stderr)
+    #fail si une partie est adctuellement en cours pour le joueur defie ou pour l'user qui accepte
+    #ajouter dans le cache {accecptedChallenge:{challanger: challenged}}
+    
+    # verifier si l'user est en train de jouer
+    userIsPlaying = False
+    # verifier si une partie existe pour le challenger deja
+    challengerIsPlaying = False
+    if userIsPlaying is True or challengerIsPlaying is True
+        return JsonResponse({"error": "You or the challenger player is currently playing. Try again later."}, status=200)
+    # creer la partie en bdd
     return JsonResponse({}, status=200)
 
 @csrf_exempt

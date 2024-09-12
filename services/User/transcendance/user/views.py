@@ -1029,7 +1029,7 @@ def deleteBlockedUser(request):
     if user is None:
         return JsonResponse({'error': 'User not in db'}, status=403)
     try:
-        user.foeList.remove(unfriend)
+        user.foeList.remove(unblock)
     except ValueError:
         return JsonResponse({'No blocked person to unblock'}, status=404)
     try:

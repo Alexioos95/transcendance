@@ -582,16 +582,16 @@ def updateInfo(request):
     friendObject = []
     foe = user.foeList
     print(f'foe == {foe}', file=sys.stderr)
-    
+
     # Modification principale : utiliser append() au lieu de +=
     for friend in user.friendsList:
         DBFriend = get_user_in_db("Username", friend)
         friendObject.append({
             "Username": DBFriend.Username,
-            "lastTimeOnline": DBFriend.lastTimeOnline,
+            "lastTimeOnline": DBFriend.lastTimeOnline.isoformat(),
             "id": DBFriend.id
         })
-    
+
     objectPing = {
         "username": user.Username,
         "Avatar": user.Avatar,
@@ -601,7 +601,7 @@ def updateInfo(request):
         'gameInvitation': [],
         'challengeAccepted': {'game': 'pong', 'username': []}
     }
-    
+
     print(f'object: {json.dumps(objectPing)}', file=sys.stderr)
     return JsonResponse(objectPing, status=200)
 

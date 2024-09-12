@@ -584,7 +584,7 @@ def updateInfo(request):
     print(f'foe == {foe}', file=sys.stderr)
     for friend in user.friendsList:
         DBFriend = get_user_in_db("Username", friend)#penser a change par les ids
-        friendObject += {DBFriend.Username, DBFriend.lastTimeOnline, DBFriend.id}
+        friendObject.append({DBFriend.Username, DBFriend.lastTimeOnline, DBFriend.id})
     objectPing = {"username":user.Username, "Avatar":user.Avatar, "language": user.language, 'FriendList':friendObject,'BlockList':foe,'gameInvitation':[],'challengeAccepted':{'game':'pong', 'username':[]}}
     print(f'object: {objectPing}', file=sys.stderr)
     return JsonResponse(objectPing, status=200)

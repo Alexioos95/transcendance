@@ -612,7 +612,17 @@ def updateInfo(request):
             # "id": DBFriend.id,
             "avatar":avatarPath
         })
-
+    challenge = cache.get('pendingChallenge', {})
+    receivedChallenge = []
+    if user.id in challenge:
+        reveicedChallenge = challenge[user.id]
+    print(f'liste des challenge en attente: {challenge}', file=sys.stderr)
+    print(f'challenge en attente de l user: {user.Username} et ses challenges en attentes sont: {receivedChallenge}', file=sys.stderr)
+    challengerArray = []
+    for challanger in receivedChallenge:
+        user = get_user_in_db('id', challanger)
+        print(f'challenger en attente de l user: {user.Username} ', file=sys.stderr)
+        challengerArray.append(user.Username)
     usernameChallenge = ''
     objectPing = {
         "username": user.Username,
@@ -620,7 +630,7 @@ def updateInfo(request):
         "language": user.language,
         'friendList': friendObject,
         'blockList': foeObject,
-        'challengeReceived': {'game': 'pong', 'username': []},
+        'challengeReceived': {'game': 'pong', 'username': challengerArray},#empecher de se defier soi meme ca serait une bonne idee
         'challengeAccepted': {'game': 'pong', 'username': usernameChallenge}
     }
 
@@ -637,9 +647,9 @@ def sendInvitation(request):
     try:
         dbUser = decodeJwt(authCoockie)#bdd
     except customException as e:
-        return JsonResponse("error": e.data, status=e.code)
+        return JsonResponse({"error": e.data}, status=e.code)
     if dbUser is None:
-        return JsonResponse("error": "User does not exist", status=401)
+        return JsonResponse({"error": "User does not exist"}, status=401)
     usernameId = dbUser.id
     data = {}
     try:
@@ -651,9 +661,12 @@ def sendInvitation(request):
     challengedUser = get_user_in_db('Username', data['toChallenge'])
     if challengedUser is None:
         return JsonResponse({"error": "user does not exist"}, status=200)
-    challenge = cach2e.get('pendingChallenge', {})
-    challange[challengedUser.id].append(usernameId)
-    cache.set({'pendingChallenge': challenge}, 7200)
+    challenge = cache.get('pendingChallenge', {})
+    if challengedUser.id not in challenge:
+        challenge[challengedUser.id] = []
+    challenge[challengedUser.id].append(usernameId)
+    cache.set('pendingChallenge', challenge, 7200)
+    print(f'ceci est la liste des challenges en cours!: {challenge}', file=sys.stderr)
     return JsonResponse({}, status=200)
 
     # if challenge and :
@@ -670,7 +683,7 @@ def acceptInvitation(request):
     userIsPlaying = False
     # verifier si une partie existe pour le challenger deja
     challengerIsPlaying = False
-    if userIsPlaying is True or challengerIsPlaying is True
+    if userIsPlaying is True or challengerIsPlaying is True:
         return JsonResponse({"error": "You or the challenger player is currently playing. Try again later."}, status=200)
     # creer la partie en bdd
     return JsonResponse({}, status=200)

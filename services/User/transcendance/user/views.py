@@ -185,8 +185,8 @@ def decodeJwt(auth_coockie):
 @require_http_methods(["GET"])
 def checkJwt(request):
     print('test')
-	#if request.method != 'GET':
-		#return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
+    #if request.method != 'GET':
+        #return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
     auth = checkCookie(request, 'auth')
     if auth is None:
         return JsonResponse({"error": "user not log"}, status=401)
@@ -832,19 +832,13 @@ def ping(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def addFriend(request):
-    #1 decodeJwt pour identifier la personne qui veut ajouter un ami et s'assurer que le JWT est toujours valide .
+    #1 decodeJwt pour identifier la personne qui veut ajouter un ami et s'assurer que le JWT est toujours valide.
     #2 verifier qu'on ne s'ajoute pas soi meme
     #3 check si ami en db
     #4 check si ami a ajouter est dans la liste d'ennemis et l'en supprimer s'il y est.
+    #4.5 check si ami pas deja dans liste d'amis.
     #5 Ajouter ami dans la liste d'amis.
     #6 renvoyer status == 200
-
-
-    # addFriend:         { newFriend: username }
-    # blockUser:         { toBlock: username }
-    # deleteFriend:      { unfriend: username }
-    # deleteBlockedUser: { unblock: username }
-
 
     #1
     cookie = checkCookie(request, 'auth')
@@ -879,6 +873,11 @@ def addFriend(request):
       if x == newFriend.Username:
           user.foeList.remove(newFriend)
 
+    #4.5
+    for x in user.friendsList:
+        if x == newFriend.Username:
+            return JsonResponse({'message': 'Friend already in friends list'}, status=200)
+
     #5
     user.friendsList.append(newFriend)
     try:
@@ -891,17 +890,13 @@ def addFriend(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def blockUser(request):
-    #1 decodeJwt pour identifier la personne qui veut bloquer une persone et s'assurer que le JWT est toujours valide .
+    #1 decodeJwt pour identifier la personne qui veut bloquer une persone et s'assurer que le JWT est toujours valide.
     #2 verifier qu'on ne s'ajoute pas soi meme
     #3 check si personne en db
     #4 check si personne a bloquer est dans la liste d'amis et l'en supprimer s'il y est.
+    #4.5 check si personne pas deja bloqué.
     #5 Ajouter personne dans la liste d'ennemis.
     #6 renvoyer status == 200
-
-    # addFriend:         { newFriend: username }
-    # blockUser:         { toBlock: username }
-    # deleteFriend:      { unfriend: username }
-    # deleteBlockedUser: { unblock: username }
 
     #1
     cookie = checkCookie(request, 'auth')
@@ -933,34 +928,84 @@ def blockUser(request):
     if user is None:
         return JsonResponse({'error': 'User does not exist'}, status=401)
     for x in user.friendsList:
-        print(f'x: {x}, toBlock: {toBlock}',file=sys.stderr)
-        print(f'repr x: {repr(x)}, repr toBlock: {repr(toBlock)}',file=sys.stderr)
         if x == toBlock.Username:
             user.friendsList.remove(toBlock)
+
+    #4.5
+    for x in user.foeList:
+        if x == toBlock.Username:
+            return JsonResponse({'message': 'Person already blocked'}, status=200)
 
     #5
     user.foeList.append(toBlock)
     try:
       user.save()
-    except Exception as e:
-      print(f'Erreur addFriend : {e}', file=sys.stderr)
+    except Exception:
       return JsonResponse({'error': 'An unknown error occured'}, status=500)
     return JsonResponse({'message': 'OK'}, status=200)
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def deleteFriend(request):
-    # decodeJwt pour identifier la personne qui veut supprimer un ami et s'assurer que le JWT est toujours valide .
-    # check si ami a supprimer est dans la liste d'amis et l'en supprimer s'il y est.
+    #1 decodeJwt pour identifier la personne qui veut supprimer un ami et s'assurer que le JWT est toujours valide.
+    #2 check si ami a supprimer est dans la liste d'amis et l'en supprimer s'il y est.
     # renvoyer status == 200
-    return JsonResponse({}, status=200)
 
+    #1
+    cookie = checkCookie(request, 'auth')
+    if cookie is None:
+        return JsonResponse({'error': 'User not logged'}, status=401)
+    try:
+      user = decodeJwt(cookie)
+    except customException as e:
+      return JsonResponse({'error': e.data}, status=e.status)
+
+    #2
+    try:
+        data = json.loads(request.body)
+    except Exception as e:
+        return JsonResponse({'error': 'Invalid Json'}, status=403)
+    if not 'unfriend' in data:
+        return JsonResponse({'error': 'No unfriend in request body'}, status=403)
+    unfriend = data['unfriend']
+    user = get_user_in_db('Username', user)
+    if user is None:
+        return JsonResponse({'error': 'User not in db'}, status=403)
+    try:
+        user.friendsList.remove(unfriend)
+    except ValueError:
+        return JsonResponse({'No friend to remove'}, status=404)
+    return JsonResponse({}, status=200)
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def deleteBlockedUser(request):
-    # decodeJwt pour identifier la personne qui veut supprimer une personne bloquee et s'assurer que le JWT est toujours valide .
-    # check si personne a supprimer est dans la liste de bloques et l'en supprimer s'il y est.
+    #1 decodeJwt pour identifier la personne qui veut supprimer une personne bloquee et s'assurer que le JWT est toujours valide.
+    #2 check si personne a supprimer est dans la liste de bloques et l'en supprimer s'il y est.
     # renvoyer status == 200
-    return JsonResponse({}, status=200)
 
+    #1
+    cookie = checkCookie(request, 'auth')
+    if cookie is None:
+        return JsonResponse({'error': 'User not logged'}, status=401)
+    try:
+      user = decodeJwt(cookie)
+    except customException as e:
+      return JsonResponse({'error': e.data}, status=e.status)
+
+    #2
+    try:
+        data = json.loads(request.body)
+    except Exception as e:
+        return JsonResponse({'error': 'Invalid Json'}, status=403)
+    if not 'unblock' in data:
+        return JsonResponse({'error': 'No unblock in request body'}, status=403)
+    unblock = data['unblock']
+    user = get_user_in_db('Username', user)
+    if user is None:
+        return JsonResponse({'error': 'User not in db'}, status=403)
+    try:
+        user.foeList.remove(unfriend)
+    except ValueError:
+        return JsonResponse({'No blocked person to unblock'}, status=404)
+    return JsonResponse({}, status=200)

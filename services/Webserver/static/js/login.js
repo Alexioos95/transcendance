@@ -83,6 +83,11 @@ function	handleSignUp(struct)
 			lang: struct.langSelect.value
 		};
 
+		if (obj.username === undefined || obj.email === undefined || obj.password === undefined)
+		{
+			struct.error.register.innerHTML = "All inputs are mandatory"
+			return ;
+		}
 		fetch("/user/register/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.status === 201)
@@ -145,6 +150,11 @@ function	handleConnection(struct)
 	}
 	else
 	{
+		if (obj.email === undefined || obj.password === undefined)
+		{
+			struct.error.register.innerHTML = "All inputs are mandatory"
+			return ;
+		}
 		fetch("/user/login/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
 				if (response.ok)

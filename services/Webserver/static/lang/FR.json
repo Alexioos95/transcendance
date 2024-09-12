@@ -67,7 +67,6 @@
 		"2fa-email": "Email",
 		"activate": "Activer",
 		"save": "Sauvegarder",
-		"unblock": "Débloquer",
 		"chat": "Chat",
 		"friend": "Amis",
 		"criticalChat": "Une erreur critique a impacté le Chat en ligne"
@@ -109,6 +108,7 @@
 		"removeFriend": "Retirer de la liste d'amis",
 		"seeHistory": "Voir l'historique",
 		"invitePong": "Inviter pour un Pong",
-		"blockUser": "Bloquer l'utilisateur"
+		"blockUser": "Bloquer l'utilisateur",
+		"unblockUser": "Debloquer l'utilisateur"
 	}
 }

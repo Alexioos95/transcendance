@@ -1,22 +1,5 @@
 "use strict";
 
-function	deleteFriend()
-{
-	const obj = { unfriend: "toUnfriend" };
-
-	fetch("/user/deleteFriend/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-	.then(response => {
-		if (response.ok)
-			console.log("deleteFriend OK");
-		else
-		{
-			console.log("deleteFriend NOT OK");
-			console.log("status=", response.status);
-			console.log("response=", response.json());
-		}
-	})
-	.catch(() => console.error("Error: failed to fetch the deleteFriend route"));
-}
 function	deleteBlocked()
 {
 	const obj = { unblock: "toUnblock" };
@@ -41,6 +24,7 @@ function	deleteBlocked()
 async function	run(data)
 {
 	const struct = {
+		username: document.querySelector(".nav-user span"),
 		header: getHeaderStruct(),
 		cards: getCardsStruct(),
 		gameForm: getGameFormStruct(),
@@ -51,6 +35,7 @@ async function	run(data)
 		tabs: getTabsStruct(),
 		chat: getChatStruct(),
 		friend: getFriendStruct(),
+		blocked: getBlockedStruct(),
 		translation: getTranslationStruct(),
 		guestMode: false,
 		run: 1
@@ -247,105 +232,14 @@ function	setupEventListeners(struct, data)
 	if (data.guestMode === "false")
 	{
 		liveChat(struct);
-		const myInterval = setInterval(function() {
-			if (struct.run === 0)
-				clearInterval(myInterval);
-			fetch("/user/updateInfo/", { method: "GET", credentials: "include"})
-				.then(response => response.json())
-				.then(data => {
-					console.log(data);
-					// Avatar
-					if (data.avatar === undefined || data.avatar === "")
-						document.querySelector(".nav-user img").src = "/images/default_avatar.png";
-					else
-					document.querySelector(".nav-user img").src = data.avatar;
-					// Friendlist
-					const array = data.FriendList;
-					const nbFriend = array.length / 3;
-					const logged = [];
-					const unlogged = [];
-
-					for (let i = 0; i < nbFriend; i++)
-					{
-						// Create elements
-						const tr = document.createElement("tr");
-						const td = document.createElement("td");
-						const friendCard = document.createElement("div");
-						const avatarWrapper = document.createElement("div");
-						const img = document.createElement("img");
-						const friendUser = document.createElement("div");
-						const usernameWrapper = document.createElement("div");
-						const username = document.createElement("span");
-						const statusIcon = document.createElement("i");
-						const friendOption = document.createElement("div");
-						const button1 = document.createElement("button");
-						const button2 = document.createElement("button");
-						const button3 = document.createElement("button");
-						const i1 = document.createElement("i");
-						const i2 = document.createElement("i");
-						const i3 = document.createElement("i");
-
-						// Set avatar
-						// img.src = array[0]; // !!!!!!!!!
-						img.src = "/images/default_avatar.png";
-						img.alt = "Avatar";
-						// Set username
-						username.innerHTML = array[0];
-						// Set status
-						let status = "online";
-						let date = new Date(array[2]);
-						let currDate = new Date();
-						if (date + 10 < currDate)
-
-						statusIcon.classList.add("fa-solid", "fa-circle-dot", status);
-
-
-						// Append
-						avatarWrapper.appendChild(img);
-						usernameWrapper.appendChild(username);
-						usernameWrapper.appendChild(status);
-						friendOption.appendChild(button1);
-						friendOption.appendChild(button2);
-						friendOption.appendChild(button3);
-						friendUser.appendChild(usernameWrapper);
-						friendUser.appendChild(friendOption);
-						friendCard.appendChild(avatarWrapper);
-						friendCard.appendChild(friendUser);
-						td.appendChild(friendCard);
-						td.tabindex = "0";
-						tr.appendChild(td);
-					// <tr>
-					// 	<td tabindex="0">
-					// 		<div class="friend-card">
-					// 			<div class="friend-user-avatar">
-					// 				<img src="images/default_avatar.png" alt="Avatar">
-					// 			</div>
-					// 			<div class="friend-user">
-					// 				<div>
-					// 					<span>User</span>
-					// 					<i class="fa-solid fa-circle-dot offline" title="En ligne"></i>
-					// 				</div>
-					// 				<div class="friend-options">
-					// 					<button type="button" class="hover-purple" title="Voir l'historique">
-					// 						<i class="fa-solid fa-clock-rotate-left"></i>
-					// 					</button>
-					// 					<button type="button" class="hover-blue" title="Inviter pour un Pong">
-					// 						<i class="fa-solid fa-table-tennis-paddle-ball"></i>
-					// 					</button>
-					// 					<button type="button" class="hover-red" title="Retirer de la liste d'amis" onclick="deleteFriend()">
-					// 						<i class="fa-solid fa-user-minus"></i>
-					// 					</button>
-					// 				</div>
-					// 			</div>
-					// 		</div>
-					// 	</td>
-					// </tr>
-					}
-					console.log(data.FriendList);
-					console.log(data.FriendList[0]);
-				})
-				.catch(() => console.error("Error: failed to fetch the updateInfo route"));
-		}, 10000);
+		struct.friend.input.addEventListener("keydown", function(event) {
+			if (event.key === "Enter")
+			{
+				event.preventDefault();
+				addFriend(struct, undefined, struct.friend.input.value)
+				struct.friend.input.value = "";
+			}
+		});
 	}
 }
 
@@ -358,16 +252,42 @@ function	replaceDatas(struct, data)
 	else
 	{
 		const avatar = document.querySelector(".nav-user img");
-		const username = document.querySelector(".nav-user span");
 		const inputs = document.querySelectorAll(".options-wrapper-connection input");
 
 		if (data.avatar !== undefined)
 			avatar.src = data.avatar;
 		else
 			avatar.src = "/images/default_avatar.png"
-		username.innerHTML = data.username;
+		struct.username.innerHTML = data.username;
 		inputs[0].value = data.username;
 		inputs[1].value = data.email;
+
+		const myInterval = setInterval(function() {
+			if (struct.run === 0)
+				clearInterval(myInterval);
+			fetch("/user/updateInfo/", { method: "GET", credentials: "include"})
+				.then(response => response.json())
+				.then(data => {
+					console.log("data=", data);
+					console.log("friendList=", data.friendList);
+					// Re-build Lang
+					fetchTranslation(struct, data.language);
+					// Re-build Avatar
+					if (data.avatar === undefined || data.avatar === "")
+						document.querySelector(".nav-user img").src = "/images/default_avatar.png";
+					else
+						document.querySelector(".nav-user img").src = data.avatar;
+					// Re-build Username
+					if (struct.username.innerHTML !== data.username)
+						struct.username.innerHTML = data.username;
+					// Re-build Lists
+					buildFriendlist(struct, data);
+					buildBlockedlist(struct, data);
+					// Build Challenge
+					receiveInvitation(struct, data);
+				})
+				.catch(() => console.error("Error: failed to fetch the updateInfo route"));
+		}, 3000);
 	}
 }
 
@@ -456,10 +376,21 @@ function	shuffle(array)
 
 	while (i != 0)
 	{
-	  let j = Math.floor(Math.random() * i);
-	  i--;
-	  [array[i], array[j]] = [array[j], array[i]];
+		let j = Math.floor(Math.random() * i);
+		i--;
+		[array[i], array[j]] = [array[j], array[i]];
 	}
+}
+
+function	alphabeticalSort(array)
+{
+	array.sort((a, b) => {
+		if (a.getAttribute("data-user") > b.getAttribute("data-user"))
+			return 1;
+		if (a.getAttribute("data-user") < b.getAttribute("data-user"))
+			return -1;
+		return 0;
+	});
 }
 
 function	showTab(show, hide)
@@ -493,30 +424,6 @@ function	fetchTranslation(struct, lang)
 	}
 }
 
-async function	translateGamePage(struct, obj, currLang)
-{
-	struct.options.lang.curr = currLang;
-	const plainTexts = Object.values(obj.plainText);
-	const placeHolders = Object.values(obj.placeholder);
-	const titles = Object.values(obj.title);
-	const ariaLabels = Object.values(obj.ariaLabel);
-	const tabOptions = Object.values(obj.tabOptions)
-	const friendButtons = document.getElementsByClassName("addFriend");
-	const historyButtons = document.getElementsByClassName("seeHistory");
-	const inviteButtons = document.getElementsByClassName("invitePong");
-	const blockButtons = document.getElementsByClassName("addBlock");
-
-	translationLoop(struct, plainTexts, "txt", "innerHTML");
-	translationLoop(struct, placeHolders, "pholder", "placeholder");
-	translationLoop(struct, titles, "title", "title");
-	translationLoop(struct, ariaLabels, "ariaLabel", "ariaLabel");
-	translationChatOptionsLoop(friendButtons, tabOptions, 0);
-	translationChatOptionsLoop(historyButtons, tabOptions, 2);
-	translationChatOptionsLoop(inviteButtons, tabOptions, 3);
-	translationChatOptionsLoop(blockButtons, tabOptions, 4);
-	updateTournamentMarkers(struct, false);
-}
-
 function translationLoop(struct, items, structName, property)
 {
 	items.forEach((item, index) => {
@@ -524,7 +431,7 @@ function translationLoop(struct, items, structName, property)
 	});
 };
 
-function translationChatOptionsLoop(element, tabOptions, translation)
+function translationTabOptionsLoop(element, tabOptions, translation)
 {
 	for (let i = 0; i < element.length; i++)
 	{
@@ -533,21 +440,195 @@ function translationChatOptionsLoop(element, tabOptions, translation)
 	}
 };
 
+function	createOptionButton(title, addClass, addClass2, child)
+{
+	const button = document.createElement("button");
+
+	button.type = "button";
+	button.title = title;
+	button.ariaLabel = title;
+	button.classList.add(addClass, addClass2);
+	button.appendChild(child);
+	return (button);
+}
+
+//////////////////////
+// Re-building HTML
+//////////////////////
+function	buildFriendlist(struct, data)
+{
+	while (struct.friend.output.firstChild)
+		struct.friend.output.firstChild.remove();
+	if (data.friendList.length === 0)
+		return ;
+
+	const logged = [];
+	const unlogged = [];
+	let array;
+
+	if (struct.options.lang.curr === "FR")
+		array = ["Voir l'historique", "Inviter pour un Pong", "Retirer de la liste d'amis"];
+	else if (struct.options.lang.curr === "EN")
+		array = ["See history", "Invite for a Pong", "Remove from friendlist"];
+	else if (struct.options.lang.curr === "NL")
+		array = ["Zie geschiedenis", "Uitnodigen voor Pong", "Van vriendenlijst verwijderen"];
+	for (let i = 0; i < data.friendList.length; i++)
+	{
+		// Create elements
+		const tr = document.createElement("tr");
+		const td = document.createElement("td");
+		const friendCard = document.createElement("div");
+		const avatarWrapper = document.createElement("div");
+		const img = document.createElement("img");
+		const friendUser = document.createElement("div");
+		const usernameWrapper = document.createElement("div");
+		const username = document.createElement("span");
+		const statusIcon = document.createElement("i");
+		const friendOption = document.createElement("div");
+		const i1 = document.createElement("i");
+		const i2 = document.createElement("i");
+		const i3 = document.createElement("i");
+
+		// Set avatar
+		img.src = "/images/default_avatar.png";
+		img.alt = "Avatar";
+		// Set username and status
+		username.innerHTML = data.friendList[i].Username;
+		let status = "online";
+		let lastDate = new Date(data.friendList[i].lastTimeOnline).getTime() + (30 * 1000);
+		let currDate = new Date().getTime();
+
+		if (lastDate < currDate)
+			status = "offline";
+		statusIcon.classList.add("fa-solid", "fa-circle-dot", status);
+		// Add classes;
+		avatarWrapper.classList.add("friend-user-avatar");
+		friendUser.classList.add("friend-user");
+		friendCard.classList.add("friend-card");
+		// Friend Options
+		i1.classList.add("fa-solid", "fa-clock-rotate-left");
+		i2.classList.add("fa-solid", "fa-table-tennis-paddle-ball");
+		i3.classList.add("fa-solid", "fa-user-minus");
+		const button1 = createOptionButton(array[0], "hover-purple", "seeHistory", i1);
+		const button2 = createOptionButton(array[1], "hover-blue", "invitePong", i2);
+		const button3 = createOptionButton(array[2], "hover-red", "removeFriend", i3);
+		button1.addEventListener("click", function() { seeHistory(struct, button1); });
+		button2.addEventListener("click", function() { sendInvite(struct, button2); });
+		button3.addEventListener("click", function() { deleteFriend(struct, button3); });
+		// Append
+		avatarWrapper.appendChild(img);
+		usernameWrapper.appendChild(username);
+		usernameWrapper.appendChild(statusIcon);
+		friendOption.appendChild(button1);
+		friendOption.appendChild(button2);
+		friendOption.appendChild(button3);
+		friendUser.appendChild(usernameWrapper);
+		friendUser.appendChild(friendOption);
+		friendCard.appendChild(avatarWrapper);
+		friendCard.appendChild(friendUser);
+		td.appendChild(friendCard);
+		td.tabindex = "0";
+		tr.appendChild(td);
+		tr.setAttribute("data-user", data.friendList[i].Username);
+		// Push
+		if (status === "online")
+			logged.push(tr);
+		else
+			unlogged.push(tr);
+	}
+	console.log(logged);
+	console.log(unlogged);
+	alphabeticalSort(logged);
+	alphabeticalSort(unlogged);
+	for (let i = 0; i < logged.length; i++)
+		struct.friend.output.appendChild(logged[i]);
+	for (let i = 0; i < unlogged.length; i++)
+		struct.friend.output.appendChild(unlogged[i]);
+}
+
+function	buildBlockedlist(struct, data)
+{
+	let sentence;
+
+	// while (struct.blocked.output.firstChild)
+	// 	struct.blocked.output.firstChild.remove();
+	if (data.blockList.length === 0)
+		return ;
+	if (struct.options.lang.curr === "FR")
+		sentence = "Debloquer";
+	else if (struct.options.lang.curr === "EN")
+		sentence = "Unblock";
+	else if (struct.options.lang.curr === "NL")
+		sentence = "Deblokkeren";
+	for (let i = 0; i < data.blockList.length; i++)
+	{
+		// Create Element
+		const tr = document.createElement("tr");
+		const td = document.createElement("td");
+		const blockedCard = document.createElement("div");
+		const avatarWrapper = document.createElement("div");
+		const img = document.createElement("img");
+		const blockedUser = document.createElement("div");
+		const username = document.createElement("span");
+		const button = document.createElement("button");
+		const icon = document.createElement("i");
+		const span = document.createElement("span");
+
+		// Set avatar
+		img.src = "/images/default_avatar.png";
+		img.alt = "Avatar";
+		// Set username
+		username.innerHTML = data.blockList[i].username;
+		// Set button
+		button.append(icon);
+		button.appendChild(span);
+		// Add classes
+		blockedCard.classList.add("blocked-card");
+		avatarWrapper.classList.add("blocked-user-avatar");
+		icon.classList.add("fa-solid", "fa-square-minus");
+		blockedUser.classList.add("blocked-user");
+		// Append
+		avatarWrapper.appendChild(img);
+		blockedUser.appendChild(username);
+		blockedUser.appendChild(button);
+		blockedCard.appendChild(avatarWrapper);
+		blockedCard.appendChild(blockedUser);
+		td.append(blockedCard);
+		tr.append(td);
+		struct.blocked.output.appendChild(tr);
+	}
+{/* <tr>
+	<td tabindex="0">
+		<div class="blocked-card">
+			<div class="blocked-user-avatar">
+				<img src="/images/default_avatar.png" alt="Avatar">
+			</div>
+			<div class="blocked-user">
+				<span>User</span>
+				<button type="button">
+					<i class="fa-solid fa-square-minus"></i>
+					<span>Débloquer</span>
+				</button>
+			</div>
+		</div>
+	</td>
+</tr> */}
+}
+
 async function	setGuestRestrictions(struct)
 {
 	const historyIcon = document.querySelectorAll("header .fa-clock-rotate-left")[0];
 	const lockIcon = document.querySelectorAll(".tab-tabs .fa-lock")[0];
 	const hideForGuest = document.getElementsByClassName("hide-for-guest");
-	const username = document.querySelector(".nav-user span");
 	const avatar = document.querySelector(".nav-user img");
 	const inputs = document.querySelectorAll(".mode-selector input");
 
 	if (struct.options.lang.curr === "FR")
-		username.innerHTML = "Invité";
+		struct.username.innerHTML = "Invité";
 	else if (struct.options.lang.curr === "EN")
-		username.innerHTML = "Guest";
+		struct.username.innerHTML = "Guest";
 	else if (struct.options.lang.curr === "NL")
-		username.innerHTML = "Gast";
+		struct.username.innerHTML = "Gast";
 	avatar.src = "/images/default_avatar.png";
 	inputs[2].disabled = true;
 	historyIcon.classList.add("hidden");
@@ -564,6 +645,186 @@ async function	setGuestRestrictions(struct)
 	struct.guestMode = true;
 }
 
+async function	translateGamePage(struct, obj, currLang)
+{
+	struct.options.lang.curr = currLang;
+	const plainTexts = Object.values(obj.plainText);
+	const placeHolders = Object.values(obj.placeholder);
+	const titles = Object.values(obj.title);
+	const ariaLabels = Object.values(obj.ariaLabel);
+	const tabOptions = Object.values(obj.tabOptions)
+	const friendButtons = document.getElementsByClassName("addFriend");
+	const rmFriendButtons = document.getElementsByClassName("removeFriend");
+	const historyButtons = document.getElementsByClassName("seeHistory");
+	const inviteButtons = document.getElementsByClassName("invitePong");
+	const blockButtons = document.getElementsByClassName("addBlock");
+	const rmBlockButtons = document.getElementsByClassName("removeBlock");
+
+	translationLoop(struct, plainTexts, "txt", "innerHTML");
+	translationLoop(struct, placeHolders, "pholder", "placeholder");
+	translationLoop(struct, titles, "title", "title");
+	translationLoop(struct, ariaLabels, "ariaLabel", "ariaLabel");
+	translationTabOptionsLoop(friendButtons, tabOptions, 0);
+	translationTabOptionsLoop(rmFriendButtons, tabOptions, 1);
+	translationTabOptionsLoop(historyButtons, tabOptions, 2);
+	translationTabOptionsLoop(inviteButtons, tabOptions, 3);
+	translationTabOptionsLoop(blockButtons, tabOptions, 4);
+	translationTabOptionsLoop(rmBlockButtons, tabOptions, 5);
+	updateTournamentMarkers(struct, false);
+}
+
+//////////////////////////
+// Tabs Options Fetches
+//////////////////////////
+function	addFriend(struct, button, usernameInput)
+{
+	let username;
+
+	if (usernameInput === undefined)
+		username = button.parentElement.parentElement.querySelector("span").innerHTML;
+	else
+		username = usernameInput;
+	console.log("Username=", username);
+	const obj = { newFriend: username };
+
+	fetch("/user/addFriend/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		.then(response => {
+			const tr = document.createElement("tr");
+			const td = document.createElement("td");
+			const p = document.createElement("p");
+			let isScrolled = false;
+
+			p.classList.add("chat-announcement");
+			if (response.ok)
+				p.innerHTML = "Added to friend";
+			else
+				p.innerHTML = "Failed to add to friend";
+			if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
+				isScrolled = true;
+			td.appendChild(p);
+			tr.appendChild(td);
+			struct.chat.output.appendChild(tr);
+			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
+				struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
+			if (username === usernameInput)
+			{
+				struct.tabs.wrapperInputs.classList.add("in-error");
+				sleep(1000)
+					.then(() => { struct.tabs.wrapperInputs.classList.remove("in-error"); });
+			}
+			console.log("status=", response.status);
+			console.log("response=", response.json());
+		})
+		.catch(() => console.error("Error: failed to fetch the addFriend route"));
+}
+
+function	deleteFriend(struct, button)
+{
+	// !!!!!!!!!!!!!!!!!!!!!
+	const username = button.parentElement.parentElement.querySelector("span").innerHTML;
+	const obj = { unfriend: username };
+
+	fetch("/user/deleteFriend/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+	.then(response => {
+		if (response.ok)
+			console.log("deleteFriend OK");
+		else
+		{
+			console.log("deleteFriend NOT OK");
+			console.log("status=", response.status);
+			response.json().then(data => console.log(data));
+		}
+	})
+	.catch(() => console.error("Error: failed to fetch the deleteFriend route"));
+}
+
+function	seeHistory(struct, button)
+{
+	// !!!!!!!!!!!!!!!!!!!!!
+	const username = button.parentElement.parentElement.querySelector("span").innerHTML;
+	console.log("Username=", username);
+	const obj = { seeHistory: username };
+
+	fetch("/user/seeHistory/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		.then(response => {
+			const tr = document.createElement("tr");
+			const td = document.createElement("td");
+			const p = document.createElement("p");
+
+			p.classList.add("chat-announcement");
+			if (response.ok)
+				p.innerHTML = "see history user";
+			else
+				p.innerHTML = "Failed to see history of user";
+			td.appendChild(p);
+			tr.appendChild(td);
+			struct.chat.output.appendChild(tr);
+		})
+		.catch(() => console.error("Error: failed to fetch the seeHistory route"));
+}
+
+function	sendInvite(struct, button)
+{
+	const username = button.parentElement.parentElement.querySelector("span").innerHTML;
+	console.log("Username=", username);
+	const obj = { toChallenge: username };
+
+	fetch("/user/sendInvitation/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		.then(response => {
+			const tr = document.createElement("tr");
+			const td = document.createElement("td");
+			const p = document.createElement("p");
+			let isScrolled = false;
+
+			p.classList.add("chat-announcement");
+			if (response.ok)
+				p.innerHTML = "Challenged user!";
+			else
+				p.innerHTML = "Failed to challenge user";
+			if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
+				isScrolled = true;
+			td.appendChild(p);
+			tr.appendChild(td);
+			struct.chat.output.appendChild(tr);
+			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
+				struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
+			console.log("status=", response.status);
+			console.log("response=", response.json());
+		})
+		.catch(() => console.error("Error: failed to fetch the sendInvitation route"));
+}
+
+function	blockUser(struct, button)
+{
+	const username = button.parentElement.parentElement.querySelector("span").innerHTML;
+	console.log("Username=", username);
+	const obj = { toBlock: username };
+
+	fetch("/user/blockUser/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		.then(response => {
+			const tr = document.createElement("tr");
+			const td = document.createElement("td");
+			const p = document.createElement("p");
+			let isScrolled = false;
+
+			p.classList.add("chat-announcement");
+			if (response.ok)
+				p.innerHTML = "Added to blocked";
+			else
+				p.innerHTML = "Failed to block user";
+			if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
+				isScrolled = true;
+			td.appendChild(p);
+			tr.appendChild(td);
+			struct.chat.output.appendChild(tr);
+			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
+				struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
+			console.log("status=", response.status);
+			console.log("response=", response.json());
+		})
+		.catch(() => console.error("Error: failed to fetch the blockUser route"));
+}
+
 /////////////////////////
 // Live Chat
 /////////////////////////
@@ -572,31 +833,37 @@ function	liveChat(struct)
 	struct.chat.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/chat/");
 	struct.chat.socket.addEventListener("error", function() {
 		const tr = document.querySelectorAll(".tab-chat tr");
-		const buttons = document.querySelector(".tab-chat button");
+		const buttons = document.querySelectorAll(".tab-chat button");
 		const lock = document.getElementsByClassName("tab-chat-lock")[0];
 
 		struct.tabs.chat.input.classList.add("hidden");
-		for (let i = 1; i < tr.length; i++)
-			tr[i].style.opacity = 0.5;
-		for (let i = 0; i < buttons.length; i++)
-			buttons[i].disabled = true;
+		if (tr !== undefined)
+		{
+			for (let i = 1; i < tr.length; i++)
+				tr[i].style.opacity = 0.5;
+		}
+		if (buttons !== undefined)
+		{
+			for (let i = 0; i < buttons.length; i++)
+				buttons[i].disabled = true;
+		}
 		lock.classList.remove("hidden");
 	});
 	struct.chat.socket.addEventListener("message", function(event) {
 		const data = JSON.parse(event.data);
 		if (data.type === "connected")
 		{
-			if (data.user !== document.querySelector(".nav-user span"))
-			{
-				const tr = document.createElement("tr");
-				const td = document.createElement("td");
-				const p = document.createElement("p");
+			// if (data.user !== document.querySelector(".nav-user span"))
+			// {
+			// 	const tr = document.createElement("tr");
+			// 	const td = document.createElement("td");
+			// 	const p = document.createElement("p");
 	
-				p.classList.add("chat-announcement");
-				td.appendChild(p);
-				tr.appendChild(td);
-				struct.chat.output.appendChild(tr);
-			}
+			// 	p.classList.add("chat-announcement");
+			// 	td.appendChild(p);
+			// 	tr.appendChild(td);
+			// 	struct.chat.output.appendChild(tr);
+			// }
 			return ;
 		} 
 		const tr = createChatMessage(struct, data);
@@ -673,11 +940,11 @@ function	createChatMessage(struct, data)
 		i2.classList.add("fa-solid", "fa-clock-rotate-left");
 		i3.classList.add("fa-solid", "fa-table-tennis-paddle-ball");
 		i4.classList.add("fa-solid", "fa-circle-xmark");
-		const button1 = createChatButton(array[0], "hover-green", "addFriend", i1);
-		const button2 = createChatButton(array[1], "hover-purple", "seeHistory", i2);
-		const button3 = createChatButton(array[2], "hover-blue", "invitePong", i3);
-		const button4 = createChatButton(array[3], "hover-red", "addBlock", i4);
-		button1.addEventListener("click", function() { addFriend(struct, button1); });
+		const button1 = createOptionButton(array[0], "hover-green", "addFriend", i1);
+		const button2 = createOptionButton(array[1], "hover-purple", "seeHistory", i2);
+		const button3 = createOptionButton(array[2], "hover-blue", "invitePong", i3);
+		const button4 = createOptionButton(array[3], "hover-red", "addBlock", i4);
+		button1.addEventListener("click", function() { addFriend(struct, button1, undefined); });
 		button2.addEventListener("click", function() { seeHistory(struct, button2); });
 		button3.addEventListener("click", function() { sendInvite(struct, button3); });
 		button4.addEventListener("click", function() { blockUser(struct, button4); });
@@ -700,139 +967,62 @@ function	createChatMessage(struct, data)
 	return (tr);
 }
 
-function	createChatButton(title, addClass, addClass2, child)
+function	receiveInvitation(struct, data)
 {
-	const button = document.createElement("button");
+	let sentence;
+	let isScrolled = false;
 
-	button.type = "button";
-	button.title = title;
-	button.ariaLabel = title;
-	button.classList.add(addClass, addClass2);
-	button.appendChild(child);
-	return (button);
+	if (struct.options.lang.curr === "FR")
+		sentence = " vous a inviter pour un Pong";
+	else if (struct.options.lang.curr === "EN")
+		sentence = " invited you to a Pong";
+	else if (struct.options.lang.curr === "NL")
+		sentence = " je uitgenodigd voor een Pong";
+	if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
+		isScrolled = true;
+	for (let i = 0; i < data.challengeReceived.username.length; i++)
+	{
+		const tr = document.createElement("tr");
+		const td = document.createElement("td");
+		const p = document.createElement("p");
+		const span = document.createElement("span");
+		const text = document.createTextNode(sentence);
+		const icon = document.createElement("i");
+
+		icon.classList.add("fa-solid", "fa-exclamation");
+		const button = createOptionButton("Accepter", "", "", icon);
+		button.addEventListener("click", function() {
+			const obj = {
+				username1: struct.username.innerHTML,
+				username2: button.parentElement.querySelector("p span").innerHTML
+			};
+
+			console.log("fetch /user/acceptInvitation");
+			fetch("/user/acceptInvitation/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+				.then(response => {
+					if (response.ok)
+						console.log("response /user/acceptInvitation ok");
+					else
+					{
+						console.log("response /user/acceptInvitation not good");
+						console.log(response.status);
+						response.json().then(data => console.log(data));
+					}
+				})
+				.catch(() => console.error("Error: failed to fetch the acceptInvitation route"));
+		});
+		span.innerHTML = data.challengeReceived.username[i];
+		p.appendChild(span);
+		p.appendChild(text);
+		p.classList.add("chat-announcement");
+		td.appendChild(p);
+		td.appendChild(button);
+		tr.appendChild(td);
+		struct.chat.output.appendChild(tr);
+	}
+	if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
+		struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
 }
-
-function	addFriend(struct, button)
-{
-	const username = button.parentElement.parentElement.querySelector(".chat-message span").innerHTML;
-	console.log("Username=", username);
-	const obj = { newFriend: username };
-
-	fetch("/user/addFriend/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-		.then(response => {
-			const tr = document.createElement("tr");
-			const td = document.createElement("td");
-			const p = document.createElement("p");
-			let isScrolled = false;
-
-			p.classList.add("chat-announcement");
-			if (response.ok)
-				p.innerHTML = "Added to friend";
-			else
-				p.innerHTML = "Failed to add to friend";
-			if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
-				isScrolled = true;
-			td.appendChild(p);
-			tr.appendChild(td);
-			struct.chat.output.appendChild(tr);
-			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
-				struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
-			console.log("status=", response.status);
-			console.log("response=", response.json());
-		})
-		.catch(() => console.error("Error: failed to fetch the addFriend route"));
-}
-
-function	seeHistory(struct, button)
-{
-	// !!!!!!!!!!!!!!!!!!!!!
-	const username = button.parentElement.parentElement.querySelector(".chat-message span").innerHTML;
-	console.log("Username=", username);
-	const obj = { seeHistory: username };
-
-	fetch("/user/seeHistory/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-		.then(response => {
-			const tr = document.createElement("tr");
-			const td = document.createElement("td");
-			const p = document.createElement("p");
-
-			p.classList.add("chat-announcement");
-			if (response.ok)
-				p.innerHTML = "see history user";
-			else
-				p.innerHTML = "Failed to see history of user";
-			td.appendChild(p);
-			tr.appendChild(td);
-			struct.chat.output.appendChild(tr);
-		})
-		.catch(() => console.error("Error: failed to fetch the seeHistory route"));
-}
-
-function	sendInvite(struct, button)
-{
-	// !!!!!!!!!!!!!!!!!!!!!
-	const username = button.parentElement.parentElement.querySelector(".chat-message span").innerHTML;
-	console.log("Username=", username);
-	const obj = { toChallenge: username };
-
-	fetch("/user/Challenge/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-		.then(response => {
-			const tr = document.createElement("tr");
-			const td = document.createElement("td");
-			const p = document.createElement("p");
-			let isScrolled = false;
-
-			p.classList.add("chat-announcement");
-			if (response.ok)
-				p.innerHTML = "Challenge uer";
-			else
-				p.innerHTML = "Failed to challenge user";
-			if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
-				isScrolled = true;
-			td.appendChild(p);
-			tr.appendChild(td);
-			struct.chat.output.appendChild(tr);
-			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
-				struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
-			console.log("status=", response.status);
-			console.log("response=", response.json());
-		})
-		.catch(() => console.error("Error: failed to fetch the Challenge route"));
-}
-
-function	blockUser(struct, button)
-{
-	const username = button.parentElement.parentElement.querySelector(".chat-message span").innerHTML;
-	console.log("Username=", username);
-	const obj = { toBlock: username };
-
-	fetch("/user/blockUser/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-		.then(response => {
-			const tr = document.createElement("tr");
-			const td = document.createElement("td");
-			const p = document.createElement("p");
-			let isScrolled = false;
-
-			p.classList.add("chat-announcement");
-			if (response.ok)
-				p.innerHTML = "Added to blocked";
-			else
-				p.innerHTML = "Failed to block user";
-			console.log(struct.tabs.chat.table.scrollTop);
-			console.log(struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight);
-			if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
-				isScrolled = true;
-			td.appendChild(p);
-			tr.appendChild(td);
-			struct.chat.output.appendChild(tr);
-			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
-				struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
-			console.log("status=", response.status);
-			console.log("response=", response.json());
-		})
-		.catch(() => console.error("Error: failed to fetch the blockUser route"));
-}
-
 //////////////////////////////////////////////////////
 // Get(?)Struct
 //////////////////////////////////////////////////////
@@ -1013,7 +1203,20 @@ function	getChatStruct()
 
 function	getFriendStruct()
 {
-	// !!!!!!!!
+	const textareas = document.querySelectorAll(".wrapper-inputs textarea");
+	const friendOutput = document.querySelector(".tab-friends tbody")
+
+	const struct = {
+		output: friendOutput,
+		input: textareas[1],
+	};
+	return (struct);
+}
+
+function	getBlockedStruct()
+{
+	const struct = { output: document.querySelector(".wrapper-blocked tbody") };
+	return (struct);
 }
 
 function	getTranslationStruct()

@@ -238,9 +238,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.role = 'paddleRight'
             self.paddleRight_name = ''
             if auth_cookie:
-                try:
-                    self.paddleRight_name = self.get_username_from_jwt(auth_cookie)
-               if self.paddleRight_name is None:
+                self.paddleRight_name = self.get_username_from_jwt(auth_cookie)
+                if self.paddleRight_name is None:
                     await self.close()
                     return
             else:
@@ -284,15 +283,15 @@ class GameConsumer(AsyncWebsocketConsumer):
             remaining_role = 'paddleLeft' if self.role == 'paddleRight' else 'paddleRight'
             winner = 'Player1' if remaining_role == 'paddleLeft' else 'Player2'
 
+            if self.role == 'paddleLeft':
+                winner = self.paddleLeft_name
+            else:
+                winner = self.paddleRight_name
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     'type': 'game_over',
-                    if (self.role == 'paddleLeft')
-                        'winner' = self.paddleLeft_name
-                    else
-                        'winner' = self.paddleRight_name
-                    #'winner': winner
+                    'winner': winner
                 }
             )
 
@@ -372,14 +371,15 @@ class GameConsumer(AsyncWebsocketConsumer):
             if game.check_game_over():
                 winner = game.get_winner()
 
+                if (self.role == 'paddleLeft'):
+                    winner: self.paddleLeft_name
+                else:
+                    winner: self.paddleRight_name
                 await self.channel_layer.group_send(
                     self.room_group_name,
                     {
                         'type': 'game_over',
-                        if (self.role == 'paddleLeft')
-                            'winner': self.paddleLeft_name
-                        else
-                            'winner': self.paddleRight_name
+                        'winner': winner
                     }
                 )
                 game.running = False

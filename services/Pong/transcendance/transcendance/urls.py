@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('initGame/', pongView.initGame),
     path('', pongView.index),
+    path('ping', pongView.ping),
     ]

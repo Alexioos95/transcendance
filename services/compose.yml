@@ -169,6 +169,30 @@ services:
 #      context: services
 #      dockerfile: Tetris/Dockerfile
 
+  ping:
+    hostname: ping
+	container_name: ping
+    # depends_on:
+	#   user:
+	#     condition: service_healthy
+	#     restart: true
+	#   chat:
+	#     condition: service_healthy
+	#     restart: true
+	#   mail:
+	#     condition: service_healthy
+	#     restart: true
+	#   pong:
+	#     condition: service_healthy
+	#     restart: true
+	pull_policy: build
+	build:
+	  context: Ping
+	  dockerfile: Dockerfile
+	networks:
+	  - transcendance
+	restart: unless-stopped
+
   webserver:
     hostname: webserver
     container_name: webserver
@@ -182,9 +206,15 @@ services:
     #   mail:
     #     condition: service_healthy
     #     restart: true
+    #   pong:
+    #     condition: service_healthy
+    #     restart: true
+    #   ping:
+    #     condition: service_healthy
+    #     restart: true
     pull_policy: build
     build:
-      context: Webserver/
+      context: Webserver
       dockerfile: Dockerfile
     ports:
       - 80:80

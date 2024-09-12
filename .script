@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
 
-#make .js file with 3 global variables containing the routes to websockets.
 sed -i s/DUMP/$1/g ./services/Webserver/static/js/websockets.js
-##	Run scipt inside containers ! To not overwrite the original websocket.js. Thus the post should be set in .env file and not passed to makefile !
 
 #auth42 Redirect route needs post 
-
-#set post in .env for user
-
-#add route in nginx to reset password
-
-#add volume for user db

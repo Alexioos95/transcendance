@@ -24,6 +24,7 @@ function	deleteBlocked()
 async function	run(data)
 {
 	const struct = {
+		username: document.querySelector(".nav-user span"),
 		header: getHeaderStruct(),
 		cards: getCardsStruct(),
 		gameForm: getGameFormStruct(),
@@ -34,6 +35,7 @@ async function	run(data)
 		tabs: getTabsStruct(),
 		chat: getChatStruct(),
 		friend: getFriendStruct(),
+		blocked: getBlockedStruct(),
 		translation: getTranslationStruct(),
 		guestMode: false,
 		run: 1
@@ -250,14 +252,13 @@ function	replaceDatas(struct, data)
 	else
 	{
 		const avatar = document.querySelector(".nav-user img");
-		const username = document.querySelector(".nav-user span");
 		const inputs = document.querySelectorAll(".options-wrapper-connection input");
 
 		if (data.avatar !== undefined)
 			avatar.src = data.avatar;
 		else
 			avatar.src = "/images/default_avatar.png"
-		username.innerHTML = data.username;
+		struct.username.innerHTML = data.username;
 		inputs[0].value = data.username;
 		inputs[1].value = data.email;
 
@@ -269,18 +270,21 @@ function	replaceDatas(struct, data)
 				.then(data => {
 					console.log("data=", data);
 					console.log("friendList=", data.friendList);
-					// Avatar
+					// Re-build Lang
+					fetchTranslation(struct, data.language);
+					// Re-build Avatar
 					if (data.avatar === undefined || data.avatar === "")
 						document.querySelector(".nav-user img").src = "/images/default_avatar.png";
 					else
-					document.querySelector(".nav-user img").src = data.avatar;
-					// Friendlist
-					while (struct.friend.output.firstChild)
-						struct.friend.output.firstChild.remove();
-					if (data.friendList.length > 0)
-						buildFriendlist(struct, data);
-					if (data.blockList.length > 0)
-						buildBlockedlist(struct, data);
+						document.querySelector(".nav-user img").src = data.avatar;
+					// Re-build Username
+					if (struct.username.innerHTML !== data.username)
+						struct.username.innerHTML = data.username;
+					// Re-build Lists
+					buildFriendlist(struct, data);
+					buildBlockedlist(struct, data);
+					// Build Challenge
+					receiveInvitation(struct, data);
 				})
 				.catch(() => console.error("Error: failed to fetch the updateInfo route"));
 		}, 3000);
@@ -372,9 +376,9 @@ function	shuffle(array)
 
 	while (i != 0)
 	{
-	  let j = Math.floor(Math.random() * i);
-	  i--;
-	  [array[i], array[j]] = [array[j], array[i]];
+		let j = Math.floor(Math.random() * i);
+		i--;
+		[array[i], array[j]] = [array[j], array[i]];
 	}
 }
 
@@ -382,9 +386,9 @@ function	alphabeticalSort(array)
 {
 	array.sort((a, b) => {
 		if (a.getAttribute("data-user") > b.getAttribute("data-user"))
-		  return 1;
+			return 1;
 		if (a.getAttribute("data-user") < b.getAttribute("data-user"))
-		  return -1;
+			return -1;
 		return 0;
 	});
 }
@@ -427,7 +431,7 @@ function translationLoop(struct, items, structName, property)
 	});
 };
 
-function translationChatOptionsLoop(element, tabOptions, translation)
+function translationTabOptionsLoop(element, tabOptions, translation)
 {
 	for (let i = 0; i < element.length; i++)
 	{
@@ -436,11 +440,28 @@ function translationChatOptionsLoop(element, tabOptions, translation)
 	}
 };
 
+function	createOptionButton(title, addClass, addClass2, child)
+{
+	const button = document.createElement("button");
+
+	button.type = "button";
+	button.title = title;
+	button.ariaLabel = title;
+	button.classList.add(addClass, addClass2);
+	button.appendChild(child);
+	return (button);
+}
+
 //////////////////////
 // Re-building HTML
 //////////////////////
 function	buildFriendlist(struct, data)
 {
+	while (struct.friend.output.firstChild)
+		struct.friend.output.firstChild.remove();
+	if (data.friendList.length === 0)
+		return ;
+
 	const logged = [];
 	const unlogged = [];
 	let array;
@@ -477,7 +498,6 @@ function	buildFriendlist(struct, data)
 		let lastDate = new Date(data.friendList[i].lastTimeOnline).getTime() + (30 * 1000);
 		let currDate = new Date().getTime();
 
-		console.log(lastDate, currDate);
 		if (lastDate < currDate)
 			status = "offline";
 		statusIcon.classList.add("fa-solid", "fa-circle-dot", status);
@@ -528,7 +548,71 @@ function	buildFriendlist(struct, data)
 
 function	buildBlockedlist(struct, data)
 {
-	// !!!!!!!!!!!!!!!!
+	let sentence;
+
+	// while (struct.blocked.output.firstChild)
+	// 	struct.blocked.output.firstChild.remove();
+	if (data.blockList.length === 0)
+		return ;
+	if (struct.options.lang.curr === "FR")
+		sentence = "Debloquer";
+	else if (struct.options.lang.curr === "EN")
+		sentence = "Unblock";
+	else if (struct.options.lang.curr === "NL")
+		sentence = "Deblokkeren";
+	for (let i = 0; i < data.blockList.length; i++)
+	{
+		// Create Element
+		const tr = document.createElement("tr");
+		const td = document.createElement("td");
+		const blockedCard = document.createElement("div");
+		const avatarWrapper = document.createElement("div");
+		const img = document.createElement("img");
+		const blockedUser = document.createElement("div");
+		const username = document.createElement("span");
+		const button = document.createElement("button");
+		const icon = document.createElement("i");
+		const span = document.createElement("span");
+
+		// Set avatar
+		img.src = "/images/default_avatar.png";
+		img.alt = "Avatar";
+		// Set username
+		username.innerHTML = data.blockList[i].username;
+		// Set button
+		button.append(icon);
+		button.appendChild(span);
+		// Add classes
+		blockedCard.classList.add("blocked-card");
+		avatarWrapper.classList.add("blocked-user-avatar");
+		icon.classList.add("fa-solid", "fa-square-minus");
+		blockedUser.classList.add("blocked-user");
+		// Append
+		avatarWrapper.appendChild(img);
+		blockedUser.appendChild(username);
+		blockedUser.appendChild(button);
+		blockedCard.appendChild(avatarWrapper);
+		blockedCard.appendChild(blockedUser);
+		td.append(blockedCard);
+		tr.append(td);
+		struct.blocked.output.appendChild(tr);
+	}
+{/* <tr>
+	<td tabindex="0">
+		<div class="blocked-card">
+			<div class="blocked-user-avatar">
+				<img src="/images/default_avatar.png" alt="Avatar">
+			</div>
+			<div class="blocked-user">
+				<span>User</span>
+				<button type="button">
+					<i class="fa-solid fa-square-minus"></i>
+					<span>Débloquer</span>
+				</button>
+			</div>
+		</div>
+	</td>
+</tr> */}
 }
 
 async function	setGuestRestrictions(struct)
@@ -536,16 +620,15 @@ async function	setGuestRestrictions(struct)
 	const historyIcon = document.querySelectorAll("header .fa-clock-rotate-left")[0];
 	const lockIcon = document.querySelectorAll(".tab-tabs .fa-lock")[0];
 	const hideForGuest = document.getElementsByClassName("hide-for-guest");
-	const username = document.querySelector(".nav-user span");
 	const avatar = document.querySelector(".nav-user img");
 	const inputs = document.querySelectorAll(".mode-selector input");
 
 	if (struct.options.lang.curr === "FR")
-		username.innerHTML = "Invité";
+		struct.username.innerHTML = "Invité";
 	else if (struct.options.lang.curr === "EN")
-		username.innerHTML = "Guest";
+		struct.username.innerHTML = "Guest";
 	else if (struct.options.lang.curr === "NL")
-		username.innerHTML = "Gast";
+		struct.username.innerHTML = "Gast";
 	avatar.src = "/images/default_avatar.png";
 	inputs[2].disabled = true;
 	historyIcon.classList.add("hidden");
@@ -571,18 +654,22 @@ async function	translateGamePage(struct, obj, currLang)
 	const ariaLabels = Object.values(obj.ariaLabel);
 	const tabOptions = Object.values(obj.tabOptions)
 	const friendButtons = document.getElementsByClassName("addFriend");
+	const rmFriendButtons = document.getElementsByClassName("removeFriend");
 	const historyButtons = document.getElementsByClassName("seeHistory");
 	const inviteButtons = document.getElementsByClassName("invitePong");
 	const blockButtons = document.getElementsByClassName("addBlock");
+	const rmBlockButtons = document.getElementsByClassName("removeBlock");
 
 	translationLoop(struct, plainTexts, "txt", "innerHTML");
 	translationLoop(struct, placeHolders, "pholder", "placeholder");
 	translationLoop(struct, titles, "title", "title");
 	translationLoop(struct, ariaLabels, "ariaLabel", "ariaLabel");
-	translationChatOptionsLoop(friendButtons, tabOptions, 0);
-	translationChatOptionsLoop(historyButtons, tabOptions, 2);
-	translationChatOptionsLoop(inviteButtons, tabOptions, 3);
-	translationChatOptionsLoop(blockButtons, tabOptions, 4);
+	translationTabOptionsLoop(friendButtons, tabOptions, 0);
+	translationTabOptionsLoop(rmFriendButtons, tabOptions, 1);
+	translationTabOptionsLoop(historyButtons, tabOptions, 2);
+	translationTabOptionsLoop(inviteButtons, tabOptions, 3);
+	translationTabOptionsLoop(blockButtons, tabOptions, 4);
+	translationTabOptionsLoop(rmBlockButtons, tabOptions, 5);
 	updateTournamentMarkers(struct, false);
 }
 
@@ -880,18 +967,62 @@ function	createChatMessage(struct, data)
 	return (tr);
 }
 
-function	createOptionButton(title, addClass, addClass2, child)
+function	receiveInvitation(struct, data)
 {
-	const button = document.createElement("button");
+	let sentence;
+	let isScrolled = false;
 
-	button.type = "button";
-	button.title = title;
-	button.ariaLabel = title;
-	button.classList.add(addClass, addClass2);
-	button.appendChild(child);
-	return (button);
+	if (struct.options.lang.curr === "FR")
+		sentence = " vous a inviter pour un Pong";
+	else if (struct.options.lang.curr === "EN")
+		sentence = " invited you to a Pong";
+	else if (struct.options.lang.curr === "NL")
+		sentence = " je uitgenodigd voor een Pong";
+	if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
+		isScrolled = true;
+	for (let i = 0; i < data.challengeReceived.username.length; i++)
+	{
+		const tr = document.createElement("tr");
+		const td = document.createElement("td");
+		const p = document.createElement("p");
+		const span = document.createElement("span");
+		const text = document.createTextNode(sentence);
+		const icon = document.createElement("i");
+
+		icon.classList.add("fa-solid", "fa-exclamation");
+		const button = createOptionButton("Accepter", "", "", icon);
+		button.addEventListener("click", function() {
+			const obj = {
+				username1: struct.username.innerHTML,
+				username2: button.parentElement.querySelector("p span").innerHTML
+			};
+
+			console.log("fetch /user/acceptInvitation");
+			fetch("/user/acceptInvitation/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+				.then(response => {
+					if (response.ok)
+						console.log("response /user/acceptInvitation ok");
+					else
+					{
+						console.log("response /user/acceptInvitation not good");
+						console.log(response.status);
+						response.json().then(data => console.log(data));
+					}
+				})
+				.catch(() => console.error("Error: failed to fetch the acceptInvitation route"));
+		});
+		span.innerHTML = data.challengeReceived.username[i];
+		p.appendChild(span);
+		p.appendChild(text);
+		p.classList.add("chat-announcement");
+		td.appendChild(p);
+		td.appendChild(button);
+		tr.appendChild(td);
+		struct.chat.output.appendChild(tr);
+	}
+	if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
+		struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
 }
-
 //////////////////////////////////////////////////////
 // Get(?)Struct
 //////////////////////////////////////////////////////
@@ -1079,6 +1210,12 @@ function	getFriendStruct()
 		output: friendOutput,
 		input: textareas[1],
 	};
+	return (struct);
+}
+
+function	getBlockedStruct()
+{
+	const struct = { output: document.querySelector(".wrapper-blocked tbody") };
 	return (struct);
 }
 

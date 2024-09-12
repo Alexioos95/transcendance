@@ -67,7 +67,6 @@
 		"2fa-email": "Email",
 		"activate": "Activeer",
 		"save": "Opslaan",
-		"unblock": "Deblokkeren",
 		"chat": "Chat",
 		"friend": "Vrienden",
 		"criticalChat": "Een kritieke fout beïnvloedde de online Chat"
@@ -109,6 +108,7 @@
 		"removeFriend": "Van vriendenlijst verwijderen",
 		"seeHistory": "Zie geschiedenis",
 		"invitePong": "Uitnodigen voor Pong",
-		"blockUser": "Gebruiker blokkeren"
+		"blockUser": "Gebruiker blokkeren",
+		"unblockUser": "Gebruiker deblokkeren" 
 	}
 }

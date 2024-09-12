@@ -67,7 +67,6 @@
 		"2fa-email": "Email",
 		"activate": "Activate",
 		"save": "Save",
-		"unblock": "Unblock",
 		"chat": "Chat",
 		"friend": "Friends",
 		"criticalChat": "A critical error impacted the online Chat"
@@ -109,6 +108,7 @@
 		"removeFriend": "Remove from friendlist",
 		"seeHistory": "See history",
 		"invitePong": "Invite for a Pong",
-		"blockUser": "Block the user"
+		"blockUser": "Block the user",
+		"unblockUser": "Unblock the user"
 	}
 }

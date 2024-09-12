@@ -1,23 +1,4 @@
 "use strict";
-
-function	deleteBlocked()
-{
-	const obj = { unblock: "toUnblock" };
-
-	fetch("/user/deleteBlockedUser/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-	.then(response => {
-		if (response.ok)
-			console.log("deleteFriend OK");
-		else
-		{
-			console.log("deleteFriend NOT OK");
-			console.log("status=", response.status);
-			console.log("response=", response.json());
-		}
-	})
-	.catch(() => console.error("Error: failed to fetch the deleteBlockedUser route"));
-}
-
 /////////////////////////
 // Script
 /////////////////////////
@@ -269,20 +250,16 @@ function	replaceDatas(struct, data)
 				.then(response => response.json())
 				.then(data => {
 					console.log("data=", data);
-					console.log("friendList=", data.friendList);
 					// Re-build Lang
 					fetchTranslation(struct, data.language);
 					// Re-build Avatar
-					if (data.avatar === undefined || data.avatar === "")
-						document.querySelector(".nav-user img").src = "/images/default_avatar.png";
-					else
-						document.querySelector(".nav-user img").src = data.avatar;
+					document.querySelector(".nav-user img").src = data.avatar;
 					// Re-build Username
 					if (struct.username.innerHTML !== data.username)
 						struct.username.innerHTML = data.username;
 					// Re-build Lists
 					buildFriendlist(struct, data);
-					buildBlockedlist(struct, data);
+					buildBlocklist(struct, data);
 					// Build Challenge
 					receiveInvitation(struct, data);
 				})
@@ -490,10 +467,10 @@ function	buildFriendlist(struct, data)
 		const i3 = document.createElement("i");
 
 		// Set avatar
-		img.src = "/images/default_avatar.png";
+		img.src = data.friendList[i].avatar;
 		img.alt = "Avatar";
 		// Set username and status
-		username.innerHTML = data.friendList[i].Username;
+		username.innerHTML = data.friendList[i].username;
 		let status = "online";
 		let lastDate = new Date(data.friendList[i].lastTimeOnline).getTime() + (30 * 1000);
 		let currDate = new Date().getTime();
@@ -529,15 +506,13 @@ function	buildFriendlist(struct, data)
 		td.appendChild(friendCard);
 		td.tabindex = "0";
 		tr.appendChild(td);
-		tr.setAttribute("data-user", data.friendList[i].Username);
+		tr.setAttribute("data-user", data.friendList[i].username);
 		// Push
 		if (status === "online")
 			logged.push(tr);
 		else
 			unlogged.push(tr);
 	}
-	console.log(logged);
-	console.log(unlogged);
 	alphabeticalSort(logged);
 	alphabeticalSort(unlogged);
 	for (let i = 0; i < logged.length; i++)
@@ -546,20 +521,21 @@ function	buildFriendlist(struct, data)
 		struct.friend.output.appendChild(unlogged[i]);
 }
 
-function	buildBlockedlist(struct, data)
+function	buildBlocklist(struct, data)
 {
-	let sentence;
+	let word;
+	let array = [];
 
-	// while (struct.blocked.output.firstChild)
-	// 	struct.blocked.output.firstChild.remove();
+	while (struct.blocked.output.firstChild)
+		struct.blocked.output.firstChild.remove();
 	if (data.blockList.length === 0)
 		return ;
 	if (struct.options.lang.curr === "FR")
-		sentence = "Debloquer";
+		word = "Debloquer";
 	else if (struct.options.lang.curr === "EN")
-		sentence = "Unblock";
+		word = "Unblock";
 	else if (struct.options.lang.curr === "NL")
-		sentence = "Deblokkeren";
+		word = "Deblokkeren";
 	for (let i = 0; i < data.blockList.length; i++)
 	{
 		// Create Element
@@ -575,17 +551,20 @@ function	buildBlockedlist(struct, data)
 		const span = document.createElement("span");
 
 		// Set avatar
-		img.src = "/images/default_avatar.png";
+		img.src = data.blockList[i].avatar;
 		img.alt = "Avatar";
 		// Set username
 		username.innerHTML = data.blockList[i].username;
 		// Set button
-		button.append(icon);
+		icon.classList.add("fa-solid", "fa-square-minus");
+		span.innerHTML = word;
+		button.appendChild(icon);
+		button.appendChild(document.createTextNode("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t"));
 		button.appendChild(span);
+		button.addEventListener("click", function() { deleteBlocked(struct, button); });
 		// Add classes
 		blockedCard.classList.add("blocked-card");
 		avatarWrapper.classList.add("blocked-user-avatar");
-		icon.classList.add("fa-solid", "fa-square-minus");
 		blockedUser.classList.add("blocked-user");
 		// Append
 		avatarWrapper.appendChild(img);
@@ -595,24 +574,12 @@ function	buildBlockedlist(struct, data)
 		blockedCard.appendChild(blockedUser);
 		td.append(blockedCard);
 		tr.append(td);
-		struct.blocked.output.appendChild(tr);
+		tr.setAttribute("data-user", data.blockList[i].Username);
+		array.push(tr);
 	}
-{/* <tr>
-	<td tabindex="0">
-		<div class="blocked-card">
-			<div class="blocked-user-avatar">
-				<img src="/images/default_avatar.png" alt="Avatar">
-			</div>
-			<div class="blocked-user">
-				<span>User</span>
-				<button type="button">
-					<i class="fa-solid fa-square-minus"></i>
-					<span>Débloquer</span>
-				</button>
-			</div>
-		</div>
-	</td>
-</tr> */}
+	alphabeticalSort(array);
+	for (let i = 0; i < array.length; i++)
+		struct.blocked.output.appendChild(array[i]);
 }
 
 async function	setGuestRestrictions(struct)
@@ -823,6 +790,25 @@ function	blockUser(struct, button)
 			console.log("response=", response.json());
 		})
 		.catch(() => console.error("Error: failed to fetch the blockUser route"));
+}
+
+function	deleteBlocked(struct, button)
+{
+	const username = button.parentElement.querySelector("span").innerHTML;
+	const obj = { unblock: username };
+
+	fetch("/user/deleteBlockedUser/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+		.then(response => {
+			if (response.ok)
+				console.log("deleteFriend OK");
+			else
+			{
+				console.log("deleteFriend NOT OK");
+				console.log("status=", response.status);
+				console.log("response=", response.json());
+			}
+		})
+		.catch(() => console.error("Error: failed to fetch the deleteBlockedUser route"));
 }
 
 /////////////////////////

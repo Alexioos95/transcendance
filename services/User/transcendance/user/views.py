@@ -184,12 +184,11 @@ def decodeJwt(auth_coockie):
 
 @require_http_methods(["GET"])
 def checkJwt(request):
-    print('test')
     #if request.method != 'GET':
         #return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
     auth = checkCookie(request, 'auth')
     if auth is None:
-        return JsonResponse({"error": "user not log"}, status=401)
+        return JsonResponse({"error": "user not log"}, status=200)
     print(f'le cookie est {auth}', file=sys.stderr)
     try:
         username = decodeJwt(auth)
@@ -198,7 +197,12 @@ def checkJwt(request):
             return JsonResponse({"error": "user does nor exist"}, status=403)
         print(f'le cookie est {auth}', file=sys.stderr)
         print(f'username:{user.Username}, Avatar:{user.Avatar}, lang: {user.language}', file=sys.stderr)
-        return JsonResponse({"username":user.Username, "Avatar":user.Avatar, "lang": user.language}, status=200)
+        avatar = ''
+        if not user.Avatar:
+            avatar = '/images/default_avatar.png'
+        else:
+            avatar = user.Avatar
+        return JsonResponse({"username":user.Username, "Avatar":avatar, "lang": user.language}, status=200)
     except customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
 
@@ -564,6 +568,7 @@ def disconnect(request):
     response = HttpResponse()
     response.set_cookie('auth', '', expires='Thu, 01 Jan 1970 00:00:00 GMT')
     return response
+
 #ajouter les ids dans le jwt!!!!!!
 @csrf_exempt
 def updateInfo(request):
@@ -580,24 +585,38 @@ def updateInfo(request):
     if user is None:
         return JsonResponse({"error": "User does not exists"}, status=403)
     friendObject = []
-    foe = user.foeList
-    print(f'foe == {foe}', file=sys.stderr)
-
+    foeObject = []
     # Modification principale : utiliser append() au lieu de +=
     for friend in user.friendsList:
         DBFriend = get_user_in_db("Username", friend)
         friendObject.append({
-            "Username": DBFriend.Username,
+            "username": DBFriend.Username,
             "lastTimeOnline": DBFriend.lastTimeOnline.isoformat(),
-            "id": DBFriend.id
+            # "id": DBFriend.id,
+            "avatar":DBFriend.Avatar
         })
+
+    for block in user.foeList:
+        DBFoe = get_user_in_db("Username", block)
+        avatarPath = ""
+        if not DBFoe.Avatar:
+            avatarPath = "/images/default_avatar.png"
+        else:
+            avatarPath = DBFoe.Avatar
+        foeObject.append({
+            "username": DBFoe.Username,
+            # "lastTimeOnline": DBFoe.lastTimeOnline.isoformat(),
+            # "id": DBFriend.id,
+            "avatar":avatarPath
+        })
+
     usernameChallenge = ''
     objectPing = {
         "username": user.Username,
         "avatar": user.Avatar,
         "language": user.language,
         'friendList': friendObject,
-        'blockList': foe,
+        'blockList': foeObject,
         'challengeReceived': {'game': 'pong', 'username': []},
         'challengeAccepted': {'game': 'pong', 'username': usernameChallenge}
     }

@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
@@ -39,3 +39,6 @@ def initGame(request):
 
 def index(request):
     return render(request, 'index.html')
+
+def ping(request):
+    return HttpResponse(status=204)

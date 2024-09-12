@@ -8,15 +8,17 @@ popState();
 async function	checkJWT()
 {
 	if (window.location.href.indexOf("resetmypassword") > -1)
-	{
 		navigate("reset", undefined, undefined);
-	}
 	else
 	{
 		await fetch("/user/checkJwt/")
-			.then(response => {
-				if (response.ok)
-					return (response.json().then(data => { data.guestMode = "false"; navigate("game", data, { signUp: "false", lang: "FR" })}));
+			.then(response => response.json())
+			.then(data => {
+				if (data.error === undefined)
+				{
+					data.guestMode = "false";
+					return (navigate("game", data, { signUp: "false", lang: "FR" }));
+				}
 				else
 				{
 					history.replaceState({ state: "login", lang: "FR" }, "", "");

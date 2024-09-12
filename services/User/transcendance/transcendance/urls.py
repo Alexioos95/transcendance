@@ -49,8 +49,8 @@ urlpatterns = [
     # POST envoi un username a jouter a une des liste ami bloque
     path('user/addFriend/', views.addFriend),
     path('user/blockUser/', views.blockUser),
-    # path('user/deleteFriend/', views.deleteFriend),
-    # path('user/deleteBlockedUser/', views.deleteBlockedUser),
+    path('user/deleteFriend/', views.deleteFriend),
+    path('user/deleteBlockedUser/', views.deleteBlockedUser),
     #POST
     path('user/resetPaswd/', views.resetPasswd), #envoi un mail auquel sera envoye un mail de reset de son password via un lien fourni
     #POST

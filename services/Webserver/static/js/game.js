@@ -805,7 +805,7 @@ function	deleteBlocked(struct, button)
 			{
 				console.log("deleteFriend NOT OK");
 				console.log("status=", response.status);
-				console.log("response=", response.json());
+				response.text().then(data => console.log(data));
 			}
 		})
 		.catch(() => console.error("Error: failed to fetch the deleteBlockedUser route"));
@@ -987,7 +987,11 @@ function	receiveInvitation(struct, data)
 			fetch("/user/acceptInvitation/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 				.then(response => {
 					if (response.ok)
-						console.log("response /user/acceptInvitation ok");
+					{
+						// Couper la partie locale.
+						// Bloquer la piece.
+						// Lancer la partie/socket.
+					}
 					else
 					{
 						console.log("response /user/acceptInvitation not good");

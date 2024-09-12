@@ -171,7 +171,7 @@ services:
 
   ping:
     hostname: ping
-	container_name: ping
+    container_name: ping
     # depends_on:
 	#   user:
 	#     condition: service_healthy
@@ -185,13 +185,13 @@ services:
 	#   pong:
 	#     condition: service_healthy
 	#     restart: true
-	pull_policy: build
-	build:
-	  context: Ping
-	  dockerfile: Dockerfile
-	networks:
-	  - transcendance
-	restart: unless-stopped
+    pull_policy: build
+    build:
+      context: Ping
+      dockerfile: Dockerfile
+    networks:
+      - transcendance
+    restart: unless-stopped
 
   webserver:
     hostname: webserver

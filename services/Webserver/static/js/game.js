@@ -50,6 +50,7 @@ async function	run(data)
 		history: getHistoryStruct(),
 		tabs: getTabsStruct(),
 		chat: getChatStruct(),
+		friend: getFriendStruct(),
 		translation: getTranslationStruct(),
 		guestMode: false,
 		run: 1
@@ -250,12 +251,101 @@ function	setupEventListeners(struct, data)
 			if (struct.run === 0)
 				clearInterval(myInterval);
 			fetch("/user/updateInfo/", { method: "GET", credentials: "include"})
-				.then(response => {
-					console.log("status=", response.status);
-					console.log("response=", response.json());
+				.then(response => response.json())
+				.then(data => {
+					console.log(data);
+					// Avatar
+					if (data.avatar === undefined || data.avatar === "")
+						document.querySelector(".nav-user img").src = "/images/default_avatar.png";
+					else
+					document.querySelector(".nav-user img").src = data.avatar;
+					// Friendlist
+					const array = data.FriendList;
+					const nbFriend = array.length / 3;
+					const logged = [];
+					const unlogged = [];
+
+					for (let i = 0; i < nbFriend; i++)
+					{
+						// Create elements
+						const tr = document.createElement("tr");
+						const td = document.createElement("td");
+						const friendCard = document.createElement("div");
+						const avatarWrapper = document.createElement("div");
+						const img = document.createElement("img");
+						const friendUser = document.createElement("div");
+						const usernameWrapper = document.createElement("div");
+						const username = document.createElement("span");
+						const statusIcon = document.createElement("i");
+						const friendOption = document.createElement("div");
+						const button1 = document.createElement("button");
+						const button2 = document.createElement("button");
+						const button3 = document.createElement("button");
+						const i1 = document.createElement("i");
+						const i2 = document.createElement("i");
+						const i3 = document.createElement("i");
+
+						// Set avatar
+						// img.src = array[0]; // !!!!!!!!!
+						img.src = "/images/default_avatar.png";
+						img.alt = "Avatar";
+						// Set username
+						username.innerHTML = array[0];
+						// Set status
+						let status = "online";
+						let date = new Date(array[2]);
+						let currDate = new Date();
+						if (date + 10 < currDate)
+
+						statusIcon.classList.add("fa-solid", "fa-circle-dot", status);
+
+
+						// Append
+						avatarWrapper.appendChild(img);
+						usernameWrapper.appendChild(username);
+						usernameWrapper.appendChild(status);
+						friendOption.appendChild(button1);
+						friendOption.appendChild(button2);
+						friendOption.appendChild(button3);
+						friendUser.appendChild(usernameWrapper);
+						friendUser.appendChild(friendOption);
+						friendCard.appendChild(avatarWrapper);
+						friendCard.appendChild(friendUser);
+						td.appendChild(friendCard);
+						td.tabindex = "0";
+						tr.appendChild(td);
+					// <tr>
+					// 	<td tabindex="0">
+					// 		<div class="friend-card">
+					// 			<div class="friend-user-avatar">
+					// 				<img src="images/default_avatar.png" alt="Avatar">
+					// 			</div>
+					// 			<div class="friend-user">
+					// 				<div>
+					// 					<span>User</span>
+					// 					<i class="fa-solid fa-circle-dot offline" title="En ligne"></i>
+					// 				</div>
+					// 				<div class="friend-options">
+					// 					<button type="button" class="hover-purple" title="Voir l'historique">
+					// 						<i class="fa-solid fa-clock-rotate-left"></i>
+					// 					</button>
+					// 					<button type="button" class="hover-blue" title="Inviter pour un Pong">
+					// 						<i class="fa-solid fa-table-tennis-paddle-ball"></i>
+					// 					</button>
+					// 					<button type="button" class="hover-red" title="Retirer de la liste d'amis" onclick="deleteFriend()">
+					// 						<i class="fa-solid fa-user-minus"></i>
+					// 					</button>
+					// 				</div>
+					// 			</div>
+					// 		</div>
+					// 	</td>
+					// </tr>
+					}
+					console.log(data.FriendList);
+					console.log(data.FriendList[0]);
 				})
 				.catch(() => console.error("Error: failed to fetch the updateInfo route"));
-		}, 10000)
+		}, 10000);
 	}
 }
 
@@ -271,7 +361,10 @@ function	replaceDatas(struct, data)
 		const username = document.querySelector(".nav-user span");
 		const inputs = document.querySelectorAll(".options-wrapper-connection input");
 
-		avatar.src = data.avatar;
+		if (data.avatar !== undefined)
+			avatar.src = data.avatar;
+		else
+			avatar.src = "/images/default_avatar.png"
 		username.innerHTML = data.username;
 		inputs[0].value = data.username;
 		inputs[1].value = data.email;
@@ -403,37 +496,42 @@ function	fetchTranslation(struct, lang)
 async function	translateGamePage(struct, obj, currLang)
 {
 	struct.options.lang.curr = currLang;
-	let plainTexts = Object.values(obj.plainText);
-	let placeHolders = Object.values(obj.placeholder);
-	let titles = Object.values(obj.title);
-	let ariaLabels = Object.values(obj.ariaLabel);
-	let i = 0;
+	const plainTexts = Object.values(obj.plainText);
+	const placeHolders = Object.values(obj.placeholder);
+	const titles = Object.values(obj.title);
+	const ariaLabels = Object.values(obj.ariaLabel);
+	const tabOptions = Object.values(obj.tabOptions)
+	const friendButtons = document.getElementsByClassName("addFriend");
+	const historyButtons = document.getElementsByClassName("seeHistory");
+	const inviteButtons = document.getElementsByClassName("invitePong");
+	const blockButtons = document.getElementsByClassName("addBlock");
 
-	for (let text of plainTexts)
-	{
-		struct.translation.txt[i].innerHTML = text;
-		i++;
-	}
-	i = 0;
-	for (let placeholder of placeHolders)
-	{
-		struct.translation.pholder[i].placeholder = placeholder;
-		i++;
-	}
-	i = 0;
-	for (let title of titles)
-	{
-		struct.translation.title[i].title = title;
-		i++;
-	}
-	i = 0;
-	for (let ariaLabel of ariaLabels)
-	{
-		struct.translation.ariaLabel[i].ariaLabel = ariaLabel;
-		i++;
-	}
+	translationLoop(struct, plainTexts, "txt", "innerHTML");
+	translationLoop(struct, placeHolders, "pholder", "placeholder");
+	translationLoop(struct, titles, "title", "title");
+	translationLoop(struct, ariaLabels, "ariaLabel", "ariaLabel");
+	translationChatOptionsLoop(friendButtons, tabOptions, 0);
+	translationChatOptionsLoop(historyButtons, tabOptions, 2);
+	translationChatOptionsLoop(inviteButtons, tabOptions, 3);
+	translationChatOptionsLoop(blockButtons, tabOptions, 4);
 	updateTournamentMarkers(struct, false);
 }
+
+function translationLoop(struct, items, structName, property)
+{
+	items.forEach((item, index) => {
+		struct.translation[structName][index][property] = item;
+	});
+};
+
+function translationChatOptionsLoop(element, tabOptions, translation)
+{
+	for (let i = 0; i < element.length; i++)
+	{
+		element[i].title = tabOptions[translation];
+		element[i].ariaLabel = tabOptions[translation];
+	}
+};
 
 async function	setGuestRestrictions(struct)
 {
@@ -504,7 +602,7 @@ function	liveChat(struct)
 		const tr = createChatMessage(struct, data);
 		let isScrolled = false;
 
-		if (struct.tabs.chat.table.scrollTop === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
+		if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
 			isScrolled = true;
 		struct.chat.output.appendChild(tr);
 		if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
@@ -525,6 +623,7 @@ function	liveChat(struct)
 
 function	createChatMessage(struct, data)
 {
+	// Create elements
 	const tr = document.createElement("tr");
 	const td = document.createElement("td");
 	const chatMessage = document.createElement("div");
@@ -538,8 +637,12 @@ function	createChatMessage(struct, data)
 	const i2 = document.createElement("i");
 	const i3 = document.createElement("i");
 	const i4 = document.createElement("i");
+	let options = true;
 	let array;
 
+	// Check username
+	// if (document.querySelector(".nav-user span").innerHTML === data.user)
+	// 	options = false; // !!!!!!!!!!!
 	// Get lang
 	if (struct.options.lang.curr === "FR")
 		array = ["Ajouter en ami", "Voir l'historique", "Inviter pour un Pong", "Bloquer l'utilisateur"];
@@ -548,7 +651,10 @@ function	createChatMessage(struct, data)
 	else if (struct.options.lang.curr === "NL")
 		array = ["Aan vriendenlijst toevoegen", "Zie geschiedenis", "Uitnodigen voor Pong", "Gebruiker blokkeren"];
 	// Set avatar
-	avatar.src = data.avatar;
+	if (data.avatar !== undefined)
+		avatar.src = data.avatar;
+	else
+		avatar.src = "/images/default_avatar.png"
 	avatar.alt = "Avatar";
 	chatUserAvatar.classList.add("chat-user-avatar");
 	chatUserAvatar.appendChild(avatar);
@@ -561,38 +667,47 @@ function	createChatMessage(struct, data)
 	chatMessage.appendChild(chatUserAvatar);
 	chatMessage.appendChild(p);
 	// Set buttons
-	i1.classList.add("fa-solid", "fa-user-plus");
-	i2.classList.add("fa-solid", "fa-clock-rotate-left");
-	i3.classList.add("fa-solid", "fa-table-tennis-paddle-ball");
-	i4.classList.add("fa-solid", "fa-circle-xmark");
-	const button1 = createChatButton(array[0], "hover-green", i1);
-	const button2 = createChatButton(array[1], "hover-purple", i2);
-	const button3 = createChatButton(array[2], "hover-blue", i3);
-	const button4 = createChatButton(array[3], "hover-red", i4);
-	button1.addEventListener("click", function() { addFriend(struct, button1); });
-	button2.addEventListener("click", function() { seeHistory(struct, button2); });
-	button3.addEventListener("click", function() { sendInvite(struct, button3); });
-	button4.addEventListener("click", function() { blockUser(struct, button4); });
+	if (options === true)
+	{
+		i1.classList.add("fa-solid", "fa-user-plus");
+		i2.classList.add("fa-solid", "fa-clock-rotate-left");
+		i3.classList.add("fa-solid", "fa-table-tennis-paddle-ball");
+		i4.classList.add("fa-solid", "fa-circle-xmark");
+		const button1 = createChatButton(array[0], "hover-green", "addFriend", i1);
+		const button2 = createChatButton(array[1], "hover-purple", "seeHistory", i2);
+		const button3 = createChatButton(array[2], "hover-blue", "invitePong", i3);
+		const button4 = createChatButton(array[3], "hover-red", "addBlock", i4);
+		button1.addEventListener("click", function() { addFriend(struct, button1); });
+		button2.addEventListener("click", function() { seeHistory(struct, button2); });
+		button3.addEventListener("click", function() { sendInvite(struct, button3); });
+		button4.addEventListener("click", function() { blockUser(struct, button4); });
+		// Append
+		chatOptions.appendChild(button1);
+		chatOptions.appendChild(document.createTextNode("\n\t\t\t\t\t\t\t\t\t\t"));
+		chatOptions.appendChild(button2);
+		chatOptions.appendChild(document.createTextNode("\n\t\t\t\t\t\t\t\t\t\t"));
+		chatOptions.appendChild(button3);
+		chatOptions.appendChild(document.createTextNode("\n\t\t\t\t\t\t\t\t\t\t"));
+		chatOptions.appendChild(button4);
+		chatOptions.classList.add("chat-options");
+	}
 	// Append
-	chatOptions.appendChild(button1);
-	chatOptions.appendChild(button2);
-	chatOptions.appendChild(button3);
-	chatOptions.appendChild(button4);
-	chatOptions.classList.add("chat-options");
 	td.appendChild(chatMessage);
-	td.appendChild(chatOptions);
+	if (options === true)
+		td.appendChild(chatOptions);
 	td.tabIndex = "0";
 	tr.appendChild(td);
 	return (tr);
 }
 
-function	createChatButton(title, addClass, child)
+function	createChatButton(title, addClass, addClass2, child)
 {
 	const button = document.createElement("button");
 
 	button.type = "button";
 	button.title = title;
-	button.classList.add(addClass);
+	button.ariaLabel = title;
+	button.classList.add(addClass, addClass2);
 	button.appendChild(child);
 	return (button);
 }
@@ -608,15 +723,20 @@ function	addFriend(struct, button)
 			const tr = document.createElement("tr");
 			const td = document.createElement("td");
 			const p = document.createElement("p");
+			let isScrolled = false;
 
 			p.classList.add("chat-announcement");
 			if (response.ok)
 				p.innerHTML = "Added to friend";
 			else
 				p.innerHTML = "Failed to add to friend";
+			if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
+				isScrolled = true;
 			td.appendChild(p);
 			tr.appendChild(td);
 			struct.chat.output.appendChild(tr);
+			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
+				struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
 			console.log("status=", response.status);
 			console.log("response=", response.json());
 		})
@@ -638,7 +758,7 @@ function	seeHistory(struct, button)
 
 			p.classList.add("chat-announcement");
 			if (response.ok)
-				p.innerHTML = "Blocked user";
+				p.innerHTML = "see history user";
 			else
 				p.innerHTML = "Failed to see history of user";
 			td.appendChild(p);
@@ -660,15 +780,22 @@ function	sendInvite(struct, button)
 			const tr = document.createElement("tr");
 			const td = document.createElement("td");
 			const p = document.createElement("p");
+			let isScrolled = false;
 
 			p.classList.add("chat-announcement");
 			if (response.ok)
-				p.innerHTML = "Blocked user";
+				p.innerHTML = "Challenge uer";
 			else
 				p.innerHTML = "Failed to challenge user";
+			if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
+				isScrolled = true;
 			td.appendChild(p);
 			tr.appendChild(td);
 			struct.chat.output.appendChild(tr);
+			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
+				struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
+			console.log("status=", response.status);
+			console.log("response=", response.json());
 		})
 		.catch(() => console.error("Error: failed to fetch the Challenge route"));
 }
@@ -684,15 +811,22 @@ function	blockUser(struct, button)
 			const tr = document.createElement("tr");
 			const td = document.createElement("td");
 			const p = document.createElement("p");
+			let isScrolled = false;
 
 			p.classList.add("chat-announcement");
 			if (response.ok)
-				p.innerHTML = "Blocked user";
+				p.innerHTML = "Added to blocked";
 			else
 				p.innerHTML = "Failed to block user";
+			console.log(struct.tabs.chat.table.scrollTop);
+			console.log(struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight);
+			if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
+				isScrolled = true;
 			td.appendChild(p);
 			tr.appendChild(td);
 			struct.chat.output.appendChild(tr);
+			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
+				struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
 			console.log("status=", response.status);
 			console.log("response=", response.json());
 		})
@@ -875,6 +1009,11 @@ function	getChatStruct()
 		socket: undefined
 	};
 	return (struct);
+}
+
+function	getFriendStruct()
+{
+	// !!!!!!!!
 }
 
 function	getTranslationStruct()

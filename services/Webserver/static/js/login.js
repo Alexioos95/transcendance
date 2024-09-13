@@ -51,7 +51,7 @@ function	login(prevData)
 			console.error("Couldn't open pop-up's connection to 42Intra.");
 			return ;
 		}
-		const myInterval = setInterval(function() {
+		const myInterval = setInterval(() => {
 			console.log("fetch /user/checkAuth42");
 			fetch("/user/checkAuth42/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 				.then(response => {

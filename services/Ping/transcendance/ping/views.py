@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import JsonResponse, HttpResponse
 import requests
 
 # Create your views here.
@@ -16,7 +16,7 @@ def testRoutes(request):
 #        if pingResponses[_] != 204:
 #            print("No Ping", file=sys.stderr)
 #    print(pingResponses)
-	return JsonResponse(pingResponses, status=200)
+    return JsonResponse(pingResponses, status=200)
 
 def ping(request):
-    HttpResponse(status=204)
+    return HttpResponse(status=204)

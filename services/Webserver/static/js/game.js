@@ -842,6 +842,7 @@ function	liveChat(struct)
 	});
 	struct.chat.socket.addEventListener("message", function(event) {
 		const data = JSON.parse(event.data);
+		
 		if (data.type === "connected")
 		{
 			// if (data.user !== document.querySelector(".nav-user span"))
@@ -996,10 +997,11 @@ function	receiveInvitation(struct, data)
 						if (struct.screen.game !== undefined)
 							struct.screen.game.running = 0;
 						coinAnimation(struct)
-							.then(() => { struct.screen.game = getPongStruct(); })
-							.then(() => { struct.screen.game.online = true; })
-							.then(() => { struct.screen.game.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/pong/"); })
-							.then(() => { struct.screen.game.run(struct); });
+							.then(() => {
+								struct.screen.game = getPongStruct();
+								struct.screen.game.online = true;
+								struct.screen.game.run(struct);
+							});
 					}
 					else
 					{

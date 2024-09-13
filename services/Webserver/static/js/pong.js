@@ -31,9 +31,39 @@ function	initPongStruct(game, wrapperCanvas)
 {
 	game.canvas = getCanvas(wrapperCanvas);
 	game.ctx = game.canvas.getContext("2d");
-	game.paddles = getPaddles(game.canvas);
-	game.ball = getBall(game.canvas);
-	game.scores = [0, 0];
+	if (game.online === false)
+	{
+		game.paddles = getPaddles(game.canvas);
+		game.ball = getBall(game.canvas);
+	}
+	else
+	{
+		game.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/pong/");
+		game.socket.addEventListener("error", function() { console.error("Critical error on Pong's websocket") });
+		game.socket.addEventListener("message", function(event) {
+			const data = JSON.parse(event.data);
+			const paddleLeft = getPixels(game.canvas, data.x_paddleLeft, data.y_paddleLeft);
+			const paddleRight = getPixels(game.canvas, data.x_paddleRight, data.y_paddleRight);
+			const ball = getPixels(game.canvas, data.ball.x, data.ball.y);
+			const obj = { key: undefined };
+
+			game.paddles.left.x = paddleLeft[0];
+			game.paddles.left.y = paddleLeft[1];
+			game.paddles.right.x = paddleRight[0];
+			game.paddles.right.y = paddleRight[1];
+			game.ball.x = ball[0];
+			game.ball.y = ball[1];
+			game.scores = data.score;
+			render(game);
+
+			if (game.paddles.left.move_top === 1)
+				obj.key = "top";
+			else if (game.paddles.left.move_bot === 1)
+				obj.key = "bot";
+			if (obj.key !== undefined)
+				game.socket.send(obj);
+		});
+	}
 	game.running = 1;
 }
 
@@ -66,12 +96,8 @@ async function	loop(struct, game)
 		{
 			movePaddles(game.canvas, game.paddles);
 			moveBall(game);
+			render(game);
 		}
-		else
-		{
-			// Update info with socket.
-		}
-		render(game);
 		requestAnimationFrame(() => loop(struct, game));
 	}
 	else
@@ -685,4 +711,10 @@ function	getDimensions(game, pictures)
 	dimensions.rightWidth[0] = (game.canvas.width / 2) + ((game.canvas.width / 2) / 2) - (dimensions.rightDimensions + 20);
 	dimensions.rightWidth[1] = (game.canvas.width / 2) + ((game.canvas.width / 2) / 2);
 	return (dimensions);
+}
+
+function getPixels(canvas, xPercent, yPercent)
+{
+	const struct = [((xPercent / 100) * canvas.width), ((yPercent / 100) * canvas.height)];
+	return (struct);
 }

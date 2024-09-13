@@ -46,6 +46,7 @@ def setCookie(user, response):
     expirationTime = 1209600
     encoded_jwt = jwt.encode({
         "userName": user['username'],
+        "id": user['id'],
         "expirationDate": time.time() + expirationTime
     }, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")
     response.set_cookie(

@@ -41,12 +41,7 @@ async function	run(data)
 function	setupEventListeners(struct, data)
 {
 	// Header Buttons
-	struct.header.historyButton.addEventListener("click", function() {
-		resetPhoneClasses(struct, struct.cards.chat);
-		struct.tabs.wrapperTabs.classList.add("hidden");
-		struct.tabs.wrapperInputs.classList.add("zindex");
-		struct.history.wrapper.classList.remove("zindex", "hidden");
-	});
+	struct.header.historyButton.addEventListener("click", function() { seeHistory(struct, undefined, struct.username.innerHTML); });
 	struct.header.gameSelectorButton.addEventListener("click", function() { resetPhoneClasses(struct, struct.cards.gameSelector); });
 	struct.header.chatButton.addEventListener("click", function() {
 		resetPhoneClasses(struct, struct.cards.chat);
@@ -718,10 +713,14 @@ function	deleteFriend(struct, button)
 	.catch(() => console.error("Failed to fetch the deleteFriend route"));
 }
 
-function	seeHistory(struct, button)
+function	seeHistory(struct, button, own)
 {
-	// !!!!!!!!!!!!!!!!!!!!!
-	const username = button.parentElement.parentElement.querySelector("span").innerHTML;
+	let username;
+
+	if (own === undefined)
+		username = button.parentElement.parentElement.querySelector("span").innerHTML;
+	else
+		username = own;
 	console.log("Username=", username);
 	const obj = { seeHistory: username };
 
@@ -733,9 +732,20 @@ function	seeHistory(struct, button)
 
 			p.classList.add("chat-announcement");
 			if (response.ok)
+			{
+				console.log("/user/seeHistory OK; display history over chat.")
 				p.innerHTML = "see history user";
+				resetPhoneClasses(struct, struct.cards.chat);
+				struct.tabs.wrapperTabs.classList.add("hidden");
+				struct.tabs.wrapperInputs.classList.add("zindex");
+				struct.history.wrapper.classList.remove("zindex", "hidden");
+			}
 			else
+			{
+				console.log("/user/seeHistory NOT OK; do nothing.");
+				response.text().then(data => console.log(data));
 				p.innerHTML = "Failed to see history of user";
+			}
 			td.appendChild(p);
 			tr.appendChild(td);
 			struct.chat.output.appendChild(tr);

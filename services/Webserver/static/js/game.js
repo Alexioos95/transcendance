@@ -619,6 +619,12 @@ function	buildHistory(struct, data, username)
 			status = "history-card-lose";
 		if (data.matches[i].game !== "pong")
 			status = "history-card-tetris";
+		// Datas
+		username1.innerHTML = data.username1;
+		score1.innerHTML = data.score1;
+		username2.innerHTML = data.username2;
+		score2.innerHTML = data.score2;
+		date.innerHTML = data.date;
 		// Add classes
 		historyCard.classList.add("history-card", status);
 		historyCardGame.classList.add("history-card-game", game);
@@ -1033,28 +1039,40 @@ function	createChatMessage(struct, data)
 
 function	receiveInvitation(struct, data)
 {
+	let accept;
 	let sentence;
 	let isScrolled = false;
 
+	// Lang
 	if (struct.options.lang.curr === "FR")
+	{
 		sentence = " vous a inviter pour un Pong";
+		accept = "Accepter";
+	}
 	else if (struct.options.lang.curr === "EN")
+	{
 		sentence = " invited you to a Pong";
+		accept = "Accept";
+	}
 	else if (struct.options.lang.curr === "NL")
+	{
 		sentence = " je uitgenodigd voor een Pong";
+		accept = "Accepteren";
+	}
 	if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
 		isScrolled = true;
 	for (let i = 0; i < data.challengeReceived.username.length; i++)
 	{
+		// Create elements
 		const tr = document.createElement("tr");
 		const td = document.createElement("td");
 		const p = document.createElement("p");
 		const span = document.createElement("span");
 		const text = document.createTextNode(sentence);
 		const icon = document.createElement("i");
-
+		// Set button
 		icon.classList.add("fa-solid", "fa-exclamation");
-		const button = createOptionButton("Accepter", "", "", icon);
+		const button = createOptionButton(accept, "", "", icon);
 		button.addEventListener("click", function() {
 			const obj = {
 				username1: struct.username.innerHTML,
@@ -1085,6 +1103,7 @@ function	receiveInvitation(struct, data)
 				.catch(() => console.error("Failed to fetch the acceptInvitation route"));
 		});
 		span.innerHTML = data.challengeReceived.username[i];
+		// Append
 		p.appendChild(span);
 		p.appendChild(text);
 		p.classList.add("chat-announcement");
@@ -1232,7 +1251,9 @@ function	getHistoryStruct()
 {
 	const struct = {
 		wrapper: document.getElementsByClassName("wrapper-history")[0],
-		leaveButton: document.querySelector(".wrapper-history button")
+		leaveButton: document.querySelector(".wrapper-history button"),
+		username: document.querySelector(".wrapper-history h3"),
+		output: document.querySelector(".tab-history tbody")
 	};
 	return (struct);
 }
@@ -1290,15 +1311,6 @@ function	getFriendStruct()
 function	getBlockedStruct()
 {
 	const struct = { output: document.querySelector(".wrapper-blocked tbody") };
-	return (struct);
-}
-
-function	getHistoryStruct()
-{
-	const struct = {
-		username: document.querySelector(".wrapper-history h3"),
-		output: document.querySelector(".tab-history tbody"),
-	};
 	return (struct);
 }
 

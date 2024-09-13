@@ -61,7 +61,7 @@ function	initPongStruct(game, wrapperCanvas)
 			else if (game.paddles.left.move_bot === 1)
 				obj.key = "bot";
 			if (obj.key !== undefined)
-				game.socket.send(obj);
+				game.socket.send(JSON.stringify(obj));
 		});
 	}
 	game.running = 1;
@@ -103,6 +103,8 @@ async function	loop(struct, game)
 	else
 	{
 		game.running = 0;
+		if (game.socket !== undefined)
+			game.socket.close(1000);
 		renderFinalScore(game);
 		document.getElementsByClassName("game")[0].removeEventListener("mouseup", mouseUpEvent(struct.screen.game.paddles));
 		await endGame(struct);

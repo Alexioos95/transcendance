@@ -197,6 +197,7 @@ function	setupEventListeners(struct, data)
 	struct.screen.wrapperCanvas.addEventListener("keyup", function(event) { disableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mousemove", function(event) { enableStickMove(event, struct); });
 	struct.screen.wrapperCanvas.addEventListener("mouseup", function(event) { disableStickMove(event, struct); });
+	// Game Mode
 	struct.gameForm.inputs[0].addEventListener("change", function() {
 		struct.screen.primaryPlayer.classList.remove("solo");
 		struct.screen.secondaryPlayer.classList.remove("hidden");
@@ -362,11 +363,14 @@ function	shuffle(array)
 function	alphabeticalSort(array)
 {
 	array.sort((a, b) => {
-		if (a.getAttribute("data-user") > b.getAttribute("data-user"))
-			return 1;
-		if (a.getAttribute("data-user") < b.getAttribute("data-user"))
-			return -1;
-		return 0;
+		nameA = a.getAttribute("data-user");
+		nameB = b.getAttribute("data-user");
+
+		if (nameA.toLowerCase() > nameB.toLowerCase())
+			return (1);
+		else if (nameA.toLowerCase() < nameB.toLowerCase())
+			return (-1);
+		return (0);
 	});
 }
 
@@ -478,6 +482,7 @@ function	buildFriendlist(struct, data)
 		if (lastDate < currDate)
 			status = "offline";
 		statusIcon.classList.add("fa-solid", "fa-circle-dot", status);
+		statusIcon.title = status;
 		// Add classes;
 		avatarWrapper.classList.add("friend-user-avatar");
 		friendUser.classList.add("friend-user");
@@ -558,6 +563,7 @@ function	buildBlocklist(struct, data)
 		// Set button
 		icon.classList.add("fa-solid", "fa-square-minus");
 		span.innerHTML = word;
+		span.classList.add("removeBlock");
 		button.appendChild(icon);
 		button.appendChild(document.createTextNode("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t"));
 		button.appendChild(span);
@@ -574,7 +580,7 @@ function	buildBlocklist(struct, data)
 		blockedCard.appendChild(blockedUser);
 		td.append(blockedCard);
 		tr.append(td);
-		tr.setAttribute("data-user", data.blockList[i].Username);
+		tr.setAttribute("data-user", data.blockList[i].username);
 		array.push(tr);
 	}
 	alphabeticalSort(array);
@@ -636,7 +642,8 @@ async function	translateGamePage(struct, obj, currLang)
 	translationTabOptionsLoop(historyButtons, tabOptions, 2);
 	translationTabOptionsLoop(inviteButtons, tabOptions, 3);
 	translationTabOptionsLoop(blockButtons, tabOptions, 4);
-	translationTabOptionsLoop(rmBlockButtons, tabOptions, 5);
+	for (let i = 0; i < rmBlockButtons.length; i++)
+		rmBlockButtons[i].innerHTML = tabOptions[5];
 	updateTournamentMarkers(struct, false);
 }
 
@@ -679,8 +686,6 @@ function	addFriend(struct, button, usernameInput)
 				sleep(1000)
 					.then(() => { struct.tabs.wrapperInputs.classList.remove("in-error"); });
 			}
-			console.log("status=", response.status);
-			console.log("response=", response.json());
 		})
 		.catch(() => console.error("Error: failed to fetch the addFriend route"));
 }
@@ -699,7 +704,7 @@ function	deleteFriend(struct, button)
 		{
 			console.log("deleteFriend NOT OK");
 			console.log("status=", response.status);
-			response.json().then(data => console.log(data));
+			response.text().then(data => console.log(data));
 		}
 	})
 	.catch(() => console.error("Error: failed to fetch the deleteFriend route"));
@@ -756,7 +761,7 @@ function	sendInvite(struct, button)
 			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
 				struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
 			console.log("status=", response.status);
-			console.log("response=", response.json());
+			response.text().then(data => console.log(data));
 		})
 		.catch(() => console.error("Error: failed to fetch the sendInvitation route"));
 }
@@ -787,7 +792,7 @@ function	blockUser(struct, button)
 			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
 				struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
 			console.log("status=", response.status);
-			console.log("response=", response.json());
+			response.text().then(data => console.log(data));
 		})
 		.catch(() => console.error("Error: failed to fetch the blockUser route"));
 }
@@ -988,15 +993,19 @@ function	receiveInvitation(struct, data)
 				.then(response => {
 					if (response.ok)
 					{
-						// Couper la partie locale.
-						// Bloquer la piece.
-						// Lancer la partie/socket.
+						if (struct.screen.game !== undefined)
+							struct.screen.game.running = 0;
+						coinAnimation(struct)
+							.then(() => { struct.screen.game = getPongStruct(); })
+							.then(() => { struct.screen.game.online = true; })
+							.then(() => { struct.screen.game.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/pong/"); })
+							.then(() => { struct.screen.game.run(struct); });
 					}
 					else
 					{
 						console.log("response /user/acceptInvitation not good");
 						console.log(response.status);
-						response.json().then(data => console.log(data));
+						response.text().then(data => console.log(data));
 					}
 				})
 				.catch(() => console.error("Error: failed to fetch the acceptInvitation route"));
@@ -1013,9 +1022,9 @@ function	receiveInvitation(struct, data)
 	if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
 		struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
 }
-//////////////////////////////////////////////////////
+//////////////////
 // Get(?)Struct
-//////////////////////////////////////////////////////
+//////////////////
 function	getHeaderStruct()
 {
 	const buttons = document.querySelectorAll("header button");
@@ -1274,7 +1283,11 @@ async function	checkGameSelectorValidation(struct)
 		if (game === "pong")
 			struct.screen.game = getPongStruct();
 		else if (game === "tetris")
+		{
+			if (mode === "online")
+				reject(0);
 			struct.screen.game = getTetrisStruct();
+		}
 		setupGameControls(struct, game);
 		title.style.opacity = 0;
 		sleep(350)
@@ -1312,8 +1325,8 @@ async function waitMatchMaking(struct)
 						else
 						{
 							console.log("response /user/matchMaking not good; Wait 10s");
-							console.log(response.status);
-							console.log(response.json());
+							console.log("status=", response.status);
+							response.text().then(data => console.log(data));
 						}
 					})
 					.catch(() => console.error("Error: failed to fetch the matchMaking route"));

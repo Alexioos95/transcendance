@@ -13,6 +13,7 @@ function	getPongStruct()
 		ball: undefined,
 		run: startPong,
 		online: false,
+		socket, undefined,
 		running: 0
 	};
 	return (struct);
@@ -59,10 +60,17 @@ async function	loop(struct, game)
 {
 	game.ctx.fillStyle = "#2F2F2F";
 	game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-	if (game.scores[0] < 11 && game.scores[1] < 11)
+	if (game.running === 1 && game.scores[0] < 11 && game.scores[1] < 11)
 	{
-		movePaddles(game.canvas, game.paddles);
-		moveBall(game);
+		if (game.online === false)
+		{
+			movePaddles(game.canvas, game.paddles);
+			moveBall(game);
+		}
+		else
+		{
+			// Update info with socket.
+		}
 		render(game);
 		requestAnimationFrame(() => loop(struct, game));
 	}

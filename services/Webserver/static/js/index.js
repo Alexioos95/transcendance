@@ -25,7 +25,7 @@ async function	checkJWT()
 					return (navigate("login", undefined,  { signUp: "false", lang: "FR" }));
 				}
 			})
-			.catch(() => console.error("Error: failed to fetch the checkJwt route"));
+			.catch(() => console.error("Failed to fetch the checkJwt route"));
 	}
 }
 

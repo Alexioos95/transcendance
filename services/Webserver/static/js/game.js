@@ -75,7 +75,7 @@ function	setupEventListeners(struct, data)
 					struct.chat.socket.close(1000);
 			})
 			.then(() => { return (navigate("login", undefined, { signUp: "false", lang: struct.options.lang.curr }))})
-			.catch(() => console.error("Error: failed to fetch the matchMaking route"));
+			.catch(() => console.error("Failed to fetch the matchMaking route"));
 	});
 	// Cross Buttons
 	struct.options.leaveButton.addEventListener("click", function() {
@@ -130,7 +130,7 @@ function	setupEventListeners(struct, data)
 				else
 					response.json().then(data => struct.options.account.error.innerHTML = data.error);
 			})
-			.catch(() => console.error("Error: failed to fetch the init2fa route"));
+			.catch(() => console.error("Failed to fetch the init2fa route"));
 		struct.options.account.twoFA.wrapper.classList.remove("hidden");
 	});
 	struct.options.account.twoFA.button.addEventListener("click", function() {
@@ -151,25 +151,33 @@ function	setupEventListeners(struct, data)
 						struct.options.account.error.innerHTML = "YIKES";
 					}
 			})
-			.catch(() => console.error("Error: failed to fetch the set2fa route"));
+			.catch(() => console.error("Failed to fetch the set2fa route"));
 	});
 	struct.options.account.formSubmit.addEventListener("click", function(event) {
 		event.preventDefault();
 
 		const data = new FormData(struct.options.account.form);
 		const avatarImage = document.getElementsByClassName("change-avatar")[0].files[0];
-		const form = new FormData();
+		const avatarForm = new FormData();
+		const obj = {
+			lang: data.get("lang"),
+			username: data.get("options-username"),
+			email: data.get("options-email"),
+			passwordCurr: data.get("options-password-curr"),
+			passwordNew: data.get("options-password-new"),
+			twoFA: data.get("2fa")
+		};
 
-		form.append("file", avatarImage);
-		form.append("lang", data.get("lang"));
-		form.append("username", data.get("options-username"));
-		form.append("email", data.get("options-email"));
-		form.append("passwordCurr", data.get("options-password-curr"));
-		form.append("passwordNew", data.get("options-password-new"));
-		form.append("twoFA", data.get("2fa"));
-
-		const obj = {};
-		form.forEach(function(value, key) { obj[key] = value; });
+		avatarForm.append("file", avatarImage);
+		console.log("fetch /user/sendFile");
+		fetch("/user/sendFile/", { method: "POST", body: avatarForm, credentials: "include"})
+			.then(response => {
+				if (response.ok)
+					console.log("/user/sendFile OK; do nothing")
+				else
+					response.text().then(data => console.log("/user/sendFile NOT OK. data=", data));
+			})
+			.catch(() => console.error("Failed to fetch the sendFile route"));
 		console.log("fetch /user/updateUserInfos");
 		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => {
@@ -186,7 +194,7 @@ function	setupEventListeners(struct, data)
 					struct.options.account.error.innerHTML = "YIKES";
 				}
 			})
-			.catch(() => console.error("Error: failed to fetch the updateUserInfos route"));
+			.catch(() => console.error("Failed to fetch the updateUserInfos route"));
 	});
 	struct.options.blocked.button.addEventListener("click", function() { showTab(struct.options.blocked, struct.options.account) });
 	// Tabs Chat/Friend
@@ -264,7 +272,7 @@ function	replaceDatas(struct, data)
 					// Build Challenge
 					receiveInvitation(struct, data);
 				})
-				.catch(() => console.error("Error: failed to fetch the updateInfo route"));
+				.catch(() => console.error("Failed to fetch the updateInfo route"));
 		}, 3000);
 	}
 }
@@ -687,7 +695,7 @@ function	addFriend(struct, button, usernameInput)
 					.then(() => { struct.tabs.wrapperInputs.classList.remove("in-error"); });
 			}
 		})
-		.catch(() => console.error("Error: failed to fetch the addFriend route"));
+		.catch(() => console.error("Failed to fetch the addFriend route"));
 }
 
 function	deleteFriend(struct, button)
@@ -707,7 +715,7 @@ function	deleteFriend(struct, button)
 			response.text().then(data => console.log(data));
 		}
 	})
-	.catch(() => console.error("Error: failed to fetch the deleteFriend route"));
+	.catch(() => console.error("Failed to fetch the deleteFriend route"));
 }
 
 function	seeHistory(struct, button)
@@ -732,7 +740,7 @@ function	seeHistory(struct, button)
 			tr.appendChild(td);
 			struct.chat.output.appendChild(tr);
 		})
-		.catch(() => console.error("Error: failed to fetch the seeHistory route"));
+		.catch(() => console.error("Failed to fetch the seeHistory route"));
 }
 
 function	sendInvite(struct, button)
@@ -763,7 +771,7 @@ function	sendInvite(struct, button)
 			console.log("status=", response.status);
 			response.text().then(data => console.log(data));
 		})
-		.catch(() => console.error("Error: failed to fetch the sendInvitation route"));
+		.catch(() => console.error("Failed to fetch the sendInvitation route"));
 }
 
 function	blockUser(struct, button)
@@ -794,7 +802,7 @@ function	blockUser(struct, button)
 			console.log("status=", response.status);
 			response.text().then(data => console.log(data));
 		})
-		.catch(() => console.error("Error: failed to fetch the blockUser route"));
+		.catch(() => console.error("Failed to fetch the blockUser route"));
 }
 
 function	deleteBlocked(struct, button)
@@ -813,7 +821,7 @@ function	deleteBlocked(struct, button)
 				response.text().then(data => console.log(data));
 			}
 		})
-		.catch(() => console.error("Error: failed to fetch the deleteBlockedUser route"));
+		.catch(() => console.error("Failed to fetch the deleteBlockedUser route"));
 }
 
 /////////////////////////
@@ -842,7 +850,7 @@ function	liveChat(struct)
 	});
 	struct.chat.socket.addEventListener("message", function(event) {
 		const data = JSON.parse(event.data);
-		
+
 		if (data.type === "connected")
 		{
 			// if (data.user !== document.querySelector(".nav-user span"))
@@ -1010,7 +1018,7 @@ function	receiveInvitation(struct, data)
 						response.text().then(data => console.log(data));
 					}
 				})
-				.catch(() => console.error("Error: failed to fetch the acceptInvitation route"));
+				.catch(() => console.error("Failed to fetch the acceptInvitation route"));
 		});
 		span.innerHTML = data.challengeReceived.username[i];
 		p.appendChild(span);
@@ -1331,7 +1339,7 @@ async function waitMatchMaking(struct)
 							response.text().then(data => console.log(data));
 						}
 					})
-					.catch(() => console.error("Error: failed to fetch the matchMaking route"));
+					.catch(() => console.error("Failed to fetch the matchMaking route"));
 			}, 10000);
 		});
 	}

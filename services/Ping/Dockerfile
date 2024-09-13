@@ -2,9 +2,9 @@ FROM python:alpine3.19@sha256:17a0bb21c0b146f0de3b9b3c1e31b0b2394b16bc7c47ebdaf3
 
 WORKDIR /app
 
-#COPY requirements.txt ./
+COPY requirements.txt ./
 
-#RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY transcendance/ transcendance/
 

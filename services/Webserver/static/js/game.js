@@ -17,6 +17,7 @@ async function	run(data)
 		chat: getChatStruct(),
 		friend: getFriendStruct(),
 		blocked: getBlockedStruct(),
+		history: getHistoryStruct(),
 		translation: getTranslationStruct(),
 		guestMode: false,
 		run: 1
@@ -247,7 +248,7 @@ function	replaceDatas(struct, data)
 		inputs[0].value = data.username;
 		inputs[1].value = data.email;
 
-		const myInterval = setInterval(function() {
+		const myInterval = setInterval(() => {
 			if (struct.run === 0)
 				clearInterval(myInterval);
 			fetch("/user/updateInfo/", { method: "GET", credentials: "include"})
@@ -499,7 +500,7 @@ function	buildFriendlist(struct, data)
 		const button3 = createOptionButton(array[2], "hover-red", "removeFriend", i3);
 		button1.addEventListener("click", function() { seeHistory(struct, button1); });
 		button2.addEventListener("click", function() { sendInvite(struct, button2); });
-		button3.addEventListener("click", function() { deleteFriend(struct, button3); });
+		button3.addEventListener("click", function() { deleteFriend(button3); });
 		// Append
 		avatarWrapper.appendChild(img);
 		usernameWrapper.appendChild(username);
@@ -512,7 +513,7 @@ function	buildFriendlist(struct, data)
 		friendCard.appendChild(avatarWrapper);
 		friendCard.appendChild(friendUser);
 		td.appendChild(friendCard);
-		td.tabindex = "0";
+		td.tabIndex = "0";
 		tr.appendChild(td);
 		tr.setAttribute("data-user", data.friendList[i].username);
 		// Push
@@ -546,7 +547,7 @@ function	buildBlocklist(struct, data)
 		word = "Deblokkeren";
 	for (let i = 0; i < data.blockList.length; i++)
 	{
-		// Create Element
+		// Create elements
 		const tr = document.createElement("tr");
 		const td = document.createElement("td");
 		const blockedCard = document.createElement("div");
@@ -570,7 +571,7 @@ function	buildBlocklist(struct, data)
 		button.appendChild(icon);
 		button.appendChild(document.createTextNode("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t"));
 		button.appendChild(span);
-		button.addEventListener("click", function() { deleteBlocked(struct, button); });
+		button.addEventListener("click", function() { deleteBlocked(button); });
 		// Add classes
 		blockedCard.classList.add("blocked-card");
 		avatarWrapper.classList.add("blocked-user-avatar");
@@ -582,6 +583,7 @@ function	buildBlocklist(struct, data)
 		blockedCard.appendChild(avatarWrapper);
 		blockedCard.appendChild(blockedUser);
 		td.append(blockedCard);
+		td.tabIndex = "0";
 		tr.append(td);
 		tr.setAttribute("data-user", data.blockList[i].username);
 		array.push(tr);
@@ -589,6 +591,60 @@ function	buildBlocklist(struct, data)
 	alphabeticalSort(array);
 	for (let i = 0; i < array.length; i++)
 		struct.blocked.output.appendChild(array[i]);
+}
+
+function	buildHistory(struct, data, username)
+{
+	/*struct.history.username.innerHTML = username;
+	while (struct.history.output.firstChild)
+		struct.history.output.firstChild.remove();
+	for (let i = 0; i < data.matches.length; i++)
+	{
+		// Create elements
+		const tr = document.createElement("tr");
+		const td = document.createElement("td");
+		const historyCard = document.createElement("div");
+		const historyCardGame = document.createElement("div");
+		const historyCardText = document.createElement("div");
+		const username1 = document.createElement("span");
+		const score1 = document.createElement("span");
+		const bar = document.createElement("div");
+		const username2 = document.createElement("span");
+		const score2 = document.createElement("span");
+		const date = document.createElement("span");
+		// Bools
+		let status = "history-card-win";
+		let game = "history-card-pong";
+		if (data.matches[i].winner !== username)
+			status = "history-card-lose";
+		if (data.matches[i].game !== "pong")
+			status = "history-card-tetris";
+		// Datas
+		username1.innerHTML = data.username1;
+		score1.innerHTML = data.score1;
+		username2.innerHTML = data.username2;
+		score2.innerHTML = data.score2;
+		date.innerHTML = data.date;
+		// Add classes
+		historyCard.classList.add("history-card", status);
+		historyCardGame.classList.add("history-card-game", game);
+		historyCardText.classList.add("history-card-text");
+		bar.classList.add("bar");
+		date.classList.add("history-card-date");
+		// Append
+		historyCardText.appendChild(username1);
+		historyCardText.appendChild(score1);
+		historyCardText.appendChild(bar);
+		historyCardText.appendChild(username2);
+		historyCardText.appendChild(score2);
+		historyCard.appendChild(historyCardGame);
+		historyCard.appendChild(historyCardText);
+		historyCard.appendChild(date);
+		td.appendChild(historyCard);
+		td.tabIndex = "0";
+		tr.appendChild(td);
+		struct.history.output.appendChild(tr);
+	}*/
 }
 
 async function	setGuestRestrictions(struct)
@@ -679,6 +735,7 @@ function	addFriend(struct, button, usernameInput)
 			if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
 				isScrolled = true;
 			td.appendChild(p);
+			td.tabIndex = "0";
 			tr.appendChild(td);
 			struct.chat.output.appendChild(tr);
 			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
@@ -693,9 +750,8 @@ function	addFriend(struct, button, usernameInput)
 		.catch(() => console.error("Failed to fetch the addFriend route"));
 }
 
-function	deleteFriend(struct, button)
+function	deleteFriend(button)
 {
-	// !!!!!!!!!!!!!!!!!!!!!
 	const username = button.parentElement.parentElement.querySelector("span").innerHTML;
 	const obj = { unfriend: username };
 
@@ -717,38 +773,39 @@ function	seeHistory(struct, button, own)
 {
 	let username;
 
-	if (own === undefined)
-		username = button.parentElement.parentElement.querySelector("span").innerHTML;
-	else
+	if (own !== undefined)
 		username = own;
+	else
+		username = button.parentElement.parentElement.querySelector("span").innerHTML;
 	console.log("Username=", username);
 	const obj = { seeHistory: username };
 
 	fetch("/user/seeHistory/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 		.then(response => {
-			const tr = document.createElement("tr");
-			const td = document.createElement("td");
-			const p = document.createElement("p");
-
-			p.classList.add("chat-announcement");
 			if (response.ok)
 			{
 				console.log("/user/seeHistory OK; display history over chat.")
-				p.innerHTML = "see history user";
 				resetPhoneClasses(struct, struct.cards.chat);
 				struct.tabs.wrapperTabs.classList.add("hidden");
 				struct.tabs.wrapperInputs.classList.add("zindex");
 				struct.history.wrapper.classList.remove("zindex", "hidden");
+				response.json().then(data => buildHistory(struct, data, username));
 			}
 			else
 			{
+				const tr = document.createElement("tr");
+				const td = document.createElement("td");
+				const p = document.createElement("p");
+	
 				console.log("/user/seeHistory NOT OK; do nothing.");
 				response.text().then(data => console.log(data));
+				p.classList.add("chat-announcement");
 				p.innerHTML = "Failed to see history of user";
+				td.appendChild(p);
+				td.tabIndex = "0";
+				tr.appendChild(td);
+				struct.chat.output.appendChild(tr);
 			}
-			td.appendChild(p);
-			tr.appendChild(td);
-			struct.chat.output.appendChild(tr);
 		})
 		.catch(() => console.error("Failed to fetch the seeHistory route"));
 }
@@ -774,6 +831,7 @@ function	sendInvite(struct, button)
 			if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
 				isScrolled = true;
 			td.appendChild(p);
+			td.tabIndex = "0";
 			tr.appendChild(td);
 			struct.chat.output.appendChild(tr);
 			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
@@ -805,6 +863,7 @@ function	blockUser(struct, button)
 			if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
 				isScrolled = true;
 			td.appendChild(p);
+			td.tabIndex = "0";
 			tr.appendChild(td);
 			struct.chat.output.appendChild(tr);
 			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
@@ -815,7 +874,7 @@ function	blockUser(struct, button)
 		.catch(() => console.error("Failed to fetch the blockUser route"));
 }
 
-function	deleteBlocked(struct, button)
+function	deleteBlocked(button)
 {
 	const username = button.parentElement.querySelector("span").innerHTML;
 	const obj = { unblock: username };
@@ -823,10 +882,10 @@ function	deleteBlocked(struct, button)
 	fetch("/user/deleteBlockedUser/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 		.then(response => {
 			if (response.ok)
-				console.log("deleteFriend OK");
+				console.log("deleteBlocked OK");
 			else
 			{
-				console.log("deleteFriend NOT OK");
+				console.log("deleteBlocked NOT OK");
 				console.log("status=", response.status);
 				response.text().then(data => console.log(data));
 			}
@@ -871,6 +930,7 @@ function	liveChat(struct)
 	
 			// 	p.classList.add("chat-announcement");
 			// 	td.appendChild(p);
+			// 	td.tabIndex = "0";
 			// 	tr.appendChild(td);
 			// 	struct.chat.output.appendChild(tr);
 			// }
@@ -979,28 +1039,40 @@ function	createChatMessage(struct, data)
 
 function	receiveInvitation(struct, data)
 {
+	let accept;
 	let sentence;
 	let isScrolled = false;
 
+	// Lang
 	if (struct.options.lang.curr === "FR")
+	{
 		sentence = " vous a inviter pour un Pong";
+		accept = "Accepter";
+	}
 	else if (struct.options.lang.curr === "EN")
+	{
 		sentence = " invited you to a Pong";
+		accept = "Accept";
+	}
 	else if (struct.options.lang.curr === "NL")
+	{
 		sentence = " je uitgenodigd voor een Pong";
+		accept = "Accepteren";
+	}
 	if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
 		isScrolled = true;
 	for (let i = 0; i < data.challengeReceived.username.length; i++)
 	{
+		// Create elements
 		const tr = document.createElement("tr");
 		const td = document.createElement("td");
 		const p = document.createElement("p");
 		const span = document.createElement("span");
 		const text = document.createTextNode(sentence);
 		const icon = document.createElement("i");
-
+		// Set button
 		icon.classList.add("fa-solid", "fa-exclamation");
-		const button = createOptionButton("Accepter", "", "", icon);
+		const button = createOptionButton(accept, "", "", icon);
 		button.addEventListener("click", function() {
 			const obj = {
 				username1: struct.username.innerHTML,
@@ -1031,11 +1103,13 @@ function	receiveInvitation(struct, data)
 				.catch(() => console.error("Failed to fetch the acceptInvitation route"));
 		});
 		span.innerHTML = data.challengeReceived.username[i];
+		// Append
 		p.appendChild(span);
 		p.appendChild(text);
 		p.classList.add("chat-announcement");
 		td.appendChild(p);
 		td.appendChild(button);
+		td.tabIndex = "0";
 		tr.appendChild(td);
 		struct.chat.output.appendChild(tr);
 	}
@@ -1177,7 +1251,9 @@ function	getHistoryStruct()
 {
 	const struct = {
 		wrapper: document.getElementsByClassName("wrapper-history")[0],
-		leaveButton: document.querySelector(".wrapper-history button")
+		leaveButton: document.querySelector(".wrapper-history button"),
+		username: document.querySelector(".wrapper-history h3"),
+		output: document.querySelector(".tab-history tbody")
 	};
 	return (struct);
 }

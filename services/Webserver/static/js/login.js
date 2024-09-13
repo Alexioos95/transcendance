@@ -53,13 +53,13 @@ function	login(prevData)
 		}
 		const myInterval = setInterval(() => {
 			console.log("fetch /user/checkAuth42");
-			fetch("/user/checkAuth42/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			fetch("/user/checkAuth42/", { method: "GET", credentials: "include"})
 				.then(response => {
 					if (response.ok)
 					{
 						console.log("response /user/checkAuth42 OK; Navigate to game")
 						clearInterval(myInterval);
-						return (navigate("game", { guestMode: "false", lang: struct.langSelect.value }, { signUp: "false", lang: struct.langSelect.value }));
+						return (response.json().then(data => navigate("game", data, { signUp: "false", lang: struct.langSelect.value })));
 					}
 					else
 					{

@@ -24,6 +24,8 @@ import random
 # response = requests.post('http://localhost:8001/sendMail/', json=mailData)#mettre la route dans l'env ou set la route definitive dans le build final?
 # print(response.status_code)
 
+# penser a check pasword size + check ancien password pour changement
+
 class customException(Exception):
     def __init__(self, data, code):
         self.data = data
@@ -645,17 +647,45 @@ def updateInfo(request):
     challenge = cache.get('pendingChallenge', {})
     receivedChallenge = []
     if user.id in challenge:
-        reveicedChallenge = challenge[user.id]
+        print('coucou', file=sys.stderr)
+        receivedChallenge = challenge[user.id]
     print(f'liste des challenge en attente: {challenge}', file=sys.stderr)
     print(f'challenge en attente de l user: {user.Username} son id: {user.id} et ses challenges en attentes sont: {receivedChallenge}', file=sys.stderr)
     challengerArray = []
-    for challanger in receivedChallenge:
-        user = get_user_in_db('id', challanger)
-        if user is None:
+    for i, challanger in enumerate(receivedChallenge):
+        print(f'challenger: {challanger}', file=sys.stderr)
+        loopUser = get_user_in_db('id', challanger[0])
+        if loopUser is None:
             print('no user found', file=sys.stderr)
         else:
-            print(f'challenger en attente de l user: {user.Username} ', file=sys.stderr)
-            challengerArray.append(user.Username)
+            if challanger[2] == False:
+                print(f'challenger en attente de l user: {loopUser} ', file=sys.stderr)
+                receivedChallenge[i] = (challanger[0], challanger[1], True)
+                challengerArray.append(challanger[1])
+
+    print(f'reveived challange apres la boucle : {receivedChallenge}', file=sys.stderr)
+    print(f'challange apres la boucle : {challenge}', file=sys.stderr)
+    cache.delete('pendingChallenge')
+    cache.set('pendingChallenge', challenge, 7200)
+
+    # challenge = cache.get('pendingChallenge', {})
+    # received_challenge = []
+
+    # if user.id in challenge:
+    #     print('coucou', file=sys.stderr)
+    #     received_challenge = challenge[user.id]
+
+    # print(f'Liste des challenges en attente: {challenge}', file=sys.stderr)
+    # print(f'Challenges en attente de l\'utilisateur {user.Username} (ID: {user.id}) et ses challenges en attentes sont: {received_challenge}', file=sys.stderr)
+    # challenger_array = []
+
+    # for challenger_id in received_challenge:
+    #     user = get_user_in_db(challenger_id)
+    #     if user is None:
+    #         print(f'Aucun utilisateur trouvé pour l\'ID {challenger_id}', file=sys.stderr)
+    #     else:
+    #         print(f'Utilisateur en attente de {user.Username} (ID: {user.id})', file=sys.stderr)
+    #     challenger_array.append(user.Username)
     usernameChallenge = ''
     print(f'challenger array == {challengerArray}', file=sys.stderr)
     objectPing = {
@@ -673,7 +703,6 @@ def updateInfo(request):
 
 @csrf_exempt
 def sendInvitation(request):
-    print("i am here", file=sys.stderr)
     # tjs valide sauf bidouille verifier l'user
     #ajouter dans le cache {pendingChallenge:{challanged: challenger}}
     authCoockie = checkCookie(request, 'auth')
@@ -698,7 +727,7 @@ def sendInvitation(request):
     challenge = cache.get('pendingChallenge', {})
     if challengedUser.id not in challenge:
         challenge[challengedUser.id] = []
-    challenge[challengedUser.id].append(usernameId)
+    challenge[challengedUser.id].append((usernameId, dbUser.Username, False))
     cache.set('pendingChallenge', challenge, 7200)
     print(f'ceci est la liste des challenges en cours!: {challenge}', file=sys.stderr)
     return JsonResponse({}, status=200)
@@ -709,17 +738,20 @@ def sendInvitation(request):
 
 @csrf_exempt
 def acceptInvitation(request):
-    print("i am not here", file=sys.stderr)
     #fail si une partie est adctuellement en cours pour le joueur defie ou pour l'user qui accepte
+    # get le joueur en bdd
+    # je le cherche dans le cache a la ligne de l'user de cette requete si je trouve je compare les id si id pas correspondant ou que le joueur n'a pas ete initiallement identifie
+    # refaire une requete bdd sur l'id pour avoir le joueur rellement a l'origine de la requete si joueur non identifiable retourner 403 une fois joueur identifie continuer
     #ajouter dans le cache {accecptedChallenge:{challanger: challenged}}
     
-    # verifier si l'user est en train de jouer
+    # verifier si l'user est en train de jouer en appelant la route http://os.environ['DUMP']/pong/playerPLaying, POST? utiliser 2 code de retour pour true false 200/418
     userIsPlaying = False
-    # verifier si une partie existe pour le challenger deja
+    # verifier si deja une partie existe pour le challenger 
     challengerIsPlaying = False
     if userIsPlaying is True or challengerIsPlaying is True:
         return JsonResponse({"error": "You or the challenger player is currently playing. Try again later."}, status=200)
     # creer la partie en bdd
+    # remove des partiePending + ajouter dans les parties acceptee cle challenger value chlange player user de cette requete
     return JsonResponse({}, status=200)
 
 @csrf_exempt

@@ -1039,17 +1039,15 @@ function	createChatMessage(struct, data)
 
 function	receiveInvitation(struct, data)
 {
-	let accept;
-	let sentence;
+	if (data.challengeReceived.username === undefined || data.challengeReceived.username.length === 0)
+		return ;
+
+	let accept = "Accepter";
+	let sentence = " vous a inviter pour un Pong";
 	let isScrolled = false;
 
 	// Lang
-	if (struct.options.lang.curr === "FR")
-	{
-		sentence = " vous a inviter pour un Pong";
-		accept = "Accepter";
-	}
-	else if (struct.options.lang.curr === "EN")
+	if (struct.options.lang.curr === "EN")
 	{
 		sentence = " invited you to a Pong";
 		accept = "Accept";
@@ -1070,9 +1068,13 @@ function	receiveInvitation(struct, data)
 		const span = document.createElement("span");
 		const text = document.createTextNode(sentence);
 		const icon = document.createElement("i");
+		const button = document.createElement("button");
 		// Set button
 		icon.classList.add("fa-solid", "fa-exclamation");
-		const button = createOptionButton(accept, "", "", icon);
+		button.type = "button";
+		button.title = accept;
+		button.ariaLabel = accept;
+		button.appendChild(icon);
 		button.addEventListener("click", function() {
 			const obj = {
 				username1: struct.username.innerHTML,
@@ -1116,6 +1118,7 @@ function	receiveInvitation(struct, data)
 	if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
 		struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
 }
+
 //////////////////
 // Get(?)Struct
 //////////////////

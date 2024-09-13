@@ -1076,10 +1076,7 @@ function	receiveInvitation(struct, data)
 		button.ariaLabel = accept;
 		button.appendChild(icon);
 		button.addEventListener("click", function() {
-			const obj = {
-				username1: struct.username.innerHTML,
-				username2: button.parentElement.querySelector("p span").innerHTML
-			};
+			const obj = { username: button.parentElement.querySelector("p span").innerHTML };
 
 			console.log("fetch /user/acceptInvitation");
 			fetch("/user/acceptInvitation/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})

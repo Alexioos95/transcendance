@@ -35,6 +35,7 @@ function	initPongStruct(game, wrapperCanvas)
 	{
 		game.paddles = getPaddles(game.canvas);
 		game.ball = getBall(game.canvas);
+		game.scores = [0, 0];
 	}
 	else
 	{

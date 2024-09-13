@@ -248,7 +248,7 @@ function	replaceDatas(struct, data)
 		inputs[0].value = data.username;
 		inputs[1].value = data.email;
 
-		const myInterval = setInterval(function() {
+		const myInterval = setInterval(() => {
 			if (struct.run === 0)
 				clearInterval(myInterval);
 			fetch("/user/updateInfo/", { method: "GET", credentials: "include"})

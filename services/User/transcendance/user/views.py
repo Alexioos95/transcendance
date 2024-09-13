@@ -45,8 +45,8 @@ class customException(Exception):
 def setCookie(user, response):
     expirationTime = 1209600
     encoded_jwt = jwt.encode({
-        "userName": user['username'],
-        "id": user['id'],
+        "userName": user.Username,
+        "id": user.id,
         "expirationDate": time.time() + expirationTime
     }, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")
     response.set_cookie(
@@ -182,7 +182,7 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
     response_data = JsonResponse({"2fa": 'False',  "email": userData['email'], "guestMode":"false", "username":new_user.Username, "avatar": '/images/default_avatar.png' , "lang": new_user.language}, status=201)
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes
     encoded_jwt = jwt.encode({"userName": userData['username'], "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
-    setCookie(userData, response_data) ### TEST THIS OUT ###
+    setCookie(new_user, response_data) ### TEST THIS OUT ###
 #    response_data.set_cookie(
 #        'auth',
 #        encoded_jwt,
@@ -647,13 +647,17 @@ def updateInfo(request):
     if user.id in challenge:
         reveicedChallenge = challenge[user.id]
     print(f'liste des challenge en attente: {challenge}', file=sys.stderr)
-    print(f'challenge en attente de l user: {user.Username} et ses challenges en attentes sont: {receivedChallenge}', file=sys.stderr)
+    print(f'challenge en attente de l user: {user.Username} son id: {user.id} et ses challenges en attentes sont: {receivedChallenge}', file=sys.stderr)
     challengerArray = []
     for challanger in receivedChallenge:
         user = get_user_in_db('id', challanger)
-        print(f'challenger en attente de l user: {user.Username} ', file=sys.stderr)
-        challengerArray.append(user.Username)
+        if user is None:
+            print('no user found', file=sys.stderr)
+        else:
+            print(f'challenger en attente de l user: {user.Username} ', file=sys.stderr)
+            challengerArray.append(user.Username)
     usernameChallenge = ''
+    print(f'challenger array == {challengerArray}', file=sys.stderr)
     objectPing = {
         "username": user.Username,
         "avatar": user.Avatar,

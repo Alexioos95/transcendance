@@ -42,6 +42,35 @@ function	login(prevData)
 		cancelSignUp(struct);
 		window.history.pushState({ state: "login", lang: struct.langSelect.value }, "", "");
 	});
+	struct.formButton.fortyTwoConnection.addEventListener("click", function() {
+		const url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9&redirect_uri=http%3A%2F%2F" + window.location.hostname + "%3A4433%2Fauth42&response_type=code";
+		const popUp = window.open(url);
+
+		if (!popUp)
+		{
+			console.error("Couldn't open pop-up's connection to 42Intra.");
+			return ;
+		}
+		const myInterval = setInterval(() => {
+			console.log("fetch /user/checkAuth42");
+			fetch("/user/checkAuth42/", { method: "GET", credentials: "include"})
+				.then(response => {
+					if (response.ok)
+					{
+						console.log("response /user/checkAuth42 OK; Navigate to game")
+						clearInterval(myInterval);
+						return (response.json().then(data => navigate("game", data, { signUp: "false", lang: struct.langSelect.value })));
+					}
+					else
+					{
+						console.log("response /user/checkAuth42 NOT OK; Wait 2s");
+						console.log(response.status);
+						response.text().then(data => console.log(data));
+					}
+				})
+				.catch(() => console.error("Failed to fetch the checkAuth42 route"));
+		}, 2000)
+	});
 	struct.guestConnection.addEventListener("click", function() {
 		navigate("game", { guestMode: "true", lang: struct.langSelect.value }, { signUp: "false", lang: struct.langSelect.value });
 		window.history.pushState({ state: "guestMode", lang: struct.langSelect.value }, "", "");
@@ -394,7 +423,7 @@ function	getLoginStruct()
 		connection: document.getElementsByClassName("submit")[0],
 		forgotPassword: document.getElementsByClassName("forgot-password")[0],
 		signUp: document.getElementsByClassName("signup")[0],
-		cancelSignUp: document.getElementsByClassName("cancel-signup")[0],
+		cancelSignUp: document.getElementsByClassName("cancel-signup")[0]
 	};
 	const translateStruct = {
 		text: document.getElementsByClassName("translate-text"),
@@ -410,6 +439,7 @@ function	getLoginStruct()
 		formInput: inputStruct,
 		formButton: buttonStruct,
 		wrapperSpecialLogin: document.getElementsByClassName("special-login")[0],
+		fortyTwoConnection: document.getElementsByClassName("login-42")[0],
 		guestConnection: document.getElementsByClassName("special-login-guest")[0],
 		langSelect: document.getElementsByTagName("select")[0],
 		translate: translateStruct,

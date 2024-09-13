@@ -35,6 +35,8 @@ def initGame(request):
     
     return JsonResponse({'status': 'Game created successfully'}, status=201)
 	
+@csrf_exempt
+@require_http_methods(["POST"])
 def getPlayerGames(request):
 	try:
 		data = json.loads(request.body)
@@ -43,7 +45,7 @@ def getPlayerGames(request):
 	
 	user = data['username']
 
-	query = Game.objects.filter(Player1 == user).values() | Game.objects.filter(Player2 == user).values()   # What if no occurence in db ?
+	query = Game.objects.filter(Player1 == user) | Game.objects.filter(Player2 == user)   # What if no occurence in db ?
 	print(f'query: {query}', file=sys.stderr)
 	response = []
 	for x in query:
@@ -52,6 +54,8 @@ def getPlayerGames(request):
 
 	return JsonResponse({'data': response}, status=200)
 
+@csrf_exempt
+@require_http_methods(["POST"])
 def PlayerPlaying(requet):
 	try:
 		data = json.loads(request.body)
@@ -60,17 +64,19 @@ def PlayerPlaying(requet):
 
 	user = data['username']
 
-	query = Game.objects.filter(Player1 == user, gameEnde == False).values() | Game.objects.filter(Player2 == user, gameEnde == False).values()   # What if no occurence in db ?
+	query = Game.objects.filter(Player1 == user, gameEnde == False) | Game.objects.filter(Player2 == user, gameEnde == False)   # What if no occurence in db ? # Should only return 1 occurence
 	print(f'query: {query}', file=sys.stderr)
-	response = []
-	for x in query:
+	for x in query: # To debug print
 		print(f'x: {x.values()}', file=sys.stderr)
-		response.append(x.values())
 
-	return JsonResponse({'data': response}, status=200)
+	if not query:
+		return HttpResponse(status=418)
+	return HttpResponse(status=200)
 
-def index(request):
+def index(request):	# A virer ?
     return render(request, 'index.html')
 
+@csrf_exempt
+@require_http_methods(["GET"])
 def ping(request):
     return HttpResponse(status=204)

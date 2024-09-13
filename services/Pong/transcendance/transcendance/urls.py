@@ -21,6 +21,8 @@ from pong import views as pongView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('initGame/', pongView.initGame),
+    path('PlayerPlaying/', pongView.PlayerPlaying),
+    path('getPlayerGames/', pongView.getPlayerGames),
     path('', pongView.index),
-    path('ping', pongView.ping),
+    path('ping/', pongView.ping),
     ]

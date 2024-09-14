@@ -316,6 +316,7 @@ function	replaceDatas(struct, data)
 					buildFriendlist(struct, data);
 					buildBlocklist(struct, data);
 					receiveInvitation(struct, data);
+					acceptInvitation(struct, data);
 				})
 				.catch(() => console.error("Failed to fetch the updateInfo route"));
 		}, 3000);
@@ -1145,6 +1146,20 @@ function	receiveInvitation(struct, data)
 	}
 	if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
 		struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
+}
+
+function	acceptInvitation(struct, data)
+{
+	if (data.challengeAccepted.username === "")
+		return ;
+	if (struct.screen.game !== undefined)
+		struct.screen.game.running = 0;
+	coinAnimation(struct)
+		.then(() => {
+			struct.screen.game = getPongStruct();
+			struct.screen.game.online = true;
+			struct.screen.game.run(struct);
+		});
 }
 
 //////////////////

@@ -411,10 +411,18 @@ def checkAuth42(request):
         return HttpResponse(status=405)
     return response
 
-def save_file(uploaded_file):
+def save_file(uploaded_file, mime_type):
     upload_dir = '/images'
     file_name = generate_code()
     file_path = os.path.join(upload_dir, file_name)
+    extensionDict = {
+            'image/jpeg': 'jpeg',
+            'image/png': 'png',
+            'image/svg+xml': 'svg',
+            'image/webp': 'webp'
+    }
+    extension = extensionDict[mime_type]
+    file_path = '.'.join((file_path, extension))
     print(f"path image == {file_path}", file=sys.stderr)
     with open(file_path, 'wb+') as destination:
         for chunk in uploaded_file.chunks():
@@ -423,19 +431,22 @@ def save_file(uploaded_file):
 
 
 def image_validation(request):
-    if 'image' in request.FILES:
-        uploaded_file = request.FILES['image']
+    print(f'=== request.FILE: {request.FILES}', file=sys.stderr)
+    if 'file' in request.FILES:
+        print(f"=== request.FILE['file']: {request.FILES['file']}", file=sys.stderr)
+        uploaded_file = request.FILES['file']
         mime_type = uploaded_file.content_type
+        print(f'image mime type: {mime_type}', file=sys.stderr)
         accepted_mime_types = [
             'image/jpeg',   # JPEG
             'image/png',    # PNG
             'image/svg+xml', # SVG
             'image/webp'    # WebP
         ]
-    if mime_type in accepted_mime_types:
-        return save_file(uploaded_file)
-    else:
-        raise customException("Invalid image format", 200)
+        if mime_type in accepted_mime_types:
+            return save_file(uploaded_file, mime_type)
+        else:
+            raise customException("Invalid image format", 200)
 
 # def is_valid_choice(value, model_class):
 #     try:
@@ -487,7 +498,7 @@ def updateUserInfos(request):
     # data = json.loads(request.body.decode('utf-8'))#try catch
 
     # avatar = data['avatar']
-    print(f'Avatar update user info: {avatar}', file=sys.stderr)
+    #print(f'Avatar update user info: {avatar}', file=sys.stderr)
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
@@ -538,14 +549,14 @@ def updateUserInfos(request):
         except Exception as e:
             print(f"error == {e}", file=sys.stderr)
             return JsonResponse({"error":e}, status=200)
-    if 'avatar' in data and data['avatar']:#on recoit une image je l'enregistre dans le volume et stock l'url
-        # image_validation()
-        print(f'ceci est un fichier ! {request.FILES}',file=sys.stderr)
-        print(f'avant la boucle',file=sys.stderr)
-        for key, value in request.FILES.items():
-            print(f"cle: {key}, Valoeur {value}")
-        print(f'apres la boucle',file=sys.stderr)
-        user.Avatar = data['avatar']
+#    if 'avatar' in data and data['avatar']:#on recoit une image je l'enregistre dans le volume et stock l'url
+#        # image_validation()
+#        print(f'ceci est un fichier ! {request.FILES}',file=sys.stderr)
+#        print(f'avant la boucle',file=sys.stderr)
+#        for key, value in request.FILES.items():
+#            print(f"cle: {key}, Valoeur {value}")
+#        print(f'apres la boucle',file=sys.stderr)
+#        user.Avatar = data['avatar']
     if 'lang' in data and data['lang']:
         print("je passe par les langues 1", file=sys.stderr)
         if is_valid_choice(data['lang'], User.language):
@@ -968,6 +979,36 @@ def matchMaking(request):
 @require_http_methods(["GET"])
 def ping(request):
     return HttpResponse(status=204)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def sendFile(request):
+    auth = checkCookie(request, 'auth')
+    if auth is None:
+        return JsonResponse({'error': 'User not connected'}, status=403)
+    print(f'le cookie est {auth}', file=sys.stderr)
+    user = ""
+    try:
+        user = decodeJwt(auth)
+        if user is None:
+            return JsonResponse({'error': 'User does not exist'}, status=403)
+    except customException as e:
+        return JsonResponse({"error": e.data}, status=e.code)
+    oldAvatar = user.Avatar
+    try:
+        imagePath = image_validation(request)
+        try:
+            user.Avatar = imagePath
+            user.save()
+        except Exception:
+            return JsonResponse({'error': "Can't save in database"}, status=500)
+    except Exception:
+        return JsonResponse({'error': "Invalid image format"}, status=200)
+    if oldAvatar:
+        os.remove(oldAvatar)
+    return HttpResponse(status=200)
+
+
 
 @csrf_exempt
 @require_http_methods(["POST"])

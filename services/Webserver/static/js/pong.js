@@ -48,8 +48,8 @@ function	initPongStruct(struct, game, wrapperCanvas)
 			const ball = getPixels(game.canvas, data.ball.x, data.ball.y);
 			const obj = { key: undefined };
 
-			// struct.screen.playerOnControls[0].innerHTML = data.playerLeft;
-			// struct.screen.playerOnControls[1].innerHTML = data.playerRight;
+			struct.screen.playerOnControls[0].innerHTML = data.paddleLeft_name;
+			struct.screen.playerOnControls[1].innerHTML = data.paddleRight_name;
 			game.paddles.left.x = paddleLeft[0];
 			game.paddles.left.y = paddleLeft[1];
 			game.paddles.right.x = paddleRight[0];

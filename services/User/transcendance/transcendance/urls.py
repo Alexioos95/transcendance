@@ -60,7 +60,7 @@ urlpatterns = [
     #GET
     path('user/updateInfo/', views.updateInfo), #requete a effetuer regulierement (1s?) afin de recevoir les defis/acceptation de defi liste d'ami avec leur date de connection liste de bloque a jour {defi:"nom du jeu si defi accepte ping la route du jeu sinon vide", friendList:[], blockedList:[]}
     path('user/sendInvitation/', views.sendInvitation),
-    path('user/acceptInvitation/', views.sendInvitation),
+    path('user/acceptInvitation/', views.acceptInvitation),
     #GET
     path('user/ping/', views.ping), #renvoi 204 si ok sinon vtf
 

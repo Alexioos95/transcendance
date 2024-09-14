@@ -613,8 +613,8 @@ def updateInfo(request):
         return JsonResponse({'error': 'Unauthorized request'}, status=403)
     user = ""
     try:
-        userName = decodeJwt(auth)
-        user = get_user_in_db('Username', userName)
+        user = decodeJwt(auth)
+        # user = get_user_in_db('Username', userName)
     except customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
@@ -647,10 +647,9 @@ def updateInfo(request):
     challenge = cache.get('pendingChallenge', {})
     receivedChallenge = []
     if user.id in challenge:
-        print('coucou', file=sys.stderr)
         receivedChallenge = challenge[user.id]
-    print(f'liste des challenge en attente: {challenge}', file=sys.stderr)
-    print(f'challenge en attente de l user: {user.Username} son id: {user.id} et ses challenges en attentes sont: {receivedChallenge}', file=sys.stderr)
+    # print(f'liste des challenge en attente: {challenge}', file=sys.stderr)
+    # print(f'challenge en attente de l user: {user.Username} son id: {user.id} et ses challenges en attentes sont: {receivedChallenge}', file=sys.stderr)
     challengerArray = []
     for i, challanger in enumerate(receivedChallenge):
         print(f'challenger: {challanger}', file=sys.stderr)
@@ -663,11 +662,23 @@ def updateInfo(request):
                 receivedChallenge[i] = (challanger[0], challanger[1], True)
                 challengerArray.append(challanger[1])
 
-    print(f'reveived challange apres la boucle : {receivedChallenge}', file=sys.stderr)
-    print(f'challange apres la boucle : {challenge}', file=sys.stderr)
+    # print(f'reveived challange apres la boucle : {receivedChallenge}', file=sys.stderr)
+    # print(f'challange apres la boucle : {challenge}', file=sys.stderr)
     cache.delete('pendingChallenge')
     cache.set('pendingChallenge', challenge, 7200)
+    acceptedChallenge = cache.get('accecptedChallenge', {})
+    if user.id in acceptedChallenge:
+        accepted = acceptedChallenge[user.id]
+        cache.delete('accecptedChallenge')
+        del acceptedChallenge[user.id]
+        cache.set('accecptedChallenge', challenge, 7200)
 
+    accepted = cache.get(f'accecptedChallenge{user.Username}', "")#id plus tard
+    # adv = get_user_in_db('id', accepted)
+    print(f'accepted = {accepted}',file=sys.stderr)
+    cache.delete(f'accecptedChallenge{user.Username}')#id plus tard
+    # accepted = adv.Username
+#  cache.set(f'accecptedChallenge{data['username'].id}', user.id, 60)
     # challenge = cache.get('pendingChallenge', {})
     # received_challenge = []
 
@@ -686,8 +697,7 @@ def updateInfo(request):
     #     else:
     #         print(f'Utilisateur en attente de {user.Username} (ID: {user.id})', file=sys.stderr)
     #     challenger_array.append(user.Username)
-    usernameChallenge = ''
-    print(f'challenger array == {challengerArray}', file=sys.stderr)
+    # print(f'challenger array == {challengerArray}', file=sys.stderr)
     objectPing = {
         "username": user.Username,
         "avatar": user.Avatar,
@@ -695,7 +705,7 @@ def updateInfo(request):
         'friendList': friendObject,
         'blockList': foeObject,
         'challengeReceived': {'game': 'pong', 'username': challengerArray},#empecher de se defier soi meme ca serait une bonne idee
-        'challengeAccepted': {'game': 'pong', 'username': usernameChallenge}
+        'challengeAccepted': {'game': 'pong', 'username': accepted}
     }
 
     print(f'object: {json.dumps(objectPing)}', file=sys.stderr)
@@ -705,10 +715,13 @@ def updateInfo(request):
 def sendInvitation(request):
     # tjs valide sauf bidouille verifier l'user
     #ajouter dans le cache {pendingChallenge:{challanged: challenger}}
-    authCoockie = checkCookie(request, 'auth')
+    auth = checkCookie(request, 'auth')
+    if auth is None:
+        print('coockie missing')
+        return HttpResponse(status=403)
     dbUser = {}
     try:
-        dbUser = decodeJwt(authCoockie)#bdd
+        dbUser = decodeJwt(auth)#bdd
     except customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
     if dbUser is None:
@@ -745,11 +758,52 @@ def acceptInvitation(request):
     #ajouter dans le cache {accecptedChallenge:{challanger: challenged}}
     
     # verifier si l'user est en train de jouer en appelant la route http://os.environ['DUMP']/pong/playerPLaying, POST? utiliser 2 code de retour pour true false 200/418
+    auth = checkCookie(request, 'auth')
+    if auth is None:
+        print('coockie missing')
+        return HttpResponse(status=403)
+    user = {}
+    try:
+        user = decodeJwt(auth)
+    except customException as e:
+        return JsonResponse({"error": e.data}, status=e.code)
+    if user is None:
+        return JsonResponse({"error": "user does not exist"}, status=403)
+    data = {}
+    print(f'acceptInvitation: {request.body}', file=sys.stderr)
+    try:
+        data = json.loads(request.body)
+    except Exception:
+        return JsonResponse({"error": "invalid Json"}, status=403)
+    # print(f'acceptInvitation: data == {data}', file=sys.stderr)
+    # challanger = get_user_in_db(data['username'])
+    # cache.get('pendingChallenge', {}) verifier info pas erronee et trouerl e bon joueur
     userIsPlaying = False
-    # verifier si deja une partie existe pour le challenger 
     challengerIsPlaying = False
+    # print(f'envoi requete for PlayerPlaying ', file=sys.stderr)
+    response = requests.post('http://pong:8004/PlayerPlaying/', {"username":user.Username})
+    if response.status_code == 200:
+        userIsPlaying = True
+    response = requests.post('http://pong:8004/PlayerPlaying/', {"username":data['username']})
+    if response.status_code == 200:
+        challengerIsPlaying = True
+    # print(f'acceptInvitation: response for PlayerPlaying == {response.status_code}', file=sys.stderr)
+    # print(f'acceptInvitation: body for PlayerPlaying == {response.text}', file=sys.stderr)
+
+    # verifier si deja une partie existe pour le challenger 
+    
     if userIsPlaying is True or challengerIsPlaying is True:
         return JsonResponse({"error": "You or the challenger player is currently playing. Try again later."}, status=200)
+    gameData = {'player1': user.Username, 'player2': data['username']}
+    gameResponse = requests.post('http://pong:8004/initGame/', json=gameData)#inscrit la partie en bdd jeu
+    print(f'acceptInvitation: response for PlayerPlaying == {gameResponse.status_code}', file=sys.stderr)
+    print(f'acceptInvitation: body for PlayerPlaying == {gameResponse.text}', file=sys.stderr)
+    
+
+    # challenge[challengedUser.id] = usernameId
+    cache.set(f'accecptedChallenge{data['username']}', user.Username, 60)#remplace par la data de bdd et mettre l'id du joueur
+
+
     # creer la partie en bdd
     # remove des partiePending + ajouter dans les parties acceptee cle challenger value chlange player user de cette requete
     return JsonResponse({}, status=200)

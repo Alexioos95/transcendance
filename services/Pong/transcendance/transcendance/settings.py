@@ -28,6 +28,7 @@ DEBUG = True
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'channels',
     'corsheaders',
     'pong',
@@ -151,4 +152,4 @@ CORS_ALLOWED_ORIGINS = [
     "http://made-f0ar11s6:8000",
 ]
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'made-f0br7s18', 'made-f0br7s17', 'made-f0br6s17', 'made-f0Br5s11', 'made-f0Br6s19', 'made-f0ar11s6']
+ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1', 'made-f0br7s18', 'made-f0br7s17', 'made-f0br6s17', 'made-f0Br5s11', 'made-f0Br6s19', 'made-f0ar11s6']

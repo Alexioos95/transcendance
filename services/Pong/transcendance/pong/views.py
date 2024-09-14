@@ -5,6 +5,8 @@ from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from .models import Game
 import json
+import sys
+
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -12,7 +14,7 @@ def initGame(request):
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        return JsonResponse({'error': 'Invalid JSON'}, status=403)
     
     player1 = data.get('player1')
     player2 = data.get('player2')
@@ -56,21 +58,27 @@ def getPlayerGames(request):
 
 @csrf_exempt
 @require_http_methods(["POST"])
-def PlayerPlaying(requet):
+def PlayerPlaying(request):
+	print(f'Can It print ??!', file=sys.stderr)
+	print(f'PlayerPlaying data: {request.body}', file=sys.stderr)
 	try:
 		data = json.loads(request.body)
 	except json.JSONDecodeError as e:
+		print(f'PlayerPlaying : Coucou msg= {e.msg}', file=sys.stderr)
 		return JsonResponse({'error': e.msg}, status=403)
-
+	if 'username' not in data:
+		return JsonResponse({'error': 'invalid Json'}, status=403)
 	user = data['username']
+	print(f'PlayerPlaying username: {data['username']}', file=sys.stderr)
 
-	query = Game.objects.filter(Player1 == user, gameEnde == False) | Game.objects.filter(Player2 == user, gameEnde == False)   # What if no occurence in db ? # Should only return 1 occurence
+	# query = Game.objects.all()
+	query = Game.objects.filter(Player1__exact=user, gameEnded__exact=False) | Game.objects.filter(Player2__exact=user, gameEnded__exact=False)   # What if no occurence in db ? # Should only return 1 occurence
+	if not query:
+		print(f'emptyquery', file=sys.stderr)
+		return HttpResponse(status=418)
 	print(f'query: {query}', file=sys.stderr)
 	for x in query: # To debug print
 		print(f'x: {x.values()}', file=sys.stderr)
-
-	if not query:
-		return HttpResponse(status=418)
 	return HttpResponse(status=200)
 
 def index(request):	# A virer ?

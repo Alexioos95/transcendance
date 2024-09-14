@@ -22,7 +22,7 @@ function	getPongStruct()
 async function	startPong(struct)
 {
 	initPongStruct(struct, struct.screen.game, struct.screen.wrapperCanvas);
-	setupPongEventListeners(struct.screen.game, struct.wrapperCanvas);
+	setupPongEventListeners(struct, struct.screen.game, struct.wrapperCanvas);
 	struct.screen.game.canvas.focus();
 	loop(struct, struct.screen.game);
 }
@@ -83,7 +83,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 	game.running = 1;
 }
 
-function	setupPongEventListeners(game, wrapperCanvas)
+function	setupPongEventListeners(struct, game, wrapperCanvas)
 {
 	// Keyboard
 	game.canvas.addEventListener("keydown", function(event) { enableMove(event, game.canvas, game.paddles); });
@@ -100,6 +100,9 @@ function	setupPongEventListeners(game, wrapperCanvas)
 	game.canvas.addEventListener("touchcancel", function(event) { disableMove(event, game.paddles); });
 	// Resizing
 	document.defaultView.addEventListener("resize", function() { resize(game, wrapperCanvas); });
+	// Focus
+	game.canvas.addEventListener("focus", function() { struct.screen.wrapperScreen.classList.add("active"); });
+	game.canvas.addEventListener("blur", function() { struct.screen.wrapperScreen.classList.remove("active"); });
 }
 
 async function	loop(struct, game)

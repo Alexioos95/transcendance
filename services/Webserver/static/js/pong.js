@@ -13,7 +13,7 @@ function	getPongStruct()
 		ball: undefined,
 		run: startPong,
 		online: false,
-		socket, undefined,
+		socket: undefined,
 		running: 0
 	};
 	return (struct);

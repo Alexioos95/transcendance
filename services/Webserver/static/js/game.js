@@ -59,19 +59,24 @@ function	setupEventListeners(struct, data)
 		showScreen(struct.screen, struct.screen.wrapperOptions)
 	});
 	struct.header.logoutButton.addEventListener("click", function() {
+		struct.run = 0; 
+		if (struct.screen.game !== undefined)
+			struct.screen.game.running = 0;
 		if (struct.guestMode === true)
 		{
 			struct.run = 0;
 			return (navigate("login", undefined, { signUp: "false", lang: struct.options.lang.curr }));
 		}
-		fetch("/user/disconnect/", { method: "GET", credentials: "include"})
-			.then(() => { struct.run = 0; })
-			.then(() => {
-				if (struct.chat.socket !== undefined)
-					struct.chat.socket.close(1000);
-			})
-			.then(() => { return (navigate("login", undefined, { signUp: "false", lang: struct.options.lang.curr }))})
-			.catch(() => console.error("Failed to fetch the matchMaking route"));
+		else
+		{
+			fetch("/user/disconnect/", { method: "GET", credentials: "include"})
+				.then(() => {
+					if (struct.chat.socket !== undefined)
+						struct.chat.socket.close(1000);
+				})
+				.then(() => { return (navigate("login", undefined, { signUp: "false", lang: struct.options.lang.curr }))})
+				.catch(() => console.error("Failed to fetch the disconnect route"));
+		}
 	});
 	// Cross Buttons
 	struct.options.leaveButton.addEventListener("click", function() {
@@ -250,10 +255,12 @@ function	replaceDatas(struct, data)
 
 		const myInterval = setInterval(() => {
 			if (struct.run === 0)
-				clearInterval(myInterval);
+				return (clearInterval(myInterval));
 			fetch("/user/updateInfo/", { method: "GET", credentials: "include"})
 				.then(response => response.json())
 				.then(data => {
+					if (struct.run === 0)
+						return (clearInterval(myInterval));
 					console.log("data=", data);
 					// Re-build Lang
 					fetchTranslation(struct, data.language);
@@ -595,6 +602,8 @@ function	buildBlocklist(struct, data)
 
 function	buildHistory(struct, data, username)
 {
+	let array = [];
+
 	/*struct.history.username.innerHTML = username;
 	while (struct.history.output.firstChild)
 		struct.history.output.firstChild.remove();
@@ -643,8 +652,10 @@ function	buildHistory(struct, data, username)
 		td.appendChild(historyCard);
 		td.tabIndex = "0";
 		tr.appendChild(td);
-		struct.history.output.appendChild(tr);
-	}*/
+		array.push(tr);
+	}
+	for (let i = array.length - 1; i >= 0; i--)
+		struct.history.output.appendChild(array[i]);*/
 }
 
 async function	setGuestRestrictions(struct)
@@ -898,7 +909,7 @@ function	deleteBlocked(button)
 /////////////////////////
 function	liveChat(struct)
 {
-	struct.chat.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/chat/");
+	struct.chat.socket = new WebSocket("wss://" + window.location.hostname + ":443/ws/chat/");
 	struct.chat.socket.addEventListener("error", function() {
 		const tr = document.querySelectorAll(".tab-chat tr");
 		const buttons = document.querySelectorAll(".tab-chat button");
@@ -978,8 +989,8 @@ function	createChatMessage(struct, data)
 	let array;
 
 	// Check username
-	// if (document.querySelector(".nav-user span").innerHTML === data.user)
-	// 	options = false; // !!!!!!!!!!!
+	if (document.querySelector(".nav-user span").innerHTML === data.user)
+		options = false;
 	// Get lang
 	if (struct.options.lang.curr === "FR")
 		array = ["Ajouter en ami", "Voir l'historique", "Inviter pour un Pong", "Bloquer l'utilisateur"];
@@ -1043,18 +1054,18 @@ function	receiveInvitation(struct, data)
 		return ;
 
 	let accept = "Accepter";
-	let sentence = " vous a inviter pour un Pong";
+	let sentence = " vous a inviter pour un Pong ";
 	let isScrolled = false;
 
 	// Lang
 	if (struct.options.lang.curr === "EN")
 	{
-		sentence = " invited you to a Pong";
+		sentence = " invited you to a Pong ";
 		accept = "Accept";
 	}
 	else if (struct.options.lang.curr === "NL")
 	{
-		sentence = " je uitgenodigd voor een Pong";
+		sentence = " je uitgenodigd voor een Pong ";
 		accept = "Accepteren";
 	}
 	if (parseInt(struct.tabs.chat.table.scrollTop, 10) === struct.tabs.chat.table.scrollHeight - struct.tabs.chat.table.offsetHeight)
@@ -1064,19 +1075,17 @@ function	receiveInvitation(struct, data)
 		// Create elements
 		const tr = document.createElement("tr");
 		const td = document.createElement("td");
+		const button = document.createElement("button");
 		const p = document.createElement("p");
 		const span = document.createElement("span");
 		const text = document.createTextNode(sentence);
 		const icon = document.createElement("i");
-		const button = document.createElement("button");
 		// Set button
-		icon.classList.add("fa-solid", "fa-exclamation");
 		button.type = "button";
 		button.title = accept;
 		button.ariaLabel = accept;
-		button.appendChild(icon);
 		button.addEventListener("click", function() {
-			const obj = { username: button.parentElement.querySelector("p span").innerHTML };
+			const obj = { username: button.querySelector("p span").innerHTML };
 
 			console.log("fetch /user/acceptInvitation");
 			fetch("/user/acceptInvitation/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
@@ -1102,11 +1111,14 @@ function	receiveInvitation(struct, data)
 				.catch(() => console.error("Failed to fetch the acceptInvitation route"));
 		});
 		span.innerHTML = data.challengeReceived.username[i];
+		icon.classList.add("fa-solid", "fa-check");
 		// Append
 		p.appendChild(span);
 		p.appendChild(text);
-		p.classList.add("chat-announcement");
-		td.appendChild(p);
+		p.appendChild(icon);
+		p.classList.add("chat-announcement", "chat-challenge");
+		button.appendChild(p);
+		td.appendChild(button);
 		td.appendChild(button);
 		td.tabIndex = "0";
 		tr.appendChild(td);
@@ -1360,8 +1372,8 @@ async function	coinAnimation(struct)
 
 async function	addInsertCoinAnimations(coin, text)
 {
-	text.classList.add("active");
 	coin.classList.add("active");
+	text.classList.add("active");
 	await sleep(2500);
 }
 
@@ -1374,16 +1386,12 @@ async function	checkGameSelectorValidation(struct)
 		const mode = data.get("mode");
 		const title = document.getElementsByTagName("h2")[0];
 
-		if (game === null || mode === null)
+		if (game === null || mode === null || (game === "tetris" && game === "online"))
 			return (reject(0));
-		if (game === "pong")
+		else if (game === "pong")
 			struct.screen.game = getPongStruct();
 		else if (game === "tetris")
-		{
-			if (mode === "online")
-				reject(0);
 			struct.screen.game = getTetrisStruct();
-		}
 		setupGameControls(struct, game);
 		title.style.opacity = 0;
 		sleep(350)

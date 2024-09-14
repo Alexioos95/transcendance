@@ -1431,6 +1431,20 @@ canvas.pong {
 	margin: 0;
 	width: 100%;
 	color: #FFD700;
+	text-align: justify;
+}
+
+.tab-chat .chat-challenge {
+	transition: color 0.80s ease-in;
+}
+
+.tab-chat .chat-challenge .fa-check {
+	color: #32CD32;
+}
+
+.tab-chat .chat-challenge:hover,
+.tab-chat .chat-challenge:focus {
+	color: #DE9003;
 }
 
 .tab-chat .chat-message span {

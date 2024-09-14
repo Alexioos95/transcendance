@@ -21,13 +21,13 @@ function	getPongStruct()
 
 async function	startPong(struct)
 {
-	initPongStruct(struct.screen.game, struct.screen.wrapperCanvas);
+	initPongStruct(struct, struct.screen.game, struct.screen.wrapperCanvas);
 	setupPongEventListeners(struct.screen.game, struct.wrapperCanvas);
 	struct.screen.game.canvas.focus();
 	loop(struct, struct.screen.game);
 }
 
-function	initPongStruct(game, wrapperCanvas)
+function	initPongStruct(struct, game, wrapperCanvas)
 {
 	game.canvas = getCanvas(wrapperCanvas);
 	game.ctx = game.canvas.getContext("2d");
@@ -48,6 +48,8 @@ function	initPongStruct(game, wrapperCanvas)
 			const ball = getPixels(game.canvas, data.ball.x, data.ball.y);
 			const obj = { key: undefined };
 
+			// struct.screen.playerOnControls[0].innerHTML = data.playerLeft;
+			// struct.screen.playerOnControls[1].innerHTML = data.playerRight;
 			game.paddles.left.x = paddleLeft[0];
 			game.paddles.left.y = paddleLeft[1];
 			game.paddles.right.x = paddleRight[0];

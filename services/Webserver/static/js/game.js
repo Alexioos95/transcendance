@@ -5,6 +5,7 @@
 async function	run(data)
 {
 	const struct = {
+		body: document.querySelector("body"),
 		username: document.querySelector(".nav-user span"),
 		header: getHeaderStruct(),
 		cards: getCardsStruct(),
@@ -125,11 +126,12 @@ function	setupEventListeners(struct, data)
 		const obj = { type: "email" };
 		
 		fetch("/user/init2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-			.then(response => {
-				if (response.ok)
+			.then(response => response.json())
+			.then(data => {
+				if (data.error === undefined)
 					struct.options.account.twoFA.wrapper.classList.remove("hidden");
 				else
-					response.json().then(data => struct.options.account.error.innerHTML = data.error);
+					struct.options.account.error.innerHTML = data.error;
 			})
 			.catch(() => console.error("Failed to fetch the init2fa route"));
 		struct.options.account.twoFA.wrapper.classList.remove("hidden");
@@ -138,19 +140,20 @@ function	setupEventListeners(struct, data)
 		const obj = { type: struct.options.account.twoFA.input.value };
 		
 		fetch("/user/set2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-			.then(response => {
-				if (response.ok)
-					{
-						struct.options.account.error.classList.remove("error");
-						struct.options.account.error.classList.add("success");
-						struct.options.account.error.innerHTML = "SUCCESS";
-					}
-					else
-					{
-						struct.options.account.error.classList.remove("success");
-						struct.options.account.error.classList.add("error");
-						struct.options.account.error.innerHTML = "YIKES";
-					}
+			.then(response => response.json())
+			.then(data => {
+				if (data.error === undefined)
+				{
+					struct.options.account.error.classList.remove("error");
+					struct.options.account.error.classList.add("success");
+					struct.options.account.error.innerHTML = "SUCCESS";
+				}
+				else
+				{
+					struct.options.account.error.classList.remove("success");
+					struct.options.account.error.classList.add("error");
+					struct.options.account.error.innerHTML = "YIKES";
+				}
 			})
 			.catch(() => console.error("Failed to fetch the set2fa route"));
 	});
@@ -172,17 +175,19 @@ function	setupEventListeners(struct, data)
 		avatarForm.append("file", avatarImage);
 		console.log("fetch /user/sendFile");
 		fetch("/user/sendFile/", { method: "POST", body: avatarForm, credentials: "include"})
-			.then(response => {
-				if (response.ok)
+			.then(response => response.json())
+			.then(data => {
+				if (data.error === undefined)
 					console.log("/user/sendFile OK; do nothing")
 				else
-					response.text().then(data => console.log("/user/sendFile NOT OK. data=", data));
+					console.log("/user/sendFile NOT OK; data=", data);
 			})
 			.catch(() => console.error("Failed to fetch the sendFile route"));
 		console.log("fetch /user/updateUserInfos");
 		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-			.then(response => {
-				if (response.ok)
+			.then(response => response.json())
+			.then(data => {
+				if (data.error === undefined)
 				{
 					struct.options.account.error.classList.remove("error");
 					struct.options.account.error.classList.add("success");
@@ -232,6 +237,18 @@ function	setupEventListeners(struct, data)
 			}
 		});
 	}
+	document.defaultView.addEventListener("resize", function() {
+		if ((struct.body.offsetHeight * 2) + (struct.body.offsetHeight / 2) < struct.body.offsetWidth)
+		{
+			struct.screen.wrapperDecorations.classList.add("hidden");
+			struct.screen.wrapperScreen.classList.add("full");
+		}
+		else
+		{
+			struct.screen.wrapperDecorations.classList.remove("hidden");
+			struct.screen.wrapperScreen.classList.remove("full");
+		}
+	});
 }
 
 function	replaceDatas(struct, data)
@@ -259,7 +276,7 @@ function	replaceDatas(struct, data)
 			fetch("/user/updateInfo/", { method: "GET", credentials: "include"})
 				.then(response => response.json())
 				.then(data => {
-					if (struct.run === 0)
+					if (data.error !== undefined || struct.run === 0)
 						return (clearInterval(myInterval));
 					console.log("data=", data);
 					// Re-build Lang
@@ -604,7 +621,7 @@ function	buildHistory(struct, data, username)
 {
 	let array = [];
 
-	/*struct.history.username.innerHTML = username;
+	struct.history.username.innerHTML = username;
 	while (struct.history.output.firstChild)
 		struct.history.output.firstChild.remove();
 	for (let i = 0; i < data.matches.length; i++)
@@ -655,7 +672,7 @@ function	buildHistory(struct, data, username)
 		array.push(tr);
 	}
 	for (let i = array.length - 1; i >= 0; i--)
-		struct.history.output.appendChild(array[i]);*/
+		struct.history.output.appendChild(array[i]);
 }
 
 async function	setGuestRestrictions(struct)
@@ -728,18 +745,18 @@ function	addFriend(struct, button, usernameInput)
 		username = button.parentElement.parentElement.querySelector("span").innerHTML;
 	else
 		username = usernameInput;
-	console.log("Username=", username);
 	const obj = { newFriend: username };
 
 	fetch("/user/addFriend/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-		.then(response => {
+		.then(response => response.json())
+		.then(data => {
 			const tr = document.createElement("tr");
 			const td = document.createElement("td");
 			const p = document.createElement("p");
 			let isScrolled = false;
 
 			p.classList.add("chat-announcement");
-			if (response.ok)
+			if (data.error === undefined)
 				p.innerHTML = "Added to friend";
 			else
 				p.innerHTML = "Failed to add to friend";
@@ -767,17 +784,7 @@ function	deleteFriend(button)
 	const obj = { unfriend: username };
 
 	fetch("/user/deleteFriend/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-	.then(response => {
-		if (response.ok)
-			console.log("deleteFriend OK");
-		else
-		{
-			console.log("deleteFriend NOT OK");
-			console.log("status=", response.status);
-			response.text().then(data => console.log(data));
-		}
-	})
-	.catch(() => console.error("Failed to fetch the deleteFriend route"));
+		.catch(() => console.error("Failed to fetch the deleteFriend route"));
 }
 
 function	seeHistory(struct, button, own)
@@ -788,19 +795,19 @@ function	seeHistory(struct, button, own)
 		username = own;
 	else
 		username = button.parentElement.parentElement.querySelector("span").innerHTML;
-	console.log("Username=", username);
 	const obj = { seeHistory: username };
 
 	fetch("/user/seeHistory/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-		.then(response => {
-			if (response.ok)
+		.then(response => response.json())
+		.then(data => {
+			if (data.error === undefined)
 			{
 				console.log("/user/seeHistory OK; display history over chat.")
 				resetPhoneClasses(struct, struct.cards.chat);
 				struct.tabs.wrapperTabs.classList.add("hidden");
 				struct.tabs.wrapperInputs.classList.add("zindex");
 				struct.history.wrapper.classList.remove("zindex", "hidden");
-				response.json().then(data => buildHistory(struct, data, username));
+				buildHistory(struct, data, username);
 			}
 			else
 			{
@@ -809,7 +816,7 @@ function	seeHistory(struct, button, own)
 				const p = document.createElement("p");
 	
 				console.log("/user/seeHistory NOT OK; do nothing.");
-				response.text().then(data => console.log(data));
+				console.log(data);
 				p.classList.add("chat-announcement");
 				p.innerHTML = "Failed to see history of user";
 				td.appendChild(p);
@@ -824,18 +831,18 @@ function	seeHistory(struct, button, own)
 function	sendInvite(struct, button)
 {
 	const username = button.parentElement.parentElement.querySelector("span").innerHTML;
-	console.log("Username=", username);
 	const obj = { toChallenge: username };
 
-	fetch("/user/sendInvitation/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-		.then(response => {
+	fetch("/user/sendInvitation/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})	
+		.then(response => response.json())
+		.then(data => {
 			const tr = document.createElement("tr");
 			const td = document.createElement("td");
 			const p = document.createElement("p");
 			let isScrolled = false;
 
 			p.classList.add("chat-announcement");
-			if (response.ok)
+			if (data.error === undefined)
 				p.innerHTML = "Challenged user!";
 			else
 				p.innerHTML = "Failed to challenge user";
@@ -847,8 +854,6 @@ function	sendInvite(struct, button)
 			struct.chat.output.appendChild(tr);
 			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
 				struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
-			console.log("status=", response.status);
-			response.text().then(data => console.log(data));
 		})
 		.catch(() => console.error("Failed to fetch the sendInvitation route"));
 }
@@ -856,18 +861,18 @@ function	sendInvite(struct, button)
 function	blockUser(struct, button)
 {
 	const username = button.parentElement.parentElement.querySelector("span").innerHTML;
-	console.log("Username=", username);
 	const obj = { toBlock: username };
 
 	fetch("/user/blockUser/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-		.then(response => {
+		.then(response => response.json())
+		.then(data => {
 			const tr = document.createElement("tr");
 			const td = document.createElement("td");
 			const p = document.createElement("p");
 			let isScrolled = false;
 
 			p.classList.add("chat-announcement");
-			if (response.ok)
+			if (data.error === undefined)
 				p.innerHTML = "Added to blocked";
 			else
 				p.innerHTML = "Failed to block user";
@@ -879,8 +884,6 @@ function	blockUser(struct, button)
 			struct.chat.output.appendChild(tr);
 			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
 				struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
-			console.log("status=", response.status);
-			response.text().then(data => console.log(data));
 		})
 		.catch(() => console.error("Failed to fetch the blockUser route"));
 }
@@ -891,16 +894,6 @@ function	deleteBlocked(button)
 	const obj = { unblock: username };
 
 	fetch("/user/deleteBlockedUser/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-		.then(response => {
-			if (response.ok)
-				console.log("deleteBlocked OK");
-			else
-			{
-				console.log("deleteBlocked NOT OK");
-				console.log("status=", response.status);
-				response.text().then(data => console.log(data));
-			}
-		})
 		.catch(() => console.error("Failed to fetch the deleteBlockedUser route"));
 }
 
@@ -1089,8 +1082,9 @@ function	receiveInvitation(struct, data)
 
 			console.log("fetch /user/acceptInvitation");
 			fetch("/user/acceptInvitation/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-				.then(response => {
-					if (response.ok)
+				.then(response => response.json())
+				.then(data => {
+					if (data.error === undefined)
 					{
 						if (struct.screen.game !== undefined)
 							struct.screen.game.running = 0;
@@ -1104,8 +1098,7 @@ function	receiveInvitation(struct, data)
 					else
 					{
 						console.log("response /user/acceptInvitation not good");
-						console.log(response.status);
-						response.text().then(data => console.log(data));
+						console.log(data);
 					}
 				})
 				.catch(() => console.error("Failed to fetch the acceptInvitation route"));
@@ -1170,9 +1163,11 @@ function	getGameFormStruct()
 function	getScreenStruct()
 {
 	const struct = {
+		wrapperScreen: document.getElementsByClassName("wrapper-screen-all")[0],
 		wrapperCanvas: document.getElementsByClassName("wrapper-canvas")[0],
 		wrapperOptions: document.getElementsByClassName("wrapper-options")[0],
 		wrapperTournamentForm: document.getElementsByClassName("tournament-form")[0],
+		wrapperDecorations: document.getElementsByClassName("wrapper-bottom-section")[0],
 		primaryPlayer: document.getElementsByClassName("wrapper-player-controls")[1],
 		secondaryPlayer: document.getElementsByClassName("wrapper-player-controls")[0],
 		sticks: getSticksStruct(),
@@ -1419,22 +1414,22 @@ async function waitMatchMaking(struct)
 			const myInterval = setInterval(() => {
 				console.log("fetch /user/matchMaking");
 				fetch("/user/matchMaking/", { method: "GET", credentials: "include"})
-					.then(response => {
-						if (response.ok)
+					.then(response => response.json())
+					.then(data => {
+						if (data.matched === "true")
 						{
-							console.log("response /user/matchMaking ok; clear interval // Need to start game");
+							console.log("response /user/matchMaking ok; clear interval");
 							clearInterval(myInterval);
 							resolve();
 						}
 						else
 						{
-							console.log("response /user/matchMaking not good; Wait 10s");
-							console.log("status=", response.status);
-							response.text().then(data => console.log(data));
+							console.log("response /user/matchMaking not good; Wait 5s");
+							console.log(data);
 						}
 					})
 					.catch(() => console.error("Failed to fetch the matchMaking route"));
-			}, 10000);
+			}, 5000);
 		});
 	}
 }
@@ -1445,7 +1440,6 @@ async function	waitGoButton(struct)
 		return ;
 	return new Promise((resolve, reject) => {
 		const button = document.createElement("button");
-		const controls = document.getElementsByClassName("wrapper-bottom-section")[0];
 		const span1 = document.createElement("span");
 		const span2 = document.createElement("span");
 
@@ -1462,10 +1456,10 @@ async function	waitGoButton(struct)
 			struct.screen.wrapperCanvas.appendChild(span2);
 		}
 		struct.screen.wrapperCanvas.appendChild(button);
-		controls.classList.add("wrapper-bottom-section-hover");
+		struct.screen.wrapperDecorations.classList.add("wrapper-bottom-section-hover");
 		button.addEventListener("click", function() {
 			struct.options.wrapper.classList.add("hidden");
-			controls.classList.remove("wrapper-bottom-section-hover");
+			struct.screen.wrapperDecorations.classList.remove("wrapper-bottom-section-hover");
 			button.remove();
 			resolve();
 		}, { once: true });

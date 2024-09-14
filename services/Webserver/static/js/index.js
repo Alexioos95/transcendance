@@ -35,9 +35,13 @@ async function popState()
 		if (event.state)
 		{
 			fetch("/user/checkJwt/")
-				.then(response => {
-					if (response.ok)
-						return (response.json().then(data => { data.guestMode = "false"; navigate("game", data, { signUp: "false", lang: "FR" })}));
+				.then(response => response.json())
+				.then(data => {
+					if (data.error === undefined)
+					{
+						data.guestMode = "false";
+						return (navigate("game", data, { signUp: "false", lang: "FR" }));
+					}
 					else
 					{
 						const data = event.state;
@@ -51,7 +55,8 @@ async function popState()
 							const data = { guestMode: "true", lang: data.lang };
 							navigate("game", data, { signUp: "false", lang: data.lang });
 						}
-				}});
+					}
+				});
 		}
 	});
 }

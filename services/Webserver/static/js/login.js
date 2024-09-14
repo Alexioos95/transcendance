@@ -47,34 +47,34 @@ function	login(prevData)
 		const popUp = window.open(url, "", "popup=true");
 
 		if (!popUp)
-		{
-			console.error("Couldn't open pop-up's connection to 42Intra.");
-			return ;
-		}
+			return (console.error("Couldn't open pop-up's connection to 42Intra."));
 		const myInterval = setInterval(() => {
 			console.log("fetch /user/checkAuth42");
 			fetch("/user/checkAuth42/", { method: "GET", credentials: "include"})
-				.then(response => {
+				.then(response => response.json())
+				.then(data => {
 					if (popUp.closed)
 					{
 						console.log("popUp was closed; clearInterval");
-						clearInterval(myInterval);
+						return (clearInterval(myInterval));
 					}
-					if (response.ok)
+					if (data.error === undefined)
 					{
 						console.log("response /user/checkAuth42 OK; Navigate to game")
 						clearInterval(myInterval);
-						return (response.json().then(data => navigate("game", data, { signUp: "false", lang: struct.langSelect.value })));
+						return (navigate("game", data, { signUp: "false", lang: struct.langSelect.value }));
 					}
 					else
 					{
 						console.log("response /user/checkAuth42 NOT OK; Wait 2s");
-						console.log(response.status);
-						response.text().then(data => console.log(data));
+						console.log(data);
 					}
 				})
-				.catch(() => console.error("Failed to fetch the checkAuth42 route"));
-		}, 2000)
+				.catch(() => {
+					console.error("Failed to fetch the checkAuth42 route");
+					clearInterval(myInterval);
+				});
+		}, 2000);
 	});
 	struct.guestConnection.addEventListener("click", function() {
 		navigate("game", { guestMode: "true", lang: struct.langSelect.value }, { signUp: "false", lang: struct.langSelect.value });
@@ -123,11 +123,12 @@ function	handleSignUp(struct)
 			return ;
 		}
 		fetch("/user/register/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-			.then(response => {
-				if (response.status === 201)
-					return (response.json().then(data => { navigate("game", data, { signUp: "false", lang: struct.langSelect.value }); }));
+			.then(response => response.json())
+			.then(data => {
+				if (data.error === undefined)
+					return (navigate("game", data, { signUp: "false", lang: struct.langSelect.value }));
 				else
-					response.json().then(data => { console.log(data); struct.error.register.innerHTML = data.error; });
+					struct.error.register.innerHTML = data.error;
 			})
 			.catch(() => console.error("Error: failed to fetch the register route"));
 	}
@@ -164,10 +165,10 @@ function	handleConnection(struct)
 
 	if (struct.formButton.connection.classList.contains("recovery"))
 	{
-		console.log("fetch /user/resetPaswd");
 		fetch("/user/resetPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-			.then(response => {
-				if (response.ok)
+			.then(response => response.json())
+			.then(data => {
+				if (data.error === undefined)
 				{
 					struct.error.login.classList.add("success");
 					struct.error.login.classList.remove("error");
@@ -177,7 +178,7 @@ function	handleConnection(struct)
 				{
 					struct.error.login.classList.remove("success");
 					struct.error.login.classList.add("error");
-					response.json().then(data => struct.error.login.innerHTML = data.error);
+					struct.error.login.innerHTML = data.error;
 				}
 			})
 			.catch(() => console.error("Error: failed to fetch the resetPaswd route"));
@@ -190,15 +191,15 @@ function	handleConnection(struct)
 			return ;
 		}
 		fetch("/user/login/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-			.then(response => {
-				if (response.ok)
+			.then(response => response.json())
+			.then(data => {
+				if (data.error === undefined)
 				{
 					resetErrorDisplay(struct.error.login);
-					return (response.json().then(data => { call2FA(struct, data) }));
+					return (call2FA(struct, data));
 				}
 				else
-					response.text().then(data => { console.log(data); struct.error.login.innerHTML = data.error; });
-					// response.json().then(data => { console.log(data); struct.error.login.innerHTML = data.error; });
+					struct.error.login.innerHTML = data.error;
 			})
 			.catch(() => console.error("Error: failed to fetch the login route"));
 	}
@@ -231,13 +232,14 @@ async function waitCode(struct)
 			const obj = { code: input.value };
 
 			fetch("/user/log2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-			.then(response => {
-				if (response.ok)
-					return (response.json().then(data => { navigate("game", data, { signUp: "false", lang: struct.langSelect.value })}));
-				else
-					response.json().then(data => { struct.error.twoFA.innerHTML = data.error; });
-			})
-			.catch(() => console.error("Error: failed to fetch the log2fa route"));
+				.then(response => response.json())
+				.then(data => {
+					if (data.error === undefined)
+						return (navigate("game", data, { signUp: "false", lang: struct.langSelect.value }));
+					else
+						struct.error.twoFA.innerHTML = data.error;
+				})
+				.catch(() => console.error("Error: failed to fetch the log2fa route"));
 		});
 	});
 }
@@ -346,13 +348,16 @@ function resetPassword()
 	});
 	struct.button.addEventListener("click", function() {
 		const urlParams = new URLSearchParams(window.location.search);
-		const code = urlParams.get('code');
-		console.log(code);
-		const obj = { password: struct.input.value, 'code': code};
+		const code = urlParams.get("code");
+		const obj = {
+			password: struct.input.value,
+			code: code
+		};
 
 		fetch("/user/sendNewPaswd/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
-			.then(response => {
-				if (response.ok)
+			.then(response => response.json())
+			.then(data => {
+				if (data.error === undefined)
 				{
 					showMessage(struct.error)
 						.then(() => sleep(2000))
@@ -363,8 +368,7 @@ function resetPassword()
 				{
 					struct.error.classList.add("error");
 					struct.error.classList.remove("success");
-					response.text().then(data => { console.log(data) });
-					// response.json().then(data => { struct.error.innerHTML = data.error });
+					struct.error.innerHTML = data.error;
 				}
 			})
 			.catch(() => console.error("Error: failed to fetch the sendNewPaswd route"));

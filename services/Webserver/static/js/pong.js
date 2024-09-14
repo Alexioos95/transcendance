@@ -9,7 +9,7 @@ function	getPongStruct()
 		canvas: undefined,
 		ctx: undefined,
 		paddles: undefined,
-		scores: undefined,
+		scores: [0, 0],
 		ball: undefined,
 		run: startPong,
 		online: false,
@@ -31,16 +31,17 @@ function	initPongStruct(struct, game, wrapperCanvas)
 {
 	game.canvas = getCanvas(wrapperCanvas);
 	game.ctx = game.canvas.getContext("2d");
-	if (game.online === false)
+	game.paddles = getPaddles(game.canvas);
+	game.ball = getBall(game.canvas);
+	if (game.online === true)
 	{
-		game.paddles = getPaddles(game.canvas);
-		game.ball = getBall(game.canvas);
-		game.scores = [0, 0];
-	}
-	else
-	{
+		let start = true;
 		game.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/pong/");
-		game.socket.addEventListener("error", function() { console.error("Critical error on Pong's websocket") });
+		game.socket.addEventListener("error", function() {
+			console.error("Critical error on Pong's websocket");
+			game.running = 0;
+			struct.gameForm.inputs[2].disabled = true;
+		});
 		game.socket.addEventListener("message", function(event) {
 			const data = JSON.parse(event.data);
 			const paddleLeft = getPixels(game.canvas, data.x_paddleLeft, data.y_paddleLeft);
@@ -48,8 +49,20 @@ function	initPongStruct(struct, game, wrapperCanvas)
 			const ball = getPixels(game.canvas, data.ball.x, data.ball.y);
 			const obj = { key: undefined };
 
-			struct.screen.playerOnControls[0].innerHTML = data.paddleLeft_name;
-			struct.screen.playerOnControls[1].innerHTML = data.paddleRight_name;
+			if (start === true)
+			{
+				const span1 = document.createElement("span");
+				const span2 = document.createElement("span");
+				span1.classList.add("canvas-user-1");
+				span2.classList.add("canvas-user-2");
+				span1.innerHTML = data.paddleLeft_name;
+				span2.innerHTML = data.paddleLeft_name;
+				struct.screen.wrapperCanvas.appendChild(span1);
+				struct.screen.wrapperCanvas.appendChild(span2);
+				struct.screen.playerOnControls[0].innerHTML = data.paddleLeft_name;
+				struct.screen.playerOnControls[1].innerHTML = data.paddleRight_name;
+			}
+			start = false;
 			game.paddles.left.x = paddleLeft[0];
 			game.paddles.left.y = paddleLeft[1];
 			game.paddles.right.x = paddleRight[0];

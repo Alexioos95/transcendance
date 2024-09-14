@@ -42,6 +42,16 @@ async function	run(data)
 
 function	setupEventListeners(struct, data)
 {
+	// Accessibility CSS
+	const labels = document.querySelectorAll("label > [type=\"radio\"]");
+
+	labels.forEach((radio) => {
+  		radio.addEventListener("focus", function() {
+			if (radio.matches(":focus-visible"))
+				radio.parentElement.style.outline = "1px black auto";
+		});
+		radio.addEventListener('blur', function() { radio.parentElement.style.outline = "none"; });
+	});
 	// Header Buttons
 	struct.header.historyButton.addEventListener("click", function() { seeHistory(struct, undefined, struct.username.innerHTML); });
 	struct.header.gameSelectorButton.addEventListener("click", function() { resetPhoneClasses(struct, struct.cards.gameSelector); });
@@ -88,9 +98,24 @@ function	setupEventListeners(struct, data)
 	});
 	struct.history.leaveButton.addEventListener("click", function() { resetHistoryClasses(struct); });
 	// Lang
-	struct.options.lang.fr.addEventListener("click", function() { fetchTranslation(struct, "FR") });
-	struct.options.lang.en.addEventListener("click", function() { fetchTranslation(struct, "EN") });
-	struct.options.lang.nl.addEventListener("click", function() { fetchTranslation(struct, "NL") });
+	struct.options.lang.fr.addEventListener("click", function() {
+		fetchTranslation(struct, "FR");
+		struct.options.lang.fr.classList.add("active");
+		struct.options.lang.en.classList.remove("active");
+		struct.options.lang.nl.classList.remove("active");
+	});
+	struct.options.lang.en.addEventListener("click", function() {
+		fetchTranslation(struct, "EN");
+		struct.options.lang.fr.classList.remove("active");
+		struct.options.lang.en.classList.add("active");
+		struct.options.lang.nl.classList.remove("active");
+	});
+	struct.options.lang.nl.addEventListener("click", function() {
+		fetchTranslation(struct, "NL");
+		struct.options.lang.fr.classList.remove("active");
+		struct.options.lang.en.classList.remove("active");
+		struct.options.lang.nl.classList.add("active");
+	});
 	// Tabs Account/Blocked
 	struct.options.account.button.addEventListener("click", function() { showTab(struct.options.account, struct.options.blocked) });
 	struct.options.account.showPasswords[0].addEventListener("click", function() {
@@ -238,6 +263,7 @@ function	setupEventListeners(struct, data)
 		});
 	}
 	document.defaultView.addEventListener("resize", function() {
+		const avatar = document.querySelector(".nav-user img");
 		if ((struct.body.offsetHeight * 2) + (struct.body.offsetHeight / 2) < struct.body.offsetWidth)
 		{
 			struct.screen.wrapperDecorations.classList.add("hidden");
@@ -248,6 +274,7 @@ function	setupEventListeners(struct, data)
 			struct.screen.wrapperDecorations.classList.remove("hidden");
 			struct.screen.wrapperScreen.classList.remove("full");
 		}
+		avatar.style.width = avatar.clientHeight + "px";
 	});
 }
 
@@ -265,7 +292,8 @@ function	replaceDatas(struct, data)
 		if (data.avatar !== undefined)
 			avatar.src = data.avatar;
 		else
-			avatar.src = "/images/default_avatar.png"
+			avatar.src = "/images/default_avatar.png";
+		avatar.style.width = avatar.clientHeight + "px";
 		struct.username.innerHTML = data.username;
 		inputs[0].value = data.username;
 		inputs[1].value = data.email;
@@ -279,17 +307,14 @@ function	replaceDatas(struct, data)
 					if (data.error !== undefined || struct.run === 0)
 						return (clearInterval(myInterval));
 					console.log("data=", data);
-					// Re-build Lang
-					fetchTranslation(struct, data.language);
-					// Re-build Avatar
-					document.querySelector(".nav-user img").src = data.avatar;
-					// Re-build Username
+					// Re-build Avatar and Username
+					if (avatar.src !== data.avatar)
+						avatar.src = data.avatar;
 					if (struct.username.innerHTML !== data.username)
 						struct.username.innerHTML = data.username;
 					// Re-build Lists
 					buildFriendlist(struct, data);
 					buildBlocklist(struct, data);
-					// Build Challenge
 					receiveInvitation(struct, data);
 				})
 				.catch(() => console.error("Failed to fetch the updateInfo route"));
@@ -690,6 +715,7 @@ async function	setGuestRestrictions(struct)
 	else if (struct.options.lang.curr === "NL")
 		struct.username.innerHTML = "Gast";
 	avatar.src = "/images/default_avatar.png";
+	avatar.style.width = avatar.clientHeight + "px";
 	inputs[2].disabled = true;
 	historyIcon.classList.add("hidden");
 	for (let i = 0; i < 3; i++)

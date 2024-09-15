@@ -420,7 +420,7 @@ def sendNewPaswd(request):
     try:
         dbUser.save()
     except Exception:
-        return JsonResponse({'error': 'Unable to save in database', 200})
+        return JsonResponse({'error': 'Unable to save in database'}, status=200)
     # if 'username' in data and data['username'] and user.Username != data['username']:
     cache.delete(data['code'])
     return JsonResponse({'message': "new password set successfuly"})

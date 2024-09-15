@@ -607,11 +607,14 @@ def acceptInvitation(request):
 # verifier si deja une partie existe pour notre user
     response = requests.post('http://pong:8004/PlayerPlaying/', json={"username":user.id})
     if response.status_code == 200:
+        print('je passe par la', file=sys.stderr)
         userIsPlaying = True
 # verifier si deja une partie existe pour l adversaire 
     response = requests.post('http://pong:8004/PlayerPlaying/', json={"username":opponent.id})
     if response.status_code == 200:
+        print('je passe par la', file=sys.stderr)
         challengerIsPlaying = True
+    print(f'userIsPlaying: {userIsPlaying}, challengerIsPlaying: {challengerIsPlaying}', file=sys.stderr)
     if userIsPlaying is True or challengerIsPlaying is True:
         return JsonResponse({"error": "You or the challenger player is currently playing. Try again later."}, status=200)
     gameData = {'player1': user.id, 'player2': opponent.id}

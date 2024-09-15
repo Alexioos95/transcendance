@@ -1095,6 +1095,12 @@ canvas.pong {
 	display: flex;
 }
 
+.blocked-card .blocked-user-avatar img {
+	width: 100%;
+	height: 100%;
+	object-fit: inherit;
+}
+
 .blocked-card .blocked-user {
 	display: flex;
 	flex-direction: column;
@@ -1351,7 +1357,9 @@ canvas.pong {
 }
 
 .wrapper-tabs-tables table img {
-	object-fit: contain;
+	height: 100%;
+	width: 100%;
+	object-fit: inherit;
 }
 
 .wrapper-tabs-tables table button {

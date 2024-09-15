@@ -187,7 +187,6 @@ function	setupEventListeners(struct, data)
 
 		const data = new FormData(struct.options.account.form);
 		const avatarImage = document.getElementsByClassName("change-avatar")[0].files[0];
-		const avatarForm = new FormData();
 		const obj = {
 			lang: data.get("lang"),
 			username: data.get("options-username"),
@@ -196,19 +195,13 @@ function	setupEventListeners(struct, data)
 			passwordNew: data.get("options-password-new"),
 			twoFA: data.get("2fa")
 		};
+		if (avatarImage !== undefined)
+		{
+			const avatarForm = new FormData();
 
-		avatarForm.append("file", avatarImage);
-		console.log("fetch /user/sendFile");
-		fetch("/user/sendFile/", { method: "POST", body: avatarForm, credentials: "include"})
-			.then(response => response.json())
-			.then(data => {
-				if (data.error === undefined)
-					console.log("/user/sendFile OK; do nothing")
-				else
-					console.log("/user/sendFile NOT OK; data=", data);
-			})
-			.catch(() => console.error("Failed to fetch the sendFile route"));
-		console.log("fetch /user/updateUserInfos");
+			avatarForm.append("file", avatarImage);
+			fetch("/user/sendFile/", { method: "POST", body: avatarForm, credentials: "include"});
+		}
 		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => response.json())
 			.then(data => {
@@ -289,7 +282,7 @@ function	replaceDatas(struct, data)
 		const avatar = document.querySelector(".nav-user img");
 		const inputs = document.querySelectorAll(".options-wrapper-connection input");
 
-		if (data.avatar !== undefined)
+		if (data.avatar !== undefined && data.avatar !== "")
 			avatar.src = data.avatar;
 		else
 			avatar.src = "/images/default_avatar.png";
@@ -308,7 +301,7 @@ function	replaceDatas(struct, data)
 						return (clearInterval(myInterval));
 					console.log("data=", data);
 					// Re-build Avatar and Username
-					if (avatar.src !== data.avatar)
+					if (data.avatar !== undefined && data.avatar !== "" && data.avatar !== avatar.src)
 						avatar.src = data.avatar;
 					if (struct.username.innerHTML !== data.username)
 						struct.username.innerHTML = data.username;
@@ -952,21 +945,7 @@ function	liveChat(struct)
 		const data = JSON.parse(event.data);
 
 		if (data.type === "connected")
-		{
-			// if (data.user !== document.querySelector(".nav-user span"))
-			// {
-			// 	const tr = document.createElement("tr");
-			// 	const td = document.createElement("td");
-			// 	const p = document.createElement("p");
-	
-			// 	p.classList.add("chat-announcement");
-			// 	td.appendChild(p);
-			// 	td.tabIndex = "0";
-			// 	tr.appendChild(td);
-			// 	struct.chat.output.appendChild(tr);
-			// }
 			return ;
-		} 
 		const tr = createChatMessage(struct, data);
 		let isScrolled = false;
 
@@ -1008,9 +987,6 @@ function	createChatMessage(struct, data)
 	let options = true;
 	let array;
 
-	// Check username
-	if (document.querySelector(".nav-user span").innerHTML === data.user)
-		options = false;
 	// Get lang
 	if (struct.options.lang.curr === "FR")
 		array = ["Ajouter en ami", "Voir l'historique", "Inviter pour un Pong", "Bloquer l'utilisateur"];
@@ -1019,7 +995,8 @@ function	createChatMessage(struct, data)
 	else if (struct.options.lang.curr === "NL")
 		array = ["Aan vriendenlijst toevoegen", "Zie geschiedenis", "Uitnodigen voor Pong", "Gebruiker blokkeren"];
 	// Set avatar
-	if (data.avatar !== undefined)
+	console.log(data);
+	if (data.avatar !== undefined && data.avatar !== "")
 		avatar.src = data.avatar;
 	else
 		avatar.src = "/images/default_avatar.png"
@@ -1027,6 +1004,8 @@ function	createChatMessage(struct, data)
 	chatUserAvatar.classList.add("chat-user-avatar");
 	chatUserAvatar.appendChild(avatar);
 	// Set username
+	if (struct.username === data.user)
+		options = false;
 	span.innerHTML = data.user;
 	p.appendChild(span);
 	p.appendChild(text);

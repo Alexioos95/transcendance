@@ -20,7 +20,7 @@ from django.contrib.postgres.fields import ArrayField
 class User(models.Model):
     Email = models.CharField(max_length=1000, blank=False, unique=True)
     Username = models.CharField(max_length=30, blank=False, unique=True)
-    Password = models.CharField(max_length=1000, blank=True)  # hash
+    Password = models.CharField(max_length=70, blank=True)
     Avatar = models.CharField(max_length=1000)
     
     class Language(models.TextChoices):
@@ -34,7 +34,7 @@ class User(models.Model):
         APK = 'APK', 'APK'
     
     language = models.CharField(max_length=3, choices=Language.choices, default=Language.FR)
-    twoFA = models.CharField(max_length=4, choices=TwoFA.choices, default=TwoFA.NONE)
+    twoFA = models.CharField(max_length=5, choices=TwoFA.choices, default=TwoFA.NONE) # Use bool instead
     key2FA = models.CharField(max_length=100)
     lastTimeOnline = models.DateTimeField()  # instance de datetime.date
     pongLvl = models.PositiveBigIntegerField()

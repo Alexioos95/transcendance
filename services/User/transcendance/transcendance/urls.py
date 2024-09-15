@@ -25,7 +25,6 @@ from user import views
 #tout les echanges client serveur se font en json
 
 urlpatterns = [
-    path('', views.index),#faire une route static via nginx a enlever d'ici
     #POST
     path('user/register/', views.register),#prend du json en entree attend les champ username password et email, return 201 ainsi qu'un json contenant les infos user  si l'user a ete cree et set un coockie auth jwt sinon un code adapte ainsi qu'un json contenant error
     #POST
@@ -36,10 +35,10 @@ urlpatterns = [
     path('user/auth42/', views.auth42),
     #POST
     
-    path('user/set2fa/', views.checkCodeSet),
-    path('user/log2fa/', views.checkCodeLog), #envoyer un code user qu'il a obtenu via son moyen de double authentification retourn 200 + # {"username":"username", "Avatar":PATH, "Language": "FR"} si le code est valide
+    path('user/set2fa/', views.checkCodeSet),#verifie le code recu si il est valide sset la 2fa en bdd. get code en cache
+    path('user/log2fa/', views.checkCodeLog), #verifie le code recu si il est valide retourn 200 + # {"username":"username", "Avatar":PATH, "Language": "FR"} si le code est valide
     #POST
-    path('user/init2fa/', views.set2FA), #envoi le type de 2fa voulu si mail un code sera envoye au mail et le retour sera 200 si ca c'est corectement passe (403 si invalide user) et un code sera attendu en retour via la meme route qui le settera la 2fa si le code est bon sinon code d'erreur et 2fa non set 
+    path('user/init2fa/', views.set2FA),#on identifie l'user , on envoie le mail, si le mail echoue 200 + informer error le mail doit etre valide sinon 200 en attente du code. set code en cache
     #GET
     path('user/disconnect/', views.disconnect), #supprime le coockie auth
     #GET

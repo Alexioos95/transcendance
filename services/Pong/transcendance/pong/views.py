@@ -76,8 +76,8 @@ def PlayerPlaying(request):
 		print(f'emptyquery', file=sys.stderr)
 		return HttpResponse(status=418)
 	print(f'query: {query}', file=sys.stderr)
-	for x in query: # To debug print
-		print(f'x: {x.values()}', file=sys.stderr)
+#	for x in query: # To debug print
+#		print(f'x: {x.values()}', file=sys.stderr)
 	return HttpResponse(status=200)
 
 def index(request):	# A virer ?

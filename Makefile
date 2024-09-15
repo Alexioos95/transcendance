@@ -54,10 +54,8 @@ mrproper: down
 	docker image rm -f $(NAME)-webserver
 	docker image rm -f redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
 	docker image rm -f postgres@sha256:d898b0b78a2627cb4ee63464a14efc9d296884f1b28c841b0ab7d7c42f1fffdf
-#	sh -c 'if (( echo $(docker images -f "dangling=true" -q | wc -l) != 0 )); then \
-#		docker image rm `docker images -f "dangling=true" -q`; \
-#	fi'
-	docker image rm `docker images -f "dangling=true" -q`
+	docker image rm `docker images -f "dangling=true" -q` 2>/dev/null || true
 	docker volume rm -f $(NAME)_static-data
 	docker volume rm -f $(NAME)_image-data
+	docker volume rm `docker volume ls -f "dangling=true" -q` 2>/dev/null || true
 	docker builder prune -af

@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from user import userMiddleware
-import time
+from user import userMiddleware as mid
 from datetime import date, datetime, timedelta
 from user.models import User
 from django.http import JsonResponse
@@ -12,13 +11,18 @@ from django.core.validators import validate_email
 import json
 import pytz
 import requests
-import os
 import pyotp
 import qrcode
-import jwt
-import bcrypt
 import sys
 import random
+import bcrypt
+import jwt
+import os
+import time
+
+### SetCookie
+#UpdateUserInfo
+#Login
 
 # mailData = {'title':'transcendance registration','body':f'welcome {username}, successfully registered', 'destinataire':'ftTranscendanceAMFEA@gmail.com'}
 # response = requests.post('http://localhost:8001/sendMail/', json=mailData)#mettre la route dans l'env ou set la route definitive dans le build final?
@@ -26,141 +30,45 @@ import random
 
 # penser a check pasword size + check ancien password pour changement
 
-class customException(Exception):
-    def __init__(self, data, code):
-        self.data = data
-        self.code = code
-
-# def setCookie(user, response):
-#     expirationTime = 1209600
-#     encoded_jwt = jwt.encode({"userName": user.Username, "expirationDate": time.time() + expirationTime}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")
-#     response.set_cookie(
-#         'auth',
-#         encoded_jwt,
-#         httponly=True,
-#         secure=True,
-#         samesite='None',
-#         expires=datetime.utcnow() + timedelta(hours=25),	# Expire avant le JWT...
-#         # domain="*"
-# 	)
-
-def setCookie(user, response):
-    expirationTime = 1209600
-    encoded_jwt = jwt.encode({
-        "userName": user.Username,
-        "id": user.id,
-        "expirationDate": time.time() + expirationTime
-    }, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")
-    response.set_cookie(
-        'auth',
-        encoded_jwt,
-        httponly=True,
-        secure=True,
-        samesite='None',
-        expires=datetime.utcnow() + timedelta(hours=25),
-    )
-
-def index(request):#a degager
-    print('coucou')
-    if request.method == 'POST':
-        form_data = request.POST
-        print('data =', form_data)
-    return render(request , 'index.html')
-
-
-def print_all_cookies(request):#a ddegsge avant la fin sertsa verifier les coockies
-    cookies = request.COOKIES
-    if cookies:
-        print("Cookies présents dans la requête :")
-        for cookie_name, cookie_value in cookies.items():
-            print(f'{cookie_name}: {cookie_value}')
-    else:
-        print("Aucun cookie n'est présent dans la requête.")
-
-def checkCookie(request, str):#middleware
-    # print_all_cookies(request)
-    if str in request.COOKIES:
-        return request.COOKIES[str]
-    else:
-        return None
-
-def get_user_in_db(field_name: str, value: str):#middleware //a utliser pour check si un champ unique est deja utilise dans update info
-    try:
-        print(f'fieldname {field_name}, value {value}', file=sys.stderr)
-        user = User.objects.get(**{field_name: value})
-        print(user, file=sys.stderr)
-        print("Informations de l'utilisateur :")
-        for attr_name, attr_value in vars(user).items():
-            print(f"{attr_name}: {attr_value}", end=" ")
-    
-        print()  # Ajout d'une ligne après la liste des attributs
-        return user
-    except Exception:  #Not defined
-        return None
-
-def register_user_in_database(user_info:dict):
-    try:
-        user_info.save()
-    except Exception:
-        raise customException("User already exists", 409)
-
-def generate_bcrypt_hash(password: str) -> bytes:
-    salt = bcrypt.gensalt()
-    password_encoded = bcrypt.hashpw(password.encode('utf-8'), salt)
-    return password_encoded
-
-# def generate_bcrypt_hash(password: str) -> str:#middleware
+# def mid.generate_bcrypt_hash(password: str) -> str:#middleware
 #     salt = bcrypt.gensalt()
 #     passwordEncoded = bcrypt.hashpw(password.encode('utf-8'), salt)
 #     return passwordEncoded
 
-def compare_bcrypt_hash(username:str, password: str) -> bool:#middleware
-    dbUser = get_user_in_db(Username, username)
-    if dbUser == False: #Should be None ?
-        return False
-    if bcrypt.checkpw(password.encode('utf-8'), dbUserList[0].Password.encode('utf-8')):
-        return True
-    else:
-        return False
-
-
-def CheckInfoRegister(data):
-    userData = {}
-    if 'username' in data:
-        userData['username'] = data['username']
-    if 'password' in data:
-        userData['password'] = data['password']
-    if 'email' in data:
-        userData['email'] = data['email']
-    if 'lang' in data:
-        userData['lang'] = data['lang']
-        missing_fields = []
-    for field in ['username', 'password', 'email', 'lang']:
-        if field not in userData or not userData[field].strip():
-            missing_fields.append(field)
-    if missing_fields:
-        raise customException(f'missing field: {missing_fields}', 401)
-    return userData
 
 @csrf_exempt
 @require_http_methods(["POST"])
-def register(request):#check si user est unique sinon refuser try except get?	#Set language par default ou la récupérer du front ?
-  
-    print(f"ici body == {request.body}", file=sys.stderr)
-    data = {}
-    try:
-        data = json.loads(request.body)
-    except Exception as e:
+def register(request):
+    data = mid.loadJson(request.body)
+    if data is None:
         return JsonResponse({"error": "invalid Json"}, status=403)
     userData = {}
     try:
-        userData = CheckInfoRegister(data)
-    except customException as e:
+        userData = mid.CheckInfoRegister(data)
+    except mid.customException as e:
         return JsonResponse({'error': e.data}, status=e.code)
+
+    user = mid.get_user_in_db('Username', userData['username'])
+    mail = mid.get_user_in_db('Email', userData['email'])
+    if user is not None or mail is not None:
+       return JsonResponse({"error": "User or email already used"}, status=409)
+
+
     time = datetime.now()
     tz = pytz.timezone('CET')
     tzTime = tz.localize(time)
-    hashed_password = bcrypt.hashpw(userData['password'].encode('utf-8'), bcrypt.gensalt())
+
+    #CKECK EMAIL FORMAT
+
+
+    try:
+        mid.checkCredentialsLen(userData)
+        mid.checkEmailFormat(userData['email'])
+    except mid.customException as e:
+        return JsonResponse({'error': e.data}, status=e.code)
+
+    hashed_password = mid.generate_bcrypt_hash(userData['password'])
+
     new_user = User(
         Email=userData['email'],
         Username=userData['username'],
@@ -169,95 +77,53 @@ def register(request):#check si user est unique sinon refuser try except get?	#S
         pongLvl=0,
         language=userData['lang'],
         tetrisLvl=0,
-        twoFA=True,
+        twoFA=False,
         friendsList = [],
         foeList = [],
     )
     try:
         new_user.save()
-    except Exception as error:
-        print('ca a echouer a ecrie en bdd')
-        response_data = JsonResponse({"error": "erreur in database"}, status=409)
-        print(error)
+    except Exception:
+        response_data = JsonResponse({"error": "Unable to write in database"}, status=500)
         return(response_data)
-    print(f'new user username {new_user.Username}, avatar = {new_user.Avatar}, langage = {new_user.language}')
     response_data = JsonResponse({"2fa": 'False',  "email": userData['email'], "guestMode":"false", "username":new_user.Username, "avatar": '/images/default_avatar.png' , "lang": new_user.language}, status=201)
-    expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes
-    encoded_jwt = jwt.encode({"userName": userData['username'], "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
-    setCookie(new_user, response_data) ### TEST THIS OUT ###
-#    response_data.set_cookie(
-#        'auth',
-#        encoded_jwt,
-#        httponly=True,
-#        secure=True,
-#        samesite='None',
-#        expires=datetime.utcnow() + timedelta(hours=25),	# Expire avant le JWT...
-#        # domain="*"
-#    )
-    print("tout est ok")
+    mid.setCookie(new_user, response_data)
     return (response_data)
-
-def decodeJwt(auth_coockie):
-    decodedJwt = ""
-    try:
-        decoded_token = jwt.decode(auth_coockie, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
-        username = decoded_token.get('userName')  # Extract the username from the token	#	Quelle utilité ?
-    except jwt.InvalidTokenError:
-        raise customException("Forbidden", 403)
-    print(username)
-    print(decoded_token)
-    print(decoded_token.get("expirationDate"))
-    print(time.time())
-    if decoded_token.get("expirationDate") < time.time():
-        raise customException("Token expired", 401)
-    # check si user existe toujours en db
-    user = get_user_in_db("Username", username)
-    if not user:
-        raise customException("User does not exists", 403)
-    # return JsonResponse({'success': 'User connected'}, status=200)
-    return user
 
 @require_http_methods(["GET"])
 def checkJwt(request):
-    #if request.method != 'GET':
-        #return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
-    auth = checkCookie(request, 'auth')
+    auth = mid.checkCookie(request, 'auth')
     if auth is None:
         return JsonResponse({"error": "user not log"}, status=200)
-    print(f'le cookie est {auth}', file=sys.stderr)
     try:
-        username = decodeJwt(auth)
-        user = get_user_in_db('Username', username)
+        username = mid.decodeJwt(auth)
+        user = mid.get_user_in_db('Username', username)
         if not user:
             return JsonResponse({"error": "user does nor exist"}, status=403)
-        print(f'le cookie est {auth}', file=sys.stderr)
-        print(f'username:{user.Username}, Avatar:{user.Avatar}, lang: {user.language}', file=sys.stderr)
         avatar = ''
         if not user.Avatar:
             avatar = '/images/default_avatar.png'
         else:
             avatar = user.Avatar
         return JsonResponse({"username":user.Username, "Avatar":avatar, "lang": user.language}, status=200)
-    except customException as e:
+    except mid.customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def login(request):
-    data = json.loads(request.body)
+    data = mid.loadJson(request.body)
+    if data is None:
+        return JsonResponse({"error": "invalid Json"}, status=403)
     userData = {}
     if 'email' in data:
         userData['email'] = data['email']
     if 'password' in data:
         userData['password'] = data['password']
 
-#    requestUserName = data['username']
- #   password = data['password']
-    # hash for comparison with db
-    # Guard against injection/xss here?
     # Check if empty name or password?
     # Check for minimum lengths?
-    dbUser = get_user_in_db("Email", userData['email'])
+    dbUser = mid.get_user_in_db("Email", userData['email'])
     print(f"le user{dbUser}", file=sys.stderr)
     if dbUser is None:
         print('on passe par ici', file=sys.stderr)
@@ -281,10 +147,10 @@ def login(request):
     else:
         print("Le mot de passe est invalide.", file=sys.stderr)
         return JsonResponse({'error': 'invalid credentials'}, status=401)
-    encoded_jwt = jwt.encode({"userName": dbUser.Username, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")#    Export to .env file        #    Add env_example file
+    encoded_jwt = jwt.encode({"userName": dbUser.Username, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")
     if dbUser.twoFA != 'None':
         print("coucou 2fa", file=sys.stderr)
-        code = generate_code(8)
+        code = mid.generate_code(8)
         cache.set(code, dbUser.Username, 600)
         mailData = {
         'title': 'Your 2FA code for Transcendance',
@@ -300,7 +166,7 @@ def login(request):
         response = requests.post('http://mail:8002/sendMail/', json=mailData)
         print({'error': 'Failed to send email {}'}, file=sys.stderr)
         if response.status_code != 200:
-            return JsonResponse({'error': 'Failed to send email'}, status=500)
+            return JsonResponse({'error': 'Failed to send email'}, status=200)
 
         return JsonResponse({"twoFA": 'true', 'guestMode': 'false'}, status=200)#code a verifier code 2fa attendu
     response_data = JsonResponse({"twoFA": 'false', "guestMode": "false", "username":dbUser.Username, "Avatar":dbUser.Avatar, "lang": dbUser.language, "email": dbUser.Email})
@@ -411,59 +277,6 @@ def checkAuth42(request):
         return HttpResponse(status=405)
     return response
 
-def save_file(uploaded_file, mime_type):
-    upload_dir = '/images'
-    file_name = generate_code()
-    file_path = os.path.join(upload_dir, file_name)
-    extensionDict = {
-            'image/jpeg': 'jpeg',
-            'image/png': 'png',
-            'image/svg+xml': 'svg',
-            'image/webp': 'webp'
-    }
-    extension = extensionDict[mime_type]
-    file_path = '.'.join((file_path, extension))
-    print(f"path image == {file_path}", file=sys.stderr)
-    with open(file_path, 'wb+') as destination:
-        for chunk in uploaded_file.chunks():
-            destination.write(chunk)
-    return file_path
-
-
-def image_validation(request):
-    print(f'=== request.FILE: {request.FILES}', file=sys.stderr)
-    if 'file' in request.FILES:
-        print(f"=== request.FILE['file']: {request.FILES['file']}", file=sys.stderr)
-        uploaded_file = request.FILES['file']
-        mime_type = uploaded_file.content_type
-        print(f'image mime type: {mime_type}', file=sys.stderr)
-        accepted_mime_types = [
-            'image/jpeg',   # JPEG
-            'image/png',    # PNG
-            'image/svg+xml', # SVG
-            'image/webp'    # WebP
-        ]
-        if mime_type in accepted_mime_types:
-            return save_file(uploaded_file, mime_type)
-        else:
-            raise customException("Invalid image format", 200)
-
-# def is_valid_choice(value, model_class):
-#     try:
-#         print(f'value == {value}', file=sys.stderr)
-#         choices = getattr(model_class, 'language', None)
-#         if choices is None:
-#             print(f'choices == {choices}', file=sys.stderr)
-#             return False 
-#         print(f'return value == {value in [choice[0] for choice in choices]}', file=sys.stderr)
-#         return value in [choice[0] for choice in choices]
-#     except Exception as e:
-#         print(f'exception == {e}', file=sys.stderr)
-
-def is_valid_choice(value, model_class):
-    valid_choices = ["FR", "EN", "NL"]
-    return value in valid_choices
-
 @csrf_exempt
 @require_http_methods(["POST"])
 def updateUserInfos(request):
@@ -475,7 +288,9 @@ def updateUserInfos(request):
     # print(f'body: {request.body}')
     decoded_body = request.body.decode('utf-8')
     print(f'body dans updta user info: {request.body}', file=sys.stderr)
-    body = json.loads(request.body.decode('utf-8'))
+    body = mid.loadJson(request.body.decode('utf-8'))
+    if body is None:
+        return JsonResponse({"error": "invalid Json"}, status=403)
 
     # Vérifiez s'il y a un fichier et si son contenu est non vide
     if 'file' in body:
@@ -484,11 +299,9 @@ def updateUserInfos(request):
     else:
         print("Aucun fichier trouvé ou vide", file=sys.stderr)
     # print(f'file dans updta user info: {decoded_body['file']}', file=sys.stderr)
-    try:
-        data = json.loads(decoded_body)
-    except Exception as e:
-        print("Erreur lors du parsing JSON", file=sys.stderr)
-        return JsonResponse({'error': "invalid Json"}, status=403)
+    data = mid.loadJson(decoded_body)
+    if data is None:
+        return JsonResponse({"error": "invalid Json"}, status=403)
 
     # # Accédez au champ "avatar"
     # if 'avatar' in parsed_json:
@@ -499,20 +312,18 @@ def updateUserInfos(request):
 
     # avatar = data['avatar']
     #print(f'Avatar update user info: {avatar}', file=sys.stderr)
-    try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError:
-        print('json')
-        return JsonResponse({'error': 'Invalid JSON'}, status=403)
-    auth = checkCookie(request, 'auth')
+    data = mid.loadJson(request.body)
+    if data is None:
+        return JsonResponse({"error": "invalid Json"}, status=403)
+    auth = mid.checkCookie(request, 'auth')
     if auth is None:
         print('coockie missing')
         return HttpResponse(status=403)
     user = ""
     try:
-        user = decodeJwt(auth)
-        # user = get_user_in_db('Username', userName)
-    except customException as e:
+        user = mid.decodeJwt(auth)
+        # user = mid.get_user_in_db('Username', userName)
+    except mid.customException as e:
         print('e.data')
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
@@ -529,13 +340,13 @@ def updateUserInfos(request):
         # return JsonResponse({'error': 'user do not exist'}, status=403)
     if 'username' in data and data['username'] and user.Username != data['username']:
         print("verification user already existing", file=sys.stderr)
-        if get_user_in_db('Username', data['username']) is not None:
+        if mid.get_user_in_db('Username', data['username']) is not None:
             print('userneame', file=sys.stderr)
             return JsonResponse({"errorUsername": "username already exists"}, status=403)
         user.Username = data['username']
     if 'email' in data and data['email'] and user.Email != data['email']:
         print("verification email already existing", file=sys.stderr)
-        if get_user_in_db('Email', data['email']) is not None:
+        if mid.get_user_in_db('Email', data['email']) is not None:
             print('enmail', file=sys.stderr)
             return JsonResponse({"errorEmail": "email already exists"}, status=403)
         user.Email = data['email']
@@ -544,7 +355,7 @@ def updateUserInfos(request):
         if (len(data['passwordNew'])) < 8 or len(data['passwordNew']) > 70:
             return JsonResponse({'error': 'password length should be between 8 and 70 characters'}, status=200)
         try:#penser a comparer le currpasswd avec celui en bdd
-            encoded_password = generate_bcrypt_hash(data['passwordNew'])
+            encoded_password = mid.generate_bcrypt_hash(data['passwordNew'])
             user.Password = encoded_password.decode('utf-8')
         except Exception as e:
             print(f"error == {e}", file=sys.stderr)
@@ -559,7 +370,7 @@ def updateUserInfos(request):
 #        user.Avatar = data['avatar']
     if 'lang' in data and data['lang']:
         print("je passe par les langues 1", file=sys.stderr)
-        if is_valid_choice(data['lang'], User.language):
+        if mid.is_valid_lang(data['lang']):
             print("La langue est valide", file=sys.stderr)
             print("jep asse par les langues 2", file=sys.stderr)
             user.language = data['lang']
@@ -582,11 +393,9 @@ def updateUserInfos(request):
 def sendNewPaswd(request):
     decoded_body = request.body.decode('utf-8')
     print(f'body dans get new psswd: {request.body}', file=sys.stderr)
-    data= {}
-    try:
-        data = json.loads(request.body.decode('utf-8'))#try catch
-    except Exception as e:
-        return JsonResponse({"error": "wrong Json format"}, status=403)
+    data = mid.loadJson(request.body.decode('utf-8'))
+    if data is None:
+        return JsonResponse({"error": "invalid Json"}, status=403)
     url = request.build_absolute_uri()
     print(url, file=sys.stderr)
     if 'code' not in data or not data['code']:
@@ -596,17 +405,27 @@ def sendNewPaswd(request):
     username = cache.get(data['code'], None)
     if username is None:
         return JsonResponse({"error": "invalid code"}, status=401)
-    dbUser = get_user_in_db('Username', username)
+    dbUser = mid.get_user_in_db('Username', username)
     if dbUser is None:
         return JsonResponse({"error": "user does not exist"}, status=403)
     try:
-        encoded_password = generate_bcrypt_hash(data['password'])
+        #verif taille password
+        encoded_password = mid.generate_bcrypt_hash(data['password'])
         dbUser.Password = encoded_password.decode('utf-8')
     except Exception as e:
         print(f"error == {e}", file=sys.stderr)
         return JsonResponse({"error": "There's something wrong, please try again."}, status=200)
-    dbUser.save()
+## DONT FORGET TO CHECK EVERYTHING BEFORE TRYINNG TO SAVE IN DB
+#
+    try:
+        dbUser.save()
+    except Exception:
+        return JsonResponse({'error': 'Unable to save in database', 200})
+    # if 'username' in data and data['username'] and user.Username != data['username']:
+    cache.delete(data['code'])
     return JsonResponse({'message': "new password set successfuly"})
+#
+##
 
 @csrf_exempt
 def disconnect(request):
@@ -616,15 +435,14 @@ def disconnect(request):
 
 @csrf_exempt
 def updateInfo(request):
-#recuperer l'user
-    auth = checkCookie(request, 'auth')
+    auth = mid.checkCookie(request, 'auth')
     user = ''
     if auth is None:
         return JsonResponse({'error': 'Unauthorized request'}, status=403)
     user = ""
     try:
-        user = decodeJwt(auth)
-    except customException as e:
+        user = mid.decodeJwt(auth)
+    except mid.customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
         return JsonResponse({"error": "User does not exists"}, status=403)
@@ -632,7 +450,7 @@ def updateInfo(request):
     foeObject = []
 # creer l'obj ami a renvoyer
     for friend in user.friendsList:
-        DBFriend = get_user_in_db("Username", friend)
+        DBFriend = mid.get_user_in_db("Username", friend)
         friendObject.append({
             "username": DBFriend.Username,
             "lastTimeOnline": DBFriend.lastTimeOnline.isoformat(),
@@ -641,7 +459,7 @@ def updateInfo(request):
         })
 #lster les bloques a renvoyer
     for block in user.foeList:
-        DBFoe = get_user_in_db("Username", block)
+        DBFoe = mid.get_user_in_db("Username", block)
         avatarPath = ""
         if not DBFoe.Avatar:
             avatarPath = "/images/default_avatar.png"
@@ -662,8 +480,7 @@ def updateInfo(request):
     print(f'update info : challenge en attente de l user: {user.Username} son id: {user.id} et ses challenges en attentes sont: {receivedChallenge}', file=sys.stderr)
     challengerArray = []
     for i, challanger in enumerate(receivedChallenge):
-        print(f'update info : challenger: {challanger}', file=sys.stderr)
-        loopUser = get_user_in_db('id', challanger[0])
+        loopUser = mid.get_user_in_db('id', challanger[0])
         if loopUser is None:
             print('update info :  no user found', file=sys.stderr)
         else:
@@ -683,7 +500,7 @@ def updateInfo(request):
     accepted = cache.get(f'accecptedChallenge{user.id}', "")
     cache.delete(f'accecptedChallenge{user.id}')
     if accepted:
-        accepted = get_user_in_db('id', accepted)
+        accepted = mid.get_user_in_db('id', accepted)
         if accepted is None:
             return JsonResponse({"error": "user does not exist"}, status=200)
         else:
@@ -706,26 +523,24 @@ def updateInfo(request):
 def sendInvitation(request):
     # tjs valide sauf bidouille verifier l'user
     #ajouter dans le cache {pendingChallenge:{challanged: challenger}}
-    auth = checkCookie(request, 'auth')
+    auth = mid.checkCookie(request, 'auth')
     if auth is None:
         print('coockie missing')
         return HttpResponse(status=403)
     dbUser = {}
     try:
-        dbUser = decodeJwt(auth)#bdd
-    except customException as e:
+        dbUser = mid.decodeJwt(auth)#bdd
+    except mid.customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
     if dbUser is None:
         return JsonResponse({"error": "User does not exist"}, status=401)
     usernameId = dbUser.id
-    data = {}
-    try:
-        data = json.loads(request.body)
-    except Exception as e:
+    data = mid.loadJson(request.body)
+    if data is None:
         return JsonResponse({"error": "invalid Json"}, status=403)
     if 'toChallenge' not in data:
         return JsonResponse({"error": "invalid Json"}, status=403)
-    challengedUser = get_user_in_db('Username', data['toChallenge'])
+    challengedUser = mid.get_user_in_db('Username', data['toChallenge'])
     if challengedUser is None:
         return JsonResponse({"error": "user does not exist"}, status=200)
     challenge = cache.get('pendingChallenge', {})
@@ -741,19 +556,18 @@ def sendInvitation(request):
 @csrf_exempt
 def acceptInvitation(request):
 #recuperer et verifier le coockie auth
-    auth = checkCookie(request, 'auth')
+    auth = mid.checkCookie(request, 'auth')
     if auth is None:
         print('coockie missing')
         return HttpResponse(status=403)
     user = {}
 #decoder le jwt et recuperer une instance de l'user via la DB
     try:
-        user = decodeJwt(auth)
-    except customException as e:
+        user = mid.decodeJwt(auth)
+    except mid.customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
         return JsonResponse({"error": "user does not exist"}, status=403)
-    data = {}
 # recuperer dans le cache la liste des defis en attente
     pendingChallenge = cache.get('pendingChallenge', None)
     if pendingChallenge is None:
@@ -764,23 +578,20 @@ def acceptInvitation(request):
     arrayChallenger = pendingChallenge[user.id]
 
 #decompresser le json d body puis verifier la presence du champ 'username'
-    try:
-        data = json.loads(request.body)
-    except Exception:
-        return JsonResponse({"error": "invalid Json"}, status=403)
-    if 'username' not in data:
+    data = mid.loadJson(request.body)
+    if data is None or 'username' not in data:
         return JsonResponse({"error": "invalid Json"}, status=403)
 
 #recuperer l'adversaire en bdd
     ligne_correspondance = ''
-    opponent = get_user_in_db('Username', data['username'])
+    opponent = mid.get_user_in_db('Username', data['username'])
     if opponent is None:
 #si on ne trouve pas l'username en db on cherche une reference de cet username dans les defis en atente
         ligne_correspondance = next((ligne for ligne in arrayChallenger if ligne[0] == opponent.id), None)
         if ligne_correspondance is None:
             return JsonResponse({"error": "cannot found opponent."}, status=200)
 #sinon on le cherche avec le id car l'username a ete identifie l'user a pu changer son userame, echec si l'user a ete delete?      
-        opponent = get_user_in_db('id', ligne_correspondance[0])
+        opponent = mid.get_user_in_db('id', ligne_correspondance[0])
         if opponent is None:
             return JsonResponse({"error": "cannot found opponent."}, status=403)
 #cas ou l'adversaire a ete trouve mais que l'username ne correspond pas
@@ -828,17 +639,16 @@ def acceptInvitation(request):
 
 @csrf_exempt
 def checkCodeLog(request):
-    try:
-        data = json.loads(request.body)
-    except Exception:
-        return HttpResponse(status=403)
+    data = mid.loadJson(request.body)
+    if data is None:
+        return JsonResponse({"error": "invalid Json"}, status=403)
     #recoit un demande d'activation 2fa on recupere l'usser via le JWT et on lui envoie un mail contannt le code + le stocker en cache cle code value user 10 minutes
     if 'code' in data:
         print(f"code == {data['code']}", file=sys.stderr)
         code = data['code']
         username = cache.get(code)
         cache.delete(code)
-        user = get_user_in_db("Username", username)
+        user = mid.get_user_in_db("Username", username)
         if user is None:
             return JsonResponse({"error":"user does not exist"}, status=401)
         expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
@@ -880,83 +690,20 @@ def set2FA(request):
 #             code.append(chr(48 + value - 52))
 #     return ''.join(code)
 
-
-def get_alpha_maj(value:int)->str:
-    print(f'originale value == {value}', file=sys.stderr)
-    if chr(value) in "IJLO":
-        value += 5
-    print(f'generated letter == {chr(value)}', file=sys.stderr)
-    return chr(value)
-
-def get_alpha_min(value:int)->str:
-    print(f'originale value == {value}', file=sys.stderr)
-    if chr(value) in "ijlo":
-        value += 5
-    print(f'generated letter == {chr(value)}', file=sys.stderr)
-    return chr(value)
-
-def get_digit(value:int)->str:
-    print(f'originale value == {value}', file=sys.stderr)
-    if value == chr(0):
-        value += 1
-    print(f'generated letter == {chr(value)}', file=sys.stderr)
-    return chr(value)
-
-def generate_code(size:int=100)->str:
-    code = []
-    if size <= 0:
-        size = 100
-    for _ in range(size):
-        value = random.randint(0, 61)
-        if value < 10:
-            code += get_digit(value + ord('0'))
-        elif value < 35:
-            code += get_alpha_min(value - 9 + ord('a'))
-        else:
-            code += get_alpha_maj(value - 35 + ord('A'))
-    return ''.join(code)
-
-@csrf_exempt
-def checkCodeModifyPassword(request):
-    code = request.GET.get('code')
-    if code:
-        print({"message": f"Code received: {code}"})
-    if not code:
-        return JsonResponse({"error": "No code provided"}, status=400)
-    userName = cache.get(code)
-    if userName is None:
-        return JsonResponse({"error": "Invalid or expired code"}, status=400)
-    cache.delete(code)
-    try:
-        user = User.objects.get(username=userName)
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return HttpResponseBadRequest({'error': 'Invalid JSON'}, status=403)
-        if 'password' in data:
-            user.Password = data['password']
-            user.save()
-            return JsonResponse({"message":"password successfully updated"}, status=200)
-    except User.DoesNotExist:
-        print('User does not exist')
-        return JsonResponse({'error': 'User does not exist'}, status=404)
-
 @csrf_exempt
 @require_http_methods(["POST"])
 def resetPasswd(request):
     print("jep asse par ici", file=sys.stderr)
-    validationCode = generate_code()
-    try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError:
-        print("je passe par erreur json", file=sys.stderr)
-        return HttpResponseBadRequest({'error': 'Invalid JSON'}, status=403)
+    validationCode = mid.generate_code()
+    data = mid.loadJson(request.body)
+    if data is None:
+        return JsonResponse({"error": "invalid Json"}, status=403)
     email = ""
     if "email" not in data:
         print("je passe par erreur email", file=sys.stderr)
         return JsonResponse({'error': 'Invalid format'}, status=403)
     email = data['email']
-    user = get_user_in_db('Email', email)
+    user = mid.get_user_in_db('Email', email)
     if user is None:
         print("je passe par erreur no user", file=sys.stderr)
         return JsonResponse({'error': 'User does not exist'}, status=403)
@@ -990,16 +737,16 @@ def matchMaking(request):
     # check si le joueur est dans le cache , l'enlever et set la marge lvladveraire
     # check dans le cache si on lui trouve un avdversaire
     # sinon ajouter le joueur dans le cache
-    auth = checkCookie(request, 'auth')
+    auth = mid.checkCookie(request, 'auth')
     if auth is None:
         return JsonResponse({'error': 'User not connected'}, status=403)
     print(f'le cookie est {auth}', file=sys.stderr)
     username = ""
     try:
-        username = decodeJwt(auth)
-    except customException as e:
+        username = mid.decodeJwt(auth)
+    except mid.customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
-    user = get_user_in_db("Username", username)
+    user = mid.get_user_in_db("Username", username)
     if user is None:
         return JsonResponse({"error": "User does not exits"}, status=403)
     print(f'le username est {username}', file=sys.stderr)
@@ -1044,20 +791,20 @@ def ping(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def sendFile(request):
-    auth = checkCookie(request, 'auth')
+    auth = mid.checkCookie(request, 'auth')
     if auth is None:
         return JsonResponse({'error': 'User not connected'}, status=403)
     print(f'le cookie est {auth}', file=sys.stderr)
     user = ""
     try:
-        user = decodeJwt(auth)
+        user = mid.decodeJwt(auth)
         if user is None:
             return JsonResponse({'error': 'User does not exist'}, status=403)
-    except customException as e:
+    except mid.customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
     oldAvatar = user.Avatar
     try:
-        imagePath = image_validation(request)
+        imagePath = mid.image_validation(request)
         try:
             user.Avatar = imagePath
             user.save()
@@ -1068,8 +815,6 @@ def sendFile(request):
     if oldAvatar:
         os.remove(oldAvatar)
     return HttpResponse(status=200)
-
-
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -1083,19 +828,18 @@ def addFriend(request):
     #6 renvoyer status == 200
 
     #1
-    cookie = checkCookie(request, 'auth')
+    cookie = mid.checkCookie(request, 'auth')
     if cookie is None:
         return JsonResponse({'error': 'User not logged'}, status=401)
     try:
-      user = decodeJwt(cookie)
-    except customException as e:
-      return JsonResponse({'error': e.data}, status=e.status)
+      user = mid.decodeJwt(cookie)
+    except mid.customException as e:
+      return JsonResponse({'error': e.data}, status=e.code)
 
     #2
-    try:
-        data = json.loads(request.body)
-    except Exception as e:
-        return JsonResponse({'error': 'Invalid Json'}, status=403)
+    data = mid.loadJson(request.body)
+    if data is None:
+        return JsonResponse({"error": "invalid Json"}, status=403)
     if not 'newFriend' in data:
         return JsonResponse({'error': 'No newFriend in request body'}, status=403)
     newFriend = data['newFriend']
@@ -1103,12 +847,12 @@ def addFriend(request):
         return JsonResponse({'error': 'NewFriend is user itself'}, status=403)
 
     #3
-    newFriend = get_user_in_db('Username', data['newFriend'])
+    newFriend = mid.get_user_in_db('Username', data['newFriend'])
     if newFriend is None:
         return JsonResponse({'error': 'newFriend not found'}, status=404)
      
     #4
-    user = get_user_in_db('Username', user)
+    user = mid.get_user_in_db('Username', user)
     if user is None:
         return JsonResponse({'error': 'User does not exist'}, status=401)
     for x in user.foeList:
@@ -1118,7 +862,7 @@ def addFriend(request):
     #4.5
     for x in user.friendsList:
         if x == newFriend.Username:
-            return JsonResponse({'message': 'Friend already in friends list'}, status=200)
+            return JsonResponse({'error': 'Friend already in friends list'}, status=200)
 
     #5
     user.friendsList.append(newFriend)
@@ -1141,19 +885,18 @@ def blockUser(request):
     #6 renvoyer status == 200
 
     #1
-    cookie = checkCookie(request, 'auth')
+    cookie = mid.checkCookie(request, 'auth')
     if cookie is None:
         return JsonResponse({'error': 'User not logged'}, status=401)
     try:
-      user = decodeJwt(cookie)
-    except customException as e:
-      return JsonResponse({'error': e.data}, status=e.status)
+      user = mid.decodeJwt(cookie)
+    except mid.customException as e:
+      return JsonResponse({'error': e.data}, status=e.code)
 
     #2
-    try:
-        data = json.loads(request.body)
-    except Exception as e:
-        return JsonResponse({'error': 'Invalid Json'}, status=403)
+    data = mid.loadJson(request.body)
+    if data is None:
+        return JsonResponse({"error": "invalid Json"}, status=403)
     if not 'toBlock' in data:
         return JsonResponse({'error': 'No toBlock in request body'}, status=403)
     toBlock = data['toBlock']
@@ -1161,12 +904,12 @@ def blockUser(request):
         return JsonResponse({'error': 'Person to block is user itself'}, status=403)
 
     #3
-    toBlock = get_user_in_db('Username', data['toBlock'])
+    toBlock = mid.get_user_in_db('Username', data['toBlock'])
     if toBlock is None:
         return JsonResponse({'error': 'Person to block not found'}, status=404)
      
     #4
-    user = get_user_in_db('Username', user)
+    user = mid.get_user_in_db('Username', user)
     if user is None:
         return JsonResponse({'error': 'User does not exist'}, status=401)
     for x in user.friendsList:
@@ -1194,23 +937,22 @@ def deleteFriend(request):
     # renvoyer status == 200
 
     #1
-    cookie = checkCookie(request, 'auth')
+    cookie = mid.checkCookie(request, 'auth')
     if cookie is None:
         return JsonResponse({'error': 'User not logged'}, status=401)
     try:
-      user = decodeJwt(cookie)
-    except customException as e:
-      return JsonResponse({'error': e.data}, status=e.status)
+      user = mid.decodeJwt(cookie)
+    except mid.customException as e:
+      return JsonResponse({'error': e.data}, status=e.code)
 
     #2
-    try:
-        data = json.loads(request.body)
-    except Exception as e:
-        return JsonResponse({'error': 'Invalid Json'}, status=403)
+    data = mid.loadJson(request.body)
+    if data is None:
+        return JsonResponse({"error": "invalid Json"}, status=403)
     if not 'unfriend' in data:
         return JsonResponse({'error': 'No unfriend in request body'}, status=403)
     unfriend = data['unfriend']
-    user = get_user_in_db('Username', user)
+    user = mid.get_user_in_db('Username', user)
     if user is None:
         return JsonResponse({'error': 'User not in db'}, status=403)
     try:
@@ -1232,23 +974,22 @@ def deleteBlockedUser(request):
     # renvoyer status == 200
 
     #1
-    cookie = checkCookie(request, 'auth')
+    cookie = mid.checkCookie(request, 'auth')
     if cookie is None:
         return JsonResponse({'error': 'User not logged'}, status=401)
     try:
-      user = decodeJwt(cookie)
-    except customException as e:
-      return JsonResponse({'error': e.data}, status=e.status)
+      user = mid.decodeJwt(cookie)
+    except mid.customException as e:
+      return JsonResponse({'error': e.data}, status=e.code)
 
     #2
-    try:
-        data = json.loads(request.body)
-    except Exception as e:
-        return JsonResponse({'error': 'Invalid Json'}, status=403)
+    data = mid.loadJson(request.body)
+    if data is None:
+        return JsonResponse({"error": "invalid Json"}, status=403)
     if not 'unblock' in data:
         return JsonResponse({'error': 'No unblock in request body'}, status=403)
     unblock = data['unblock']
-    user = get_user_in_db('Username', user)
+    user = mid.get_user_in_db('Username', user)
     if user is None:
         return JsonResponse({'error': 'User not in db'}, status=403)
     try:

@@ -803,7 +803,7 @@ def acceptInvitation(request):
         challengerIsPlaying = True
     if userIsPlaying is True or challengerIsPlaying is True:
         return JsonResponse({"error": "You or the challenger player is currently playing. Try again later."}, status=200)
-    gameData = {'player1': user.Username, 'player2': data['username']}
+    gameData = {'player1': user.id, 'player2': opponent.id}
 # creer la partie en bdd
     gameResponse = requests.post('http://pong:8004/initGame/', json=gameData)#inscrit la partie en bdd jeu
     print(f'acceptInvitation: response for PlayerPlaying == {gameResponse.status_code}', file=sys.stderr)

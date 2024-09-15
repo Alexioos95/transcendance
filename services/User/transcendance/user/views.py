@@ -606,7 +606,6 @@ def sendNewPaswd(request):
         print(f"error == {e}", file=sys.stderr)
         return JsonResponse({"error": "There's something wrong, please try again."}, status=200)
     dbUser.save()
-    # if 'username' in data and data['username'] and user.Username != data['username']:
     return JsonResponse({'message': "new password set successfuly"})
 
 @csrf_exempt
@@ -615,9 +614,9 @@ def disconnect(request):
     response.set_cookie('auth', '', expires='Thu, 01 Jan 1970 00:00:00 GMT')
     return response
 
-#ajouter les ids dans le jwt!!!!!!
 @csrf_exempt
 def updateInfo(request):
+#recuperer l'user
     auth = checkCookie(request, 'auth')
     user = ''
     if auth is None:
@@ -625,14 +624,13 @@ def updateInfo(request):
     user = ""
     try:
         user = decodeJwt(auth)
-        # user = get_user_in_db('Username', userName)
     except customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
         return JsonResponse({"error": "User does not exists"}, status=403)
     friendObject = []
     foeObject = []
-    # Modification principale : utiliser append() au lieu de +=
+# creer l'obj ami a renvoyer
     for friend in user.friendsList:
         DBFriend = get_user_in_db("Username", friend)
         friendObject.append({
@@ -641,7 +639,7 @@ def updateInfo(request):
             # "id": DBFriend.id,
             "avatar":DBFriend.Avatar
         })
-
+#lster les bloques a renvoyer
     for block in user.foeList:
         DBFoe = get_user_in_db("Username", block)
         avatarPath = ""
@@ -655,60 +653,42 @@ def updateInfo(request):
             # "id": DBFriend.id,
             "avatar":avatarPath
         })
+#recuperer les defis qui nous ont etes lances
     challenge = cache.get('pendingChallenge', {})
     receivedChallenge = []
     if user.id in challenge:
         receivedChallenge = challenge[user.id]
-    # print(f'liste des challenge en attente: {challenge}', file=sys.stderr)
-    # print(f'challenge en attente de l user: {user.Username} son id: {user.id} et ses challenges en attentes sont: {receivedChallenge}', file=sys.stderr)
+    print(f'update info : liste des challenge en attente: {challenge}', file=sys.stderr)
+    print(f'update info : challenge en attente de l user: {user.Username} son id: {user.id} et ses challenges en attentes sont: {receivedChallenge}', file=sys.stderr)
     challengerArray = []
     for i, challanger in enumerate(receivedChallenge):
-        print(f'challenger: {challanger}', file=sys.stderr)
+        print(f'update info : challenger: {challanger}', file=sys.stderr)
         loopUser = get_user_in_db('id', challanger[0])
         if loopUser is None:
-            print('no user found', file=sys.stderr)
+            print('update info :  no user found', file=sys.stderr)
         else:
             if challanger[2] == False:
-                print(f'challenger en attente de l user: {loopUser} ', file=sys.stderr)
+                print(f'update info :  challenger en attente de l user: {loopUser} ', file=sys.stderr)
                 receivedChallenge[i] = (challanger[0], challanger[1], True)
                 challengerArray.append(challanger[1])
-
-    # print(f'reveived challange apres la boucle : {receivedChallenge}', file=sys.stderr)
-    # print(f'challange apres la boucle : {challenge}', file=sys.stderr)
     cache.delete('pendingChallenge')
     cache.set('pendingChallenge', challenge, 7200)
+#recuperer le defi qui a ete lance et accepte s'il y en a un
     acceptedChallenge = cache.get('accecptedChallenge', {})
     if user.id in acceptedChallenge:
         accepted = acceptedChallenge[user.id]
         cache.delete('accecptedChallenge')
         del acceptedChallenge[user.id]
         cache.set('accecptedChallenge', challenge, 7200)
-
-    accepted = cache.get(f'accecptedChallenge{user.Username}', "")#id plus tard
-    # adv = get_user_in_db('id', accepted)
-    print(f'accepted = {accepted}',file=sys.stderr)
-    cache.delete(f'accecptedChallenge{user.Username}')#id plus tard
-    # accepted = adv.Username
-#  cache.set(f'accecptedChallenge{data['username'].id}', user.id, 60)
-    # challenge = cache.get('pendingChallenge', {})
-    # received_challenge = []
-
-    # if user.id in challenge:
-    #     print('coucou', file=sys.stderr)
-    #     received_challenge = challenge[user.id]
-
-    # print(f'Liste des challenges en attente: {challenge}', file=sys.stderr)
-    # print(f'Challenges en attente de l\'utilisateur {user.Username} (ID: {user.id}) et ses challenges en attentes sont: {received_challenge}', file=sys.stderr)
-    # challenger_array = []
-
-    # for challenger_id in received_challenge:
-    #     user = get_user_in_db(challenger_id)
-    #     if user is None:
-    #         print(f'Aucun utilisateur trouvé pour l\'ID {challenger_id}', file=sys.stderr)
-    #     else:
-    #         print(f'Utilisateur en attente de {user.Username} (ID: {user.id})', file=sys.stderr)
-    #     challenger_array.append(user.Username)
-    # print(f'challenger array == {challengerArray}', file=sys.stderr)
+    accepted = cache.get(f'accecptedChallenge{user.id}', "")
+    cache.delete(f'accecptedChallenge{user.id}')
+    if accepted:
+        accepted = get_user_in_db('id', accepted)
+        if accepted is None:
+            return JsonResponse({"error": "user does not exist"}, status=200)
+        else:
+            accepted = accepted.Username
+#objet a renvoyer
     objectPing = {
         "username": user.Username,
         "avatar": user.Avatar,
@@ -719,7 +699,7 @@ def updateInfo(request):
         'challengeAccepted': {'game': 'pong', 'username': accepted}
     }
 
-    print(f'object: {json.dumps(objectPing)}', file=sys.stderr)
+    print(f'update info : object: {json.dumps(objectPing)}', file=sys.stderr)
     return JsonResponse(objectPing, status=200)
 
 @csrf_exempt
@@ -753,27 +733,20 @@ def sendInvitation(request):
         challenge[challengedUser.id] = []
     challenge[challengedUser.id].append((usernameId, dbUser.Username, False))
     cache.set('pendingChallenge', challenge, 7200)
+    # print(f'ceci est la liste des challenges en cours!: {challenge}', file=sys.stderr)
+    challenge = cache.get('pendingChallenge', {})
     print(f'ceci est la liste des challenges en cours!: {challenge}', file=sys.stderr)
-    return JsonResponse({}, status=200)
-
-    # if challenge and :
-    #     challenge['username']
-    # cache.set()
+    return JsonResponse({"message": "player successfully invited"}, status=200)
 
 @csrf_exempt
 def acceptInvitation(request):
-    #fail si une partie est adctuellement en cours pour le joueur defie ou pour l'user qui accepte
-    # get le joueur en bdd
-    # je le cherche dans le cache a la ligne de l'user de cette requete si je trouve je compare les id si id pas correspondant ou que le joueur n'a pas ete initiallement identifie
-    # refaire une requete bdd sur l'id pour avoir le joueur rellement a l'origine de la requete si joueur non identifiable retourner 403 une fois joueur identifie continuer
-    #ajouter dans le cache {accecptedChallenge:{challanger: challenged}}
-    
-    # verifier si l'user est en train de jouer en appelant la route http://os.environ['DUMP']/pong/playerPLaying, POST? utiliser 2 code de retour pour true false 200/418
+#recuperer et verifier le coockie auth
     auth = checkCookie(request, 'auth')
     if auth is None:
         print('coockie missing')
         return HttpResponse(status=403)
     user = {}
+#decoder le jwt et recuperer une instance de l'user via la DB
     try:
         user = decodeJwt(auth)
     except customException as e:
@@ -781,41 +754,75 @@ def acceptInvitation(request):
     if user is None:
         return JsonResponse({"error": "user does not exist"}, status=403)
     data = {}
-    print(f'acceptInvitation: {request.body}', file=sys.stderr)
+# recuperer dans le cache la liste des defis en attente
+    pendingChallenge = cache.get('pendingChallenge', None)
+    if pendingChallenge is None:
+        return JsonResponse({"error": "challenge is not acceptable anymore."}, status=200)
+#recuperer les defis lances a notre user dans les defis en attente
+    if user.id not in pendingChallenge:
+        return JsonResponse({"error": "challenge is not acceptable anymore."}, status=200)
+    arrayChallenger = pendingChallenge[user.id]
+
+#decompresser le json d body puis verifier la presence du champ 'username'
     try:
         data = json.loads(request.body)
     except Exception:
         return JsonResponse({"error": "invalid Json"}, status=403)
-    # print(f'acceptInvitation: data == {data}', file=sys.stderr)
-    # challanger = get_user_in_db(data['username'])
-    # cache.get('pendingChallenge', {}) verifier info pas erronee et trouerl e bon joueur
+    if 'username' not in data:
+        return JsonResponse({"error": "invalid Json"}, status=403)
+
+#recuperer l'adversaire en bdd
+    ligne_correspondance = ''
+    opponent = get_user_in_db('Username', data['username'])
+    if opponent is None:
+#si on ne trouve pas l'username en db on cherche une reference de cet username dans les defis en atente
+        ligne_correspondance = next((ligne for ligne in arrayChallenger if ligne[0] == opponent.id), None)
+        if ligne_correspondance is None:
+            return JsonResponse({"error": "cannot found opponent."}, status=200)
+#sinon on le cherche avec le id car l'username a ete identifie l'user a pu changer son userame, echec si l'user a ete delete?      
+        opponent = get_user_in_db('id', ligne_correspondance[0])
+        if opponent is None:
+            return JsonResponse({"error": "cannot found opponent."}, status=403)
+#cas ou l'adversaire a ete trouve mais que l'username ne correspond pas
+    else:
+        ligne_correspondance = next((ligne for ligne in arrayChallenger if ligne[1] == opponent.Username), None)
+        if ligne_correspondance is None:
+            ligne_correspondance = next((ligne for ligne in arrayChallenger if ligne[0] == opponent.Username), None)
+            if ligne_correspondance is None:
+                return JsonResponse({"error": "cannot found opponent."}, status=403)
+#l'adversaire a maintenant ete identifie
     userIsPlaying = False
     challengerIsPlaying = False
-    # print(f'envoi requete for PlayerPlaying ', file=sys.stderr)
-    response = requests.post('http://pong:8004/PlayerPlaying/', {"username":user.Username})
+# verifier si deja une partie existe pour notre user
+    response = requests.post('http://pong:8004/PlayerPlaying/', {"username":user.id})
     if response.status_code == 200:
         userIsPlaying = True
-    response = requests.post('http://pong:8004/PlayerPlaying/', {"username":data['username']})
+# verifier si deja une partie existe pour l adversaire 
+    response = requests.post('http://pong:8004/PlayerPlaying/', {"username":opponent.id})
     if response.status_code == 200:
         challengerIsPlaying = True
-    # print(f'acceptInvitation: response for PlayerPlaying == {response.status_code}', file=sys.stderr)
-    # print(f'acceptInvitation: body for PlayerPlaying == {response.text}', file=sys.stderr)
-
-    # verifier si deja une partie existe pour le challenger 
-    
     if userIsPlaying is True or challengerIsPlaying is True:
         return JsonResponse({"error": "You or the challenger player is currently playing. Try again later."}, status=200)
     gameData = {'player1': user.Username, 'player2': data['username']}
+# creer la partie en bdd
     gameResponse = requests.post('http://pong:8004/initGame/', json=gameData)#inscrit la partie en bdd jeu
     print(f'acceptInvitation: response for PlayerPlaying == {gameResponse.status_code}', file=sys.stderr)
     print(f'acceptInvitation: body for PlayerPlaying == {gameResponse.text}', file=sys.stderr)
-    
-
-    # challenge[challengedUser.id] = usernameId
-    cache.set(f'accecptedChallenge{data['username']}', user.Username, 60)#remplace par la data de bdd et mettre l'id du joueur
-
-
-    # creer la partie en bdd
+    if (gameResponse.status_code != 201):
+        return JsonResponse({"error": "failed to initate game"}, status=gameResponse.status_code)
+# challenge[challengedUser.id] = usernameId
+    cache.set(f'accecptedChallenge{opponent.id}', user.id, 60)
+    cache.delete('pendingChallenge')
+#recuperer l'index de la ligne pour effacer ce defi
+    line_index = next((i for i, ligne in enumerate(arrayChallenger) if ligne[0] == opponent.Username), None)
+    if line_index:
+        arrayChallenger.pop(line_index)
+    if not line_index or not arrayChallenger:
+        del pendingChallenge[user.id]
+    else:
+        pendingChallenge[user.id] = arrayChallenger
+#remettre les autres dans dans le cache
+    cache.set('pendingChallenge', pendingChallenge, 7200)
     # remove des partiePending + ajouter dans les parties acceptee cle challenger value chlange player user de cette requete
     return JsonResponse({}, status=200)
 

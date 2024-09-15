@@ -605,11 +605,11 @@ def acceptInvitation(request):
     userIsPlaying = False
     challengerIsPlaying = False
 # verifier si deja une partie existe pour notre user
-    response = requests.post('http://pong:8004/PlayerPlaying/', {"username":user.id})
+    response = requests.post('http://pong:8004/PlayerPlaying/', json={"username":user.id})
     if response.status_code == 200:
         userIsPlaying = True
 # verifier si deja une partie existe pour l adversaire 
-    response = requests.post('http://pong:8004/PlayerPlaying/', {"username":opponent.id})
+    response = requests.post('http://pong:8004/PlayerPlaying/', json={"username":opponent.id})
     if response.status_code == 200:
         challengerIsPlaying = True
     if userIsPlaying is True or challengerIsPlaying is True:
@@ -777,7 +777,7 @@ def matchMaking(request):
             print('ca matchamake pas la', file=sys.stderr)
         print(f"Username: {userName}, Time: {data['time'].timestamp()}, difference Level: {data['difLevel']}", file=sys.stderr)
     gameData = {'player1': "fguarrac", 'player2': "madaguen"}
-    gameResponse = requests.post('http://localhost:8001/Tetris/initGame/', json=gameData)#inscrit la partie en bdd jeu
+    gameResponse = requests.post('http://localhost:8001/Pong/initGame/', json=gameData)#inscrit la partie en bdd jeu
     print(gameResponse.status_code, file=sys.stderr)
     matchmakingDict[username] = userMatchmaking
     cache.set('matchmaking', matchmakingDict, timeout=3600)#si pas trouve sinon inscrire en bdd game

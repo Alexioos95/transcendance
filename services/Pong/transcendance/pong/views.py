@@ -20,7 +20,6 @@ def initGame(request):
     player2 = data.get('player2')
 
     if player1 is None or player2 is None:
-        print(f'player 1 == {player1} player 2 == {player2}')
         return JsonResponse({'error': 'player1 and player2 are required'}, status=403)
     
     # Créer une nouvelle instance de Game avec la date actuelle

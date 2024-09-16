@@ -2,14 +2,18 @@
 /////////////////////////
 // Script
 /////////////////////////
-// fetch ("/ping/testRoutes/")
-// 	.then(response => response.json())
-// 	.then(data => {
-// 		console.log(data);
-		checkJWT();
-		popState();
-	// })
-	// .catch("Failed to fetch the ping route");
+entrypoint();
+
+function	entrypoint()
+{
+	if (window.location.href.indexOf("resetmypassword") === -1 && window.location.href.indexOf("code") > -1)
+	{
+		close();
+		return ;
+	}
+	checkJWT();
+	popState();
+}
 
 async function	checkJWT()
 {

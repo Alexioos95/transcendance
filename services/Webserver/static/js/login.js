@@ -5,6 +5,7 @@
 function	login(prevData)
 {
 	const struct = getLoginStruct();
+	let click = 0;
 
 	struct.formButton.forgotPassword.addEventListener("click", function() {
 		if (struct.formInput.password.classList.contains("hideInFade"))
@@ -43,39 +44,34 @@ function	login(prevData)
 		window.history.pushState({ state: "login", lang: struct.langSelect.value }, "", "");
 	});
 	struct.fortyTwoConnection.addEventListener("click", function() {
+		if (click !== 0)
+			return ;
 		const url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9&redirect_uri=https%3A%2F%2F" + window.location.hostname + "%3A4433%2F&response_type=code";
-		console.log(url)
 		const popUp = window.open(url, "", "popup=true");
+		click++;
 
 		if (!popUp)
-			return (console.error("Couldn't open pop-up's connection to 42Intra."));
+		{
+			struct.error.innerHTML = "Couldn't open 42's Pop-up";
+			return ;
+		}
 		const myInterval = setInterval(() => {
-			console.log("fetch /user/checkAuth42");
 			fetch("/user/checkAuth42/", { method: "GET", credentials: "include"})
-				.then(response => response.json())
-				.then(data => {
-					if (popUp.closed)
+				.then(response => {
+					if (response.ok)
 					{
-						console.log("popUp was closed; clearInterval");
-						return (clearInterval(myInterval));
-					}
-					if (data.error === undefined)
-					{
-						console.log("response /user/checkAuth42 OK; Navigate to game")
 						clearInterval(myInterval);
-						return (navigate("game", data, { signUp: "false", lang: struct.langSelect.value }));
+						response.json()
+							.then(data => { return (navigate("game", data, { signUp: "false", lang: struct.langSelect.value }))});
 					}
-					else
-					{
-						console.log("response /user/checkAuth42 NOT OK; Wait 2s");
-						console.log(data);
-					}
+					if (popUp.closed)
+						return (clearInterval(myInterval));
 				})
 				.catch(() => {
 					console.error("Failed to fetch the checkAuth42 route");
 					clearInterval(myInterval);
 				});
-		}, 2000);
+		}, 1000);
 	});
 	struct.guestConnection.addEventListener("click", function() {
 		navigate("game", { guestMode: "true", lang: struct.langSelect.value }, { signUp: "false", lang: struct.langSelect.value });
@@ -385,7 +381,7 @@ async function showMessage(p)
 {
 	p.classList.add("success");
 	p.classList.remove("error");
-	p.innerHTML = "Success";	
+	p.innerHTML = "Success";
 }
 
 /////////////////////////

@@ -70,7 +70,7 @@ function	setupEventListeners(struct, data)
 		showScreen(struct.screen, struct.screen.wrapperOptions)
 	});
 	struct.header.logoutButton.addEventListener("click", function() {
-		struct.run = 0; 
+		struct.run = 0;
 		if (struct.screen.game !== undefined)
 			struct.screen.game.running = 0;
 		if (struct.guestMode === true)
@@ -149,7 +149,7 @@ function	setupEventListeners(struct, data)
 	struct.options.account.twoFA.radios[0].addEventListener("change", function() { struct.options.account.twoFA.wrapper.classList.add("hidden"); });
 	struct.options.account.twoFA.radios[1].addEventListener("change", function() {
 		const obj = { type: "email" };
-		
+
 		fetch("/user/init2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => response.json())
 			.then(data => {
@@ -163,7 +163,7 @@ function	setupEventListeners(struct, data)
 	});
 	struct.options.account.twoFA.button.addEventListener("click", function() {
 		const obj = { type: struct.options.account.twoFA.input.value };
-		
+
 		fetch("/user/set2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => response.json())
 			.then(data => {
@@ -312,7 +312,6 @@ function	replaceDatas(struct, data)
 				.then(data => {
 					if (data.error !== undefined || struct.run === 0)
 						return (clearInterval(myInterval));
-					console.log("data=", data);
 					// Re-build Avatar and Username
 					if (data.avatar !== undefined && data.avatar !== "" && data.avatar !== avatar.src)
 						avatar.src = data.avatar;
@@ -853,7 +852,6 @@ function	seeHistory(struct, button, own)
 		.then(data => {
 			if (data.error === undefined)
 			{
-				console.log("/user/seeHistory OK; display history over chat.")
 				resetPhoneClasses(struct, struct.cards.chat);
 				struct.tabs.wrapperTabs.classList.add("hidden");
 				struct.tabs.wrapperInputs.classList.add("zindex");
@@ -865,9 +863,7 @@ function	seeHistory(struct, button, own)
 				const tr = document.createElement("tr");
 				const td = document.createElement("td");
 				const p = document.createElement("p");
-	
-				console.log("/user/seeHistory NOT OK; do nothing.");
-				console.log(data);
+
 				p.classList.add("chat-announcement");
 				p.innerHTML = "Failed to see history of user";
 				td.appendChild(p);
@@ -884,7 +880,7 @@ function	sendInvite(struct, button)
 	const username = button.parentElement.parentElement.querySelector("span").innerHTML;
 	const obj = { toChallenge: username };
 
-	fetch("/user/sendInvitation/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})	
+	fetch("/user/sendInvitation/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 		.then(response => response.json())
 		.then(data => {
 			const tr = document.createElement("tr");
@@ -1026,7 +1022,6 @@ function	createChatMessage(struct, data)
 	else if (struct.options.lang.curr === "NL")
 		array = ["Aan vriendenlijst toevoegen", "Zie geschiedenis", "Uitnodigen voor Pong", "Gebruiker blokkeren"];
 	// Set avatar
-	console.log(data);
 	if (data.avatar !== undefined && data.avatar !== "")
 		avatar.src = data.avatar;
 	else
@@ -1117,7 +1112,6 @@ function	receiveInvitation(struct, data)
 		button.addEventListener("click", function() {
 			const obj = { username: button.querySelector("p span").innerHTML };
 
-			console.log("fetch /user/acceptInvitation");
 			fetch("/user/acceptInvitation/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 				.then(response => response.json())
 				.then(data => {
@@ -1131,11 +1125,6 @@ function	receiveInvitation(struct, data)
 								struct.screen.game.online = true;
 								struct.screen.game.run(struct);
 							});
-					}
-					else
-					{
-						console.log("response /user/acceptInvitation not good");
-						console.log(data);
 					}
 				})
 				.catch(() => console.error("Failed to fetch the acceptInvitation route"));
@@ -1463,20 +1452,13 @@ async function waitMatchMaking(struct)
 	{
 		return new Promise((resolve, reject) => {
 			const myInterval = setInterval(() => {
-				console.log("fetch /user/matchMaking");
 				fetch("/user/matchMaking/", { method: "GET", credentials: "include"})
 					.then(response => response.json())
 					.then(data => {
 						if (data.matched === "true")
 						{
-							console.log("response /user/matchMaking ok; clear interval");
 							clearInterval(myInterval);
 							resolve();
-						}
-						else
-						{
-							console.log("response /user/matchMaking not good; Wait 5s");
-							console.log(data);
 						}
 					})
 					.catch(() => console.error("Failed to fetch the matchMaking route"));

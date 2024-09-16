@@ -22,7 +22,6 @@ class Game:
         self.radius = 1
         self.speed = 0.25
         self.winning_score = 11
-
         self.x_paddleright = 93
         self.y_paddleright = 40
         self.x_paddleleft = 5
@@ -69,7 +68,7 @@ class Game:
             )
 
     def check_game_over(self):
-        return self.score_paddleright >= self.winning_score or self.score_paddleleft >= self.winning_score
+        return self.score_paddleright > self.winning_score - 1 or self.score_paddleleft > self.winning_score - 1
 
     def get_winner(self):
         if self.score_paddleright >= self.winning_score:
@@ -239,8 +238,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         # self.room_name = self.scope['url_route']['kwargs']['room_name']
         #Recuperer le nom de la room name
         self.room_name = f"Game_{i-1}"
+        print(f"room_name = {self.room_name}", file=sys.stderr)
         self.room_group_name = f"game_{self.room_name}"
-
+        print(f"romm_group_name = {self.room_group_name}", file=sys.stderr)
 
         # Créer une nouvelle instance de jeu si elle n'existe pas
         if self.room_name not in GameConsumer.games:
@@ -257,7 +257,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-
+        self.opponent = None
         await self.accept()
         headers = dict(self.scope["headers"])
         cookies = headers[b"cookie"].decode()
@@ -265,58 +265,70 @@ class GameConsumer(AsyncWebsocketConsumer):
         auth_cookie = cookies_dict.get('auth')
         # Définir le rôle du joueur
 
-        self.paddleLeft_name = None
-        self.paddleRight_name = None
         if GameConsumer.players_in_room[self.room_name] == 0:
             self.role = 'paddleLeft'
             
             if auth_cookie:
                 name_id = await self.get_username_from_jwt(auth_cookie)
                 if name_id:
-                    self.paddleLeft_name = name_id["username"]
+                    self.username = name_id["username"]
                     self.paddleLeft_id = name_id["id"] 
+                    print("titi", file=sys.stderr)
                 else: 
+                    print("trtr", file=sys.stderr)
                     await self.close()
                     return
             else:
+                print("tttt", file=sys.stderr)
                 await self.close()
                 return
         else:
             self.role = 'paddleRight'
-            
+            print("tyty", file=sys.stderr)
             if auth_cookie:
                 name_id = await self.get_username_from_jwt(auth_cookie)
                 if name_id:
-                    self.paddleRight_name = name_id["username"]
+                    print("tptp", file=sys.stderr)
+                    self.username = name_id["username"]
                     self.paddleRight_id = name_id["id"]
                 else: 
+                    print("tntn", file=sys.stderr)
                     await self.close()
                     return
             else:
+                print("roro", file=sys.stderr)
                 await self.close()
                 return
 
         GameConsumer.players_in_room[self.room_name] += 1
 
         # Envoyer un message à tous les consommateurs pour informer du nombre actuel de joueurs
+        print("tutu", file=sys.stderr)
         await self.channel_layer.group_send(
+            
             self.room_group_name,
             {
                 'type': 'player_count_update',
-                'player_count': GameConsumer.players_in_room[self.room_name]
+                'player_count': GameConsumer.players_in_room[self.room_name],
+                'username': self.username
             }
         )
 
         self.player_actions = []
 
         # Attendre que les deux joueurs se connectent
+        print("toto", file=sys.stderr)
         while GameConsumer.players_in_room[self.room_name] != 2:
+            print("tata", file=sys.stderr)
             await asyncio.sleep(0.1)
 
         asyncio.create_task(self.send_game_updates())
 
     async def disconnect(self, close_code):
         # Retirer le joueur du groupe
+        print(f"username: {self.username}", file=sys.stderr)
+        print("on est dans disconnect", file=sys.stderr)
+        print(f"nombre utilisateur = {GameConsumer.players_in_room[self.room_name]}", file=sys.stderr)
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
@@ -334,9 +346,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             winner = 'Player1' if remaining_role == 'paddleLeft' else 'Player2'
 
             if self.role == 'paddleLeft':
-                winner = self.paddleLeft_name
+                winner = self.username
             else:
-                winner = self.paddleRight_name
+                winner = self.username
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -364,12 +376,14 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         player_action = data.get('key')
+        print("momo", file=sys.stderr)
         if player_action:
+            print("mumu", file=sys.stderr)
             self.player_actions.append((self.role, player_action))
 
     async def process_player_actions(self):
         game = GameConsumer.games[self.room_name]
-       
+        print("riri", file=sys.stderr)
         for role, action in self.player_actions:
             if role == 'paddleRight':
                 if action == 'w' or action == 'ArrowUp' or action == 'top':
@@ -394,14 +408,12 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def send_game_updates(self):
         game = GameConsumer.games[self.room_name]
-
+        print("fifi", file=sys.stderr)
         while game.running:
             await self.process_player_actions()
             game.move_ball()
-
             game_state = {
-                "paddleLeft_name": self.paddleLeft_name,
-                "paddleRight_name": self.paddleRight_name,
+                "username": self.username,
                 "canvas_width": game.canvas_width,
                 "canvas_height": game.canvas_height,
                 "paddle_width": game.paddle_width,
@@ -421,8 +433,10 @@ class GameConsumer(AsyncWebsocketConsumer):
             }
 
             if game.check_game_over():
+                print(f"game_score_paddleLeft: {game.score_paddleleft}", file=sys.stderr)
+                print(f"game_score_paddleRight: {game.score_paddleRight}", file=sys.stderr)
                 winner = game.get_winner()
-
+                print("loulou", file=sys.stderr)
                 if (self.role == 'paddleLeft'):
                     winner: self.paddleLeft_name
                 else:
@@ -438,10 +452,13 @@ class GameConsumer(AsyncWebsocketConsumer):
                 continue
 
             await self.channel_layer.group_send(
+                
+
                 self.room_group_name,
                 {
                     'type': 'game_update',
                     'game_state': game_state
+                    
                 }
             )
 
@@ -449,27 +466,43 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def game_update(self, event):
         game_state = event['game_state']
+        nameRight = None
+        nameLeft = None
+        print("coco", file=sys.stderr)
+        if self.role == 'paddleLeft':
+            nameLeft = self.username
+            nameRight = self.opponent
+        else:
+            nameRight = self.username
+            nameLeft = self.opponent
+        print(f"nameright: {nameRight}", file=sys.stderr)
+        print(f"nameLeft: {nameLeft}", file=sys.stderr)
         await self.send(text_data=json.dumps({
             'type': 'game_update',
-            'game_state': game_state
+            'game_state': game_state,
+            'nameRight':nameRight,
+            'nameLeft': nameLeft
         }))
 
     async def player_count_update(self, event):
+        print("pupu", file=sys.stderr)
         player_count = event['player_count']
+        self.opponent = event['username']
         await self.send(text_data=json.dumps({
             'type': 'player_count_update',
             'player_count': player_count
         }))
 
     async def game_over(self, event):
+        print("ploplo", file=sys.stderr)
         winner = event['winner']
         game = GameConsumer.games[self.room_name]
-
+        print("on est dans gameover", file=sys.stderr)
         # Déterminer si ce consommateur est le vainqueur
         if (self.role == 'paddleLeft' and winner == 'Player1') or (self.role == 'paddleRight' and winner == 'Player2'):
             # Obtenir les noms réels des joueurs (à ajuster selon votre logique)
-            player1 = self.paddleLeft_name  # Remplacer par la logique réelle pour obtenir le nom du joueur 1
-            player2 =  self.paddleRight_name#"Player2"  # Remplacer par la logique réelle pour obtenir le nom du joueur 2
+            # player1 = self.paddleLeft_name  # Remplacer par la logique réelle pour obtenir le nom du joueur 1
+            # player2 =  self.paddleRight_name#"Player2"  # Remplacer par la logique réelle pour obtenir le nom du joueur 2
 
             # Créer un objet Pong pour sauvegarder les résultats du jeu
             pong_game = Pong(
@@ -484,6 +517,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             await sync_to_async(pong_game.save)()
 
         # Envoyer un message WebSocket au client pour annoncer la fin du jeu
+        print("brubru", file=sys.stderr)
         await self.send(text_data=json.dumps({
             'type': 'game_over',
             'winner': winner

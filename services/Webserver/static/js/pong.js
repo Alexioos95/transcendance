@@ -119,7 +119,7 @@ async function	loop(struct, game)
 {
 	game.ctx.fillStyle = "#2F2F2F";
 	game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-	if (game.running === 1 && game.scores[0] < 11 && game.scores[1] < 11)
+	// if (game.running === 1 && game.scores[0] < 11 && game.scores[1] < 11)
 	{
 		if (game.online === false)
 		{
@@ -129,15 +129,15 @@ async function	loop(struct, game)
 		}
 		requestAnimationFrame(() => loop(struct, game));
 	}
-	else
-	{
-		game.running = 0;
-		if (game.socket !== undefined)
-			game.socket.close(1000);
-		renderFinalScore(game);
-		document.getElementsByClassName("game")[0].removeEventListener("mouseup", mouseUpEvent(struct.screen.game.paddles));
-		await endGame(struct);
-	}
+	// else
+	// {
+	// 	game.running = 0;
+	// 	if (game.socket !== undefined)
+	// 		game.socket.close(1000);
+	// 	renderFinalScore(game);
+	// 	document.getElementsByClassName("game")[0].removeEventListener("mouseup", mouseUpEvent(struct.screen.game.paddles));
+	// 	await endGame(struct);
+	// }
 }
 
 function	renderFinalScore(game)

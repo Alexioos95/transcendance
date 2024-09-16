@@ -200,7 +200,14 @@ function	setupEventListeners(struct, data)
 			const avatarForm = new FormData();
 
 			avatarForm.append("file", avatarImage);
-			fetch("/user/sendFile/", { method: "POST", body: avatarForm, credentials: "include"});
+			fetch("/user/sendFile/", { method: "POST", body: avatarForm, credentials: "include"})
+				.catch(e => {
+					struct.options.account.error.classList.add("error");
+					struct.options.account.error.classList.remove("success");
+					struct.options.account.error.innerHTML = e;
+					console.error("Failed to fetch the sendFile route")
+					return ;
+				});
 		}
 		fetch("/user/updateUserInfos/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => response.json())
@@ -541,7 +548,7 @@ function	buildFriendlist(struct, data)
 		const button1 = createOptionButton(array[0], "hover-purple", "seeHistory", i1);
 		const button2 = createOptionButton(array[1], "hover-blue", "invitePong", i2);
 		const button3 = createOptionButton(array[2], "hover-red", "removeFriend", i3);
-		button1.addEventListener("click", function() { seeHistory(struct, button1); });
+		button1.addEventListener("click", function() { seeHistory(struct, button1, undefined); });
 		button2.addEventListener("click", function() { sendInvite(struct, button2); });
 		button3.addEventListener("click", function() { deleteFriend(button3); });
 		// Append
@@ -657,19 +664,34 @@ function	buildHistory(struct, data, username)
 		const username2 = document.createElement("span");
 		const score2 = document.createElement("span");
 		const date = document.createElement("span");
+		const dateFormat = new Date(data.matches[i].date);
 		// Bools
 		let status = "history-card-win";
 		let game = "history-card-pong";
+
 		if (data.matches[i].winner !== username)
 			status = "history-card-lose";
 		if (data.matches[i].game !== "pong")
 			status = "history-card-tetris";
 		// Datas
-		username1.innerHTML = data.username1;
-		score1.innerHTML = data.score1;
-		username2.innerHTML = data.username2;
-		score2.innerHTML = data.score2;
-		date.innerHTML = data.date;
+		username1.innerHTML = data.matches[i].username1;
+		score1.innerHTML = data.matches[i].score1;
+		username2.innerHTML = data.matches[i].username2;
+		score2.innerHTML = data.matches[i].score2;
+		// Date
+		let day;
+		let month;
+
+		day = dateFormat.getDate();
+		month = dateFormat.getMonth() + 1;
+		if (day < 10)
+			day = "0" + day;
+		if (month < 10)
+			month = "0" + month;
+		if (struct.options.lang.curr === "FR")
+			date.innerHTML = day + "/" + month + "/" + dateFormat.getFullYear();
+		else
+			date.innerHTML = month + "/" + day + "/" + dateFormat.getFullYear();
 		// Add classes
 		historyCard.classList.add("history-card", status);
 		historyCardGame.classList.add("history-card-game", game);
@@ -1004,7 +1026,7 @@ function	createChatMessage(struct, data)
 	chatUserAvatar.classList.add("chat-user-avatar");
 	chatUserAvatar.appendChild(avatar);
 	// Set username
-	if (struct.username === data.user)
+	if (struct.username.innerHTML === data.user)
 		options = false;
 	span.innerHTML = data.user;
 	p.appendChild(span);
@@ -1025,7 +1047,7 @@ function	createChatMessage(struct, data)
 		const button3 = createOptionButton(array[2], "hover-blue", "invitePong", i3);
 		const button4 = createOptionButton(array[3], "hover-red", "addBlock", i4);
 		button1.addEventListener("click", function() { addFriend(struct, button1, undefined); });
-		button2.addEventListener("click", function() { seeHistory(struct, button2); });
+		button2.addEventListener("click", function() { seeHistory(struct, button2, undefined); });
 		button3.addEventListener("click", function() { sendInvite(struct, button3); });
 		button4.addEventListener("click", function() { blockUser(struct, button4); });
 		// Append

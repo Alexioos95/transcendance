@@ -38,9 +38,10 @@ function	initPongStruct(struct, game, wrapperCanvas)
 		let start = true;
 		game.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/pong/");
 		game.socket.addEventListener("error", function() {
-			console.error("Critical error on Pong's websocket");
 			game.running = 0;
+			rejectCoin(struct);
 			struct.gameForm.inputs[2].disabled = true;
+			console.error("Critical error on Pong's websocket");
 		});
 		game.socket.addEventListener("message", function(event) {
 			const data = JSON.parse(event.data);

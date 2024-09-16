@@ -52,9 +52,9 @@ function	initPongStruct(struct, game, wrapperCanvas)
 			console.log(data);
 			if (data.type === "game_update")
 			{
-				const paddleLeft = getPixels(game.canvas, parseInt(data.game_state.x_paddleLeft, 10), parseInt(data.game_state.y_paddleLeft));
-				const paddleRight = getPixels(game.canvas, parseInt(data.game_state.x_paddleRight), parseInt(data.game_state.y_paddleRight));
-				const ball = getPixels(game.canvas, parseInt(data.game_state.ball.x), parseInt(data.game_state.ball.y));
+				const paddleLeft = getPixels(game.canvas, parseInt(data.game_state.x_paddleLeft, 10), parseInt(data.game_state.y_paddleLeft, 10));
+				const paddleRight = getPixels(game.canvas, parseInt(data.game_state.x_paddleRight, 10), parseInt(data.game_state.y_paddleRight, 10));
+				const ball = getPixels(game.canvas, parseInt(data.game_state.ball.x, 10), parseInt(data.game_state.ball.y, 10));
 				const obj = { key: undefined };
 	
 				if (start === true)

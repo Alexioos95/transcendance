@@ -274,7 +274,8 @@ function	setupEventListeners(struct, data)
 			struct.screen.wrapperDecorations.classList.remove("hidden");
 			struct.screen.wrapperScreen.classList.remove("full");
 		}
-		avatar.style.width = avatar.clientHeight + "px";
+		if (avatar !== undefined)
+			avatar.style.width = avatar.clientHeight + "px";
 	});
 }
 
@@ -282,6 +283,11 @@ function	replaceDatas(struct, data)
 {
 	fetchTranslation(struct, data.lang);
 	struct.options.lang.curr = data.lang;
+	if ((struct.body.offsetHeight * 2) + (struct.body.offsetHeight / 2) < struct.body.offsetWidth)
+	{
+		struct.screen.wrapperDecorations.classList.add("hidden");
+		struct.screen.wrapperScreen.classList.add("full");
+	}
 	if (data.guestMode === "true")
 		setGuestRestrictions(struct, data);
 	else

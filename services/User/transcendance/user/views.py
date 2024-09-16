@@ -111,14 +111,15 @@ def login(request):
     if data is None:
         return JsonResponse({"error": "invalid Json"}, status=403)
     userData = {}
-    if 'email' in data:
-        userData['email'] = data['email']
-    if 'password' in data:
-        userData['password'] = data['password']
-
+   # if 'email' in data:
+   #     userData['email'] = data['email']
+   # if 'password' in data:
+   #     userData['password'] = data['password']
+    if 'email' not in data or 'password' not in data or not data['password']:
+        return JsonResponse({"error": "invalide credentials"}, status=200)
     # Check if empty name or password?
     # Check for minimum lengths?
-    dbUser = mid.get_user_in_db("Email", userData['email'])
+    dbUser = mid.get_user_in_db("Email", data['email'])
     print(f"le user{dbUser}", file=sys.stderr)
     if dbUser is None:
         print('on passe par ici', file=sys.stderr)
@@ -137,7 +138,7 @@ def login(request):
         # print(f'dbUser == {dbUserList} Username {dbUserList[0].Username} password == {dbUserList[0].Password}')
         # print(f'dbUser == {dbUserList} Username {dbUserList[0].Username} password == {dbUserList[0].Password}')
     print(f"pwd == {dbUser.Password}", file=sys.stderr)
-    if bcrypt.checkpw(userData['password'].encode('utf-8'), dbUser.Password.encode('utf-8')):
+    if bcrypt.checkpw(data['password'].encode('utf-8'), dbUser.Password.encode('utf-8')):
         print("Le mot de passe est valide.", file=sys.stderr)
     else:
         print("Le mot de passe est invalide.", file=sys.stderr)
@@ -159,7 +160,6 @@ def login(request):
             ),
             'destinataire': dbUser.Email}
         response = requests.post('http://mail:8002/sendMail/', json=mailData)
-        print({'error': 'Failed to send email {}'}, file=sys.stderr)
         if response.status_code != 200:
             return JsonResponse({'error': 'Failed to send email'}, status=200)
 
@@ -640,6 +640,7 @@ def checkCodeLog(request):
         expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
         encoded_jwt = jwt.encode({"userName": user.Username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
         response = HttpResponse(json.dumps({"guestMode": "false", 'username': user.Username, 'avatar':user.Avatar, 'language':user.language}), content_type="application/json")
+        #setCookie ici
         response.set_cookie(
         'auth',
         encoded_jwt,
@@ -651,17 +652,106 @@ def checkCodeLog(request):
     else:
         return HttpResponse(status=401)    #recupere le code dans le json
 
+@csrf_exempt
+@require_http_methods(["POST"])
 def checkCodeSet(request):
     #recupere le code dans le json
     #le get dans le cache la value est == a l'user
     #recuperer l'user en bdd et changer la value 2fa par mail
+
+    # get cookie
+    cookie = mid.checkCookie(request, 'auth')
+    if cookie is None:
+        return JsonResponse({'error': 'User not logged'}, status=401)
+
+    #1 decodeJwt pour identifier user et s'assurer que le JWT est toujours valide.
+    try:
+        user = mid.decodeJwt(cookie)
+    except mid.customException as e:
+        return JsonResponse({'error': e.data}, status=e.code)
+
+    # get code from body
+    data = mid.loadJson(request.body)
+    if data is None or 'type' not in data:
+        return JsonResponse({"error": "invalid Json"}, status=403)
+    code = data.get('type', None)
+#    if code is None:
+#        return JsonResponse({'error': 'Invalid Json'}, status=403)
+    cacheUser = cache.get(code)
+    print(f'caheUser: {repr(cacheUser)}, user.Username: {repr(user.Username)}', file=sys.stderr)
+    if cacheUser != user.Username:
+        return JsonResponse({'error': 'Wrong user'}, status=403)
+#   Clear cache
+    cache.delete(code)
+
+#    user = mid.get_user_in_db('Username', user.Username)
+#    if user is None:
+#        return JsonResponse({'error': 'User not in db'}, status=403)
+    user.twoFA = True
+    try:
+        user.save()
+    except Exception:
+        return JsonResponse({'error': 'Failed to write to database'}, status=500)
     return JsonResponse({"message": "2fa activation success"},status=200)
 
+@csrf_exempt
+@require_http_methods(["POST"])
 def set2FA(request):
     #type:email
     #retourn 200 si mail echec + champ error set
-    #recoit un demande d'activation 2fa on recupere l'usser via le JWT et on lui envoie un mail contannt le code + le stocker en cache cle code value user 10 minutes
-    return
+    #recoit un demande d'activation ou de desactivation 2fa on recupere l'user via le JWT et on lui envoie un mail contenant le code + le stocker en cache cle code value user 10 minutes pour l'activation.
+    #passer 2fa a false en cas de desactivation
+    # recoit 'type' : 'email' ou 'off' du front
+
+    # get cookie
+    cookie = mid.checkCookie(request, 'auth')
+    if cookie is None:
+        return JsonResponse({'error': 'User not logged'}, status=401)
+
+    #1 decodeJwt pour identifier user et s'assurer que le JWT est toujours valide.
+    try:
+        user = mid.decodeJwt(cookie)
+    except mid.customException as e:
+        return JsonResponse({'error': e.data}, status=e.code)
+
+    #2 si type == email, set 2fa a True.
+    #  else, set 2fa a False.
+    data = mid.loadJson(request.body)
+    if data is None:
+        return JsonResponse({"error": "invalid Json"}, status=403)
+    twoFaState = 'True' if data['type'] == 'email' else 'False'
+
+
+    user = mid.get_user_in_db('Username', user)
+    if user is None:
+        return JsonResponse({'error': 'User not in db'}, status=403)
+#    user.twoFA = twoFaState
+#    try:
+#        user.save()
+#    except Exception:
+#        return JsonResponse({'error': 'Failed to write to database'}, status=500)
+    if user.twoFA == True and twoFaState == True:
+        return JsonResponse({'error': '2FA already active'}, status=200)
+    
+    if twoFaState == False:
+        user.twoFA = twoFaState
+        try:
+            user.save()
+        except Exception:
+            return JsonResponse({'error': 'Failed to write to database'}, status=500)
+        return JsonResponse({'message': 'ok'}, status=200)
+    
+    #2.5 save code in cache
+
+    code = mid.generate_code(8)
+    cache.set(code, user.Username, timeout=600)
+
+    #3 Envoyer un mail avec code de confirmation
+    try:
+        mid.send2FaMail(user.Username, user.Email, code)
+    except mid.customException as e:
+        return JsonResponse({'error': e.data}, status=e.code)
+    return JsonResponse({'message': 'OK'}, status=200)
 
 # def generate_code(size=100):#a mettre dans les middleware
 #     code = []

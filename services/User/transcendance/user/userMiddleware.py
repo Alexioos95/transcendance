@@ -7,6 +7,7 @@ from user.models import User
 import json
 import random
 import re
+import requests
 
 class customException(Exception):
     def __init__(self, data, code):
@@ -41,7 +42,7 @@ def get_user_in_db(field_name: str, value: str):#a utliser pour check si un cham
         #for attr_name, attr_value in vars(user).items():
         #    print(f"{attr_name}: {attr_value}", end=" ")
         return user
-    except Exception as e:
+    except Exception:
         return None
 
 def register_user_in_database(user_info:dict):
@@ -184,3 +185,19 @@ def checkEmailFormat(email):
     emailRegex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
     if not re.fullmatch(emailRegex, email):
         raise customException('wrong email format', 200)
+
+def send2FaMail(user, destEmail, code):
+    mailData = {
+    'title': 'Your 2FA code for Transcendance',
+    'body': (
+        f'Hey {user},\n\n'
+        f'Looks like you\'re trying to log in. No worries, mate! We\'ve got you covered.\n\n'
+        f'Here\'s your 2FA code:\n\n{code}\n\n'
+        f'This code is good for 10 minutes, so make sure you use it pronto. If you miss it, just try again.'
+        f'If someone else asked for this, don\'t sweat it - your account\'s still safe.\n\n'
+        f'Cheers,\n\nThe Team\n'
+        ),
+    'destinataire': destEmail}
+    response = requests.post('http://mail:8002/sendMail/', json=mailData)
+    if response.status_code != 200:
+        raise customException('Failed to send email', 200)

@@ -178,10 +178,10 @@ def auth42(request):
     authorization_code = request.GET.get('code')
     data = {
         'grant_type': 'authorization_code',
-        'client_id': 'u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9',
-        'client_secret': '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',
+        'client_id': os.environ['FTAUTHUID'],
+        'client_secret': os.environ['FTAUTHSECRET'],
         'code': authorization_code,
-        'redirect_uri': f'https://made-f0ar2s5:4433/'
+        'redirect_uri': f'https://{os.environ['DUMP']}:4433/'
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', json=data)
     if response.status_code != 200:

@@ -47,6 +47,8 @@ function	initPongStruct(struct, game, wrapperCanvas)
 			console.log(event.data);
 			const data = JSON.parse(event.data);
 			console.log(data);
+			if (data.type === "player_count_update")
+				return ;
 			const paddleLeft = getPixels(game.canvas, data.game_state.x_paddleLeft, data.game_state.y_paddleLeft);
 			const paddleRight = getPixels(game.canvas, data.game_state.x_paddleRight, data.game_state.y_paddleRight);
 			const ball = getPixels(game.canvas, data.game_state.ball.x, data.game_state.ball.y);

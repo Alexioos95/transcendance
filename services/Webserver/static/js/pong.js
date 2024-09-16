@@ -24,7 +24,8 @@ async function	startPong(struct)
 	initPongStruct(struct, struct.screen.game, struct.screen.wrapperCanvas);
 	setupPongEventListeners(struct, struct.screen.game, struct.wrapperCanvas);
 	struct.screen.game.canvas.focus();
-	loop(struct, struct.screen.game);
+	if (struct.screen.game.online === false)
+		loop(struct, struct.screen.game);
 }
 
 function	initPongStruct(struct, game, wrapperCanvas)
@@ -33,10 +34,12 @@ function	initPongStruct(struct, game, wrapperCanvas)
 	game.ctx = game.canvas.getContext("2d");
 	game.paddles = getPaddles(game.canvas);
 	game.ball = getBall(game.canvas);
+	game.running = 1;
 	if (game.online === true)
 	{
 		let start = true;
 		game.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/pong/");
+
 		game.socket.addEventListener("error", function(event) {
 			console.log(event);
 			game.running = 0;
@@ -46,51 +49,62 @@ function	initPongStruct(struct, game, wrapperCanvas)
 		});
 		game.socket.addEventListener("message", function(event) {
 			const data = JSON.parse(event.data);
-			if (data.type === "player_count_update")
-				return ;
 			console.log(data);
-			const paddleLeft = getPixels(game.canvas, data.game_state.x_paddleLeft, data.game_state.y_paddleLeft);
-			const paddleRight = getPixels(game.canvas, data.game_state.x_paddleRight, data.game_state.y_paddleRight);
-			const ball = getPixels(game.canvas, data.game_state.ball.x, data.game_state.ball.y);
-			const obj = { key: undefined };
-
-			if (start === true)
+			if (data.type === "game_update")
 			{
-				const span1 = document.createElement("span");
-				const span2 = document.createElement("span");
-				span1.classList.add("canvas-user-1");
-				span2.classList.add("canvas-user-2");
-				span1.innerHTML = data.nameLeft;
-				span2.innerHTML = data.nameRight;
-				struct.screen.wrapperCanvas.appendChild(span1);
-				struct.screen.wrapperCanvas.appendChild(span2);
-				struct.screen.playerOnControls[0].innerHTML = data.nameLeft;
-				struct.screen.playerOnControls[1].innerHTML = data.nameRight;
+				const paddleLeft = getPixels(game.canvas, parseInt(data.game_state.x_paddleLeft, 10), parseInt(data.game_state.y_paddleLeft));
+				const paddleRight = getPixels(game.canvas, parseInt(data.game_state.x_paddleRight), parseInt(data.game_state.y_paddleRight));
+				const ball = getPixels(game.canvas, parseInt(data.game_state.ball.x), parseInt(data.game_state.ball.y));
+				const obj = { key: undefined };
+	
+				if (start === true)
+				{
+					const span1 = document.createElement("span");
+					const span2 = document.createElement("span");
+					span1.classList.add("canvas-user-1");
+					span2.classList.add("canvas-user-2");
+					span1.innerHTML = data.nameLeft;
+					span2.innerHTML = data.nameRight;
+					struct.screen.wrapperCanvas.appendChild(span1);
+					struct.screen.wrapperCanvas.appendChild(span2);
+					struct.screen.playerOnControls[0].innerHTML = data.nameLeft;
+					struct.screen.playerOnControls[1].innerHTML = data.nameRight;
+				}
+				start = false;
+				console.log("UPDATE PADDLE LEFT");
+				game.paddles.left.x = paddleLeft[0];
+				game.paddles.left.y = paddleLeft[1];
+				console.log("UPDATE PADDLE RIGHT");
+				game.paddles.right.x = paddleRight[0];
+				game.paddles.right.y = paddleRight[1];
+				console.log("UPDATE BALL");
+				game.ball.x = ball[0];
+				game.ball.y = ball[1];
+				console.log("UPDATE SCORE");
+				game.scores = [data.game_state.game_score_paddleLeft, data.game_state.game_score_paddleRight];
+				console.log("RENDER");
+				render(game);
+	
+				console.log("CHECK MOVE");
+				if (game.paddles.left.move_top === 1)
+					obj.key = "top";
+				else if (game.paddles.left.move_bot === 1)
+					obj.key = "bot";
+				if (obj.key !== undefined)
+					game.socket.send(JSON.stringify(obj));
+				console.log("END OF CALL");
 			}
-			start = false;
-			console.log("UPDATE PADDLE LEFT");
-			game.paddles.left.x = paddleLeft[0];
-			game.paddles.left.y = paddleLeft[1];
-			console.log("UPDATE PADDLE RIGHT");
-			game.paddles.right.x = paddleRight[0];
-			game.paddles.right.y = paddleRight[1];
-			console.log("UPDATE BALL");
-			game.ball.x = ball[0];
-			game.ball.y = ball[1];
-			console.log("UPDATE SCORE");
-			game.scores = [data.game_state.game_score_paddleLeft, data.game_state.game_score_paddleRight];
-			console.log("RENDER");
-			render(game);
-
-			if (game.paddles.left.move_top === 1)
-				obj.key = "top";
-			else if (game.paddles.left.move_bot === 1)
-				obj.key = "bot";
-			if (obj.key !== undefined)
-				game.socket.send(JSON.stringify(obj));
+			else if (data.type === "game_over")
+			{		
+				game.running = 0;
+				if (game.socket !== undefined)
+					game.socket.close(1000);
+				renderFinalScore(game);
+				document.getElementsByClassName("game")[0].removeEventListener("mouseup", mouseUpEvent(struct.screen.game.paddles));
+				endGame(struct);
+			}
 		});
 	}
-	game.running = 1;
 }
 
 function	setupPongEventListeners(struct, game, wrapperCanvas)
@@ -119,25 +133,20 @@ async function	loop(struct, game)
 {
 	game.ctx.fillStyle = "#2F2F2F";
 	game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-	// if (game.running === 1 && game.scores[0] < 11 && game.scores[1] < 11)
+	if (game.running === 1 && game.scores[0] < 11 && game.scores[1] < 11)
 	{
-		if (game.online === false)
-		{
-			movePaddles(game.canvas, game.paddles);
-			moveBall(game);
-			render(game);
-		}
+		movePaddles(game.canvas, game.paddles);
+		moveBall(game);
+		render(game);
 		requestAnimationFrame(() => loop(struct, game));
 	}
-	// else
-	// {
-	// 	game.running = 0;
-	// 	if (game.socket !== undefined)
-	// 		game.socket.close(1000);
-	// 	renderFinalScore(game);
-	// 	document.getElementsByClassName("game")[0].removeEventListener("mouseup", mouseUpEvent(struct.screen.game.paddles));
-	// 	await endGame(struct);
-	// }
+	else
+	{
+		game.running = 0;
+		renderFinalScore(game);
+		document.getElementsByClassName("game")[0].removeEventListener("mouseup", mouseUpEvent(struct.screen.game.paddles));
+		await endGame(struct);
+	}
 }
 
 function	renderFinalScore(game)

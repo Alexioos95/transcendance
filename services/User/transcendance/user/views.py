@@ -190,10 +190,10 @@ def auth42(request):
     authorization_code = request.GET.get('code')
     data = {
         'grant_type': 'authorization_code',
-        'client_id': os.environ.get('FTAUTHUID'),
-        'client_secret': os.environ.get('FTAUTHSECRET'),
+        'client_id': 'u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9',
+        'client_secret': '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',
         'code': authorization_code,
-        'redirect_uri': 'http://localhost:8000/auth42'
+        'redirect_uri': f'https://made-f0ar2s5:4433/'
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', json=data)
     if response.status_code != 200:
@@ -221,34 +221,36 @@ def auth42(request):
         # first_name = user_data.get('first_name', '')
         # last_name = user_data.get('last_name', '')
         # html_response = f'<html><body><h1>Bonjour {first_name} {last_name}</h1></body></html>'
-        # return JsonResponse(user_response.json(), status=user_response.status_code)
+        # return JsonResponse(user_response.json(), status=user_response.status_code)  
+        return JsonResponse(data)
         # //response = HttpResponse("Cookie Set")
         # //response.set_cookie('java-tutorial', 'javatpoint.com')
         # response.set_cookie('coucou', 'coucou')
 
-        try:
-            User.objects.filter(Username__exact=login).get()
-            encoded_jwt = jwt.encode({"userName": login, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
-            response_data = JsonResponse({'success': 'User logged in'}, status=200);	### Update for this function
-            return render(request , 'index.html')
-        except:
-    # Nouvel utilisateur
-            # Gestion du temps
-            time = datetime.now()
-            tz = pytz.timezone('CET')
-            tzTime = tz.localize(time)
-            # Création du nouvel utilisateur
-            new_user = User(
-                Username=login,
-                lastTimeOnline=tzTime,
-                pongLvl=0,
-                tetrisLvl=0
-            )
-            # Try excpet for uniqueness
-            new_user.save()
-            encoded_jwt = jwt.encode({"userName": login, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
-            response_data = JsonResponse({'success': 'User logged in'}, status=200);	### Update for this function
-            return render(request , 'index.html')
+        # try:
+        #     User.objects.filter(Username__exact=login).get()
+        #     encoded_jwt = jwt.encode({"userName": login, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
+        #     response_data = JsonResponse({'success': 'User logged in'}, status=200);	### Update for this function
+        #     return render(request , 'index.html')
+    #     except:
+    # # Nouvel utilisateur
+    #         # Gestion du temps
+    #         time = datetime.now()
+    #         tz = pytz.timezone('CET')
+    #         tzTime = tz.localize(time)
+    #         # Création du nouvel utilisateur
+    #         new_user = User(
+    #             Username=login,
+    #             lastTimeOnline=tzTime,
+    #             pongLvl=0,
+    #             tetrisLvl=0
+    #         )
+    #         # Try excpet for uniqueness
+    #         new_user.save()
+    #         encoded_jwt = jwt.encode({"userName": login, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
+        # response_data = JsonResponse({'success': 'User logged in'}, status=200)
+        return (response_data)
+    #         # return render(request , 'index.html')
     else:
         return JsonResponse({'error': 'Failed to fetch user data'}, status=user_response.status_code)
 
@@ -257,7 +259,7 @@ def checkAuth42(request):
     response = HttpResponse()
     userIp = request.META.get('REMOTE_ADDR')
     print(userIp)
-    if request.method == "POST":
+    if request.method == "GET":
         cachedValue = cache.get(userIp)
         if cachedValue is not None:
             response.content = cachedValue
@@ -272,7 +274,7 @@ def checkAuth42(request):
             expires=datetime.utcnow() + timedelta(hours=1)
             )
         else:
-            return HttpResponse(status=204)
+            return JsonResponse({"guestMode": "False", "username": "random 42 user"}, status=200)
     else:
         return HttpResponse(status=405)
     return response

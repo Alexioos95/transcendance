@@ -70,7 +70,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 			game.paddles.right.y = paddleRight[1];
 			game.ball.x = ball[0];
 			game.ball.y = ball[1];
-			game.scores = data.score;
+			game.scores = [data.game_score_paddleLeft, data.game_score_paddleRight];
 			render(game);
 
 			if (game.paddles.left.move_top === 1)

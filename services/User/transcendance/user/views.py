@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from user import userMiddleware as mid
 from datetime import date, datetime, timedelta
@@ -33,6 +34,25 @@ import time
 #     salt = bcrypt.gensalt()
 #     passwordEncoded = bcrypt.hashpw(password.encode('utf-8'), salt)
 #     return passwordEncoded
+
+def init_new_user(data):
+    time = datetime.now()
+    tz = pytz.timezone('CET')
+    tzTime = tz.localize(time)
+    new_user = User(
+        Email=data.get('email', ''),
+        Username=data.get('username', ''),
+        Password=data.get('password', ''),  # Décodage du hash en UTF-8
+        lastTimeOnline=tzTime,
+        pongLvl=0,
+        language=data.get('lang', 'FR'),
+        tetrisLvl=0,
+        twoFA=False,
+        friendsList = [],
+        foeList = [],
+        Avatar=data.get('avatar')
+    )
+    return new_user
 
 
 @csrf_exempt
@@ -176,14 +196,16 @@ def auth42(request):
     if request.method != 'GET':
         return JsonResponse({'error': 'Invalid request method'}, status=405)
     authorization_code = request.GET.get('code')
+    print(f'https://{os.environ['DUMP']}:4433/user/auth42/', file=sys.stderr)
     data = {
         'grant_type': 'authorization_code',
-        'client_id': 'u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9',
-        'client_secret': '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',
+        'client_id': 'u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9',#os.environ['FTAUTHUID'],
+        'client_secret': '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',#os.environ['FTAUTHSECRET'],
         'code': authorization_code,
-        'redirect_uri': f'https://made-f0ar2s5:4433/'
+        'redirect_uri': f'https://made-f0ar2s5:4433/user/auth42/'
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', json=data)
+    print(f'auth42 : code == {response.status_code}', file=sys.stderr)
     if response.status_code != 200:
         return JsonResponse({'error': 'Failed to obtain access token'}, status=response.status_code)
     access_token = response.json().get('access_token')
@@ -193,79 +215,97 @@ def auth42(request):
         'Authorization': f'Bearer {access_token}'
     }
     user_response = requests.get(f'https://api.intra.42.fr/v2/me', headers=headers)
-    
+    print(f'auth42 : code == {response.status_code}', file=sys.stderr)
     if user_response.status_code == 200:
         user_data = user_response.json()
         login = user_data.get('login', '')
-        token = "ceci est un token jwt"
+        email = user_data.get('email', '')
+        avatar = user_data.get('image', '')
+        avatar = avatar.get('versions', '')
+        avatar = avatar.get('small', '')
+        # lang = user_data.get('language', '')
+        # print('lang == {lang}', file=sys.stderr)
+        
+        # lang = lang.get('identifier', '')
+        # lang = lang.upper()
+        user42 = mid.get_user_in_db('Email', email)
+        print('lang == {lang}', file=sys.stderr)
+        if user42 is None:
+            user42 = mid.get_user_in_db("Username", login)
+            if user42 is not None:
+                login = f'{login}{mid.generate_code(15)}'
+            user42 = init_new_user({"username": login, "email": email, "avatar": avatar, 'lang': 'FR'})
+            user42.save()#try cath avant de push stp
+        id = user42.id
+        print(f'uder42 id == {id}')
         auth_data = {
-            'login': login,
-            'token': token
+            'id': id,
         }
-        authDataJson = json.dumps(auth_data)
+        authDataJson = json=(auth_data)
         userIp = request.META.get('REMOTE_ADDR')
         cache.set(userIp, authDataJson, 300)
-        # check si user est en data base sinon l'ajouter creer un jwt permettant de l'identifier
-        # first_name = user_data.get('first_name', '')
-        # last_name = user_data.get('last_name', '')
-        # html_response = f'<html><body><h1>Bonjour {first_name} {last_name}</h1></body></html>'
-        # return JsonResponse(user_response.json(), status=user_response.status_code)  
-        return JsonResponse(data)
-        # //response = HttpResponse("Cookie Set")
-        # //response.set_cookie('java-tutorial', 'javatpoint.com')
-        # response.set_cookie('coucou', 'coucou')
-
-        # try:
-        #     User.objects.filter(Username__exact=login).get()
-        #     encoded_jwt = jwt.encode({"userName": login, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
-        #     response_data = JsonResponse({'success': 'User logged in'}, status=200);	### Update for this function
-        #     return render(request , 'index.html')
-    #     except:
-    # # Nouvel utilisateur
-    #         # Gestion du temps
-    #         time = datetime.now()
-    #         tz = pytz.timezone('CET')
-    #         tzTime = tz.localize(time)
-    #         # Création du nouvel utilisateur
-    #         new_user = User(
-    #             Username=login,
-    #             lastTimeOnline=tzTime,
-    #             pongLvl=0,
-    #             tetrisLvl=0
-    #         )
-    #         # Try excpet for uniqueness
-    #         new_user.save()
-    #         encoded_jwt = jwt.encode({"userName": login, "expirationDate": time.time() + 300}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")    #    Export to .env file        #    Add env_example file
-        # response_data = JsonResponse({'success': 'User logged in'}, status=200)
-        return (response_data)
-    #         # return render(request , 'index.html')
+        print(f'auth42 : authJson {authDataJson}', file=sys.stderr)
+        data = JsonResponse({'success': 'User logged in'}, status=200);	### Update for this function
+        return redirect(f'https://{os.environ["DUMP"]}:4433/?code=code')
+        # return JsonResponse(response_data)
     else:
         return JsonResponse({'error': 'Failed to fetch user data'}, status=user_response.status_code)
 
 @csrf_exempt
 def checkAuth42(request):
-    response = HttpResponse()
     userIp = request.META.get('REMOTE_ADDR')
-    print(userIp)
+    x_real_ip = request.headers.get('X-Real-IP')
+    print(f'x_real_ip = {x_real_ip}', file=sys.stderr)
+    print(f'forwarded for{request.headers.get("X-Forward-For")}', file=sys.stderr)
+    print(f'x real{request.META.get("X-Real-IP")}', file=sys.stderr)
+    # userIp = request.META.get('HTTP_X_FORWARDED_FOR')#request.META.get('REMOTE_ADDR')
+    print(f'user ip == {userIp}', file=sys.stderr)
+    print(f'user ip == {request.META.get('HTTP_USER_AGENT')}', file=sys.stderr)
+
+    
     if request.method == "GET":
         cachedValue = cache.get(userIp)
+        print(f'checkAuth42 : {cachedValue}', file=sys.stderr)
+        
         if cachedValue is not None:
-            response.content = cachedValue
+            user = mid.get_user_in_db('id', cachedValue.get('id'))
+            response = JsonResponse({
+                "avatar": user.Avatar,
+                "guestMode": "false",
+                "username": user.Username,
+                'lang': user.language
+            }, status=200)
+            
             cache.delete(userIp)
-            response.status_code = 200
-            response.set_cookie(
-            'auth',
-            'test', #ici token jwt
-            httponly=True,   # Empêche l'accès JavaScript au cookie
-            secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
-            samesite='Strict',
-            expires=datetime.utcnow() + timedelta(hours=1)
-            )
+            mid.setCookie(user, response)
+            return response
         else:
-            return JsonResponse({"guestMode": "False", "username": "random 42 user"}, status=200)
+            return JsonResponse({"error": "still waiting"}, status=404) #penser a mettre 204
     else:
         return HttpResponse(status=405)
-    return response
+
+
+
+# @csrf_exempt
+# def checkAuth42(request):
+#     response = JsonResponse()
+#     userIp = request.META.get('REMOTE_ADDR')
+#     print(userIp)
+#     if request.method == "GET":
+#         cachedValue = cache.get(userIp)
+#         print(f'checkAuth42 : {cachedValue}', file=sys.stderr)
+#         if cachedValue is not None:
+#             user = mid.get_user_in_db('id', cachedValue.get('id'))
+#             response.content = cachedValue
+#             cache.delete(userIp)
+#             response.status_code = 200
+#             coockie = mid.setCookie(user, response)
+#             response.set_cookie(coockie)
+#             return response(data={"avatar": user.Avatar, "guestMode": "False", "username": user.Username, 'lang': language}, status=200)
+#         else:
+#             return JsonResponse({"error": "still waiting"}, status=204)#a changer pour 200
+#     else:
+#         return HttpResponse(status=405)
 
 @csrf_exempt
 @require_http_methods(["POST"])

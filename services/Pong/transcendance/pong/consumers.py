@@ -1,8 +1,12 @@
 import json
 import asyncio
 import random
+import sys
+import os
+import jwt
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
+from channels.db import database_sync_to_async
 
 def result_dir_y():
     sign = -1 if round(random.random() * 100) % 2 != 1 else 1
@@ -180,25 +184,63 @@ def collision(canvas_width, canvas_height, paddle_width, paddle_height, x_paddle
     
     return dir_x, dir_y
 
-async  def get_username_from_jwt(self, auth_cookie):
-                try:
-                    # Décrypter le JWT avec la clé secrète
-                    decoded_token = jwt.decode(auth_cookie, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
-                    # Extraire le nom d'utilisateur du JWT
-                    username = decoded_token.get('userName')                    
-                    if not username:
-                        return None
-                    return username
-                except Exception as e:
-                    return None
 
 class GameConsumer(AsyncWebsocketConsumer):
     games = {}  # Dictionnaire pour stocker les instances de jeux par room_name
     players_in_room = {}
+    
+    async  def get_username_from_jwt(self, auth_cookie):
+                try:
+                    # Décrypter le JWT avec la clé secrète
+                    decoded_token = jwt.decode(auth_cookie, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
+                    # Extraire le nom d'utilisateur du JWT
+                    username = decoded_token.get('userName')
+                    id = decoded_token.get('id')                  
+                    if not username or not id:
+                        return None
+                    return {'username': username, 'id': id}
+
+                except Exception as e:
+                    return None
+
+    @database_sync_to_async
+    def get_game(self):
+        from .models import Game
+        # with transaction.atomic():
+        return list(Game.objects.all())
 
     async def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
+        headers = dict(self.scope["headers"])
+        if b"cookie" in headers:
+            cookies = headers[b"cookie"].decode()  # Decode les cookies en string
+            cookies_dict = dict(item.split("=") for item in cookies.split("; "))  # Parse cookies en dictionnaire
+            auth_cookie = cookies_dict.get('auth')  # Récupérer le cookie 'auth'
+            print(f'auth cookie == {auth_cookie}', file=sys.stderr)
+            # decoder le jwt //set sevret dans l'env 
+            # requete bdd avec username et partie status false
+            # si rien trouve rejeter la co sinon rejoindre le groupe (avec l'id de a partie)
+            # attendre le 2nd joueur puis lancer la partie 
+
+        # print(f'coockie == self.user = {self.scope["COOCKIE"]}')
+        # all_entries = await get_game() 
+        # print(all_entries.values_list())
+        # self.dataGame = await (await self.get_game())
+        # print(self.dataGame)
+        self.dataGame = await self.get_game()
+        print(self.dataGame)  # Maintenant, cela devrait fonctionner
+        i = 0
+        for game in self.dataGame:
+            print(f"Game ID: {game.id}", file=sys.stderr)
+            print(f"Player 1: {game.Player1}", file=sys.stderr)
+            print(f"Player 2: {game.Player2}", file=sys.stderr)
+            print("---", file=sys.stderr)
+            i = i + 1
+        print(f"i = :{i}", file=sys.stderr)
+        # self.room_name = self.scope['url_route']['kwargs']['room_name']
+        #Recuperer le nom de la room name
+        self.room_name = f"Game_{i-1}"
         self.room_group_name = f"game_{self.room_name}"
+
 
         # Créer une nouvelle instance de jeu si elle n'existe pas
         if self.room_name not in GameConsumer.games:
@@ -222,13 +264,18 @@ class GameConsumer(AsyncWebsocketConsumer):
         cookies_dict = dict(item.split("=") for item in cookies.split("; "))
         auth_cookie = cookies_dict.get('auth')
         # Définir le rôle du joueur
+
+        self.paddleLeft_name = None
+        self.paddleRight_name = None
         if GameConsumer.players_in_room[self.room_name] == 0:
             self.role = 'paddleLeft'
-            self.paddleLeft_name = ''
+            
             if auth_cookie:
-                
-                self.paddleLeft_name = self.get_username_from_jwt(auth_cookie)
-                if self.paddleLeft_name is None: 
+                name_id = await self.get_username_from_jwt(auth_cookie)
+                if name_id:
+                    self.paddleLeft_name = name_id["username"]
+                    self.paddleLeft_id = name_id["id"] 
+                else: 
                     await self.close()
                     return
             else:
@@ -236,10 +283,13 @@ class GameConsumer(AsyncWebsocketConsumer):
                 return
         else:
             self.role = 'paddleRight'
-            self.paddleRight_name = ''
+            
             if auth_cookie:
-                self.paddleRight_name = self.get_username_from_jwt(auth_cookie)
-                if self.paddleRight_name is None:
+                name_id = await self.get_username_from_jwt(auth_cookie)
+                if name_id:
+                    self.paddleRight_name = name_id["username"]
+                    self.paddleRight_id = name_id["id"]
+                else: 
                     await self.close()
                     return
             else:
@@ -363,9 +413,11 @@ class GameConsumer(AsyncWebsocketConsumer):
                 "ball": {
                     "x": game.x_ball,
                     "y": game.y_ball,
-                    "radius": game.radius
+                    "radius": game.radius,
+                "game_score_paddleLeft": game.score_paddleleft,
+                "game_score_paddleRight":  game.score_paddleright,
                 },
-                "score": [game.score_paddleright, game.score_paddleleft]
+                # "score": [game.score_paddleleft, game.score_paddleright]
             }
 
             if game.check_game_over():

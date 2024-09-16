@@ -44,11 +44,10 @@ function	initPongStruct(struct, game, wrapperCanvas)
 			console.error("Critical error on Pong's websocket");
 		});
 		game.socket.addEventListener("message", function(event) {
-			const json = JSON.parse(event.data);
-			const data = json.game_state;
-			const paddleLeft = getPixels(game.canvas, data.x_paddleLeft, data.y_paddleLeft);
-			const paddleRight = getPixels(game.canvas, data.x_paddleRight, data.y_paddleRight);
-			const ball = getPixels(game.canvas, data.ball.x, data.ball.y);
+			const data = JSON.parse(event.data);
+			const paddleLeft = getPixels(game.canvas, data.game_state.x_paddleLeft, data.game_state.y_paddleLeft);
+			const paddleRight = getPixels(game.canvas, data.game_state.x_paddleRight, data.game_state.y_paddleRight);
+			const ball = getPixels(game.canvas, data.game_state.ball.x, data.game_state.ball.y);
 			const obj = { key: undefined };
 
 			if (start === true)
@@ -57,12 +56,12 @@ function	initPongStruct(struct, game, wrapperCanvas)
 				const span2 = document.createElement("span");
 				span1.classList.add("canvas-user-1");
 				span2.classList.add("canvas-user-2");
-				span1.innerHTML = data.paddleLeft_name;
-				span2.innerHTML = data.paddleLeft_name;
+				span1.innerHTML = data.nameLeft;
+				span2.innerHTML = data.nameRight;
 				struct.screen.wrapperCanvas.appendChild(span1);
 				struct.screen.wrapperCanvas.appendChild(span2);
-				struct.screen.playerOnControls[0].innerHTML = data.paddleLeft_name;
-				struct.screen.playerOnControls[1].innerHTML = data.paddleRight_name;
+				struct.screen.playerOnControls[0].innerHTML = data.nameLeft;
+				struct.screen.playerOnControls[1].innerHTML = data.nameRight;
 			}
 			start = false;
 			game.paddles.left.x = paddleLeft[0];
@@ -71,7 +70,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 			game.paddles.right.y = paddleRight[1];
 			game.ball.x = ball[0];
 			game.ball.y = ball[1];
-			game.scores = [data.game_score_paddleLeft, data.game_score_paddleRight];
+			game.scores = [data.game_state.game_score_paddleLeft, data.game_state.game_score_paddleRight];
 			render(game);
 
 			if (game.paddles.left.move_top === 1)

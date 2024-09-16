@@ -21,8 +21,7 @@ import os
 import time
 
 ### SetCookie
-#UpdateUserInfo
-#Login
+#Auth42 ?
 
 # mailData = {'title':'transcendance registration','body':f'welcome {username}, successfully registered', 'destinataire':'ftTranscendanceAMFEA@gmail.com'}
 # response = requests.post('http://localhost:8001/sendMail/', json=mailData)#mettre la route dans l'env ou set la route definitive dans le build final?
@@ -53,13 +52,9 @@ def register(request):
     if user is not None or mail is not None:
        return JsonResponse({"error": "User or email already used"}, status=409)
 
-
     time = datetime.now()
     tz = pytz.timezone('CET')
     tzTime = tz.localize(time)
-
-    #CKECK EMAIL FORMAT
-
 
     try:
         mid.checkCredentialsLen(userData)
@@ -169,16 +164,9 @@ def login(request):
             return JsonResponse({'error': 'Failed to send email'}, status=200)
 
         return JsonResponse({"twoFA": 'true', 'guestMode': 'false'}, status=200)#code a verifier code 2fa attendu
-    response_data = JsonResponse({"twoFA": 'false', "guestMode": "false", "username":dbUser.Username, "Avatar":dbUser.Avatar, "lang": dbUser.language, "email": dbUser.Email})
-    response_data.status = 200
-    response_data.set_cookie(
-    'auth',
-    encoded_jwt,
-    httponly=True,   # Empêche l'accès JavaScript au cookie
-    secure=True,     # Assure que le cookie est envoyé uniquement sur HTTPS
-    samesite='None',
-    expires=datetime.utcnow() + timedelta(hours=100))
+    response_data = JsonResponse({"twoFA": 'false', "guestMode": "false", "username":dbUser.Username, "Avatar":dbUser.Avatar, "lang": dbUser.language, "email": dbUser.Email}, status=200)
     print("tout va bien", file=sys.stderr)
+    mid.setCookie(dbUser, response_data)
     return (response_data)
     # userIp = request.META.get('REMOTE_ADDR')
     # print(f"voici l'ip user{userIp}")
@@ -380,15 +368,8 @@ def updateUserInfos(request):
     print("uptade de new user", file=sys.stderr)
     print(f"username == {user.Username}, email == {user.Email}, Avatar == {user.Avatar}, langue == {user.language}", file=sys.stderr)
     user.save()
-    response_data = JsonResponse({"message": "User information updated successfully"})
-    encoded_jwt = jwt.encode({"userName": user.Username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
-    response_data.set_cookie(
-    'auth',
-    encoded_jwt,
-    httponly=True,
-    secure=True,
-    samesite='Strict',
-    expires=datetime.utcnow() + timedelta(hours=100))
+    response_data = JsonResponse({"message": "User information updated successfully"}, status=200)
+    mid.setCookie(user, response_data)
     return response_data
 
 @csrf_exempt

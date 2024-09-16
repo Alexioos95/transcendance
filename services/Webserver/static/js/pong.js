@@ -89,9 +89,9 @@ function	initPongStruct(struct, game, wrapperCanvas)
 				render(game);
 	
 				console.log("CHECK MOVE");
-				if (game.paddles.left.move_top === 1)
+				if (game.paddles.right.move_top === 1)
 					obj.key = "top";
-				else if (game.paddles.left.move_bot === 1)
+				else if (game.paddles.right.move_bot === 1)
 					obj.key = "bot";
 				if (obj.key !== undefined)
 					game.socket.send(JSON.stringify(obj));

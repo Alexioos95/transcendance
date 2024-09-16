@@ -2,14 +2,14 @@
 /////////////////////////
 // Script
 /////////////////////////
-fetch ("/ping/testRoutes/")
-	.then(response => response.json())
-	.then(data => {
-		console.log(data);
+// fetch ("/ping/testRoutes/")
+// 	.then(response => response.json())
+// 	.then(data => {
+// 		console.log(data);
 		checkJWT();
 		popState();
-	})
-	.catch("Fcailed to fetch the ping route");
+	// })
+	// .catch("Failed to fetch the ping route");
 
 async function	checkJWT()
 {

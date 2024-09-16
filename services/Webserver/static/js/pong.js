@@ -44,6 +44,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 			console.error("Critical error on Pong's websocket");
 		});
 		game.socket.addEventListener("message", function(event) {
+			console.log(event.data);
 			const data = JSON.parse(event.data);
 			console.log(data);
 			const paddleLeft = getPixels(game.canvas, data.game_state.x_paddleLeft, data.game_state.y_paddleLeft);

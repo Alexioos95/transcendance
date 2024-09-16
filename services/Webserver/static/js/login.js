@@ -46,7 +46,7 @@ function	login(prevData)
 	struct.fortyTwoConnection.addEventListener("click", function() {
 		if (click !== 0)
 			return ;
-		const url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9&redirect_uri=https%3A%2F%2F" + window.location.hostname + "%3A4433%2F&response_type=code";
+		const url = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9&redirect_uri=https%3A%2F%2F" + window.location.hostname + "%3A4433%2Fuser%2Fauth42%2F&response_type=code";
 		const popUp = window.open(url, "", "popup=true");
 		click++;
 

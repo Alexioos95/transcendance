@@ -8,6 +8,7 @@ function	entrypoint()
 {
 	if (window.location.href.indexOf("resetmypassword") === -1 && window.location.href.indexOf("code") > -1)
 	{
+		console.log("opener == ", window.opener);
 		close();
 		return ;
 	}

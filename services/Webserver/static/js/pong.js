@@ -81,7 +81,10 @@ function	initPongStruct(struct, game, wrapperCanvas)
 				game.ball.x = ball[0];
 				game.ball.y = ball[1];
 				console.log("UPDATE SCORE");
-				game.scores = [data.game_state.game_score_paddleLeft, data.game_state.game_score_paddleRight];
+				game.scores = [parseInt(data.game_state.game_score_paddleLeft, 10), parseInt(data.game_state.game_score_paddleRight, 10)];
+				console.log("RESET CANVAS");
+				game.ctx.fillStyle = "#2F2F2F";
+				game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
 				console.log("RENDER");
 				render(game);
 	
@@ -190,6 +193,7 @@ function	renderBall(ctx, ball)
 function	renderScore(game)
 {
 	const pictures = getPictures(game.scores);
+
 	if (pictures[0] !== 0)
 		game.ctx.drawImage(pictures[0], ((game.canvas.width / 2) / 2) - pictures[1].width - 4, 20);
 	game.ctx.drawImage(pictures[1], ((game.canvas.width / 2) / 2) + 2, 20);

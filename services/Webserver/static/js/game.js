@@ -525,7 +525,10 @@ function	buildFriendlist(struct, data)
 		const i3 = document.createElement("i");
 
 		// Set avatar
-		img.src = data.friendList[i].avatar;
+		if (data.friendList[i].avatar !== undefined && data.friendList[i].avatar != "")
+			img.src = data.friendList[i].avatar;
+		else
+			img.src = "/images/default_avatar.png";
 		img.alt = "Avatar";
 		// Set username and status
 		username.innerHTML = data.friendList[i].username;
@@ -810,7 +813,7 @@ function	addFriend(struct, button, usernameInput)
 			struct.chat.output.appendChild(tr);
 			if (isScrolled === true && struct.tabs.chat.table.classList.contains("active"))
 				struct.tabs.chat.table.scrollTop = struct.tabs.chat.table.scrollHeight;
-			if (username === usernameInput)
+			if (data.error !== undefined && username === usernameInput)
 			{
 				struct.tabs.wrapperInputs.classList.add("in-error");
 				sleep(1000)

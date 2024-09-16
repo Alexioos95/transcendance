@@ -20,6 +20,6 @@ from ping import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('testRoutes/',views.testRoutes ),
-    path('ping/',views.ping ),
+    path('ping/testRoutes/', views.testRoutes),
+    path('ping/', views.ping),
 ]

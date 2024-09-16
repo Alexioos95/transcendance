@@ -58,7 +58,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 				span1.classList.add("canvas-user-1");
 				span2.classList.add("canvas-user-2");
 				span1.innerHTML = data.paddleLeft_name;
-				span2.innerHTML = data.paddleLeft_name;
+				span2.innerHTML = data.paddleRight_name;
 				struct.screen.wrapperCanvas.appendChild(span1);
 				struct.screen.wrapperCanvas.appendChild(span2);
 				struct.screen.playerOnControls[0].innerHTML = data.paddleLeft_name;

@@ -242,7 +242,7 @@ def auth42(request):
 
 @csrf_exempt
 def checkAuth42(request):
-    userIp = request.META.get('REMOTE_ADDR')   
+    userIp = request.META.get('REMOTE_ADDR')
     if request.method == "GET":
         cachedValue = cache.get(userIp)
         print(f'checkAuth42 : {cachedValue}', file=sys.stderr)
@@ -1091,3 +1091,31 @@ def deleteBlockedUser(request):
     except Exception:
         return JsonResponse({'error': 'Failed to write to database'}, status=500)
     return JsonResponse({'message': 'ok'}, status=200)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def seeHistory(request):
+
+    cookie = mid.checkCookie(request, 'auth')
+    if cookie is None:
+        return JsonResponse({'error': 'User not logged'}, status=401)
+    try:
+      user = mid.decodeJwt(cookie)
+    except mid.customException as e:
+      return JsonResponse({'error': e.data}, status=e.code)
+
+    data = mid.loadJson(request.body)
+    if data is None:
+        return JsonResponse({"error": "invalid Json"}, status=403)
+    if not 'seeHistory' in data:
+        return JsonResponse({'error': 'No username in request'}, status=403)
+    historyUser = mid.get_user_in_db('Username', data['seeHistory'])
+    response = requests.post('http://pong:8004/getPlayerGames/', json={"username": historyUser.id})
+    if response.status_code != 200:
+        return JsonResponse({'error': 'Failed to retrieve history'}, status=200)
+    matches = mid.loadJson(response.content)
+    matches = matches['matches']
+    for x in matches:
+        x['username1'] = mid.get_user_in_db('id', x['username1']).Username
+        x['username2'] = mid.get_user_in_db('id', x['username2']).Username
+    return JsonResponse({'matches': matches}, status=200)

@@ -1097,7 +1097,7 @@ function	receiveInvitation(struct, data)
 		return ;
 
 	let accept = "Accepter";
-	let sentence = " vous a inviter pour un Pong ";
+	let sentence = " vous a invite pour un Pong ";
 	let isScrolled = false;
 
 	// Lang

@@ -9,7 +9,7 @@ function	getPongStruct()
 		canvas: undefined,
 		ctx: undefined,
 		paddles: undefined,
-		scores: [0, 0],
+		scores: undefined,
 		ball: undefined,
 		run: startPong,
 		online: false,
@@ -34,6 +34,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 	game.ctx = game.canvas.getContext("2d");
 	game.paddles = getPaddles(game.canvas);
 	game.ball = getBall(game.canvas);
+	game.scores = [0, 0];
 	game.running = 1;
 	if (game.online === true)
 	{

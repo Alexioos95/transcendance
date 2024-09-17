@@ -135,7 +135,7 @@ def login(request):
         return JsonResponse({"error": "invalide credentials"}, status=200)
     try:
         mid.checkEmailFormat(data['email'])
-    except customException as e:
+    except mid.customException as e:
         return JsonResponse({'error': e.data}, status=e.code)
     dbUser = mid.get_user_in_db("Email", data['email'])
     if dbUser is None:
@@ -345,7 +345,7 @@ def updateUserInfos(request):
     if 'email' in data and data['email'] and user.Email != data['email']:
         try:
             checkEmailFormat(data['email'])
-        except customException as e:
+        except mid.customException as e:
             return JsonResponse({"error": e.data}, status=200)
         print("verification email already existing", file=sys.stderr)
         if mid.get_user_in_db('Email', data['email']) is not None:

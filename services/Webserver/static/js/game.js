@@ -151,14 +151,7 @@ function	setupEventListeners(struct, data)
 
 		fetch("/user/init2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => response.json())
-			.then(data => {
-				if (data.error === undefined)
-					struct.options.account.twoFA.wrapper.classList.remove("hidden");
-				else
-					struct.options.account.error.innerHTML = data.error;
-			})
 			.catch(() => console.error("Failed to fetch the init2fa route"));
-		struct.options.account.twoFA.wrapper.classList.remove("hidden");
 		struct.options.account.twoFA.wrapper.classList.add("hidden");
 	});
 	struct.options.account.twoFA.radios[1].addEventListener("change", function() {
@@ -324,7 +317,6 @@ function	replaceDatas(struct, data)
 			fetch("/user/updateInfo/", { method: "GET", credentials: "include"})
 				.then(response => response.json())
 				.then(data => {
-					console.log(data);
 					if (data.error !== undefined || struct.run === 0)
 						return (clearInterval(myInterval));
 					// Re-build Avatar and Username
@@ -339,7 +331,7 @@ function	replaceDatas(struct, data)
 					acceptInvitation(struct, data);
 				})
 				.catch(() => console.error("Failed to fetch the updateInfo route"));
-		}, 3000);
+		}, 1000);
 	}
 }
 

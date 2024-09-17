@@ -206,7 +206,9 @@ class GameConsumer(AsyncWebsocketConsumer):
     def get_game(self):
         from .models import Game
         # with transaction.atomic():
-        return list(Game.objects.all())
+        query = Game.objects.filter(Player1__exact=self.user_id, gameEnded__exact=False).order_by('-id') | Game.objects.filter(Player2__exact=self.user_id, gameEnded__exact=False).order_by('-id')
+        #return list(Game.objects.all())
+        return query.first()
 
     async def connect(self):
         headers = dict(self.scope["headers"])
@@ -229,18 +231,21 @@ class GameConsumer(AsyncWebsocketConsumer):
         print(self.dataGame)  # Maintenant, cela devrait fonctionner
         i = 0
         for game in self.dataGame:
-            print(f"Game ID: {game.id}", file=sys.stderr)
-            print(f"Player 1: {game.Player1}", file=sys.stderr)
-            print(f"Player 2: {game.Player2}", file=sys.stderr)
+            print(f"---Game ID: {game.id}", file=sys.stderr)
+            print(f"---Player 1: {game.Player1}", file=sys.stderr)
+            print(f"---Player 2: {game.Player2}", file=sys.stderr)
             print("---", file=sys.stderr)
             i = i + 1
-        print(f"i = :{i}", file=sys.stderr)
+        print(f"---i = :{i}", file=sys.stderr)
+        print(f'---i with complex query: {self.dataGame.id}', file=sys.stderr)
         # self.room_name = self.scope['url_route']['kwargs']['room_name']
         #Recuperer le nom de la room name
         self.room_name = f"Game_{i-1}"
         print(f"room_name = {self.room_name}", file=sys.stderr)
         self.room_group_name = f"game_{self.room_name}"
         print(f"romm_group_name = {self.room_group_name}", file=sys.stderr)
+
+        #id derniere partie en db, ou joueur1 ou joueur2 == id dans jwt
 
         # Créer une nouvelle instance de jeu si elle n'existe pas
         if self.room_name not in GameConsumer.games:

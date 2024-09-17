@@ -58,7 +58,7 @@ function	login(prevData)
 		const myInterval = setInterval(() => {
 			fetch("/user/checkAuth42/", { method: "GET", credentials: "include"})
 				.then(response => {
-					if (response.ok)
+					if (response.status === 200)
 					{
 						clearInterval(myInterval);
 						response.json()

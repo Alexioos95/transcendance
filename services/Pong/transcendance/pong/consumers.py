@@ -20,7 +20,7 @@ class Game:
         self.paddle_width = 2
         self.paddle_height = 20
         self.radius = 1
-        self.speed = 0.25
+        self.speed = 0.65
         self.winning_score = 11
         self.x_paddleright = 93
         self.y_paddleright = 40
@@ -269,41 +269,24 @@ class GameConsumer(AsyncWebsocketConsumer):
         cookies_dict = dict(item.split("=") for item in cookies.split("; "))
         auth_cookie = cookies_dict.get('auth')
         # Définir le rôle du joueur
-
-        if GameConsumer.players_in_room[self.room_name] == 0:
-            self.role = 'paddleLeft'
-            
-            if auth_cookie:
-                name_id = await self.get_username_from_jwt(auth_cookie)
-                if name_id:
-                    self.username = name_id["username"]
-                    self.paddleLeft_id = name_id["id"] 
-                    print("titi", file=sys.stderr)
-                else: 
-                    print("trtr", file=sys.stderr)
-                    await self.close()
-                    return
-            else:
-                print("tttt", file=sys.stderr)
+        if auth_cookie:
+            name_id = await self.get_username_from_jwt(auth_cookie)
+            if name_id:
+                self.username = name_id["username"]
+                self.paddleLeft_id = name_id["id"] 
+                print("titi", file=sys.stderr)
+            else: 
+                print("trtr", file=sys.stderr)
                 await self.close()
                 return
         else:
+            print("tttt", file=sys.stderr)
+            await self.close()
+            return
+        if GameConsumer.players_in_room[self.room_name] == 0:
+            self.role = 'paddleLeft'
+        else:
             self.role = 'paddleRight'
-            print("tyty", file=sys.stderr)
-            if auth_cookie:
-                name_id = await self.get_username_from_jwt(auth_cookie)
-                if name_id:
-                    print("tptp", file=sys.stderr)
-                    self.username = name_id["username"]
-                    self.paddleRight_id = name_id["id"]
-                else: 
-                    print("tntn", file=sys.stderr)
-                    await self.close()
-                    return
-            else:
-                print("roro", file=sys.stderr)
-                await self.close()
-                return
 
         GameConsumer.players_in_room[self.room_name] += 1
 
@@ -325,7 +308,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         print("toto", file=sys.stderr)
         while GameConsumer.players_in_room[self.room_name] != 2:
             print("tata", file=sys.stderr)
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.16)
 
         asyncio.create_task(self.send_game_updates())
 
@@ -358,7 +341,9 @@ class GameConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                 {
                     'type': 'game_over',
-                    'winner': winner
+                    'winner': winner,
+                    'game_score_paddleLeft': game.score_paddleleft,
+                    'game_score_paddleRight':  game.score_paddleright,
                 }
             )
 
@@ -450,7 +435,9 @@ class GameConsumer(AsyncWebsocketConsumer):
                     self.room_group_name,
                     {
                         'type': 'game_over',
-                        'winner': winner
+                        'winner': winner,
+                        'game_score_paddleLeft': game.score_paddleleft,
+                        'game_score_paddleRight':  game.score_paddleright,
                     }
                 )
                 game.running = False

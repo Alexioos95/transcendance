@@ -146,7 +146,21 @@ function	setupEventListeners(struct, data)
 				struct.options.account.showPasswordsIcons[1].classList.add("fa-eye-slash");
 			}
 	});
-	struct.options.account.twoFA.radios[0].addEventListener("change", function() { struct.options.account.twoFA.wrapper.classList.add("hidden"); });
+	struct.options.account.twoFA.radios[0].addEventListener("change", function() {
+		const obj = { type: "off" };
+
+		fetch("/user/init2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => response.json())
+			.then(data => {
+				if (data.error === undefined)
+					struct.options.account.twoFA.wrapper.classList.remove("hidden");
+				else
+					struct.options.account.error.innerHTML = data.error;
+			})
+			.catch(() => console.error("Failed to fetch the init2fa route"));
+		struct.options.account.twoFA.wrapper.classList.remove("hidden");
+		struct.options.account.twoFA.wrapper.classList.add("hidden");
+	});
 	struct.options.account.twoFA.radios[1].addEventListener("change", function() {
 		const obj = { type: "email" };
 
@@ -310,6 +324,7 @@ function	replaceDatas(struct, data)
 			fetch("/user/updateInfo/", { method: "GET", credentials: "include"})
 				.then(response => response.json())
 				.then(data => {
+					console.log(data);
 					if (data.error !== undefined || struct.run === 0)
 						return (clearInterval(myInterval));
 					// Re-build Avatar and Username
@@ -538,8 +553,11 @@ function	buildFriendlist(struct, data)
 		// Set username and status
 		username.innerHTML = data.friendList[i].username;
 		let status = "online";
-		let lastDate = new Date(data.friendList[i].lastTimeOnline).getTime() + (30 * 1000);
+		let lastDate = new Date(data.friendList[i].lastTimeOnline).getTime() + (10 * 1000);
 		let currDate = new Date().getTime();
+		console.log("+10s send=", lastDate);
+		console.log("My hour=", currDate);
+		console.log("Diff=", currDate - lastDate);
 
 		if (lastDate < currDate)
 			status = "offline";
@@ -1079,7 +1097,7 @@ function	receiveInvitation(struct, data)
 		return ;
 
 	let accept = "Accepter";
-	let sentence = " vous a inviter pour un Pong ";
+	let sentence = " vous a invite pour un Pong ";
 	let isScrolled = false;
 
 	// Lang
@@ -1109,6 +1127,7 @@ function	receiveInvitation(struct, data)
 		button.type = "button";
 		button.title = accept;
 		button.ariaLabel = accept;
+		button.classList.add("button-challenge");
 		button.addEventListener("click", function() {
 			const obj = { username: button.querySelector("p span").innerHTML };
 
@@ -1123,6 +1142,8 @@ function	receiveInvitation(struct, data)
 							.then(() => {
 								struct.screen.game = getPongStruct();
 								struct.screen.game.online = true;
+								struct.screen.primaryPlayer.classList.add("solo");
+								struct.screen.secondaryPlayer.classList.add("hidden");
 								struct.screen.game.run(struct);
 							});
 					}
@@ -1157,6 +1178,8 @@ function	acceptInvitation(struct, data)
 		.then(() => {
 			struct.screen.game = getPongStruct();
 			struct.screen.game.online = true;
+			struct.screen.primaryPlayer.classList.add("solo");
+			struct.screen.secondaryPlayer.classList.add("hidden");
 			struct.screen.game.run(struct);
 		});
 }

@@ -12,8 +12,8 @@ function	entrypoint()
 		close();
 		return ;
 	}
-	checkJWT();
-	popState();
+	try { checkJWT(); popState(); }
+	catch (error) { console.log(e); }
 }
 
 async function	checkJWT()

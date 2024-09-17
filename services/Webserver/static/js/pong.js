@@ -40,22 +40,22 @@ function	initPongStruct(struct, game, wrapperCanvas)
 		let start = true;
 		game.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/pong/");
 
-		game.socket.addEventListener("error", function(event) {
+		game.socket.addEventListener("error", function() {
 			game.running = 0;
-			rejectCoin(struct);
+			rejectCoin(struct.gameForm);
 			struct.gameForm.inputs[2].disabled = true;
 			console.error("Critical error on Pong's websocket");
 		});
 		game.socket.addEventListener("message", function(event) {
 			const data = JSON.parse(event.data);
-			
+
 			if (data.type === "game_update")
 			{
-				const paddleLeft = getPixels(game.canvas, parseInt(data.game_state.x_paddleLeft, 10), parseInt(data.game_state.y_paddleLeft, 10));
-				const paddleRight = getPixels(game.canvas, parseInt(data.game_state.x_paddleRight, 10), parseInt(data.game_state.y_paddleRight, 10));
-				const ball = getPixels(game.canvas, parseInt(data.game_state.ball.x, 10), parseInt(data.game_state.ball.y, 10));
+				const paddleLeft = getPixels(game.canvas, parseFloat(data.game_state.x_paddleLeft), parseFloat(data.game_state.y_paddleLeft));
+				const paddleRight = getPixels(game.canvas, parseFloat(data.game_state.x_paddleRight), parseFloat(data.game_state.y_paddleRight));
+				const ball = getPixels(game.canvas, parseFloat(data.game_state.ball.x), parseFloat(data.game_state.ball.y));
 				const obj = { key: undefined };
-	
+
 				console.log(ball);
 				if (start === true)
 				{
@@ -81,7 +81,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 				game.ctx.fillStyle = "#2F2F2F";
 				game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
 				render(game);
-	
+
 				if ((game.paddles.left.move_top === 1 && game.paddles.left.move_bot === 1)
 					|| (game.paddles.right.move_top === 1 && game.paddles.right.move_bot === 1)
 					|| (game.paddles.left.move_top === 1 && game.paddles.right.move_bot === 1)
@@ -95,12 +95,14 @@ function	initPongStruct(struct, game, wrapperCanvas)
 					game.socket.send(JSON.stringify(obj));
 			}
 			else if (data.type === "game_over")
-			{		
+			{
+				console.log(data);
 				game.running = 0;
 				if (game.socket !== undefined)
 					game.socket.close(1000);
 				game.ctx.fillStyle = "#2F2F2F";
 				game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
+				game.scores = [parseInt(data.game_score_paddleLeft, 10), parseInt(data.game_score_paddleRight, 10)];
 				renderFinalScore(game);
 				document.getElementsByClassName("game")[0].removeEventListener("mouseup", mouseUpEvent(struct.screen.game.paddles));
 				endGame(struct);

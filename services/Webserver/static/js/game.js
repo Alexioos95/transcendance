@@ -1141,9 +1141,12 @@ function	receiveInvitation(struct, data)
 						coinAnimation(struct)
 							.then(() => {
 								struct.screen.game = getPongStruct();
-								struct.screen.game.online = true;
+								clearCanvas(struct.screen.wrapperCanvas);
+								showScreen(struct.screen, struct.screen.wrapperCanvas)
+								resetPhoneClasses(struct);
 								struct.screen.primaryPlayer.classList.add("solo");
 								struct.screen.secondaryPlayer.classList.add("hidden");
+								struct.screen.game.online = true;
 								struct.screen.game.run(struct);
 							});
 					}
@@ -1177,9 +1180,12 @@ function	acceptInvitation(struct, data)
 	coinAnimation(struct)
 		.then(() => {
 			struct.screen.game = getPongStruct();
-			struct.screen.game.online = true;
+			clearCanvas(struct.screen.wrapperCanvas);
+			showScreen(struct.screen, struct.screen.wrapperCanvas);
+			resetPhoneClasses(struct);
 			struct.screen.primaryPlayer.classList.add("solo");
 			struct.screen.secondaryPlayer.classList.add("hidden");
+			struct.screen.game.online = true;
 			struct.screen.game.run(struct);
 		});
 }
@@ -1456,8 +1462,8 @@ async function	checkGameSelectorValidation(struct)
 			.then(() => title.style.opacity = 1)
 			.then(() => title.innerHTML = struct.screen.game.name)
 		clearCanvas(struct.screen.wrapperCanvas);
-		showScreen(struct.screen, struct.screen.wrapperCanvas)
-		resetPhoneClasses(struct)
+		showScreen(struct.screen, struct.screen.wrapperCanvas);
+		resetPhoneClasses(struct);
 		struct.header.wrapper.classList.add("zindex");
 		struct.options.wrapper.classList.add("hidden");
 		struct.cards.screen.classList.remove("zindex");

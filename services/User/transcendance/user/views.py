@@ -47,7 +47,7 @@ def init_new_user(data):
         pongLvl=0,
         language=data.get('lang', 'FR'),
         tetrisLvl=0,
-        twoFA=False,
+        twoFA=false,
         friendsList = [],
         foeList = [],
         Avatar=data.get('avatar')
@@ -92,7 +92,7 @@ def register(request):
         pongLvl=0,
         language=userData['lang'],
         tetrisLvl=0,
-        twoFA=False,
+        twoFA='false',
         friendsList = [],
         foeList = [],
     )
@@ -663,7 +663,7 @@ def checkCodeLog(request):
             return JsonResponse({"error":"user does not exist"}, status=401)
         expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
         encoded_jwt = jwt.encode({"userName": user.Username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
-        response = HttpResponse(json.dumps({"guestMode": "false", 'username': user.Username, 'avatar':user.Avatar, 'language':user.language}), content_type="application/json")
+        response = HttpResponse(json.dumps({"guestMode": "false", 'username': user.Username, 'avatar':user.Avatar, 'lang':user.language, 'email': user.Email}), content_type="application/json")
         #setCookie ici
         response.set_cookie(
         'auth',

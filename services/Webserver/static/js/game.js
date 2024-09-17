@@ -146,7 +146,21 @@ function	setupEventListeners(struct, data)
 				struct.options.account.showPasswordsIcons[1].classList.add("fa-eye-slash");
 			}
 	});
-	struct.options.account.twoFA.radios[0].addEventListener("change", function() { struct.options.account.twoFA.wrapper.classList.add("hidden"); });
+	struct.options.account.twoFA.radios[0].addEventListener("change", function() {
+		const obj = { type: "off" };
+
+		fetch("/user/init2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
+			.then(response => response.json())
+			.then(data => {
+				if (data.error === undefined)
+					struct.options.account.twoFA.wrapper.classList.remove("hidden");
+				else
+					struct.options.account.error.innerHTML = data.error;
+			})
+			.catch(() => console.error("Failed to fetch the init2fa route"));
+		struct.options.account.twoFA.wrapper.classList.remove("hidden");
+		struct.options.account.twoFA.wrapper.classList.add("hidden");
+	});
 	struct.options.account.twoFA.radios[1].addEventListener("change", function() {
 		const obj = { type: "email" };
 

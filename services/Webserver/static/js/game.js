@@ -84,6 +84,8 @@ function	setupEventListeners(struct, data)
 				.then(() => {
 					if (struct.chat.socket !== undefined)
 						struct.chat.socket.close(1000);
+					if (struct.screen.game !== undefined && struct.screen.game.socket !== undefined)
+						struct.screen.game.socket.close(1000);
 				})
 				.then(() => { return (navigate("login", undefined, { signUp: "false", lang: struct.options.lang.curr }))})
 				.catch(() => console.error("Failed to fetch the disconnect route"));

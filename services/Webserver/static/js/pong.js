@@ -56,6 +56,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 				const ball = getPixels(game.canvas, parseFloat(data.game_state.ball.x), parseFloat(data.game_state.ball.y));
 				const obj = { key: undefined };
 
+				// Show Usernames on screen
 				// if (start === true)
 				// {
 				// 	const span1 = document.createElement("span");

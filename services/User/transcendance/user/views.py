@@ -114,13 +114,13 @@ def checkJwt(request):
         username = mid.decodeJwt(auth)
         user = mid.get_user_in_db('Username', username)
         if not user:
-            return JsonResponse({"error": "user does nor exist"}, status=403)
+            return JsonResponse({"error": "user does nor exist"}, status=200)
         avatar = ''
         if not user.Avatar:
             avatar = '/images/default_avatar.png'
         else:
             avatar = user.Avatar
-        return JsonResponse({"username":user.Username, "Avatar":avatar, "lang": user.language}, status=200)
+        return JsonResponse({"2fa": user.twoFA,  "email": user.Email, "guestMode":"false", "username":user.Username, "avatar": avatar , "lang": user.language}, status=200)
     except mid.customException as e:
         return JsonResponse({"error": e.data}, status=e.code)
 
@@ -131,33 +131,15 @@ def login(request):
     if data is None:
         return JsonResponse({"error": "invalid Json"}, status=403)
     userData = {}
-   # if 'email' in data:
-   #     userData['email'] = data['email']
-   # if 'password' in data:
-   #     userData['password'] = data['password']
     if 'email' not in data or 'password' not in data or not data['password']:
         return JsonResponse({"error": "invalide credentials"}, status=200)
-    # Check if empty name or password?
-    # Check for minimum lengths?
+    try:
+        mid.checkEmailFormat(data['email'])
+    except customException as e:
+        return JsonResponse({'error': e.data}, status=e.code)
     dbUser = mid.get_user_in_db("Email", data['email'])
-    print(f"le user{dbUser}", file=sys.stderr)
     if dbUser is None:
-        print('on passe par ici', file=sys.stderr)
         return JsonResponse({"error":"invalid credentials"}, status=401)
-    
-#        for user in dbUserList:
-#            print(f'dbUser == {dbUserList} Username {user.Username} password == {user.Password}')
-#            print(f'language: {user.get_language_display()}')
-#            print(f'TwoFA: {user.get_twoFA_display()}')
-        # mydata = User.objects.all().values()
-        # print(mydata)
-        # print(list(mydata))
-        # print(f'username == {requestUserName}')
-        # dbUser = User.objects.filter(Username__exact=requestUserName)
-        # dbUserList = list(dbUser)
-        # print(f'dbUser == {dbUserList} Username {dbUserList[0].Username} password == {dbUserList[0].Password}')
-        # print(f'dbUser == {dbUserList} Username {dbUserList[0].Username} password == {dbUserList[0].Password}')
-    print(f"pwd == {dbUser.Password}", file=sys.stderr)
     if bcrypt.checkpw(data['password'].encode('utf-8'), dbUser.Password.encode('utf-8')):
         print("Le mot de passe est valide.", file=sys.stderr)
     else:
@@ -183,13 +165,10 @@ def login(request):
         if response.status_code != 200:
             return JsonResponse({'error': 'Failed to send email'}, status=200)
 
-        return JsonResponse({"twoFA": 'true', 'guestMode': 'false'}, status=200)#code a verifier code 2fa attendu
-    response_data = JsonResponse({"twoFA": 'false', "guestMode": "false", "username":dbUser.Username, "Avatar":dbUser.Avatar, "lang": dbUser.language, "email": dbUser.Email}, status=200)
-    print("tout va bien", file=sys.stderr)
+        return JsonResponse({"twoFA": 'true', 'guestMode': 'false'}, status=200)
+    response_data = JsonResponse({"2fa": dbUser.twoFA,  "email": dbUser.Email, "guestMode":"false", "username":dbUser.Username, "avatar": dbUser.Avatar , "lang": dbUser.language}, status=200)
     mid.setCookie(dbUser, response_data)
     return (response_data)
-    # userIp = request.META.get('REMOTE_ADDR')
-    # print(f"voici l'ip user{userIp}")
 
 @csrf_exempt
 def auth42(request):
@@ -357,15 +336,6 @@ def updateUserInfos(request):
     if user is None:
         print(e.data)
         return JsonResponse({"error": "User does not exists"}, status=403)
-    # try:
-    #     user = User.objects.filter(Username__exact=userName)
-    #     dbUserList = list(dbUser)
-    #     for user in dbUserList:
-    #         print(f'dbUser == {dbUserList} Username {user.Username} password == {user.Password}')
-    #         print(f'language: {user.get_language_display()}')
-    #         print(f'TwoFA: {user.get_twoFA_display()}')
-    # except Exception as e:
-        # return JsonResponse({'error': 'user do not exist'}, status=403)
     if 'username' in data and data['username'] and user.Username != data['username']:
         print("verification user already existing", file=sys.stderr)
         if mid.get_user_in_db('Username', data['username']) is not None:
@@ -373,6 +343,10 @@ def updateUserInfos(request):
             return JsonResponse({"errorUsername": "username already exists"}, status=403)
         user.Username = data['username']
     if 'email' in data and data['email'] and user.Email != data['email']:
+        try:
+            checkEmailFormat(data['email'])
+        except customException as e:
+            return JsonResponse({"error": e.data}, status=200)
         print("verification email already existing", file=sys.stderr)
         if mid.get_user_in_db('Email', data['email']) is not None:
             print('enmail', file=sys.stderr)

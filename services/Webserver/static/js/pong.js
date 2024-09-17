@@ -37,7 +37,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 	game.running = 1;
 	if (game.online === true)
 	{
-		let start = true;
+		// let start = true;
 		game.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/pong/");
 
 		game.socket.addEventListener("error", function() {
@@ -56,21 +56,21 @@ function	initPongStruct(struct, game, wrapperCanvas)
 				const ball = getPixels(game.canvas, parseFloat(data.game_state.ball.x), parseFloat(data.game_state.ball.y));
 				const obj = { key: undefined };
 
-				console.log(ball);
-				if (start === true)
-				{
-					const span1 = document.createElement("span");
-					const span2 = document.createElement("span");
-					span1.classList.add("canvas-user-1");
-					span2.classList.add("canvas-user-2");
-					span1.innerHTML = data.nameLeft;
-					span2.innerHTML = data.nameRight;
-					struct.screen.wrapperCanvas.appendChild(span1);
-					struct.screen.wrapperCanvas.appendChild(span2);
-					struct.screen.playerOnControls[0].innerHTML = data.nameLeft;
-					struct.screen.playerOnControls[1].innerHTML = data.nameRight;
-				}
-				start = false;
+				// Show Usernames on screen
+				// if (start === true)
+				// {
+				// 	const span1 = document.createElement("span");
+				// 	const span2 = document.createElement("span");
+				// 	span1.classList.add("canvas-user-1");
+				// 	span2.classList.add("canvas-user-2");
+				// 	span1.innerHTML = data.nameLeft;
+				// 	span2.innerHTML = data.nameRight;
+				// 	struct.screen.wrapperCanvas.appendChild(span1);
+				// 	struct.screen.wrapperCanvas.appendChild(span2);
+					// struct.screen.playerOnControls[0].innerHTML = data.nameLeft;
+					// struct.screen.playerOnControls[1].innerHTML = data.nameRight;
+				// }
+				// start = false;
 				game.paddles.left.x = paddleLeft[0];
 				game.paddles.left.y = paddleLeft[1];
 				game.paddles.right.x = paddleRight[0];
@@ -96,7 +96,6 @@ function	initPongStruct(struct, game, wrapperCanvas)
 			}
 			else if (data.type === "game_over")
 			{
-				console.log(data);
 				game.running = 0;
 				if (game.socket !== undefined)
 					game.socket.close(1000);

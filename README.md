@@ -291,6 +291,20 @@
 			- JSON contenant un champ `error`.
 			- Code erreur adapte.
 
+- **POST `/user/seeHistory/`**
+  	- **Status**
+  	  	- Publique.
+	- **Parametre(s)**:
+		- JSON contenant un champ `seeHistory`, ayant l'username de l'utilisateur.
+	- **Comportement**:
+ 		- Renvoie les donnees des parties.
+	- **Retour(s)**:
+		- Succes:
+			- Code 200 (OK).
+		- Echec:
+			- JSON contenant un champ `error`.
+			- Code erreur adapte.
+
 - **WEBSOCKET `ws/pong/`**
   	- **Status**
   	  	- Publique.

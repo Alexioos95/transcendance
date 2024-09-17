@@ -47,7 +47,7 @@ def init_new_user(data):
         pongLvl=0,
         language=data.get('lang', 'FR'),
         tetrisLvl=0,
-        twoFA=False,
+        twoFA='false',
         friendsList = [],
         foeList = [],
         Avatar=data.get('avatar')
@@ -92,7 +92,7 @@ def register(request):
         pongLvl=0,
         language=userData['lang'],
         tetrisLvl=0,
-        twoFA=False,
+        twoFABool='false',
         friendsList = [],
         foeList = [],
     )
@@ -101,10 +101,11 @@ def register(request):
     except Exception:
         response_data = JsonResponse({"error": "Unable to write in database"}, status=500)
         return(response_data)
-    response_data = JsonResponse({"2fa": 'False',  "email": userData['email'], "guestMode":"false", "username":new_user.Username, "avatar": '/images/default_avatar.png' , "lang": new_user.language}, status=201)
+    response_data = JsonResponse({"2fa": 'false',  "email": userData['email'], "guestMode":"false", "username":new_user.Username, "avatar": '/images/default_avatar.png' , "lang": new_user.language}, status=201)
     mid.setCookie(new_user, response_data)
     return (response_data)
 
+@csrf_exempt
 @require_http_methods(["GET"])
 def checkJwt(request):
     auth = mid.checkCookie(request, 'auth')
@@ -114,15 +115,15 @@ def checkJwt(request):
         username = mid.decodeJwt(auth)
         user = mid.get_user_in_db('Username', username)
         if not user:
-            return JsonResponse({"error": "user does nor exist"}, status=403)
+            return JsonResponse({"error": "user does nor exist"}, status=200)
         avatar = ''
         if not user.Avatar:
             avatar = '/images/default_avatar.png'
         else:
             avatar = user.Avatar
-        return JsonResponse({"username":user.Username, "Avatar":avatar, "lang": user.language}, status=200)
+        return JsonResponse({"2fa": user.twoFABool,  "email": user.Email, "guestMode":"false", "username":user.Username, "avatar": avatar , "lang": user.language}, status=200)
     except mid.customException as e:
-        return JsonResponse({"error": e.data}, status=e.code)
+        return JsonResponse({"error": e.data}, status=200)
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -131,41 +132,24 @@ def login(request):
     if data is None:
         return JsonResponse({"error": "invalid Json"}, status=403)
     userData = {}
-   # if 'email' in data:
-   #     userData['email'] = data['email']
-   # if 'password' in data:
-   #     userData['password'] = data['password']
     if 'email' not in data or 'password' not in data or not data['password']:
         return JsonResponse({"error": "invalide credentials"}, status=200)
-    # Check if empty name or password?
-    # Check for minimum lengths?
+    try:
+        mid.checkEmailFormat(data['email'])
+    except mid.customException as e:
+        return JsonResponse({'error': e.data}, status=e.code)
     dbUser = mid.get_user_in_db("Email", data['email'])
-    print(f"le user{dbUser}", file=sys.stderr)
     if dbUser is None:
-        print('on passe par ici', file=sys.stderr)
         return JsonResponse({"error":"invalid credentials"}, status=401)
-    
-#        for user in dbUserList:
-#            print(f'dbUser == {dbUserList} Username {user.Username} password == {user.Password}')
-#            print(f'language: {user.get_language_display()}')
-#            print(f'TwoFA: {user.get_twoFA_display()}')
-        # mydata = User.objects.all().values()
-        # print(mydata)
-        # print(list(mydata))
-        # print(f'username == {requestUserName}')
-        # dbUser = User.objects.filter(Username__exact=requestUserName)
-        # dbUserList = list(dbUser)
-        # print(f'dbUser == {dbUserList} Username {dbUserList[0].Username} password == {dbUserList[0].Password}')
-        # print(f'dbUser == {dbUserList} Username {dbUserList[0].Username} password == {dbUserList[0].Password}')
-    print(f"pwd == {dbUser.Password}", file=sys.stderr)
     if bcrypt.checkpw(data['password'].encode('utf-8'), dbUser.Password.encode('utf-8')):
         print("Le mot de passe est valide.", file=sys.stderr)
     else:
         print("Le mot de passe est invalide.", file=sys.stderr)
         return JsonResponse({'error': 'invalid credentials'}, status=401)
     encoded_jwt = jwt.encode({"userName": dbUser.Username, "expirationDate": time.time() + 300}, os.environ.get('SERVER_JWT_KEY'), algorithm="HS256")
-    if dbUser.twoFA != 'None':
-        print("coucou 2fa", file=sys.stderr)
+    print(f'2fa == {dbUser.twoFABool}, bool {dbUser.twoFABool == 'false'}', file=sys.stderr)
+    if (dbUser.twoFABool != 'false'):
+        print('jesuis la dans le 2 fa de login', file=sys.stderr)
         code = mid.generate_code(8)
         cache.set(code, dbUser.Username, 600)
         mailData = {
@@ -182,14 +166,12 @@ def login(request):
         response = requests.post('http://mail:8002/sendMail/', json=mailData)
         if response.status_code != 200:
             return JsonResponse({'error': 'Failed to send email'}, status=200)
-
-        return JsonResponse({"twoFA": 'true', 'guestMode': 'false'}, status=200)#code a verifier code 2fa attendu
-    response_data = JsonResponse({"twoFA": 'false', "guestMode": "false", "username":dbUser.Username, "Avatar":dbUser.Avatar, "lang": dbUser.language, "email": dbUser.Email}, status=200)
-    print("tout va bien", file=sys.stderr)
+        print('jesuis la dans le 2 fa de login avant la reposne', file=sys.stderr)
+        return JsonResponse({"twoFA": 'true', 'guestMode': 'false'}, status=200)
+    print('jesuis login avant la reposne', file=sys.stderr)
+    response_data = JsonResponse({"twoFA": 'false',  "email": dbUser.Email, "guestMode":"false", "username":dbUser.Username, "avatar": dbUser.Avatar , "lang": dbUser.language}, status=200)
     mid.setCookie(dbUser, response_data)
     return (response_data)
-    # userIp = request.META.get('REMOTE_ADDR')
-    # print(f"voici l'ip user{userIp}")
 
 @csrf_exempt
 def auth42(request):
@@ -357,15 +339,6 @@ def updateUserInfos(request):
     if user is None:
         print(e.data)
         return JsonResponse({"error": "User does not exists"}, status=403)
-    # try:
-    #     user = User.objects.filter(Username__exact=userName)
-    #     dbUserList = list(dbUser)
-    #     for user in dbUserList:
-    #         print(f'dbUser == {dbUserList} Username {user.Username} password == {user.Password}')
-    #         print(f'language: {user.get_language_display()}')
-    #         print(f'TwoFA: {user.get_twoFA_display()}')
-    # except Exception as e:
-        # return JsonResponse({'error': 'user do not exist'}, status=403)
     if 'username' in data and data['username'] and user.Username != data['username']:
         print("verification user already existing", file=sys.stderr)
         if mid.get_user_in_db('Username', data['username']) is not None:
@@ -373,6 +346,10 @@ def updateUserInfos(request):
             return JsonResponse({"errorUsername": "username already exists"}, status=403)
         user.Username = data['username']
     if 'email' in data and data['email'] and user.Email != data['email']:
+        try:
+            checkEmailFormat(data['email'])
+        except mid.customException as e:
+            return JsonResponse({"error": e.data}, status=200)
         print("verification email already existing", file=sys.stderr)
         if mid.get_user_in_db('Email', data['email']) is not None:
             print('enmail', file=sys.stderr)
@@ -689,7 +666,7 @@ def checkCodeLog(request):
             return JsonResponse({"error":"user does not exist"}, status=401)
         expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
         encoded_jwt = jwt.encode({"userName": user.Username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
-        response = HttpResponse(json.dumps({"guestMode": "false", 'username': user.Username, 'avatar':user.Avatar, 'language':user.language}), content_type="application/json")
+        response = HttpResponse(json.dumps({"guestMode": "false", 'username': user.Username, 'avatar':user.Avatar, 'lang':user.language, 'email': user.Email}), content_type="application/json")
         #setCookie ici
         response.set_cookie(
         'auth',
@@ -780,11 +757,11 @@ def set2FA(request):
 #        user.save()
 #    except Exception:
 #        return JsonResponse({'error': 'Failed to write to database'}, status=500)
-    if user.twoFA == True and twoFaState == True:
+    if user.twoFABool == 'true' and twoFaState == 'true':
         return JsonResponse({'error': '2FA already active'}, status=200)
     
     if twoFaState == False:
-        user.twoFA = twoFaState
+        user.twoFABool = 'false'
         try:
             user.save()
         except Exception:
@@ -802,19 +779,6 @@ def set2FA(request):
     except mid.customException as e:
         return JsonResponse({'error': e.data}, status=e.code)
     return JsonResponse({'message': 'OK'}, status=200)
-
-# def generate_code(size=100):#a mettre dans les middleware
-#     code = []
-#     #banir i l 1 0 o maj+min
-#     for _ in range(size):
-#         value = random.randint(0, 61)
-#         if value < 26:
-#             code.append(chr(97 + value))
-#         elif value < 52:
-#             code.append(chr(65 + value - 26))
-#         else:
-#             code.append(chr(48 + value - 52))
-#     return ''.join(code)
 
 @csrf_exempt
 @require_http_methods(["POST"])

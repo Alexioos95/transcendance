@@ -329,7 +329,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         # Réduire le nombre de joueurs
         GameConsumer.players_in_room[self.room_name] -= 1
-
+        self.group_send(GameConsumer.players_in_room[self.room_name])
         # Si le nombre de joueurs tombe à 1, déclarer le joueur restant vainqueur
         if GameConsumer.players_in_room[self.room_name] == 1:
             game = GameConsumer.games[self.room_name]
@@ -525,8 +525,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         print("brubru", file=sys.stderr)
         await self.send(text_data=json.dumps({
             'type': 'game_over',
-            "game_score_paddleLeft": game.score_paddleleft,
-            "game_score_paddleRight": game.score_paddleright,
-            'winner': winner
+            'winner': winner,
+            'game_score_paddleLeft': game.score_paddleleft,
+            'game_score_paddleRight':  game.score_paddleright,
         }))
         self.close()

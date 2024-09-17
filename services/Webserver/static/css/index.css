@@ -1467,6 +1467,7 @@ canvas.pong {
 	text-align: center;
 	gap: 1rem;
 	margin-top: 0.3rem;
+	padding: 0 0 5% 0;
 }
 
 .tab-chat .chat-options button span, .tab-chat .chat-options button i {

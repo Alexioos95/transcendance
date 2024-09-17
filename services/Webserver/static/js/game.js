@@ -84,6 +84,8 @@ function	setupEventListeners(struct, data)
 				.then(() => {
 					if (struct.chat.socket !== undefined)
 						struct.chat.socket.close(1000);
+					if (struct.screen.game !== undefined && struct.screen.game.socket !== undefined)
+						struct.screen.game.socket.close(1000);
 				})
 				.then(() => { return (navigate("login", undefined, { signUp: "false", lang: struct.options.lang.curr }))})
 				.catch(() => console.error("Failed to fetch the disconnect route"));
@@ -151,14 +153,7 @@ function	setupEventListeners(struct, data)
 
 		fetch("/user/init2fa/", { method: "POST", body: JSON.stringify(obj), credentials: "include"})
 			.then(response => response.json())
-			.then(data => {
-				if (data.error === undefined)
-					struct.options.account.twoFA.wrapper.classList.remove("hidden");
-				else
-					struct.options.account.error.innerHTML = data.error;
-			})
 			.catch(() => console.error("Failed to fetch the init2fa route"));
-		struct.options.account.twoFA.wrapper.classList.remove("hidden");
 		struct.options.account.twoFA.wrapper.classList.add("hidden");
 	});
 	struct.options.account.twoFA.radios[1].addEventListener("change", function() {
@@ -324,7 +319,6 @@ function	replaceDatas(struct, data)
 			fetch("/user/updateInfo/", { method: "GET", credentials: "include"})
 				.then(response => response.json())
 				.then(data => {
-					console.log(data);
 					if (data.error !== undefined || struct.run === 0)
 						return (clearInterval(myInterval));
 					// Re-build Avatar and Username
@@ -339,7 +333,7 @@ function	replaceDatas(struct, data)
 					acceptInvitation(struct, data);
 				})
 				.catch(() => console.error("Failed to fetch the updateInfo route"));
-		}, 3000);
+		}, 1000);
 	}
 }
 
@@ -1134,10 +1128,12 @@ function	receiveInvitation(struct, data)
 							struct.screen.game.running = 0;
 						coinAnimation(struct)
 							.then(() => {
-								struct.screen.game = getPongStruct();
 								clearCanvas(struct.screen.wrapperCanvas);
 								showScreen(struct.screen, struct.screen.wrapperCanvas)
 								resetPhoneClasses(struct);
+							})
+							.then(() => {
+								struct.screen.game = getPongStruct();
 								struct.screen.primaryPlayer.classList.add("solo");
 								struct.screen.secondaryPlayer.classList.add("hidden");
 								struct.screen.game.online = true;
@@ -1173,10 +1169,12 @@ function	acceptInvitation(struct, data)
 		struct.screen.game.running = 0;
 	coinAnimation(struct)
 		.then(() => {
-			struct.screen.game = getPongStruct();
 			clearCanvas(struct.screen.wrapperCanvas);
-			showScreen(struct.screen, struct.screen.wrapperCanvas);
+			showScreen(struct.screen, struct.screen.wrapperCanvas)
 			resetPhoneClasses(struct);
+		})
+		.then(() => {
+			struct.screen.game = getPongStruct();
 			struct.screen.primaryPlayer.classList.add("solo");
 			struct.screen.secondaryPlayer.classList.add("hidden");
 			struct.screen.game.online = true;

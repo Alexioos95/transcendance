@@ -60,9 +60,14 @@ function	login(prevData)
 				.then(response => {
 					if (response.status === 200)
 					{
-						clearInterval(myInterval);
 						response.json()
-							.then(data => { return (navigate("game", data, { signUp: "false", lang: struct.langSelect.value }))});
+							.then(data => {
+								if (data.error === undefined)
+								{
+									clearInterval(myInterval);
+									return (navigate("game", data, { signUp: "false", lang: struct.langSelect.value }))
+								}
+							});
 					}
 					if (popUp.closed)
 						return (clearInterval(myInterval));

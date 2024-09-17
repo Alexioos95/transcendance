@@ -320,7 +320,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         print("toto", file=sys.stderr)
         while GameConsumer.players_in_room[self.room_name] != 2:
             print("tata", file=sys.stderr)
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.2)
 
         asyncio.create_task(self.send_game_updates())
 

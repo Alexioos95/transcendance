@@ -41,7 +41,6 @@ function	initPongStruct(struct, game, wrapperCanvas)
 		game.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/pong/");
 
 		game.socket.addEventListener("error", function(event) {
-			console.log(event);
 			game.running = 0;
 			rejectCoin(struct);
 			struct.gameForm.inputs[2].disabled = true;
@@ -49,7 +48,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 		});
 		game.socket.addEventListener("message", function(event) {
 			const data = JSON.parse(event.data);
-			console.log(data);
+			
 			if (data.type === "game_update")
 			{
 				const paddleLeft = getPixels(game.canvas, parseInt(data.game_state.x_paddleLeft, 10), parseInt(data.game_state.y_paddleLeft, 10));
@@ -71,37 +70,36 @@ function	initPongStruct(struct, game, wrapperCanvas)
 					struct.screen.playerOnControls[1].innerHTML = data.nameRight;
 				}
 				start = false;
-				console.log("UPDATE PADDLE LEFT");
 				game.paddles.left.x = paddleLeft[0];
 				game.paddles.left.y = paddleLeft[1];
-				console.log("UPDATE PADDLE RIGHT");
 				game.paddles.right.x = paddleRight[0];
 				game.paddles.right.y = paddleRight[1];
-				console.log("UPDATE BALL");
 				game.ball.x = ball[0];
 				game.ball.y = ball[1];
-				console.log("UPDATE SCORE");
-				game.scores = [parseInt(data.game_state.game_score_paddleLeft, 10), parseInt(data.game_state.game_score_paddleRight, 10)];
-				console.log("RESET CANVAS");
+				game.scores = [parseInt(data.game_state.ball.game_score_paddleLeft, 10), parseInt(data.game_state.ball.game_score_paddleRight, 10)];
 				game.ctx.fillStyle = "#2F2F2F";
 				game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-				console.log("RENDER");
 				render(game);
 	
-				console.log("CHECK MOVE");
-				if (game.paddles.right.move_top === 1)
+				if ((game.paddles.left.move_top === 1 && game.paddles.left.move_bot === 1)
+					|| (game.paddles.right.move_top === 1 && game.paddles.right.move_bot === 1)
+					|| (game.paddles.left.move_top === 1 && game.paddles.right.move_bot === 1)
+					|| (game.paddles.left.move_bot === 1 && game.paddles.right.move_top === 1))
+					;
+				else if (game.paddles.right.move_top === 1 || game.paddles.left.move_top === 1)
 					obj.key = "top";
-				else if (game.paddles.right.move_bot === 1)
+				else if (game.paddles.right.move_bot === 1 || game.paddles.left.move_bot === 1)
 					obj.key = "bot";
 				if (obj.key !== undefined)
 					game.socket.send(JSON.stringify(obj));
-				console.log("END OF CALL");
 			}
 			else if (data.type === "game_over")
 			{		
 				game.running = 0;
 				if (game.socket !== undefined)
 					game.socket.close(1000);
+				game.ctx.fillStyle = "#2F2F2F";
+				game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
 				renderFinalScore(game);
 				document.getElementsByClassName("game")[0].removeEventListener("mouseup", mouseUpEvent(struct.screen.game.paddles));
 				endGame(struct);

@@ -101,6 +101,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 					game.socket.close(1000);
 				game.ctx.fillStyle = "#2F2F2F";
 				game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
+				game.scores = [parseInt(data.game_score_paddleLeft, 10), parseInt(data.game_score_paddleRight, 10)];
 				renderFinalScore(game);
 				document.getElementsByClassName("game")[0].removeEventListener("mouseup", mouseUpEvent(struct.screen.game.paddles));
 				endGame(struct);

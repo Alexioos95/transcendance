@@ -364,7 +364,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             {
                 'type': 'player_count_update',
-                'player_count': GameConsumer.players_in_room[self.room_name]
+                'player_count': GameConsumer.players_in_room[self.room_name],
+                'username': self.username
             }
         )
 
@@ -487,7 +488,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.opponent = event['username']
         await self.send(text_data=json.dumps({
             'type': 'player_count_update',
-            'player_count': player_count
+            'player_count': player_count,
+            'username': self.username
         }))
 
     async def game_over(self, event):
@@ -514,7 +516,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         #        winner=winner,
         #    )
             self.dataGame.gameEnded=True
-            self.dataGame.winner=winner
+            self.dataGame.winner=self.username
 
             # Utiliser sync_to_async pour sauvegarder l'objet de manière asynchrone
             await sync_to_async(self.dataGame.save)()
@@ -523,6 +525,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         print("brubru", file=sys.stderr)
         await self.send(text_data=json.dumps({
             'type': 'game_over',
+            "game_score_paddleLeft": game.score_paddleleft,
+            "game_score_paddleRight": game.score_paddleright,
             'winner': winner
         }))
         self.close()

@@ -35,50 +35,60 @@ def initGame(request):
     game.save()
     
     return JsonResponse({'status': 'Game created successfully'}, status=201)
-	
+    
 @csrf_exempt
 @require_http_methods(["POST"])
 def getPlayerGames(request):
-	try:
-		data = json.loads(request.body)
-	except json.JSONDecodeError as e:
-		return JsonResponse({'error': e.msg}, status=403)
-	
-	user = data['username']
+    print('=============================', file=sys.stderr)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError as e:
+        return JsonResponse({'error': e.msg}, status=403)
+    
+    userId = data['username']
+    print(f"user's id: {userId}", file=sys.stderr)
 
-	query = Game.objects.filter(Player1 == user) | Game.objects.filter(Player2 == user)   # What if no occurence in db ?
-	print(f'query: {query}', file=sys.stderr)
-	response = []
-	for x in query:
-		print(f'x: {x.values()}', file=sys.stderr)
-		response.append(x.values())
+    matches=[]
+#    userHistory = Game.objects.filter(Player1__exact=user) | Game.objects.filter(Player2__exact=user)
+#    print(f'@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ {userHistory}', file=sys.stderr)
+#    if not userHistory.exists():
+#        return JsonResponse({'matches': matches}, status=200)
 
-	return JsonResponse({'data': response}, status=200)
+    queries = Game.objects.filter(Player1__exact=userId, gameEnded__exact=True).values() | Game.objects.filter(Player2__exact=userId, gameEnded__exact=True).values()   # What if no occurence in db ?
+#    if not queries.exists():
+#        return JsonResponse({'matches': matches}, status=200)
+    print(f'queries: {queries}', file=sys.stderr)
+    for x in queries:
+        print(f'x: {x}', file=sys.stderr)
+        matches.append(x)
+    print(f'matches: {matches}', file=sys.stderr)
+
+    return JsonResponse({'matches': matches}, status=200)
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def PlayerPlaying(request):
-	print(f'Can It print ??!', file=sys.stderr)
-	print(f'PlayerPlaying data: {request.body}', file=sys.stderr)
-	try:
-		data = json.loads(request.body)
-	except json.JSONDecodeError as e:
-		print(f'PlayerPlaying : Coucou msg= {e.msg}', file=sys.stderr)
-		return JsonResponse({'error': e.msg}, status=403)
-	if 'username' not in data:
-		return JsonResponse({'error': 'invalid Json'}, status=403)
-	user = data['username']
-	print(f'PlayerPlaying username: {data['username']}', file=sys.stderr)
+    print(f'Can It print ??!', file=sys.stderr)
+    print(f'PlayerPlaying data: {request.body}', file=sys.stderr)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError as e:
+        print(f'PlayerPlaying : Coucou msg= {e.msg}', file=sys.stderr)
+        return JsonResponse({'error': e.msg}, status=403)
+    if 'username' not in data:
+        return JsonResponse({'error': 'invalid Json'}, status=403)
+    user = data['username']
+    print(f'PlayerPlaying username: {data['username']}', file=sys.stderr)
 
-	# query = Game.objects.all()
-	query = Game.objects.filter(Player1__exact=user, gameEnded__exact=False) | Game.objects.filter(Player2__exact=user, gameEnded__exact=False)   # What if no occurence in db ? # Should only return 1 occurence
-	if not query:
-		print(f'emptyquery', file=sys.stderr)
-		return HttpResponse(status=418)
-	print(f'query: {query}', file=sys.stderr)
-#	for x in query: # To debug print
-#		print(f'x: {x.values()}', file=sys.stderr)
-	return HttpResponse(status=200)
+    # query = Game.objects.all()
+    query = Game.objects.filter(Player1__exact=user, gameEnded__exact=False) | Game.objects.filter(Player2__exact=user, gameEnded__exact=False)   # What if no occurence in db ? # Should only return 1 occurence
+    if not query:
+        print(f'emptyquery', file=sys.stderr)
+        return HttpResponse(status=418)
+    print(f'query: {query}', file=sys.stderr)
+#    for x in query: # To debug print
+#        print(f'x: {x.values()}', file=sys.stderr)
+    return HttpResponse(status=200)
 
 def index(request):	# A virer ?
     return render(request, 'index.html')

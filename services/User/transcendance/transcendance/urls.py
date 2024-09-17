@@ -63,6 +63,7 @@ urlpatterns = [
     path('user/sendFile/', views.sendFile),
     path('user/acceptInvitation/', views.acceptInvitation),
     #GET
+    path('user/seeHistory/', views.seeHistory),
     path('user/ping/', views.ping), #renvoi 204 si ok sinon vtf
 
 ]

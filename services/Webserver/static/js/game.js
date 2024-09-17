@@ -1537,8 +1537,10 @@ function	resetInsertCoinButton(button)
 	const text = document.querySelector("#selector span");
 	const coin = document.getElementsByClassName("coin")[0];
 
-	text.classList.remove("active")
-	button.removeChild(coin);
+	if (text !== undefined)
+		text.classList.remove("active")
+	if (button !== undefined && coin !== undefined)
+		button.removeChild(coin);
 }
 
 /////////////////////////

@@ -1134,10 +1134,12 @@ function	receiveInvitation(struct, data)
 							struct.screen.game.running = 0;
 						coinAnimation(struct)
 							.then(() => {
-								struct.screen.game = getPongStruct();
 								clearCanvas(struct.screen.wrapperCanvas);
 								showScreen(struct.screen, struct.screen.wrapperCanvas)
 								resetPhoneClasses(struct);
+							})
+							.then(() => {
+								struct.screen.game = getPongStruct();
 								struct.screen.primaryPlayer.classList.add("solo");
 								struct.screen.secondaryPlayer.classList.add("hidden");
 								struct.screen.game.online = true;
@@ -1173,10 +1175,12 @@ function	acceptInvitation(struct, data)
 		struct.screen.game.running = 0;
 	coinAnimation(struct)
 		.then(() => {
-			struct.screen.game = getPongStruct();
 			clearCanvas(struct.screen.wrapperCanvas);
-			showScreen(struct.screen, struct.screen.wrapperCanvas);
+			showScreen(struct.screen, struct.screen.wrapperCanvas)
 			resetPhoneClasses(struct);
+		})
+		.then(() => {
+			struct.screen.game = getPongStruct();
 			struct.screen.primaryPlayer.classList.add("solo");
 			struct.screen.secondaryPlayer.classList.add("hidden");
 			struct.screen.game.online = true;

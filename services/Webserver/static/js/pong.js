@@ -96,7 +96,6 @@ function	initPongStruct(struct, game, wrapperCanvas)
 			}
 			else if (data.type === "game_over")
 			{
-				console.log(data);
 				game.running = 0;
 				if (game.socket !== undefined)
 					game.socket.close(1000);

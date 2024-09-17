@@ -206,7 +206,9 @@ class GameConsumer(AsyncWebsocketConsumer):
     def get_game(self):
         from .models import Game
         # with transaction.atomic():
-        return list(Game.objects.all())
+        query = Game.objects.filter(Player1__exact=self.user_id, gameEnded__exact=False).order_by('-id') | Game.objects.filter(Player2__exact=self.user_id, gameEnded__exact=False).order_by('-id')
+        #return list(Game.objects.all())
+        return query.first()
 
     async def connect(self):
         headers = dict(self.scope["headers"])
@@ -215,6 +217,11 @@ class GameConsumer(AsyncWebsocketConsumer):
             cookies_dict = dict(item.split("=") for item in cookies.split("; "))  # Parse cookies en dictionnaire
             auth_cookie = cookies_dict.get('auth')  # Récupérer le cookie 'auth'
             print(f'auth cookie == {auth_cookie}', file=sys.stderr)
+            if auth_cookie:
+                name_id = await self.get_username_from_jwt(auth_cookie)
+                if name_id:
+                    self.username = name_id["username"]
+                    self.user_id = name_id["id"] 
             # decoder le jwt //set sevret dans l'env 
             # requete bdd avec username et partie status false
             # si rien trouve rejeter la co sinon rejoindre le groupe (avec l'id de a partie)
@@ -228,19 +235,22 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.dataGame = await self.get_game()
         print(self.dataGame)  # Maintenant, cela devrait fonctionner
         i = 0
-        for game in self.dataGame:
-            print(f"Game ID: {game.id}", file=sys.stderr)
-            print(f"Player 1: {game.Player1}", file=sys.stderr)
-            print(f"Player 2: {game.Player2}", file=sys.stderr)
-            print("---", file=sys.stderr)
-            i = i + 1
-        print(f"i = :{i}", file=sys.stderr)
+        #for game in self.dataGame:
+        #    print(f"---Game ID: {game.id}", file=sys.stderr)
+        #    print(f"---Player 1: {game.Player1}", file=sys.stderr)
+        #    print(f"---Player 2: {game.Player2}", file=sys.stderr)
+        #    print("---", file=sys.stderr)
+        #    i = i + 1
+        print(f"---i = :{i}", file=sys.stderr)
+        print(f'---i with complex query: {self.dataGame.id}', file=sys.stderr)
         # self.room_name = self.scope['url_route']['kwargs']['room_name']
         #Recuperer le nom de la room name
         self.room_name = f"Game_{i-1}"
         print(f"room_name = {self.room_name}", file=sys.stderr)
         self.room_group_name = f"game_{self.room_name}"
         print(f"romm_group_name = {self.room_group_name}", file=sys.stderr)
+
+        #id derniere partie en db, ou joueur1 ou joueur2 == id dans jwt
 
         # Créer une nouvelle instance de jeu si elle n'existe pas
         if self.room_name not in GameConsumer.games:
@@ -268,7 +278,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             name_id = await self.get_username_from_jwt(auth_cookie)
             if name_id:
                 self.username = name_id["username"]
-                self.paddleLeft_id = name_id["id"] 
+                self.user_id = name_id["id"] 
                 print("titi", file=sys.stderr)
             else: 
                 print("trtr", file=sys.stderr)
@@ -418,8 +428,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             }
 
             if game.check_game_over():
-                print(f"game_score_paddleLeft: {game.score_paddleleft}", file=sys.stderr)
-                print(f"game_score_paddleRight: {game.score_paddleRight}", file=sys.stderr)
+                #print(f"game_score_paddleLeft: {game.score_paddleleft}", file=sys.stderr)
+                #print(f"game_score_paddleRight: {game.score_paddleRight}", file=sys.stderr)
                 winner = game.get_winner()
                 print("loulou", file=sys.stderr)
                 if (self.role == 'paddleLeft'):
@@ -486,22 +496,28 @@ class GameConsumer(AsyncWebsocketConsumer):
         game = GameConsumer.games[self.room_name]
         print("on est dans gameover", file=sys.stderr)
         # Déterminer si ce consommateur est le vainqueur
-        if (self.role == 'paddleLeft' and winner == 'Player1') or (self.role == 'paddleRight' and winner == 'Player2'):
+        print(f'----self.role: {self.role}, winner: {winner}', file=sys.stderr)
+        if (self.role == 'paddleLeft' and winner == 'paddleLeft') or (self.role == 'paddleRight' and winner == 'paddleRight'):
             # Obtenir les noms réels des joueurs (à ajuster selon votre logique)
             # player1 = self.paddleLeft_name  # Remplacer par la logique réelle pour obtenir le nom du joueur 1
             # player2 =  self.paddleRight_name#"Player2"  # Remplacer par la logique réelle pour obtenir le nom du joueur 2
 
+            print('WRITING TO DB', file=sys.stderr)
+
             # Créer un objet Pong pour sauvegarder les résultats du jeu
-            pong_game = Pong(
-                Player1=player1,
-                Player2=player2,
-                Winner=winner,
-                player1_score=game.score_paddleleft,
-                player2_score=game.score_paddleright
-            )
+        #    pong_game = Game(
+        #        Player1=player1,
+        #        Player2=player2,
+        #        gameEnded=True,
+        #        scorePlayer1=game.score_paddleleft,
+        #        scorePlayer2=game.score_paddleright,
+        #        winner=winner,
+        #    )
+            self.dataGame.gameEnded=True
+            self.dataGame.winner=winner
 
             # Utiliser sync_to_async pour sauvegarder l'objet de manière asynchrone
-            await sync_to_async(pong_game.save)()
+            await sync_to_async(self.dataGame.save)()
 
         # Envoyer un message WebSocket au client pour annoncer la fin du jeu
         print("brubru", file=sys.stderr)
@@ -509,3 +525,4 @@ class GameConsumer(AsyncWebsocketConsumer):
             'type': 'game_over',
             'winner': winner
         }))
+        self.close()

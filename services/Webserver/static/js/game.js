@@ -553,13 +553,7 @@ function	buildFriendlist(struct, data)
 		// Set username and status
 		username.innerHTML = data.friendList[i].username;
 		let status = "online";
-		let lastDate = new Date(data.friendList[i].lastTimeOnline).getTime() + (10 * 1000);
-		let currDate = new Date().getTime();
-		console.log("+10s send=", lastDate);
-		console.log("My hour=", currDate);
-		console.log("Diff=", currDate - lastDate);
-
-		if (lastDate < currDate)
+		if (data.friendList[i].online === "false")
 			status = "offline";
 		statusIcon.classList.add("fa-solid", "fa-circle-dot", status);
 		statusIcon.title = status;
@@ -1140,10 +1134,12 @@ function	receiveInvitation(struct, data)
 							struct.screen.game.running = 0;
 						coinAnimation(struct)
 							.then(() => {
-								struct.screen.game = getPongStruct();
 								clearCanvas(struct.screen.wrapperCanvas);
 								showScreen(struct.screen, struct.screen.wrapperCanvas)
 								resetPhoneClasses(struct);
+							})
+							.then(() => {
+								struct.screen.game = getPongStruct();
 								struct.screen.primaryPlayer.classList.add("solo");
 								struct.screen.secondaryPlayer.classList.add("hidden");
 								struct.screen.game.online = true;
@@ -1179,10 +1175,12 @@ function	acceptInvitation(struct, data)
 		struct.screen.game.running = 0;
 	coinAnimation(struct)
 		.then(() => {
-			struct.screen.game = getPongStruct();
 			clearCanvas(struct.screen.wrapperCanvas);
-			showScreen(struct.screen, struct.screen.wrapperCanvas);
+			showScreen(struct.screen, struct.screen.wrapperCanvas)
 			resetPhoneClasses(struct);
+		})
+		.then(() => {
+			struct.screen.game = getPongStruct();
 			struct.screen.primaryPlayer.classList.add("solo");
 			struct.screen.secondaryPlayer.classList.add("hidden");
 			struct.screen.game.online = true;

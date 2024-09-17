@@ -42,7 +42,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 
 		game.socket.addEventListener("error", function(event) {
 			game.running = 0;
-			rejectCoin(struct);
+			rejectCoin(struct.gameForm);
 			struct.gameForm.inputs[2].disabled = true;
 			console.error("Critical error on Pong's websocket");
 		});

@@ -22,20 +22,16 @@ class customException(Exception):
 class ChatConsumer(AsyncWebsocketConsumer):
     # Fonction pour récupérer le nom d'utilisateur à partir du JWT
     def get_username_from_jwt(self, auth_cookie):
-        print(f"getusername", file=sys.stderr)
         try:
             # Décrypter le JWT avec la clé secrète
             decoded_token = jwt.decode(auth_cookie, os.environ['SERVER_JWT_KEY'], algorithms=["HS256"])
-            print(f"decodedJwt == {decoded_token}", file=sys.stderr)
             # Extraire le nom d'utilisateur du JWT
             username = decoded_token.get('userName')
             self.avatar = decoded_token.get('avatar')
-            print(f"decodedJwt == {username}", file=sys.stderr)
             if not username:
                 return None
             return username
         except Exception as e:
-            print(f"except getusername == {e}", file=sys.stderr)
             return None
 
     async def connect(self):
@@ -47,7 +43,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             cookies = headers[b"cookie"].decode()  # Décoder les cookies en chaîne de caractères
             cookies_dict = dict(item.split("=") for item in cookies.split("; "))  # Parse cookies en dictionnaire
             auth_cookie = cookies_dict.get('auth')  # Récupérer le cookie 'auth'
-            print(f'authcoockie == {auth_cookie}', file=sys.stderr)
 
             self.username = ''
             # Si le cookie auth est trouvé, décoder le JWT pour obtenir le nom d'utilisateur
@@ -145,7 +140,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         message = event["message"]
         user = event['user']
-        avatar = event['avtar']
+        avatar = event['avatar']
 
         # Envoyer le message au WebSocket
         await self.send(text_data=json.dumps({"type":"message" ,"message": message, 'user':user, 'avatar':avatar}))

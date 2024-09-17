@@ -478,8 +478,8 @@ def updateInfo(request):
 # creer l'obj ami a renvoyer
     for friend in user.friendsList:
         DBFriend = mid.get_user_in_db("Username", friend)
-        print(f'player time == {user.lastTimeOnline}, frinend time == {DBFriend.lastTimeOnline} tetng time == {user.lastTimeOnline + timedelta(seconds=10)}', file=sys.stderr)
-        online = 'true' if user.lastTimeOnline + timedelta(seconds=10) > DBFriend.lastTimeOnline else 'false'
+        print(f'player time == {user.lastTimeOnline}, frinend time == {DBFriend.lastTimeOnline} tetng time == {user.lastTimeOnline - DBFriend.lastTimeOnline  < timedelta(seconds=10)}', file=sys.stderr)
+        online = 'true' if user.lastTimeOnline - DBFriend.lastTimeOnline  < timedelta(seconds=10) else 'false'
         print(f'online ???? {online}', file=sys.stderr)
         friendObject.append({
             "username": DBFriend.Username,

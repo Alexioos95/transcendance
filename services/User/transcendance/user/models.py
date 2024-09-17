@@ -27,15 +27,10 @@ class User(models.Model):
         FR = 'FR', 'French'
         EN = 'EN', 'English'
         NL = 'NL', 'Dutch'
-    
-    class TwoFA(models.TextChoices):
-        NONE = 'NONE', 'None'
-        MAIL = 'MAIL', 'Mail'
-        APK = 'APK', 'APK'
-    
+   
     language = models.CharField(max_length=3, choices=Language.choices, default=Language.FR)
-    twoFA = models.CharField(max_length=5, choices=TwoFA.choices, default=TwoFA.NONE) # Use bool instead
-    key2FA = models.CharField(max_length=100)
+    twoFABool = models.CharField(max_length=5, blank=False, default='false')
+    twoFA = models.CharField(max_length=5, blank=False) # Use bool instead
     lastTimeOnline = models.DateTimeField()  # instance de datetime.date
     pongLvl = models.PositiveBigIntegerField()
     tetrisLvl = models.PositiveBigIntegerField()  # start at 0, no negative values

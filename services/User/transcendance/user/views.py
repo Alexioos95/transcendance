@@ -197,12 +197,19 @@ def auth42(request):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
     authorization_code = request.GET.get('code')
     print(f'https://{os.environ['DUMP']}:4433/user/auth42/', file=sys.stderr)
+    # data = {
+    #     'grant_type': 'authorization_code',
+    #     'client_id': 'u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9',#os.environ['FTAUTHUID'],
+    #     'client_secret': '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',#os.environ['FTAUTHSECRET'],
+    #     'code': authorization_code,
+    #     'redirect_uri': f'https://made-f0ar1s2:4433/user/auth42/'
+    #}
     data = {
-        'grant_type': 'authorization_code',
-        'client_id': 'u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9',#os.environ['FTAUTHUID'],
-        'client_secret': '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',#os.environ['FTAUTHSECRET'],
-        'code': authorization_code,
-        'redirect_uri': f'https://made-f0ar2s5:4433/user/auth42/'
+    'grant_type': 'authorization_code',
+    'client_id': f'{os.environ["FTAUTHUID"]}',#os.environ['FTAUTHUID'],
+    'client_secret': f'{os.environ["FTAUTHSECRET"]}',#os.environ['FTAUTHSECRET'],
+    'code': authorization_code,
+    'redirect_uri': f'https://{os.environ["DUMP"]}:4433/user/auth42/'
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', json=data)
     print(f'auth42 : code == {response.status_code}', file=sys.stderr)
@@ -253,16 +260,7 @@ def auth42(request):
 
 @csrf_exempt
 def checkAuth42(request):
-    userIp = request.META.get('REMOTE_ADDR')
-    x_real_ip = request.headers.get('X-Real-IP')
-    print(f'x_real_ip = {x_real_ip}', file=sys.stderr)
-    print(f'forwarded for{request.headers.get("X-Forward-For")}', file=sys.stderr)
-    print(f'x real{request.META.get("X-Real-IP")}', file=sys.stderr)
-    # userIp = request.META.get('HTTP_X_FORWARDED_FOR')#request.META.get('REMOTE_ADDR')
-    print(f'user ip == {userIp}', file=sys.stderr)
-    print(f'user ip == {request.META.get('HTTP_USER_AGENT')}', file=sys.stderr)
-
-    
+    userIp = request.META.get('REMOTE_ADDR')   
     if request.method == "GET":
         cachedValue = cache.get(userIp)
         print(f'checkAuth42 : {cachedValue}', file=sys.stderr)
@@ -280,7 +278,7 @@ def checkAuth42(request):
             mid.setCookie(user, response)
             return response
         else:
-            return JsonResponse({"error": "still waiting"}, status=404) #penser a mettre 204
+            return JsonResponse({"error": "still waiting"}, status=204) #penser a mettre 204
     else:
         return HttpResponse(status=405)
 
@@ -406,7 +404,7 @@ def updateUserInfos(request):
             user.language = data['lang']
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
     print("uptade de new user", file=sys.stderr)
-    print(f"username == {user.Username}, email == {user.Email}, Avatar == {user.Avatar}, langue == {user.language}", file=sys.stderr)
+    print(f"username == {user.Username}, email == {user.Email}, lastTimeOnline: {user.lastTimeOnline}, Avatar == {user.Avatar}, langue == {user.language}", file=sys.stderr)
     user.save()
     response_data = JsonResponse({"message": "User information updated successfully"}, status=200)
     mid.setCookie(user, response_data)
@@ -469,17 +467,29 @@ def updateInfo(request):
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
         return JsonResponse({"error": "User does not exists"}, status=403)
+    # user.twoFA = True
+    print(f'le lat time online de {user.Username} est: {user.lastTimeOnline}', file=sys.stderr)
+    time = datetime.now()
+    tz = pytz.timezone('CET')
+    tzTime = tz.localize(time)
+    print(f'tztime {tzTime}', file=sys.stderr)
     friendObject = []
     foeObject = []
 # creer l'obj ami a renvoyer
     for friend in user.friendsList:
         DBFriend = mid.get_user_in_db("Username", friend)
+        print(f'player time == {user.lastTimeOnline}, frinend time == {DBFriend.lastTimeOnline} tetng time == {user.lastTimeOnline - DBFriend.lastTimeOnline  < timedelta(seconds=10)}', file=sys.stderr)
+        online = 'true' if user.lastTimeOnline - DBFriend.lastTimeOnline  < timedelta(seconds=10) else 'false'
+        print(f'online ???? {online}', file=sys.stderr)
         friendObject.append({
             "username": DBFriend.Username,
             "lastTimeOnline": DBFriend.lastTimeOnline.isoformat(),
             # "id": DBFriend.id,
-            "avatar":DBFriend.Avatar
+            "avatar":DBFriend.Avatar,
+            "online": online
         })
+    user.lastTimeOnline = tzTime
+    user.save()
 #lster les bloques a renvoyer
     for block in user.foeList:
         DBFoe = mid.get_user_in_db("Username", block)
@@ -499,8 +509,8 @@ def updateInfo(request):
     receivedChallenge = []
     if user.id in challenge:
         receivedChallenge = challenge[user.id]
-    print(f'update info : liste des challenge en attente: {challenge}', file=sys.stderr)
-    print(f'update info : challenge en attente de l user: {user.Username} son id: {user.id} et ses challenges en attentes sont: {receivedChallenge}', file=sys.stderr)
+    # print(f'update info : liste des challenge en attente: {challenge}', file=sys.stderr)
+    # print(f'update info : challenge en attente de l user: {user.Username} son id: {user.id} et ses challenges en attentes sont: {receivedChallenge}', file=sys.stderr)
     challengerArray = []
     for i, challanger in enumerate(receivedChallenge):
         loopUser = mid.get_user_in_db('id', challanger[0])
@@ -727,7 +737,7 @@ def checkCodeSet(request):
 #    user = mid.get_user_in_db('Username', user.Username)
 #    if user is None:
 #        return JsonResponse({'error': 'User not in db'}, status=403)
-    user.twoFA = True
+
     try:
         user.save()
     except Exception:

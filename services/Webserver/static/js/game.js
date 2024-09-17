@@ -553,13 +553,7 @@ function	buildFriendlist(struct, data)
 		// Set username and status
 		username.innerHTML = data.friendList[i].username;
 		let status = "online";
-		let lastDate = new Date(data.friendList[i].lastTimeOnline).getTime() + (10 * 1000);
-		let currDate = new Date().getTime();
-		console.log("+10s send=", lastDate);
-		console.log("My hour=", currDate);
-		console.log("Diff=", currDate - lastDate);
-
-		if (lastDate < currDate)
+		if (data.friendList[i].online === "false")
 			status = "offline";
 		statusIcon.classList.add("fa-solid", "fa-circle-dot", status);
 		statusIcon.title = status;
@@ -1141,9 +1135,12 @@ function	receiveInvitation(struct, data)
 						coinAnimation(struct)
 							.then(() => {
 								struct.screen.game = getPongStruct();
-								struct.screen.game.online = true;
+								clearCanvas(struct.screen.wrapperCanvas);
+								showScreen(struct.screen, struct.screen.wrapperCanvas)
+								resetPhoneClasses(struct);
 								struct.screen.primaryPlayer.classList.add("solo");
 								struct.screen.secondaryPlayer.classList.add("hidden");
+								struct.screen.game.online = true;
 								struct.screen.game.run(struct);
 							});
 					}
@@ -1177,9 +1174,12 @@ function	acceptInvitation(struct, data)
 	coinAnimation(struct)
 		.then(() => {
 			struct.screen.game = getPongStruct();
-			struct.screen.game.online = true;
+			clearCanvas(struct.screen.wrapperCanvas);
+			showScreen(struct.screen, struct.screen.wrapperCanvas);
+			resetPhoneClasses(struct);
 			struct.screen.primaryPlayer.classList.add("solo");
 			struct.screen.secondaryPlayer.classList.add("hidden");
+			struct.screen.game.online = true;
 			struct.screen.game.run(struct);
 		});
 }
@@ -1456,8 +1456,8 @@ async function	checkGameSelectorValidation(struct)
 			.then(() => title.style.opacity = 1)
 			.then(() => title.innerHTML = struct.screen.game.name)
 		clearCanvas(struct.screen.wrapperCanvas);
-		showScreen(struct.screen, struct.screen.wrapperCanvas)
-		resetPhoneClasses(struct)
+		showScreen(struct.screen, struct.screen.wrapperCanvas);
+		resetPhoneClasses(struct);
 		struct.header.wrapper.classList.add("zindex");
 		struct.options.wrapper.classList.add("hidden");
 		struct.cards.screen.classList.remove("zindex");
@@ -1537,8 +1537,10 @@ function	resetInsertCoinButton(button)
 	const text = document.querySelector("#selector span");
 	const coin = document.getElementsByClassName("coin")[0];
 
-	text.classList.remove("active")
-	button.removeChild(coin);
+	if (text !== undefined)
+		text.classList.remove("active")
+	if (button !== undefined && coin !== undefined)
+		button.removeChild(coin);
 }
 
 /////////////////////////

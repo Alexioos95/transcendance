@@ -40,7 +40,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 		let start = true;
 		game.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/pong/");
 
-		game.socket.addEventListener("error", function(event) {
+		game.socket.addEventListener("error", function() {
 			game.running = 0;
 			rejectCoin(struct.gameForm);
 			struct.gameForm.inputs[2].disabled = true;
@@ -96,6 +96,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 			}
 			else if (data.type === "game_over")
 			{
+				console.log(data);
 				game.running = 0;
 				if (game.socket !== undefined)
 					game.socket.close(1000);

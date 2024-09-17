@@ -29,6 +29,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             print(f"decodedJwt == {decoded_token}", file=sys.stderr)
             # Extraire le nom d'utilisateur du JWT
             username = decoded_token.get('userName')
+            self.avatar = decoded_token.get('avatar')
             print(f"decodedJwt == {username}", file=sys.stderr)
             if not username:
                 return None
@@ -127,6 +128,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'chat_message',
                 'user': self.username,
+                'avatar':self.avatar,
                 'message': clean_message
             }
         )
@@ -143,6 +145,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         message = event["message"]
         user = event['user']
+        avatar = event['avtar']
 
         # Envoyer le message au WebSocket
-        await self.send(text_data=json.dumps({"type":"message" ,"message": message, 'user':user}))
+        await self.send(text_data=json.dumps({"type":"message" ,"message": message, 'user':user, 'avatar':avatar}))

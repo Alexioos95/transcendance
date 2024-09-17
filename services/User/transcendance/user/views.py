@@ -260,16 +260,7 @@ def auth42(request):
 
 @csrf_exempt
 def checkAuth42(request):
-    userIp = request.META.get('REMOTE_ADDR')
-    x_real_ip = request.headers.get('X-Real-IP')
-    print(f'x_real_ip = {x_real_ip}', file=sys.stderr)
-    print(f'forwarded for{request.headers.get("X-Forward-For")}', file=sys.stderr)
-    print(f'x real{request.META.get("X-Real-IP")}', file=sys.stderr)
-    # userIp = request.META.get('HTTP_X_FORWARDED_FOR')#request.META.get('REMOTE_ADDR')
-    print(f'user ip == {userIp}', file=sys.stderr)
-    print(f'user ip == {request.META.get('HTTP_USER_AGENT')}', file=sys.stderr)
-
-    
+    userIp = request.META.get('REMOTE_ADDR')   
     if request.method == "GET":
         cachedValue = cache.get(userIp)
         print(f'checkAuth42 : {cachedValue}', file=sys.stderr)
@@ -287,7 +278,7 @@ def checkAuth42(request):
             mid.setCookie(user, response)
             return response
         else:
-            return JsonResponse({"error": "still waiting"}, status=404) #penser a mettre 204
+            return JsonResponse({"error": "still waiting"}, status=204) #penser a mettre 204
     else:
         return HttpResponse(status=405)
 
@@ -476,23 +467,29 @@ def updateInfo(request):
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
         return JsonResponse({"error": "User does not exists"}, status=403)
-    user.twoFA = True
+    # user.twoFA = True
+    print(f'le lat time online de {user.Username} est: {user.lastTimeOnline}', file=sys.stderr)
     time = datetime.now()
     tz = pytz.timezone('CET')
     tzTime = tz.localize(time)
-    user.lastTimeOnline = tzTime
-    user.save()
+    print(f'tztime {tzTime}', file=sys.stderr)
     friendObject = []
     foeObject = []
 # creer l'obj ami a renvoyer
     for friend in user.friendsList:
         DBFriend = mid.get_user_in_db("Username", friend)
+        print(f'player time == {user.lastTimeOnline}, frinend time == {DBFriend.lastTimeOnline} tetng time == {user.lastTimeOnline + timedelta(seconds=10)}', file=sys.stderr)
+        online = 'true' if user.lastTimeOnline + timedelta(seconds=10) > DBFriend.lastTimeOnline else 'false'
+        print(f'online ???? {online}', file=sys.stderr)
         friendObject.append({
             "username": DBFriend.Username,
             "lastTimeOnline": DBFriend.lastTimeOnline.isoformat(),
             # "id": DBFriend.id,
-            "avatar":DBFriend.Avatar
+            "avatar":DBFriend.Avatar,
+            "online": online
         })
+    user.lastTimeOnline = tzTime
+    user.save()
 #lster les bloques a renvoyer
     for block in user.foeList:
         DBFoe = mid.get_user_in_db("Username", block)

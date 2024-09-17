@@ -553,13 +553,7 @@ function	buildFriendlist(struct, data)
 		// Set username and status
 		username.innerHTML = data.friendList[i].username;
 		let status = "online";
-		let lastDate = new Date(data.friendList[i].lastTimeOnline).getTime() + (10 * 1000);
-		let currDate = new Date().getTime();
-		console.log("+10s send=", lastDate);
-		console.log("My hour=", currDate);
-		console.log("Diff=", currDate - lastDate);
-
-		if (lastDate < currDate)
+		if (data.friendList[i].online === "false")
 			status = "offline";
 		statusIcon.classList.add("fa-solid", "fa-circle-dot", status);
 		statusIcon.title = status;

@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-sed -i s/DUMP/$1/g ./services/Webserver/static/js/websockets.js
-
-#auth42 Redirect route needs post 

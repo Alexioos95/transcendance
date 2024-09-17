@@ -517,6 +517,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         #    )
             self.dataGame.gameEnded=True
             self.dataGame.winner=self.username
+            self.dataGame.scorePlayer1=game.score_paddleleft
+            self.dataGame.scorePlayer2=game.score_paddleright
 
             # Utiliser sync_to_async pour sauvegarder l'objet de manière asynchrone
             await sync_to_async(self.dataGame.save)()
@@ -527,6 +529,6 @@ class GameConsumer(AsyncWebsocketConsumer):
             'type': 'game_over',
             'winner': winner,
             'game_score_paddleLeft': game.score_paddleleft,
-            'game_score_paddleRight':  game.score_paddleright,
+            'game_score_paddleRight': game.score_paddleright,
         }))
         self.close()

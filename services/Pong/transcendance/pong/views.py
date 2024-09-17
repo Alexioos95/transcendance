@@ -60,7 +60,7 @@ def getPlayerGames(request):
     print(f'queries: {queries}', file=sys.stderr)
     for x in queries:
         print(f'x: {x}', file=sys.stderr)
-        matches.append(x)
+        matches.append({'username1': x['Player1'], 'game': 'pong', 'username2': x['Player2'], 'winner': x['winner'], 'score1': x['scorePlayer1'], 'score2': x['scorePlayer2'], 'date': x['gameDate']})
     print(f'matches: {matches}', file=sys.stderr)
 
     return JsonResponse({'matches': matches}, status=200)

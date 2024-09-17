@@ -329,7 +329,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         # Réduire le nombre de joueurs
         GameConsumer.players_in_room[self.room_name] -= 1
-        self.group_send(GameConsumer.players_in_room[self.room_name])
+        #self.channel_layer.group_send(GameConsumer.players_in_room[self.room_name])
         # Si le nombre de joueurs tombe à 1, déclarer le joueur restant vainqueur
         if GameConsumer.players_in_room[self.room_name] == 1:
             game = GameConsumer.games[self.room_name]

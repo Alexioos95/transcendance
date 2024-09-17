@@ -110,16 +110,16 @@ def register(request):
 def checkJwt(request):
     auth = mid.checkCookie(request, 'auth')
     if auth is None:
-        response = JsonResponse()
+        response = JsonResponse({"error": "user not log"}, status=200)
         response.set_cookie('auth', '', expires='Thu, 01 Jan 1970 00:00:00 GMT')
-        return response({"error": "user not log"}, status=200)
+        return response
     try:
         username = mid.decodeJwt(auth)
         user = mid.get_user_in_db('Username', username)
         if not user:
-            response = JsonResponse()
+            response = JsonResponse({"error": "user does not exist"}, status=200)
             response.set_cookie('auth', '', expires='Thu, 01 Jan 1970 00:00:00 GMT')
-            return response({"error": "user does nor exist"}, status=200)
+            return response
         avatar = ''
         if not user.Avatar:
             avatar = '/images/default_avatar.png'
@@ -127,9 +127,9 @@ def checkJwt(request):
             avatar = user.Avatar
         return JsonResponse({"twoFA": user.twoFABool,  "email": user.Email, "guestMode":"false", "username":user.Username, "avatar": avatar , "lang": user.language}, status=200)
     except mid.customException as e:
-        response = JsonResponse()
+        response = JsonResponse({"error": e.data}, status=200)
         response.set_cookie('auth', '', expires='Thu, 01 Jan 1970 00:00:00 GMT')
-        return response({"error": e.data}, status=200)
+        return response
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -431,19 +431,19 @@ def updateInfo(request):
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
         return JsonResponse({"error": "User does not exists"}, status=403)
-    print(f'le lat time online de {user.Username} est: {user.lastTimeOnline}', file=sys.stderr)
+    # print(f'le lat time online de {user.Username} est: {user.lastTimeOnline}', file=sys.stderr)
     time = datetime.now()
     tz = pytz.timezone('CET')
     tzTime = tz.localize(time)
-    print(f'tztime {tzTime}', file=sys.stderr)
+    # print(f'tztime {tzTime}', file=sys.stderr)
     friendObject = []
     foeObject = []
 # creer l'obj ami a renvoyer
     for friend in user.friendsList:
         DBFriend = mid.get_user_in_db("Username", friend)
-        print(f'player time == {user.lastTimeOnline}, frinend time == {DBFriend.lastTimeOnline} tetng time == {user.lastTimeOnline - DBFriend.lastTimeOnline  < timedelta(seconds=10)}', file=sys.stderr)
+        # print(f'player time == {user.lastTimeOnline}, frinend time == {DBFriend.lastTimeOnline} tetng time == {user.lastTimeOnline - DBFriend.lastTimeOnline  < timedelta(seconds=10)}', file=sys.stderr)
         online = 'true' if user.lastTimeOnline - DBFriend.lastTimeOnline  < timedelta(seconds=10) else 'false'
-        print(f'online ???? {online}', file=sys.stderr)
+        # print(f'online ???? {online}', file=sys.stderr)
         friendObject.append({
             "username": DBFriend.Username,
             "lastTimeOnline": DBFriend.lastTimeOnline.isoformat(),
@@ -478,7 +478,7 @@ def updateInfo(request):
     for i, challanger in enumerate(receivedChallenge):
         loopUser = mid.get_user_in_db('id', challanger[0])
         if loopUser is None:
-            print('update info :  no user found', file=sys.stderr)
+            pass# print('update info :  no user found', file=sys.stderr)
         else:
             if challanger[2] == False:
                 print(f'update info :  challenger en attente de l user: {loopUser} ', file=sys.stderr)
@@ -512,7 +512,7 @@ def updateInfo(request):
         'challengeAccepted': {'game': 'pong', 'username': accepted}
     }
 
-    print(f'update info : object: {json.dumps(objectPing)}', file=sys.stderr)
+    # print(f'update info : object: {json.dumps(objectPing)}', file=sys.stderr)
     return JsonResponse(objectPing, status=200)
 
 @csrf_exempt

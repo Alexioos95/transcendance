@@ -197,12 +197,19 @@ def auth42(request):
         return JsonResponse({'error': 'Invalid request method'}, status=405)
     authorization_code = request.GET.get('code')
     print(f'https://{os.environ['DUMP']}:4433/user/auth42/', file=sys.stderr)
+    # data = {
+    #     'grant_type': 'authorization_code',
+    #     'client_id': 'u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9',#os.environ['FTAUTHUID'],
+    #     'client_secret': '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',#os.environ['FTAUTHSECRET'],
+    #     'code': authorization_code,
+    #     'redirect_uri': f'https://made-f0ar1s2:4433/user/auth42/'
+    #}
     data = {
-        'grant_type': 'authorization_code',
-        'client_id': 'u-s4t2ud-f59fbc2018cb22b75560aad5357e1680cd56b1da8404e0155abc804bc0d6c4b9',#os.environ['FTAUTHUID'],
-        'client_secret': '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',#os.environ['FTAUTHSECRET'],
-        'code': authorization_code,
-        'redirect_uri': f'https://made-f0ar2s5:4433/user/auth42/'
+    'grant_type': 'authorization_code',
+    'client_id': f'{os.environ["FTAUTHUID"]}',#os.environ['FTAUTHUID'],
+    'client_secret': f'{os.environ["FTAUTHSECRET"]}',#os.environ['FTAUTHSECRET'],
+    'code': authorization_code,
+    'redirect_uri': f'https://{os.environ["DUMP"]}:4433/user/auth42/'
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', json=data)
     print(f'auth42 : code == {response.status_code}', file=sys.stderr)
@@ -406,7 +413,7 @@ def updateUserInfos(request):
             user.language = data['lang']
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
     print("uptade de new user", file=sys.stderr)
-    print(f"username == {user.Username}, email == {user.Email}, Avatar == {user.Avatar}, langue == {user.language}", file=sys.stderr)
+    print(f"username == {user.Username}, email == {user.Email}, lastTimeOnline: {user.lastTimeOnline}, Avatar == {user.Avatar}, langue == {user.language}", file=sys.stderr)
     user.save()
     response_data = JsonResponse({"message": "User information updated successfully"}, status=200)
     mid.setCookie(user, response_data)
@@ -469,6 +476,12 @@ def updateInfo(request):
         return JsonResponse({"error": e.data}, status=e.code)
     if user is None:
         return JsonResponse({"error": "User does not exists"}, status=403)
+    user.twoFA = True
+    time = datetime.now()
+    tz = pytz.timezone('CET')
+    tzTime = tz.localize(time)
+    user.lastTimeOnline = tzTime
+    user.save()
     friendObject = []
     foeObject = []
 # creer l'obj ami a renvoyer
@@ -499,8 +512,8 @@ def updateInfo(request):
     receivedChallenge = []
     if user.id in challenge:
         receivedChallenge = challenge[user.id]
-    print(f'update info : liste des challenge en attente: {challenge}', file=sys.stderr)
-    print(f'update info : challenge en attente de l user: {user.Username} son id: {user.id} et ses challenges en attentes sont: {receivedChallenge}', file=sys.stderr)
+    # print(f'update info : liste des challenge en attente: {challenge}', file=sys.stderr)
+    # print(f'update info : challenge en attente de l user: {user.Username} son id: {user.id} et ses challenges en attentes sont: {receivedChallenge}', file=sys.stderr)
     challengerArray = []
     for i, challanger in enumerate(receivedChallenge):
         loopUser = mid.get_user_in_db('id', challanger[0])
@@ -727,7 +740,7 @@ def checkCodeSet(request):
 #    user = mid.get_user_in_db('Username', user.Username)
 #    if user is None:
 #        return JsonResponse({'error': 'User not in db'}, status=403)
-    user.twoFA = True
+
     try:
         user.save()
     except Exception:

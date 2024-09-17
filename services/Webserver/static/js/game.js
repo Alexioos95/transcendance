@@ -541,7 +541,7 @@ function	buildFriendlist(struct, data)
 		let status = "online";
 		let lastDate = new Date(data.friendList[i].lastTimeOnline).getTime() + (10 * 1000);
 		let currDate = new Date().getTime();
-		console.log("Hour send=", data.friendList[i].lastTimeOnline).getTime();
+		console.log("Hour send=", data.friendList[i].lastTimeOnline.getTime());
 		console.log("+10s send=", lastDate);
 		console.log("My hour=", currDate);
 		console.log("Diff=", currDate - lastDate);

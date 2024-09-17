@@ -56,6 +56,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 				const ball = getPixels(game.canvas, parseInt(data.game_state.ball.x, 10), parseInt(data.game_state.ball.y, 10));
 				const obj = { key: undefined };
 	
+				console.log(ball);
 				if (start === true)
 				{
 					const span1 = document.createElement("span");

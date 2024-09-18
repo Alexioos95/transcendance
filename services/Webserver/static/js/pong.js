@@ -7,6 +7,8 @@ function	getPongStruct()
 	const struct = {
 		name: "PONG",
 		canvas: undefined,
+		width: undefined,
+		height: undefined,
 		ctx: undefined,
 		paddles: undefined,
 		scores: undefined,
@@ -34,7 +36,9 @@ function	initPongStruct(struct, game, wrapperCanvas)
 	game.ctx = game.canvas.getContext("2d");
 	game.paddles = getPaddles(game.canvas);
 	game.ball = getBall(game.canvas);
-	game.scores = [0, 0];
+	game.scores = [10, 10];
+	game.height = game.canvas.height;
+	game.width = game.canvas.width;
 	game.running = 1;
 	if (game.online === true)
 	{
@@ -211,6 +215,11 @@ function	resize(game, wrapper)
 		width: game.canvas.width,
 		height: game.canvas.height
 	};
+	if (oldValues.width === 0 || oldValues.height === 0)
+	{
+		oldValues.width = game.width;
+		oldValues.height = game.height;
+	}
 	setCanvasDimensions(game.canvas, wrapper);
 	resizePaddles(oldValues, game.canvas, game.paddles);
 	resizeBall(oldValues, game.canvas, game.ball);
@@ -623,6 +632,7 @@ function	getCanvas(wrapper)
 	canvas.classList.add("pong");
 	canvas.setAttribute("id", "canvas");
 	canvas.setAttribute("tabindex", "0");
+	console.log(wrapper);
 	setCanvasDimensions(canvas, wrapper);
 	wrapper.appendChild(canvas);
 	return (canvas);
@@ -632,9 +642,24 @@ function	setCanvasDimensions(canvas, wrapper)
 {
 	if (wrapper === undefined)
 		return ;
-	const width = wrapper.clientWidth;
-	const height = wrapper.clientHeight;
+	let isHidden = false;
+	let width;
+	let height;
 
+	if (wrapper.classList.contains("hidden"))
+		isHidden = true;
+	if (isHidden === false)
+	{
+		width = wrapper.clientWidth;
+		height = wrapper.clientHeight;
+	}
+	else
+	{
+		wrapper.classList.remove("hidden");
+		width = wrapper.clientWidth * 2;
+		height = wrapper.clientHeight;
+		wrapper.classList.add("hidden");
+	}
 	canvas.setAttribute("width", width);
 	canvas.setAttribute("height", height);
 }

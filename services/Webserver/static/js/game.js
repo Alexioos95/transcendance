@@ -186,7 +186,7 @@ function	setupEventListeners(struct, data)
 				{
 					struct.options.account.error.classList.remove("success");
 					struct.options.account.error.classList.add("error");
-					struct.options.account.error.innerHTML = "YIKES";
+					struct.options.account.error.innerHTML = data.error;
 				}
 			})
 			.catch(() => console.error("Failed to fetch the set2fa route"));
@@ -231,7 +231,7 @@ function	setupEventListeners(struct, data)
 				{
 					struct.options.account.error.classList.remove("success");
 					struct.options.account.error.classList.add("error");
-					struct.options.account.error.innerHTML = "YIKES";
+					struct.options.account.error.innerHTML = data.error;
 				}
 			})
 			.catch(() => console.error("Failed to fetch the updateUserInfos route"));
@@ -373,6 +373,9 @@ async function	endGame(struct)
 		updateTournamentWinners(struct);
 		updateTournamentMarkers(struct, true);
 		updateTournamentNames(struct, struct.screen.playerOnControls);
+		clearCanvas(struct.screen.wrapperCanvas);
+		showScreen(struct.screen, struct.screen.wrapperCanvas)
+		resetPhoneClasses(struct);
 		if (struct.tournament.matches != 0)
 			launchGame(struct);
 		else
@@ -1136,6 +1139,7 @@ function	receiveInvitation(struct, data)
 								struct.screen.game = getPongStruct();
 								struct.screen.primaryPlayer.classList.add("solo");
 								struct.screen.secondaryPlayer.classList.add("hidden");
+								setupGameControls(struct, "pong");
 								struct.screen.game.online = true;
 								struct.screen.game.run(struct);
 							});
@@ -1177,6 +1181,7 @@ function	acceptInvitation(struct, data)
 			struct.screen.game = getPongStruct();
 			struct.screen.primaryPlayer.classList.add("solo");
 			struct.screen.secondaryPlayer.classList.add("hidden");
+			setupGameControls(struct, "pong");
 			struct.screen.game.online = true;
 			struct.screen.game.run(struct);
 		});
@@ -1803,7 +1808,7 @@ function	showTournamentOverview(struct)
 	}
 	struct.gameForm.form.classList.add("hidden");
 	struct.tournament.overview.classList.remove("hidden");
-	updateTournamentMarkers(struct, true);
+	updateTournamentMarkers(struct, false);
 }
 
 function	updateTournamentNames(struct, elements)
@@ -1830,6 +1835,8 @@ function	updateTournamentMarkers(struct, shift)
 {
 	let array;
 
+	if (shift === true)
+		struct.tournament.markerArray.shift();
 	if (struct.options.lang.curr === "FR")
 		array = struct.tournament.markerArrayStringsFR;
 	else if (struct.options.lang.curr === "EN")
@@ -1838,8 +1845,6 @@ function	updateTournamentMarkers(struct, shift)
 		array = struct.tournament.markerArrayStringsNL;
 	for (let i = 0; i < 3; i++)
 		struct.tournament.markers[i].innerHTML = array[struct.tournament.markerArray[0][i]];
-	if (shift === true)
-		struct.tournament.markerArray.shift();
 }
 
 function	updateTournamentWinners(struct)

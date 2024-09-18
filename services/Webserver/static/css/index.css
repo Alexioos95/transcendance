@@ -1554,7 +1554,9 @@ canvas.pong {
 	min-height: 10%;
 	height: 10%;
 	max-height: 10%;
+	padding: 10%;
 	margin: 0;
+	font-size: 2vh;
 }
 
 .tab-history tbody {

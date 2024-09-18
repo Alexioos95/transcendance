@@ -329,32 +329,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         # Réduire le nombre de joueurs
         GameConsumer.players_in_room[self.room_name] -= 1
-        #self.channel_layer.group_send(GameConsumer.players_in_room[self.room_name])
-        # Si le nombre de joueurs tombe à 1, déclarer le joueur restant vainqueur
-        if GameConsumer.players_in_room[self.room_name] == 1:
-            game = GameConsumer.games[self.room_name]
-
-            # Déterminer qui est le joueur restant et le déclarer vainqueur
-            remaining_role = 'paddleLeft' if self.role == 'paddleRight' else 'paddleRight'
-            winner = 'Player1' if remaining_role == 'paddleLeft' else 'Player2'
-
-            if self.role == 'paddleLeft':
-                winner = self.username
-            else:
-                winner = self.username
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'game_over',
-                    'winner': winner,
-                    'game_score_paddleLeft': game.score_paddleleft,
-                    'game_score_paddleRight':  game.score_paddleright,
-                }
-            )
-
-            # Arrêter le jeu en cours
-            game.running = False
-
+        
         # Si aucun joueur ne reste, supprimer le jeu
         if GameConsumer.players_in_room[self.room_name] == 0:
             del GameConsumer.games[self.room_name]

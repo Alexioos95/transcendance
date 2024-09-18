@@ -6,12 +6,12 @@ services:
     hostname: redis_chat
     container_name: redis_chat
     image: redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
-    # healthcheck:
-    #   test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-    #   start_period: 30s
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     networks:
       - transcendance
@@ -20,12 +20,12 @@ services:
     hostname: redis_pong
     container_name: redis_pong
     image: redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
-    # healthcheck:
-    #   test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-    #   start_period: 30s
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p 6380 ping | grep PONG"]
+      start_period: 20s
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     networks:
       - transcendance
@@ -46,12 +46,12 @@ services:
     hostname: postgres_user
     container_name: postgres_user
     image: postgres@sha256:d898b0b78a2627cb4ee63464a14efc9d296884f1b28c841b0ab7d7c42f1fffdf
-    # healthcheck:
-    #   test: ["CMD-SHELL", "sh -c 'pg_isready -U $${POSTGRES_USER} -d postgres'"]
-    #   start_period: 30s
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U $${POSTGRES_USER} -d postgres'"]
+      start_period: 20s
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     networks:
       - transcendance
@@ -66,12 +66,12 @@ services:
     hostname: postgres_pong
     container_name: postgres_pong
     image: postgres@sha256:d898b0b78a2627cb4ee63464a14efc9d296884f1b28c841b0ab7d7c42f1fffdf
-    # healthcheck:
-    #   test: ["CMD-SHELL", "sh -c 'pg_isready -U $${POSTGRES_USER} -d postgres'"]
-    #   start_period: 30s
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U $${POSTGRES_USER} -d postgres'"]
+      start_period: 20s
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     networks:
       - transcendance
@@ -84,10 +84,10 @@ services:
   user:
     hostname: user
     container_name: user
-    #depends_on:
-    #  user_db:
-    #    condition: service_healthy
-    #    restart: true
+    depends_on:
+      user_db:
+        condition: service_healthy
+        restart: true
     pull_policy: build
     build:
       context: User
@@ -110,10 +110,10 @@ services:
   chat:
     hostname: chat
     container_name: chat
-    # depends_on:
-    #   chat_cache:
-    #     condition: service_healthy
-    #     restart: true
+    depends_on:
+      chat_cache:
+        condition: service_healthy
+        restart: true
     pull_policy: build
     build:
       context: Chat
@@ -144,13 +144,13 @@ services:
   pong:
     hostname: pong
     container_name: pong
-    # depends_on:
-    #   pong_cache:
-    #     condition: service_healthy
-    #     restart: true
-    #   pong_db
-    #     condition: service_healthy
-    #     restart: true
+    depends_on:
+      pong_cache:
+        condition: service_healthy
+        restart: true
+      pong_db:
+        condition: service_healthy
+        restart: true
     pull_policy: build
     build:
       context: Pong
@@ -174,19 +174,19 @@ services:
   ping:
     hostname: ping
     container_name: ping
-    # depends_on:
-	#   user:
-	#     condition: service_healthy
-	#     restart: true
-	#   chat:
-	#     condition: service_healthy
-	#     restart: true
-	#   mail:
-	#     condition: service_healthy
-	#     restart: true
-	#   pong:
-	#     condition: service_healthy
-	#     restart: true
+    depends_on:
+      user:
+        condition: service_healthy
+        restart: true
+      chat:
+        condition: service_healthy
+        restart: true
+      mail:
+        condition: service_healthy
+        restart: true
+      pong:
+        condition: service_healthy
+        restart: true
     pull_policy: build
     build:
       context: Ping
@@ -198,22 +198,22 @@ services:
   webserver:
     hostname: webserver
     container_name: webserver
-    # depends_on:
-    #   user:
-    #     condition: service_healthy
-    #     restart: true
-    #   chat:
-    #     condition: service_healthy
-    #     restart: true
-    #   mail:
-    #     condition: service_healthy
-    #     restart: true
-    #   pong:
-    #     condition: service_healthy
-    #     restart: true
-    #   ping:
-    #     condition: service_healthy
-    #     restart: true
+    depends_on:
+      user:
+        condition: service_healthy
+        restart: true
+      chat:
+        condition: service_healthy
+        restart: true
+      mail:
+        condition: service_healthy
+        restart: true
+      pong:
+        condition: service_healthy
+        restart: true
+      ping:
+        condition: service_healthy
+        restart: true
     pull_policy: build
     build:
       context: Webserver

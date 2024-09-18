@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY transcendance/ transcendance/
 
-#HEALTHCHECK     --interval=10s --timeout=1s --retries=3 --start-period=30s \
-#        CMD wget -q --tries=1 --spider --no-check-certificate http://localhost:8003/ping; if [ $? -eq 0 ]; then exit 0; else exit 1; fi
+HEALTHCHECK     --interval=10s --timeout=1s --retries=3 --start-period=30s \
+        CMD wget -q --tries=1 --spider --no-check-certificate http://localhost:8003/ping; if [ $? -eq 0 ]; then exit 0; else exit 1; fi
 
 CMD cd transcendance && daphne -b 0.0.0.0 -p 8003 transcendance.asgi:application

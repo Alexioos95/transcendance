@@ -24,5 +24,5 @@ urlpatterns = [
     path('PlayerPlaying/', pongView.PlayerPlaying),
     path('getPlayerGames/', pongView.getPlayerGames),
     path('', pongView.index),
-    path('ping/', pongView.ping),
+    path('pong/ping/', pongView.ping),
     ]

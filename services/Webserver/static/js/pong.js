@@ -36,7 +36,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 	game.ctx = game.canvas.getContext("2d");
 	game.paddles = getPaddles(game.canvas);
 	game.ball = getBall(game.canvas);
-	game.scores = [10, 10];
+	game.scores = [0, 0];
 	game.height = game.canvas.height;
 	game.width = game.canvas.width;
 	game.running = 1;

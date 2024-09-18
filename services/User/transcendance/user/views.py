@@ -651,7 +651,7 @@ def checkCodeLog(request):
         cache.delete(code)
         user = mid.get_user_in_db("Username", username)
         if user is None:
-            return JsonResponse({"error":"user does not exist"}, status=401)
+            return JsonResponse({"error":"Invalid code"}, status=401)
         expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
         encoded_jwt = jwt.encode({"userName": user.Username, "expirationDate": expiration_time}, os.environ['SERVER_JWT_KEY'], algorithm="HS256")
         response = HttpResponse(json.dumps({"guestMode": "false", 'username': user.Username, 'avatar':user.Avatar, 'lang':user.language, 'email': user.Email}), content_type="application/json")
@@ -1098,6 +1098,8 @@ def seeHistory(request):
     if not 'seeHistory' in data:
         return JsonResponse({'error': 'No username in request'}, status=403)
     historyUser = mid.get_user_in_db('Username', data['seeHistory'])
+    if historyUser is None:
+        return JsonResponse({'error': 'User not found in db'}, status=404)
     response = requests.post('http://pong:8004/getPlayerGames/', json={"username": historyUser.id})
     if response.status_code != 200:
         return JsonResponse({'error': 'Failed to retrieve history'}, status=200)

@@ -632,7 +632,6 @@ function	getCanvas(wrapper)
 	canvas.classList.add("pong");
 	canvas.setAttribute("id", "canvas");
 	canvas.setAttribute("tabindex", "0");
-	console.log(wrapper);
 	setCanvasDimensions(canvas, wrapper);
 	wrapper.appendChild(canvas);
 	return (canvas);

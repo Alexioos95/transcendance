@@ -8,12 +8,11 @@ function	entrypoint()
 {
 	if (window.location.href.indexOf("resetmypassword") === -1 && window.location.href.indexOf("code") > -1)
 	{
-		console.log("opener == ", window.opener);
 		close();
 		return ;
 	}
 	try { checkJWT(); popState(); }
-	catch (error) { console.log(e); }
+	catch (error) { console.error(e); }
 }
 
 async function	checkJWT()

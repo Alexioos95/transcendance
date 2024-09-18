@@ -686,7 +686,8 @@ function	buildHistory(struct, data, username)
 		let status = "history-card-win";
 		let game = "history-card-pong";
 
-		if (data.matches[i].winner !== username)
+		if ((parseInt(data.matches[i].score1, 10) > parseInt(data.matches[i].score2, 10) && data.matches[i].username1 !== username)
+			|| (parseInt(data.matches[i].score2, 10) > parseInt(data.matches[i].score1, 10) && data.matches[i].username2 !== username))
 			status = "history-card-lose";
 		if (data.matches[i].game !== "pong")
 			status = "history-card-tetris";

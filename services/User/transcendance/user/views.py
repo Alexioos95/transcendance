@@ -344,11 +344,14 @@ def updateUserInfos(request):
         print(f'passwordd: |{data["passwordNew"]}|', file=sys.stderr)
         if (len(data['passwordNew'])) < 8 or len(data['passwordNew']) > 70:
             return JsonResponse({'error': 'password length should be between 8 and 70 characters'}, status=200)
-        try:#penser a comparer le currpasswd avec celui en bdd
-            encoded_password = mid.generate_bcrypt_hash(data['passwordNew'])
-            user.Password = encoded_password.decode('utf-8')
+        try:
+            if 'passwordCurr' in data and data['passwordCurr']:
+                if bcrypt.checkpw(data['passwordCurr'].encode('utf-8'), user.Password.encode('utf-8')):
+                    encoded_password = mid.generate_bcrypt_hash(data['passwordNew'])
+                    user.Password = encoded_password.decode('utf-8')
+                else:
+                    return JsonResponse({"error": "old password does not match"}, status=401)
         except Exception as e:
-            print(f"error == {e}", file=sys.stderr)
             return JsonResponse({"error":e}, status=200)
 #    if 'avatar' in data and data['avatar']:#on recoit une image je l'enregistre dans le volume et stock l'url
 #        # image_validation()
@@ -361,13 +364,12 @@ def updateUserInfos(request):
     if 'lang' in data and data['lang']:
         print("je passe par les langues 1", file=sys.stderr)
         if mid.is_valid_lang(data['lang']):
-            print("La langue est valide", file=sys.stderr)
-            print("jep asse par les langues 2", file=sys.stderr)
             user.language = data['lang']
     expiration_time = (datetime.now() + timedelta(days=7)).timestamp()  # 300 secondes = 5 minutes penser a mettre ca dans l'env ca serait smart
-    print("uptade de new user", file=sys.stderr)
-    print(f"username == {user.Username}, email == {user.Email}, lastTimeOnline: {user.lastTimeOnline}, Avatar == {user.Avatar}, langue == {user.language}", file=sys.stderr)
-    user.save()
+    try:
+        user.save()
+    except Exception:
+        return JsonResponse({"error": "unable to save in database"}, status=500)
     response_data = JsonResponse({"message": "User information updated successfully"}, status=200)
     mid.setCookie(user, response_data)
     return response_data
@@ -1102,6 +1104,8 @@ def seeHistory(request):
     matches = mid.loadJson(response.content)
     matches = matches['matches']
     for x in matches:
+        print(f"x={x}", file=sys.stderr)
         x['username1'] = mid.get_user_in_db('id', x['username1']).Username
         x['username2'] = mid.get_user_in_db('id', x['username2']).Username
+        x['winner'] = mid.get_user_in_db('id', x['winner']).Username
     return JsonResponse({'matches': matches}, status=200)

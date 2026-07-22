@@ -1,7 +1,11 @@
 "use strict";
+
 /////////////////////////
 // Script
 /////////////////////////
+const frameTime = 1000 / 60;
+let lastTime = 0;
+
 function	getPongStruct()
 {
 	const struct = {
@@ -27,7 +31,7 @@ async function	startPong(struct)
 	setupPongEventListeners(struct, struct.screen.game, struct.wrapperCanvas);
 	struct.screen.game.canvas.focus();
 	if (struct.screen.game.online === false)
-		loop(struct, struct.screen.game);
+		loop(struct, struct.screen.game, 0);
 }
 
 function	initPongStruct(struct, game, wrapperCanvas)
@@ -43,7 +47,7 @@ function	initPongStruct(struct, game, wrapperCanvas)
 	if (game.online === true)
 	{
 		// let start = true;
-		game.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/pong/");
+		game.socket = new WebSocket("wss://" + window.location.hostname + ":443/ws/pong/");
 
 		game.socket.addEventListener("error", function() {
 			game.running = 0;
@@ -61,21 +65,6 @@ function	initPongStruct(struct, game, wrapperCanvas)
 				const ball = getPixels(game.canvas, parseFloat(data.game_state.ball.x), parseFloat(data.game_state.ball.y));
 				const obj = { key: undefined };
 
-				// Show Usernames on screen
-				// if (start === true)
-				// {
-				// 	const span1 = document.createElement("span");
-				// 	const span2 = document.createElement("span");
-				// 	span1.classList.add("canvas-user-1");
-				// 	span2.classList.add("canvas-user-2");
-				// 	span1.innerHTML = data.nameLeft;
-				// 	span2.innerHTML = data.nameRight;
-				// 	struct.screen.wrapperCanvas.appendChild(span1);
-				// 	struct.screen.wrapperCanvas.appendChild(span2);
-					// struct.screen.playerOnControls[0].innerHTML = data.nameLeft;
-					// struct.screen.playerOnControls[1].innerHTML = data.nameRight;
-				// }
-				// start = false;
 				game.paddles.left.x = paddleLeft[0];
 				game.paddles.left.y = paddleLeft[1];
 				game.paddles.right.x = paddleRight[0];
@@ -137,24 +126,35 @@ function	setupPongEventListeners(struct, game, wrapperCanvas)
 	game.canvas.addEventListener("blur", function() { struct.screen.wrapperScreen.classList.remove("active"); });
 }
 
-async function	loop(struct, game)
+
+async function loop(struct, game, timestamp)
 {
-	game.ctx.fillStyle = "#2F2F2F";
-	game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-	if (game.running === 1 && game.scores[0] < 11 && game.scores[1] < 11)
+	if (!lastTime)
+		lastTime = timestamp;
+	const delta = timestamp - lastTime;
+	if (delta >= frameTime)
 	{
-		movePaddles(game.canvas, game.paddles);
-		moveBall(game);
-		render(game);
-		requestAnimationFrame(() => loop(struct, game));
+		lastTime = timestamp - (delta % frameTime);
+		game.ctx.fillStyle = "#2F2F2F";
+		game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
+
+		if (game.running === 1 && game.scores[0] < 11 && game.scores[1] < 11)
+		{
+			movePaddles(game.canvas, game.paddles);
+			moveBall(game);
+			render(game);
+		}
+		else
+		{
+			game.running = 0;
+			renderFinalScore(game);
+			document.getElementsByClassName("game")[0]
+				.removeEventListener("mouseup", mouseUpEvent(struct.screen.game.paddles));
+			await endGame(struct);
+			return;
+		}
 	}
-	else
-	{
-		game.running = 0;
-		renderFinalScore(game);
-		document.getElementsByClassName("game")[0].removeEventListener("mouseup", mouseUpEvent(struct.screen.game.paddles));
-		await endGame(struct);
-	}
+	requestAnimationFrame((ts) => loop(struct, game, ts));
 }
 
 function	renderFinalScore(game)

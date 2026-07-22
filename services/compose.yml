@@ -2,138 +2,220 @@ name: transcendance
 
 services:
 
+  ###########################################################################
+  # REDIS
+  ###########################################################################
+
   chat_cache:
     hostname: redis_chat
     container_name: redis_chat
+
     image: redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
+
+    command: redis-server --port 6379
+
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      test: ["CMD-SHELL", "redis-cli -p 6379 ping | grep PONG"]
       start_period: 20s
       interval: 10s
       timeout: 5s
       retries: 5
+
     restart: unless-stopped
+
     networks:
       - transcendance
+
 
   pong_cache:
     hostname: redis_pong
     container_name: redis_pong
+
     image: redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
+
+    command: redis-server --port 6380
+
     healthcheck:
       test: ["CMD-SHELL", "redis-cli -p 6380 ping | grep PONG"]
       start_period: 20s
       interval: 10s
       timeout: 5s
       retries: 5
+
     restart: unless-stopped
+
     networks:
       - transcendance
-    command: --port 6380
 
-#  tetris_cache:
-#    image: redis@sha256:eaea8264f74a95ea9a0767c794da50788cbd9cf5223951674d491fa1b3f4f2d2
-#
-#
-#
-#
-#
-#
-#  tetris_db:
-#    volume:
+
+  ###########################################################################
+  # POSTGRES
+  ###########################################################################
 
   user_db:
     hostname: postgres_user
     container_name: postgres_user
+
     image: postgres@sha256:d898b0b78a2627cb4ee63464a14efc9d296884f1b28c841b0ab7d7c42f1fffdf
-    healthcheck:
-      test: ["CMD-SHELL", "sh -c 'pg_isready -U $${POSTGRES_USER} -d postgres'"]
-      start_period: 20s
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    networks:
-      - transcendance
-    #volumes:
-    #  - user-data:/var/lib/postgresql/data/
+
     environment:
       - POSTGRES_PASSWORD=$USER_POSTGRES_PASSWORD
       - POSTGRES_USER=$USER_POSTGRES_USER
       - PGPORT=$USER_POSTGRES_PORT
 
-  pong_db:
-    hostname: postgres_pong
-    container_name: postgres_pong
-    image: postgres@sha256:d898b0b78a2627cb4ee63464a14efc9d296884f1b28c841b0ab7d7c42f1fffdf
     healthcheck:
-      test: ["CMD-SHELL", "sh -c 'pg_isready -U $${POSTGRES_USER} -d postgres'"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d postgres"]
       start_period: 20s
       interval: 10s
       timeout: 5s
       retries: 5
+
     restart: unless-stopped
+
     networks:
       - transcendance
-    #  volume:
+
+
+  pong_db:
+    hostname: postgres_pong
+    container_name: postgres_pong
+
+    image: postgres@sha256:d898b0b78a2627cb4ee63464a14efc9d296884f1b28c841b0ab7d7c42f1fffdf
+
     environment:
       - POSTGRES_PASSWORD=$PONG_POSTGRES_PASSWORD
       - POSTGRES_USER=$PONG_POSTGRES_USER
       - PGPORT=$PONG_POSTGRES_PORT
 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d postgres"]
+      start_period: 20s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    restart: unless-stopped
+
+    networks:
+      - transcendance
+
+
+  ###########################################################################
+  # USER
+  ###########################################################################
+
   user:
     hostname: user
     container_name: user
+
     depends_on:
       user_db:
         condition: service_healthy
-        restart: true
-    pull_policy: build
+
     build:
       context: User
       dockerfile: Dockerfile
-    networks:
-      - transcendance
-    volumes:
-      - image-data:/images/
-    restart: unless-stopped
+
+    expose:
+      - "8001"
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import socket; s=socket.socket(); s.connect(('127.0.0.1',8001)); s.close()\""
+        ]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
     environment:
       - DUMP=$DUMP
       - SERVER_JWT_KEY=$SERVER_JWT_KEY
       - FTAUTHSECRET=$FTAUTHSECRET
       - FTAUTHUID=$FTAUTHUID
-      - POSTGRES_HOST=$USER_POSTGRES_HOST
+      - POSTGRES_HOST=postgres_user
       - POSTGRES_PASSWORD=$USER_POSTGRES_PASSWORD
       - POSTGRES_USER=$USER_POSTGRES_USER
       - PGPORT=$USER_POSTGRES_PORT
 
+    volumes:
+      - image-data:/images/
+
+    restart: unless-stopped
+
+    networks:
+      - transcendance
+
+
+  ###########################################################################
+  # CHAT
+  ###########################################################################
+
   chat:
     hostname: chat
     container_name: chat
+
     depends_on:
       chat_cache:
         condition: service_healthy
-        restart: true
-    pull_policy: build
+
     build:
       context: Chat
       dockerfile: Dockerfile
-    networks:
-      - transcendance
-    restart: unless-stopped
+
+    expose:
+      - "8000"
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import socket; s=socket.socket(); s.connect(('127.0.0.1',8000)); s.close()\""
+        ]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
     environment:
       - SERVER_JWT_KEY=$SERVER_JWT_KEY
+      - REDIS_HOST=redis_chat
+      - REDIS_PORT=6379
+
+    restart: unless-stopped
+
+    networks:
+      - transcendance
+
+
+  ###########################################################################
+  # MAIL
+  ###########################################################################
 
   mail:
     hostname: mail
     container_name: mail
-    pull_policy: build
+
     build:
       context: MailServ
       dockerfile: Dockerfile
-    networks:
-      - transcendance
-    restart: unless-stopped
+
+    expose:
+      - "8002"
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import socket; s=socket.socket(); s.connect(('127.0.0.1',8002)); s.close()\""
+        ]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
     environment:
       - DUMP=$DUMP
       - EMAIL_HOST=$EMAIL_HOST
@@ -141,98 +223,174 @@ services:
       - EMAIL_HOST_USER=$EMAIL_HOST_USER
       - EMAIL_HOST_PASSWORD=$EMAIL_HOST_PASSWORD
 
+    restart: unless-stopped
+
+    networks:
+      - transcendance
+
+
+  ###########################################################################
+  # PONG
+  ###########################################################################
+
   pong:
     hostname: pong
     container_name: pong
+
     depends_on:
       pong_cache:
         condition: service_healthy
-        restart: true
+
       pong_db:
         condition: service_healthy
-        restart: true
-    pull_policy: build
+
     build:
       context: Pong
       dockerfile: Dockerfile
-    networks:
-      - transcendance
-    restart: unless-stopped
+
+    expose:
+      - "8004"
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import socket; s=socket.socket(); s.connect(('127.0.0.1',8004)); s.close()\""
+        ]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
     environment:
       - SERVER_JWT_KEY=$SERVER_JWT_KEY
-      - POSTGRES_HOST=$PONG_POSTGRES_HOST
+      - POSTGRES_HOST=postgres_pong
       - POSTGRES_PASSWORD=$PONG_POSTGRES_PASSWORD
       - POSTGRES_USER=$PONG_POSTGRES_USER
       - PGPORT=$PONG_POSTGRES_PORT
+      - REDIS_HOST=redis_pong
+      - REDIS_PORT=6380
 
-#  tetris:
-#    pull_policy: build
-#    build:
-#      context: services
-#      dockerfile: Tetris/Dockerfile
+    restart: unless-stopped
+
+    networks:
+      - transcendance
+
+
+  ###########################################################################
+  # PING
+  ###########################################################################
 
   ping:
     hostname: ping
     container_name: ping
+
     depends_on:
       user:
         condition: service_healthy
-        restart: true
+
       chat:
         condition: service_healthy
-        restart: true
+
       mail:
         condition: service_healthy
-        restart: true
+
       pong:
         condition: service_healthy
-        restart: true
-    pull_policy: build
+
     build:
       context: Ping
       dockerfile: Dockerfile
+
+    expose:
+      - "8003"
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import socket; s=socket.socket(); s.connect(('127.0.0.1',8003)); s.close()\""
+        ]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    restart: unless-stopped
+
     networks:
       - transcendance
-    restart: unless-stopped
+
+
+  ###########################################################################
+  # WEBSERVER
+  ###########################################################################
 
   webserver:
     hostname: webserver
     container_name: webserver
+
     depends_on:
       user:
         condition: service_healthy
-        restart: true
+
       chat:
         condition: service_healthy
-        restart: true
+
       mail:
         condition: service_healthy
-        restart: true
+
       pong:
         condition: service_healthy
-        restart: true
+
       ping:
         condition: service_healthy
-        restart: true
-    pull_policy: build
+
     build:
       context: Webserver
       dockerfile: Dockerfile
+
     ports:
-      - 80:80
-      - 443:443
-    networks:
-      - transcendance
-    volumes:
-      - static-data:/app/
-    restart: unless-stopped
+      - "80:80"
+      - "443:443"
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import socket; s=socket.socket(); s.connect(('127.0.0.1',80)); s.close()\""
+        ]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
     environment:
       - DUMP=$DUMP
+
+    volumes:
+      - static-data:/app/
+
+    restart: unless-stopped
+
+    networks:
+      - transcendance
+
+
+###########################################################################
+# NETWORKS
+###########################################################################
 
 networks:
   transcendance:
 
+
+###########################################################################
+# VOLUMES
+###########################################################################
+
 volumes:
+
   static-data:
     driver: local
     driver_opts:
@@ -246,40 +404,3 @@ volumes:
       type: "none"
       o: "bind"
       device: "${PWD}/services/Webserver/static/images"
-
-#  user-data:
-
-
-#	pong
-#		db
-#		redis
-#		ws
-#	tetris
-#		db
-#		redis
-#		ws
-#	user
-#		db
-#	chat
-#		redis
-#		ws
-#	mail
-#	        -
-#	ping
-#	        -
-
-#       chat
-#               daphne  8000
-#               redis   6379
-#       user
-#               daphne  8001
-#               postgre 5432
-#       mail
-#               daphne  8002
-#       ping
-#               daphne  8003
-#       pong
-#               daphne  8004
-#               redis   6380
-#               postgre 5433
-

@@ -184,13 +184,13 @@ def auth42(request):
     if request.method != 'GET':
         return JsonResponse({'error': 'Invalid request method'}, status=405)
     authorization_code = request.GET.get('code')
-    print(f'https://{os.environ['DUMP']}:4433/user/auth42/', file=sys.stderr)
+    print(f'https://{os.environ['DUMP']}:443/user/auth42/', file=sys.stderr)
     data = {
     'grant_type': 'authorization_code',
     'client_id': f'{os.environ["FTAUTHUID"]}',#os.environ['FTAUTHUID'],
     'client_secret': f'{os.environ["FTAUTHSECRET"]}',#os.environ['FTAUTHSECRET'],
     'code': authorization_code,
-    'redirect_uri': f'https://{os.environ["DUMP"]}:4433/user/auth42/'
+    'redirect_uri': f'https://{os.environ["DUMP"]}:443/user/auth42/'
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', json=data)
     print(f'auth42 : code == {response.status_code}', file=sys.stderr)
@@ -234,7 +234,7 @@ def auth42(request):
         cache.set(userIp, authDataJson, 300)
         print(f'auth42 : authJson {authDataJson}', file=sys.stderr)
         data = JsonResponse({'success': 'User logged in'}, status=200);	### Update for this function
-        return redirect(f'https://{os.environ["DUMP"]}:4433/?code=code')
+        return redirect(f'https://{os.environ["DUMP"]}:443/?code=code')
         # return JsonResponse(response_data)
     else:
         return JsonResponse({'error': 'Failed to fetch user data'}, status=user_response.status_code)
@@ -793,7 +793,7 @@ def resetPasswd(request):
             f'Hey {user.Username},\n\n'
             'It looks like you requested to reset your password. No worries, we’ve got you covered!\n\n'
             'Click the link below to set a new password:\n\n'
-            f'https://{os.environ["DUMP"]}:4433/index.html?reset=resetmypassword&code={validationCode}\n\n'
+            f'https://{os.environ["DUMP"]}:443/index.html?reset=resetmypassword&code={validationCode}\n\n'
             'This link will be good for 10 minutes, so make sure to use it before it expires. If you missed it, just request another one.\n\n'
             'If you didn’t ask for a password reset, just ignore this email – your account is safe.\n\n'
             'Got any questions? Feel free to reach out to us!\n\n'

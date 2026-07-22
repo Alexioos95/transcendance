@@ -601,6 +601,7 @@ function	buildBlocklist(struct, data)
 {
 	let word;
 	let array = [];
+	let usernames = [];
 
 	while (struct.blocked.output.firstChild)
 		struct.blocked.output.firstChild.remove();
@@ -654,8 +655,10 @@ function	buildBlocklist(struct, data)
 		tr.append(td);
 		tr.setAttribute("data-user", data.blockList[i].username);
 		array.push(tr);
+		usernames.push(data.blockList[i].username);
 	}
 	alphabeticalSort(array);
+	struct.blocked.array = usernames;
 	for (let i = 0; i < array.length; i++)
 		struct.blocked.output.appendChild(array[i]);
 }
@@ -959,7 +962,7 @@ function	deleteBlocked(button)
 /////////////////////////
 function	liveChat(struct)
 {
-	struct.chat.socket = new WebSocket("wss://" + window.location.hostname + ":4433/ws/chat/");
+	struct.chat.socket = new WebSocket("wss://" + window.location.hostname + ":443/ws/chat/");
 	struct.chat.socket.addEventListener("error", function() {
 		const tr = document.querySelectorAll(".tab-chat tr");
 		const buttons = document.querySelectorAll(".tab-chat button");
@@ -982,6 +985,8 @@ function	liveChat(struct)
 		const data = JSON.parse(event.data);
 
 		if (data.type === "connected")
+			return ;
+		if (struct.blocked.array.includes(data.user))
 			return ;
 		const tr = createChatMessage(struct, data);
 		let isScrolled = false;
@@ -1384,7 +1389,10 @@ function	getFriendStruct()
 
 function	getBlockedStruct()
 {
-	const struct = { output: document.querySelector(".wrapper-blocked tbody") };
+	const struct = {
+		output: document.querySelector(".wrapper-blocked tbody"),
+		array: []
+	};
 	return (struct);
 }
 

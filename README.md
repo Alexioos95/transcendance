@@ -11,15 +11,19 @@ Créer un fichier ```.env``` avec les variables nécessaires dans le dossier ```
 > [!NOTE]  
 > Le fonctionnement de la connexion via l'intranet de 42 nécessite un compte sur ce dernier.
 
+## Documentation API
+
+[Documentation](https://alexioos95.github.io/transcendance/)
+
 ## Fonctionnalités
 - Dockerisation en micro-service
-- Gestion de sessions utilisateurs (inscription, connexion, mot de passe oublié, modification d'informations, et cookies)
-- Envoie de mails de réinitialisation de mot de passe
-- Jeu Pong en réseau local en 1 vs 1 ou tournoi à 4, ou en ligne en 1 vs 1 avec matchmaking. Gestion des déplacement aux touches clavier, souris et écran tactile
-- Chat textuel en direct, avec listes d'amis, bloqués, historiques de parties, et possibilité de défier un autre utilisateur
+- Gestion de sessions utilisateurs (inscription, connexion, authentification à deux facteurs, mot de passe oublié, modification d'informations, et cookies)
+- Envoie de mails d'authentification à deux facteurs et de réinitialisation de mot de passe
+- Jeu Pong en réseau local en 1 vs 1 ou tournoi à 4. Gestion des déplacement aux touches clavier, souris et écran tactile
+- Chat textuel en direct, avec listes d'amis, bloqués, historiques de parties, et possibilité de défier un autre utilisateur en ligne
 - Affichage entièrement responsive, et respectant les règles d'accessibilité
 - Traduction de contenu en 3 langues : Français, Anglais et Néerlandais
-- API partiellement publique, permettant la création d'add-ons et front-end alternatifs
+- API publique, permettant la création d'add-ons et front-end alternatifs
 
 ## Demo
 <img src="https://i.imgur.com/1TCkP0W.gif" alt="Login">  

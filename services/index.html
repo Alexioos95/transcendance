@@ -1,0 +1,1103 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation API pour Transcendence">
+      
+      
+      
+      
+        <link rel="prev" href="../game/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Services - API Transcendence</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#chat" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="API Transcendence" class="md-header__button md-logo" aria-label="API Transcendence" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            API Transcendence
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Services
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Index
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../authentification/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Authentification
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../users/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Données d'utilisateurs
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../game/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Jeu
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Services
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="API Transcendence" class="md-nav__button md-logo" aria-label="API Transcendence" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    API Transcendence
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../users/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Données d'utilisateurs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jeu
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Services
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Services
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#chat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#websocket-wschat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WEBSOCKET ws/chat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="WEBSOCKET ws/chat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Succès">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#retour" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retour
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mail
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mail">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post-mail8002sendmail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST mail:8002/sendMail
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="POST mail:8002/sendMail">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#chat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Chat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#websocket-wschat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WEBSOCKET ws/chat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="WEBSOCKET ws/chat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Succès">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#retour" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retour
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mail
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mail">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post-mail8002sendmail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST mail:8002/sendMail
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="POST mail:8002/sendMail">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Services</h1>
+
+<h2 id="chat">Chat<a class="headerlink" href="#chat" title="Permanent link">&para;</a></h2>
+<p>Points d'accès en rapport avec le chat en direct.</p>
+<hr />
+<h3 id="websocket-wschat"><strong>WEBSOCKET ws/chat</strong><a class="headerlink" href="#websocket-wschat" title="Permanent link">&para;</a></h3>
+<p>Connecte l'utilisateur au serveur du service Chat.</p>
+<div class="admonition info">
+<p class="admonition-title">Accès</p>
+<p>Public</p>
+</div>
+<h4 id="requete">Requête<a class="headerlink" href="#requete" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="nx">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">WebSocket</span><span class="p">(</span><span class="s2">&quot;wss://&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;/ws/chat&quot;</span><span class="p">);</span>
+</code></pre></div>
+<h4 id="reponse">Réponse<a class="headerlink" href="#reponse" title="Permanent link">&para;</a></h4>
+<h5 id="succes">Succès<a class="headerlink" href="#succes" title="Permanent link">&para;</a></h5>
+<p>Connecté au serveur. Envoie d'un JSON périodique dans l'event JS <code>message</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">socket</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="p">});</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;message&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Lorem ipsum&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;user&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;avatar&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/images/path/to.png&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Champ</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>type</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Type du message (<code>message</code>, <code>connected</code>)</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>message</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Message</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>user</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Nom d'utilisateur</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>avatar</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Chemin de l'image</td>
+<td style="text-align: left;">*</td>
+</tr>
+</tbody>
+</table>
+<p><code>*</code> : Champs absents lors d'un message de type <code>connected</code>.</p>
+<h6 id="retour">Retour<a class="headerlink" href="#retour" title="Permanent link">&para;</a></h6>
+<p>Attend un JSON en retour.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Champ</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>message</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Message</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="nx">socket</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+<span class="w">    </span><span class="s2">&quot;message&quot;</span><span class="o">:</span><span class="w"> </span><span class="nx">form</span><span class="p">.</span><span class="nx">input</span><span class="p">.</span><span class="nx">value</span>
+<span class="p">}));</span>
+</code></pre></div>
+<h5 id="erreur">Erreur<a class="headerlink" href="#erreur" title="Permanent link">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><span class="nx">socket</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Causes possibles:</p>
+<ul>
+<li>Token JWT invalide</li>
+</ul>
+<hr />
+<h2 id="mail">Mail<a class="headerlink" href="#mail" title="Permanent link">&para;</a></h2>
+<p>Points d'accès en rapport avec le service mail.</p>
+<hr />
+<h3 id="post-mail8002sendmail"><strong>POST mail:8002/sendMail</strong><a class="headerlink" href="#post-mail8002sendmail" title="Permanent link">&para;</a></h3>
+<p>Envoie un mail.</p>
+<div class="admonition warning">
+<p class="admonition-title">Accès</p>
+<p>Privé</p>
+</div>
+<h4 id="requete_1">Requête<a class="headerlink" href="#requete_1" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Champ</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>title</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Titre du mail</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>body</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Corps du mail</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="nf">POST</span> <span class="nn">mail:8002/sendMail</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">mail:8002</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
+<span class="na">Accept</span><span class="o">:</span> <span class="l">*/*</span>
+
+<span class="p">{</span>
+<span class="w">    </span><span class="err">&#39;</span><span class="kc">t</span><span class="err">i</span><span class="kc">tle</span><span class="err">&#39;</span><span class="p">:</span><span class="w"> </span><span class="err">&#39;</span><span class="kc">t</span><span class="err">i</span><span class="kc">tre</span><span class="err">&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="err">&#39;body&#39;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;message&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="reponse_1">Réponse<a class="headerlink" href="#reponse_1" title="Permanent link">&para;</a></h4>
+<h5 id="succes_1">Succès<a class="headerlink" href="#succes_1" title="Permanent link">&para;</a></h5>
+<p>Le mail a été envoyé.</p>
+<p><div class="highlight"><pre><span></span><code><span class="err">200 OK</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;success&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Email sent successfully&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h5 id="erreur_1">Erreur<a class="headerlink" href="#erreur_1" title="Permanent link">&para;</a></h5>
+<p><div class="highlight"><pre><span></span><code><span class="err">400 Bad Request</span>
+<span class="err">405 Method Not Allowed</span>
+<span class="err">500 Internal Server Error</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;cause&gt;&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>Causes possibles:</p>
+<ul>
+<li>Autre méthode que POST utilisée</li>
+<li>JSON invalide</li>
+<li>Serveur mail indisponible</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

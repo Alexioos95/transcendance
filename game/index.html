@@ -1,0 +1,2239 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation API pour Transcendence">
+      
+      
+      
+      
+        <link rel="prev" href="../users/">
+      
+      
+        <link rel="next" href="../services/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Jeu - API Transcendence</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#jeu" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="API Transcendence" class="md-header__button md-logo" aria-label="API Transcendence" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            API Transcendence
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Jeu
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Index
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../authentification/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Authentification
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../users/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Données d'utilisateurs
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Jeu
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../services/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Services
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="API Transcendence" class="md-nav__button md-logo" aria-label="API Transcendence" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    API Transcendence
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../users/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Données d'utilisateurs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jeu
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jeu
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#jeu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Jeu
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Jeu">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post-usersendinvitation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /user/sendInvitation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="POST /user/sendInvitation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-useracceptinvitation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /user/acceptInvitation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="POST /user/acceptInvitation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-userseehistory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /user/seeHistory
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="POST /user/seeHistory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#websocket-wspong" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WEBSOCKET ws/pong
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="WEBSOCKET ws/pong">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Succès">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#retour" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retour
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-pong8004initgame" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST pong:8004/initGame
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="POST pong:8004/initGame">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-pong8004getplayergames" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST pong:8004/getPlayerGames
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="POST pong:8004/getPlayerGames">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-pong8004playerplaying" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST pong:8004/PlayerPlaying
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="POST pong:8004/PlayerPlaying">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../services/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Services
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#jeu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Jeu
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Jeu">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post-usersendinvitation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /user/sendInvitation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="POST /user/sendInvitation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-useracceptinvitation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /user/acceptInvitation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="POST /user/acceptInvitation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-userseehistory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /user/seeHistory
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="POST /user/seeHistory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#websocket-wspong" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WEBSOCKET ws/pong
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="WEBSOCKET ws/pong">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Succès">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#retour" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retour
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-pong8004initgame" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST pong:8004/initGame
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="POST pong:8004/initGame">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-pong8004getplayergames" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST pong:8004/getPlayerGames
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="POST pong:8004/getPlayerGames">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-pong8004playerplaying" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST pong:8004/PlayerPlaying
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="POST pong:8004/PlayerPlaying">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requete_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requête
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reponse_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Réponse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Réponse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#succes_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Succès
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#erreur_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erreur
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Jeu</h1>
+
+<h2 id="jeu">Jeu<a class="headerlink" href="#jeu" title="Permanent link">&para;</a></h2>
+<p>Points d'accès en rapport avec le jeu.</p>
+<hr />
+<h3 id="post-usersendinvitation"><strong>POST /user/sendInvitation</strong><a class="headerlink" href="#post-usersendinvitation" title="Permanent link">&para;</a></h3>
+<p>Envoie une invitation de jeu Pong.</p>
+<div class="admonition info">
+<p class="admonition-title">Accès</p>
+<p>Public</p>
+</div>
+<h4 id="requete">Requête<a class="headerlink" href="#requete" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Champ</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>toChallenge</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Nom d'utilisateur de la personne à défier</td>
+</tr>
+</tbody>
+</table>
+<p><div class="highlight"><pre><span></span><code><span class="nf">POST</span> <span class="nn">/user/sendInvitation</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">example.com</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
+<span class="na">Accept</span><span class="o">:</span> <span class="l">*/*</span>
+<span class="na">Cookie</span><span class="o">:</span> <span class="l">auth=encoded_jwt</span>
+
+<span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;toChallenge&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+ou
+<div class="highlight"><pre><span></span><code><span class="nx">fetch</span><span class="p">(</span><span class="s2">&quot;/user/sendInvitation&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">toChallenge</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span>
+<span class="w">    </span><span class="p">}),</span>
+<span class="w">    </span><span class="nx">credentials</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;include&quot;</span>
+<span class="p">});</span>
+</code></pre></div></p>
+<h4 id="reponse">Réponse<a class="headerlink" href="#reponse" title="Permanent link">&para;</a></h4>
+<h5 id="succes">Succès<a class="headerlink" href="#succes" title="Permanent link">&para;</a></h5>
+<p>L'invitation a été envoyée.</p>
+<p><div class="highlight"><pre><span></span><code><span class="err">200 OK</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;player successfully invited&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h5 id="erreur">Erreur<a class="headerlink" href="#erreur" title="Permanent link">&para;</a></h5>
+<p><div class="highlight"><pre><span></span><code><span class="err">200 OK</span>
+<span class="err">401 Unauthorized</span>
+<span class="err">403 Forbidden</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;cause&gt;&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>Causes possibles:</p>
+<ul>
+<li>JSON ou token JWT invalide</li>
+<li>Utilisateur inexistant</li>
+<li>Nom d'utilisateur inexistant</li>
+</ul>
+<hr />
+<h3 id="post-useracceptinvitation"><strong>POST /user/acceptInvitation</strong><a class="headerlink" href="#post-useracceptinvitation" title="Permanent link">&para;</a></h3>
+<p>Accepte une invitation de jeu Pong.</p>
+<div class="admonition info">
+<p class="admonition-title">Accès</p>
+<p>Public</p>
+</div>
+<h4 id="requete_1">Requête<a class="headerlink" href="#requete_1" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Champ</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>username</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Nom d'utilisateur de la personne ayant défié</td>
+</tr>
+</tbody>
+</table>
+<p><div class="highlight"><pre><span></span><code><span class="nf">POST</span> <span class="nn">/user/acceptInvitation</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">example.com</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
+<span class="na">Accept</span><span class="o">:</span> <span class="l">*/*</span>
+<span class="na">Cookie</span><span class="o">:</span> <span class="l">auth=encoded_jwt</span>
+
+<span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+ou
+<div class="highlight"><pre><span></span><code><span class="nx">fetch</span><span class="p">(</span><span class="s2">&quot;/user/acceptInvitation&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">username</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span>
+<span class="w">    </span><span class="p">}),</span>
+<span class="w">    </span><span class="nx">credentials</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;include&quot;</span>
+<span class="p">});</span>
+</code></pre></div></p>
+<h4 id="reponse_1">Réponse<a class="headerlink" href="#reponse_1" title="Permanent link">&para;</a></h4>
+<h5 id="succes_1">Succès<a class="headerlink" href="#succes_1" title="Permanent link">&para;</a></h5>
+<p>L'invitation a été acceptée.</p>
+<div class="highlight"><pre><span></span><code><span class="err">200 OK</span>
+</code></pre></div>
+<h5 id="erreur_1">Erreur<a class="headerlink" href="#erreur_1" title="Permanent link">&para;</a></h5>
+<p><div class="highlight"><pre><span></span><code><span class="err">200 OK</span>
+<span class="err">401 Unauthorized</span>
+<span class="err">403 Forbidden</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;cause&gt;&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>Causes possibles:</p>
+<ul>
+<li>JSON ou token JWT invalide</li>
+<li>Utilisateur inexistant</li>
+<li>Nom d'utilisateur inexistant ou temporairement inaccessible</li>
+<li>Invitation expirée</li>
+</ul>
+<hr />
+<h3 id="post-userseehistory"><strong>POST /user/seeHistory</strong><a class="headerlink" href="#post-userseehistory" title="Permanent link">&para;</a></h3>
+<p>Renvoie l'historique de partie de l'utilisateur.</p>
+<div class="admonition info">
+<p class="admonition-title">Accès</p>
+<p>Public</p>
+</div>
+<h4 id="requete_2">Requête<a class="headerlink" href="#requete_2" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Champ</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>seeHistory</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Nom d'utilisateur</td>
+</tr>
+</tbody>
+</table>
+<p><div class="highlight"><pre><span></span><code><span class="nf">POST</span> <span class="nn">/user/seeHistory</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">example.com</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
+<span class="na">Accept</span><span class="o">:</span> <span class="l">*/*</span>
+<span class="na">Cookie</span><span class="o">:</span> <span class="l">auth=encoded_jwt</span>
+
+<span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;seeHistory&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+ou
+<div class="highlight"><pre><span></span><code><span class="nx">fetch</span><span class="p">(</span><span class="s2">&quot;/user/seeHistory&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+<span class="w">        </span><span class="nx">seeHistory</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span>
+<span class="w">    </span><span class="p">}),</span>
+<span class="w">    </span><span class="nx">credentials</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;include&quot;</span>
+<span class="p">});</span>
+</code></pre></div></p>
+<h4 id="reponse_2">Réponse<a class="headerlink" href="#reponse_2" title="Permanent link">&para;</a></h4>
+<h5 id="succes_2">Succès<a class="headerlink" href="#succes_2" title="Permanent link">&para;</a></h5>
+<p>Renvoie l'historique de parties.</p>
+<p><div class="highlight"><pre><span></span><code><span class="err">200 OK</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;matches&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;game&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pong&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;username1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;username2&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example2&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;winner&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;score1&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;score2&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-07-23 14:37:52.123456+00:00&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+
+<span class="p">}</span>
+</code></pre></div></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Champ</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>matches</code></td>
+<td style="text-align: left;"><code>array d'objet</code></td>
+<td style="text-align: left;">Liste de parties</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>matches[i].game</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Nom du jeu (<code>pong</code>)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>matches[i].username1</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Nom d'utilisateur joueur 1</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>matches[i].username2</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Nom d'utilisateur joueur 2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>matches[i].winner</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Nom d'utilisateur du gagnant</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>matches[i].score1</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">Score du joueur 1</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>matches[i].score2</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">Score du joueur 2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>matches[i].date</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Date de la fin de partie (au format ISO)</td>
+</tr>
+</tbody>
+</table>
+<h5 id="erreur_2">Erreur<a class="headerlink" href="#erreur_2" title="Permanent link">&para;</a></h5>
+<p><div class="highlight"><pre><span></span><code><span class="err">401 Unauthorized</span>
+<span class="err">403 Forbidden</span>
+<span class="err">404 Not Found</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;cause&gt;&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>Causes possibles:</p>
+<ul>
+<li>JSON ou token JWT invalide</li>
+<li>Nom d'utilisateur inexistant</li>
+</ul>
+<hr />
+<h3 id="websocket-wspong"><strong>WEBSOCKET ws/pong</strong><a class="headerlink" href="#websocket-wspong" title="Permanent link">&para;</a></h3>
+<p>Connecte l'utilisateur au serveurr du service Pong.</p>
+<div class="admonition info">
+<p class="admonition-title">Accès</p>
+<p>Public</p>
+</div>
+<h4 id="requete_3">Requête<a class="headerlink" href="#requete_3" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="nx">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">WebSocket</span><span class="p">(</span><span class="s2">&quot;wss://&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;/ws/pong&quot;</span><span class="p">);</span>
+</code></pre></div>
+<h4 id="reponse_3">Réponse<a class="headerlink" href="#reponse_3" title="Permanent link">&para;</a></h4>
+<h5 id="succes_3">Succès<a class="headerlink" href="#succes_3" title="Permanent link">&para;</a></h5>
+<p>Connecté au serveur. Envoie d'un JSON périodique dans l'event JS <code>message</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">socket</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">type</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">&quot;game_update&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="nx">socket</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+
+<span class="w">        </span><span class="p">}));</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">type</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">&quot;game_over&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">socket</span><span class="p">)</span>
+<span class="w">        </span><span class="nx">socket</span><span class="p">.</span><span class="nx">close</span><span class="p">(</span><span class="mf">1000</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;canvas_width&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;100&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;canvas_height&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;100&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;paddle_width&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;paddle_height&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;20&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;x_paddleLeft&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;5&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;y_paddleLeft&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;40&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;x_paddleRight&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;93&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;y_paddleRight&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;40&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ball&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;50&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;y&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;50&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;radius&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;game_score_paddleLeft&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;game_score_paddleRight&quot;</span><span class="p">:</span><span class="w">  </span><span class="s2">&quot;0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="p">}</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Champ</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>type</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Type du message (<code>game_update</code>, <code>game_over</code>)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state</code></td>
+<td style="text-align: left;"><code>Objet JSON</code></td>
+<td style="text-align: left;">Données de jeu</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.username</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Nom d'utilisateur</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.canvas_width</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">Largeur du canvas (en %)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.canvas_height</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">Hauteur du canvas (en %)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.paddle_width</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">Largeur de la raquette (en %)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.paddle_height</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">Hauteur de la raquette (en %)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.x_paddleLeft</code></td>
+<td style="text-align: left;"><code>float</code></td>
+<td style="text-align: left;">Position x de la raquette gauche (en %)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.y_paddleLeft</code></td>
+<td style="text-align: left;"><code>float</code></td>
+<td style="text-align: left;">Position y de la raquette gauche (en %)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.x_paddleRight</code></td>
+<td style="text-align: left;"><code>float</code></td>
+<td style="text-align: left;">Position x de la raquette droite (en %)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.y_paddleRight</code></td>
+<td style="text-align: left;"><code>float</code></td>
+<td style="text-align: left;">Position y de la raquette droite (en %)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.ball</code></td>
+<td style="text-align: left;"><code>Objet JSON</code></td>
+<td style="text-align: left;">Données de la balle</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.ball.x</code></td>
+<td style="text-align: left;"><code>float</code></td>
+<td style="text-align: left;">Position x de la balle</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.ball.y</code></td>
+<td style="text-align: left;"><code>float</code></td>
+<td style="text-align: left;">Position y de la balle</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.ball.radius</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">Radius de la balle</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.ball.game_score_paddleLeft</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">Score du joueur de la raquette de gauche</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>game_state.ball.game_score_paddleRight</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">Score du joueur de la raquette de droite</td>
+</tr>
+</tbody>
+</table>
+<h6 id="retour">Retour<a class="headerlink" href="#retour" title="Permanent link">&para;</a></h6>
+<p>Attend un JSON en retour.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Champ</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>key</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Direction de la raquette du joueur (<code>top</code>, <code>bot</code>)</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="nx">socket</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+<span class="w">    </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;top&quot;</span>
+<span class="p">}));</span>
+</code></pre></div>
+<h5 id="erreur_3">Erreur<a class="headerlink" href="#erreur_3" title="Permanent link">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><span class="nx">socket</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="p">});</span>
+</code></pre></div>
+<p>Causes possibles:</p>
+<ul>
+<li>Token JWT invalide</li>
+<li>Joueur ou adversaire déjà dans une partie</li>
+<li>Timeout</li>
+<li>Impossibilité d'écrire dans la base de données</li>
+</ul>
+<hr />
+<h3 id="post-pong8004initgame"><strong>POST pong:8004/initGame</strong><a class="headerlink" href="#post-pong8004initgame" title="Permanent link">&para;</a></h3>
+<p>Initialise une partie Pong côté serveur.</p>
+<div class="admonition warning">
+<p class="admonition-title">Accès</p>
+<p>Privé</p>
+</div>
+<h4 id="requete_4">Requête<a class="headerlink" href="#requete_4" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Champ</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>player1</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">id de l'utilisateur dans la base de données</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>player2</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">id de l'utilisateur dans la base de données</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="nf">POST</span> <span class="nn">pong:8004/initGame</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">pong:8004</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
+<span class="na">Accept</span><span class="o">:</span> <span class="l">*/*</span>
+
+<span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;player1&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;player2&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="reponse_4">Réponse<a class="headerlink" href="#reponse_4" title="Permanent link">&para;</a></h4>
+<h5 id="succes_4">Succès<a class="headerlink" href="#succes_4" title="Permanent link">&para;</a></h5>
+<p>La partie a été créée et ajoutée à la base de données.</p>
+<p><div class="highlight"><pre><span></span><code><span class="err">201 Created</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Game created successfully&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h5 id="erreur_4">Erreur<a class="headerlink" href="#erreur_4" title="Permanent link">&para;</a></h5>
+<p><div class="highlight"><pre><span></span><code><span class="err">403 Forbidden</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;cause&gt;&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>Causes possibles:</p>
+<ul>
+<li>JSON invalide</li>
+</ul>
+<hr />
+<h3 id="post-pong8004getplayergames"><strong>POST pong:8004/getPlayerGames</strong><a class="headerlink" href="#post-pong8004getplayergames" title="Permanent link">&para;</a></h3>
+<p>Renvoie l'historique de parties de l'utilisateur.</p>
+<div class="admonition warning">
+<p class="admonition-title">Accès</p>
+<p>Privé</p>
+</div>
+<h4 id="requete_5">Requête<a class="headerlink" href="#requete_5" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Champ</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>username</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">id de l'utilisateur dans la base de données</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="nf">POST</span> <span class="nn">pong:8004/getPlayerGames</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">pong:8004</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
+<span class="na">Accept</span><span class="o">:</span> <span class="l">*/*</span>
+
+<span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="reponse_5">Réponse<a class="headerlink" href="#reponse_5" title="Permanent link">&para;</a></h4>
+<h5 id="succes_5">Succès<a class="headerlink" href="#succes_5" title="Permanent link">&para;</a></h5>
+<p>Renvoie l'historique de parties de l'utilisateur.</p>
+<p><div class="highlight"><pre><span></span><code><span class="err">200 OK</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;matches&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;game&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pong&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;username1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;username2&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example2&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;winner&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;score1&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">11</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;score2&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-07-23 14:37:52.123456+00:00&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Champ</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>matches</code></td>
+<td style="text-align: left;"><code>array d'objet</code></td>
+<td style="text-align: left;">Liste de parties</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>matches[i].game</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Nom du jeu (<code>pong</code>)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>matches[i].username1</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Nom d'utilisateur joueur 1</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>matches[i].username2</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Nom d'utilisateur joueur 2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>matches[i].winner</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Nom d'utilisateur du gagnant</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>matches[i].score1</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">Score du joueur 1</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>matches[i].score2</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">Score du joueur 2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>matches[i].date</code></td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">Date de la fin de partie (au format ISO)</td>
+</tr>
+</tbody>
+</table>
+<h5 id="erreur_5">Erreur<a class="headerlink" href="#erreur_5" title="Permanent link">&para;</a></h5>
+<p><div class="highlight"><pre><span></span><code><span class="err">403 Forbidden</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;cause&gt;&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>Causes possibles:</p>
+<ul>
+<li>JSON invalide</li>
+</ul>
+<hr />
+<h3 id="post-pong8004playerplaying"><strong>POST pong:8004/PlayerPlaying</strong><a class="headerlink" href="#post-pong8004playerplaying" title="Permanent link">&para;</a></h3>
+<p>Vérifie si l'utilisateur est déjà dans une partie.</p>
+<div class="admonition warning">
+<p class="admonition-title">Accès</p>
+<p>Privé</p>
+</div>
+<h4 id="requete_6">Requête<a class="headerlink" href="#requete_6" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Champ</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>username</code></td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">id de l'utilisateur dans la base de données</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="nf">POST</span> <span class="nn">pong:8004/PlayerPlaying</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">pong:8004</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
+<span class="na">Accept</span><span class="o">:</span> <span class="l">*/*</span>
+
+<span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="reponse_6">Réponse<a class="headerlink" href="#reponse_6" title="Permanent link">&para;</a></h4>
+<h5 id="succes_6">Succès<a class="headerlink" href="#succes_6" title="Permanent link">&para;</a></h5>
+<p>Renvoie l'historique de parties de l'utilisateur.</p>
+<div class="highlight"><pre><span></span><code><span class="err">200 OK</span>
+</code></pre></div>
+<h5 id="erreur_6">Erreur<a class="headerlink" href="#erreur_6" title="Permanent link">&para;</a></h5>
+<p><div class="highlight"><pre><span></span><code><span class="err">403 Forbidden</span>
+<span class="err">418 I&#39;m a teapot</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;cause&gt;&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>Causes possibles:</p>
+<ul>
+<li>JSON invalide</li>
+<li>Utilisateur inexistant</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

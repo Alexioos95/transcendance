@@ -1,0 +1,23 @@
+site_name: API Transcendence
+site_description: Documentation API pour Transcendence
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+
+nav:
+  - Index: index.md
+  - Authentification: authentification.md
+  - Données d'utilisateurs: users.md
+  - Jeu: game.md
+  - Services: services.md
